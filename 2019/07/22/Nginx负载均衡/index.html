@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="负载均衡：将客户端的请求通过调度单元分摊到多个操作单元上进行执行，保证所有后端服务器都将性能充分发挥，从而保持服务器集群的整体性能最优。">
+<meta name="keywords" content="nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx负载均衡">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;07&#x2F;22&#x2F;Nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="负载均衡：将客户端的请求通过调度单元分摊到多个操作单元上进行执行，保证所有后端服务器都将性能充分发挥，从而保持服务器集群的整体性能最优。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-22T14:34:30.450Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/07/22/Nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Nginx负载均衡 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/22/Nginx%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx负载均衡
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-07-22 16:18:13 / 修改时间：22:34:30" itemprop="dateCreated datePublished" datetime="2019-07-22T16:18:13+08:00">2019-07-22</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><strong>负载均衡</strong>：将客户端的请求通过调度单元分摊到多个操作单元上进行执行，保证所有后端服务器都将性能充分发挥，从而保持服务器集群的整体性能最优。</p>
+<a id="more"></a>
+<h1 id="配置方法："><a href="#配置方法：" class="headerlink" title="配置方法："></a>配置方法：</h1><p>需要结合<code>proxy_pass</code>和<code>upstram server</code></p>
+<h2 id="upstream配置"><a href="#upstream配置" class="headerlink" title="upstream配置"></a>upstream配置</h2><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 只能配置在http层，大括号中有多个参数</span></span><br><span class="line">upstream name &#123;...&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="server参数"><a href="#server参数" class="headerlink" title="server参数"></a>server参数</h3><ul>
+<li>down：当前的server暂时不参与负载均衡</li>
+<li>backup：预留的备份服务器</li>
+<li>max_fails：允许请求失败的次数</li>
+<li>fail_timeout：经过max_fails失败后，服务暂停的时间，默认10秒</li>
+<li>max_conns：限制最大的接收的连接数</li>
+<li>weight：表示权重，默认是1，多个server轮询访问</li>
+</ul>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">upstream</span> backend&#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment"># 对应每一个开启的服务，可以是ip，域名，socket</span></span><br><span class="line">		<span class="comment"># weight 表示权重，默认情况下是1，进行轮询访问</span></span><br><span class="line">		<span class="attribute">server</span> backend1.example.com weight=<span class="number">5</span>;</span><br><span class="line">		<span class="attribute">server</span> backend2.example.com:<span class="number">8080</span>;</span><br><span class="line">		<span class="attribute">server</span> unix:/tmp/backend3;</span><br><span class="line"></span><br><span class="line">		<span class="comment"># backup表示是备用节点</span></span><br><span class="line">		<span class="attribute">server</span> backup1.example.com:<span class="number">8080</span> backup;</span><br><span class="line">		<span class="attribute">server</span> backup2.example.com:<span class="number">8080</span> backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx调度算法"><a href="#Nginx调度算法" class="headerlink" title="Nginx调度算法"></a>Nginx调度算法</h2><ul>
+<li>轮询：按时间顺序逐一分配到不同的后端服务器</li>
+<li>加权轮询：weight值越大，分配到的访问几率越高</li>
+<li>ip_hash：每个请求按ip的hash结果分配，这样来自同一个IP的固定访问一个后端服务器（这种方法走代理的话会导致都在一台服务器）</li>
+<li>least_conn：最少连接数，哪个机器连接数少就分发</li>
+<li>url_hash：按照访问的URL的hash结果分配请求，每个URL定向到同一个后端服务器</li>
+<li>hash：hash自定义的key</li>
+</ul>
+<p>设置调度算法：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">upstream</span> name&#123;</span><br><span class="line">		<span class="comment"># 设置调度算法，默认是轮询，如果是加权轮询，直接在server后加weight就好</span></span><br><span class="line">		ip_hash;</span><br><span class="line">		<span class="comment"># 如果是hash，可以自定义key，可以根据请求地址等，如：</span></span><br><span class="line">		<span class="attribute">hash</span> <span class="variable">$request_uri</span>;</span><br><span class="line">		<span class="attribute">server</span> ...;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置完upstream后，需要利用<code>proxy_pass</code>进行配置</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">		<span class="comment"># name对应上面的upstream的name</span></span><br><span class="line">		<span class="attribute">proxy_pass</span> http://name</span><br><span class="line">        <span class="comment"># 出现指定错误时跳过这个服务器使用下一个</span></span><br><span class="line">		proxy_next_upstream <span class="literal">error</span> timeout invalid_header http_500 http_502 http_503 http_504;</span><br><span class="line">		<span class="comment"># 导入其他proxy的配置</span></span><br><span class="line">		<span class="attribute">include</span> proxy_params;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/22/Nginx%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1/" rel="prev" title="Nginx代理服务">
+      <i class="fa fa-chevron-left"></i> Nginx代理服务
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/22/Nginx%E7%BC%93%E5%AD%98%E6%9C%8D%E5%8A%A1/" rel="next" title="Nginx缓存服务">
+      Nginx缓存服务 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置方法："><span class="nav-number">1.</span> <span class="nav-text">配置方法：</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#upstream配置"><span class="nav-number">1.1.</span> <span class="nav-text">upstream配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#server参数"><span class="nav-number">1.1.1.</span> <span class="nav-text">server参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx调度算法"><span class="nav-number">1.2.</span> <span class="nav-text">Nginx调度算法</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. Zookeeper ZAB协议为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。 ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广">
+<meta name="keywords" content="面试,Zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;20&#x2F;%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="1. Zookeeper ZAB协议为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。 ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041615117.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041632405.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041645454.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041723580.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041738662.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041757212.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041817539.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041833444.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041907813.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041923754.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041937775.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041955650.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042009165.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042029601.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042045130.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042058968.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042119217.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;zookeeper%E7%9B%91%E5%90%AC%E5%99%A8%E5%8E%9F%E7%90%86.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042158212.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042227598.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042242375.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042304441.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042317577.jpg">
+<meta property="og:updated_time" content="2020-02-20T15:26:27.910Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041615117.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/20/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Zookeeper | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/20/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zookeeper
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-20 11:03:25" itemprop="dateCreated datePublished" datetime="2019-11-20T11:03:25+08:00">2019-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-20 23:26:27" itemprop="dateModified" datetime="2020-02-20T23:26:27+08:00">2020-02-20</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-Zookeeper-ZAB协议"><a href="#1-Zookeeper-ZAB协议" class="headerlink" title="1. Zookeeper ZAB协议"></a>1. Zookeeper ZAB协议</h1><p>为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。</p>
+<p>ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广播协议。 在 ZooKeeper 中，主要依赖 ZAB 协议来实现分布式数据一致性，基于该协议，ZooKeeper 实现了一种主备模式的系统架构来保持集群中各个副本之间的数据一致性。</p>
+<a id="more"></a>
+
+<p>ZAB协议包括两种基本的模式，分别是<strong>崩溃恢复</strong>和<strong>消息广播</strong>。当整个服务框架在启动过程中，或是当<code>Leader</code>服务器出现网络中断、崩溃退出与重启等异常情况时，ZAB 协议就会进入<strong>恢复模式</strong>并选举产生新的<code>Leader</code>服务器。当选举产生了新的<code>Leader</code>服务器，同时集群中已经有过半的机器与该<code>Leader</code>服务器完成了状态同步之后，ZAB协议就会退出恢复模式。其中，所谓的状态同步是指数据同步，用来保证集群中存在过半的机器能够和<code>Leader</code>服务器的数据状态保持一致。</p>
+<p>当集群中已经有过半的<code>Follower</code>服务器完成了和<code>Leader</code>服务器的状态同步，那么整个服务框架就可以进入了<strong>消息广播模式</strong>了。当一台同样遵守ZAB协议的服务器启动后加入到集群中时，如果此时集群中已经存在一个<code>Leader</code>服务器在负责进行消息广播，那么新加入的服务器就会自觉地进入数据恢复模式：找到<code>Leader</code>所在的服务器，并与其进行数据同步，然后一起参与到消息广播流程中去。正如上文介绍中所说的，ZooKeeper设计成只允许唯一的一个<code>Leader</code>服务器来进行事务请求的处理。<code>Leader</code>服务器在接收到客户端的事务请求后，会生成对应的事务提案并发起一轮广播协议；而如果集群中的其他机器接收到客户端的事务请求，那么这些非<code>Leader</code>服务器会首先将这个事务请求转发给<code>Leader</code>服务器。</p>
+<p>根据ZAB协议，所有的写操作都必须是通过<code>Leader</code>完成，<code>Leader</code>写入本地日志后再复制到所有的<code>Follower</code>节点。</p>
+<p>一旦<code>Leader</code>节点无法工作，ZAB协议能够自动从<code>Follower</code>节点中重新选出一个合适的替代者，即新的<code>Leader</code>，该过程即为领导选举。该领导选举过程，是ZAB协议中最为重要和复杂的过程。</p>
+<h1 id="2-Zookeeper读写流程"><a href="#2-Zookeeper读写流程" class="headerlink" title="2. Zookeeper读写流程"></a>2. Zookeeper读写流程</h1><h2 id="写Leader"><a href="#写Leader" class="headerlink" title="写Leader"></a>写Leader</h2><p>通过<code>Leader</code>进行写数据的流程如下：</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041615117.jpg" alt="写Leader"></p>
+<p>由上图可见，通过<code>Leader</code>进行写操作，主要分为五步：</p>
+<ol>
+<li>客户端向<code>Leader</code>发起写请求</li>
+<li><code>Leader</code>将写请求以<code>Proposal</code>(提案)的形式发给所有<code>Follower</code>并等待<code>ACK</code></li>
+<li><code>Follower</code>收到<code>Leader</code>的<code>Proposal</code>后返回<code>ACK</code></li>
+<li><code>Leader</code>得到过半数的<code>ACK</code>（<code>Leader</code>对自己默认有一个ACK）后向所有的<code>Follower</code>和<code>Observer</code>发送<code>Commmit</code></li>
+<li><code>Leader</code>将处理结果返回给客户端</li>
+</ol>
+<p>需要注意的是：</p>
+<ul>
+<li><code>Leader</code>并不需要得到<code>Observer</code>的<code>ACK</code>，因为<code>Obsever</code>并没有投票权</li>
+<li><code>Leader</code>不需要得到所有<code>Follower</code>的<code>ACK</code>，只要收到过半的<code>ACK</code>即可，同时<code>Leader</code>本身对自己有一个<code>ACK</code>。</li>
+<li><code>Observer</code>虽然无投票权，但仍须同步<code>Leader</code>的数据从而在处理读请求时可以返回尽可能新的数据。</li>
+</ul>
+<h2 id="写Follower-Obsever"><a href="#写Follower-Obsever" class="headerlink" title="写Follower/Obsever"></a>写Follower/Obsever</h2><p>通过<code>Follower/Obsever</code>进行写操作的流程如下：</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041632405.jpg" alt="写Follower/Observer"></p>
+<p>从上图可见，<code>Follower/Observer</code>均可以接受写请求，但不能直接处理，而需要将写请求转发给<code>Leader</code>处理。</p>
+<h2 id="读操作"><a href="#读操作" class="headerlink" title="读操作"></a>读操作</h2><p><code>Leader/Follower/Observer</code>都可直接处理读请求，从本地内存中读取数据并返回给客户端即可。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041645454.jpg" alt="读操作"></p>
+<p>由于处理读请求不需要服务器之间的交互，<code>Follower/Observer</code>越多，整体可处理的读请求量越大，也即读性能越好。</p>
+<h1 id="3-领导选举算法"><a href="#3-领导选举算法" class="headerlink" title="3. 领导选举算法"></a>3. 领导选举算法</h1><p>Zookeeper使用<strong>基于TCP的FastLeaderElection</strong>算法进行领导选举。原理：</p>
+<h2 id="1-myid"><a href="#1-myid" class="headerlink" title="1.  myid"></a>1.  myid</h2><p>每个ZooKeeper服务器，都需要在数据文件夹下创建一个名为<code>myid</code>的文件，该文件包含整个ZooKeeper集群唯一的ID（整数）。例如，某ZooKeeper集群包含三台服务器，<code>hostname</code>分别为zoo1、zoo2和zoo3，其<code>myid</code>分别为1、2和3，则在配置文件中其ID与<code>hostname</code>必须一一对应，如下所示。在该配置文件中，<code>server.</code>后面的数据即为<code>myid</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">server.1=zoo1:2888:3888</span><br><span class="line">server.2=zoo2:2888:3888</span><br><span class="line">server.3=zoo3:2888:3888</span><br></pre></td></tr></table></figure>
+<h2 id="2-zxid"><a href="#2-zxid" class="headerlink" title="2. zxid"></a>2. zxid</h2><p>类似于RDBMS中的事务ID，用于标识一次更新操作的<code>Proposal ID</code>。为了保证顺序性，该<code>zkid</code>必须单调递增。因此ZooKeeper使用一个64位的数来表示，高32位是<code>Leader</code>的<code>epoch</code>，从1开始，每次选出新的<code>Leader</code>，<code>epoch</code>加一。低32位为该<code>epoch</code>内的序号，每次<code>epoch</code>变化，都将低32位的序号重置。这样保证了<code>zkid</code>的全局递增性。</p>
+<h2 id="3-服务器状态"><a href="#3-服务器状态" class="headerlink" title="3. 服务器状态"></a>3. 服务器状态</h2><ul>
+<li><code>LOOKING</code>:不确定<code>Leader</code>状态。该状态下的服务器认为当前集群中没有<code>Leader</code>，会发起<code>Leader</code>选举。</li>
+<li><code>FOLLOWING</code>:跟随者状态。表明当前服务器角色是<code>Follower</code>，并且它知道<code>Leader</code>是谁。</li>
+<li><code>LEADING</code>:领导者状态。表明当前服务器角色是<code>Leader</code>，它会维护与<code>Follower</code>间的心跳。</li>
+<li><code>OBSERVING</code>:观察者状态。表明当前服务器角色是<code>Observer</code>，与<code>Folower</code>唯一的不同在于不参与选举，也不参与集群写操作时的投票。</li>
+</ul>
+<h2 id="4-选票的数据结构"><a href="#4-选票的数据结构" class="headerlink" title="4. 选票的数据结构"></a>4. 选票的数据结构</h2><p>每个服务器在进行领导选举时，会发送如下关键信息：</p>
+<ul>
+<li><code>loginClock</code>：每个服务器会维护一个自增的整数，名为<code>loginClock</code>，表示这是该服务器发起的第多少轮投票。</li>
+<li><code>state</code>：当前服务器的状态</li>
+<li><code>self_id</code>：当前服务器的<code>myid</code></li>
+<li><code>self_zxid</code>：当前服务器上所保存的数据的最大<code>zxid</code></li>
+<li><code>vote_id</code>：被推举的服务器的<code>myid</code></li>
+<li><code>vote_zxid</code>：被推举的服务器上所保存的数据的最大<code>zxid</code></li>
+</ul>
+<h2 id="5-投票流程"><a href="#5-投票流程" class="headerlink" title="5. 投票流程"></a>5. 投票流程</h2><h3 id="自增选举轮次"><a href="#自增选举轮次" class="headerlink" title="自增选举轮次"></a>自增选举轮次</h3><p>Zookeeper规定所有有效的投票都必须在同一轮次中。每个服务器在开始新一轮投票时，会先对自己维护的<code>loginClock</code>进行自增操作。</p>
+<h3 id="初始化选票"><a href="#初始化选票" class="headerlink" title="初始化选票"></a>初始化选票</h3><p>每个服务器在广播自己的选票前，会将自己的投票箱清空。该投票箱记录了所收到的选票。例：服务器2投票给服务器3，服务器3投票给服务器1，则服务器1的投票箱为(2, 3), (3, 1), (1, 1)。票箱中只会记录每一投票者的最后一票，如投票者更新自己的选票，则其它服务器收到该新选票后会在自己票箱中更新该服务器的选票。</p>
+<h3 id="发送初始化选票"><a href="#发送初始化选票" class="headerlink" title="发送初始化选票"></a>发送初始化选票</h3><p>每个服务器最开始都是通过广播把票投给自己</p>
+<h3 id="接收外部投票"><a href="#接收外部投票" class="headerlink" title="接收外部投票"></a>接收外部投票</h3><p>服务器会尝试从其它服务器获取投票，并记入自己的投票箱内。如果无法获取任何外部投票，则会确认自己是否与集群中其它服务器保持着有效连接。如果是，则再次发送自己的投票；如果否，则马上与之建立连接。</p>
+<h3 id="判断选举轮次"><a href="#判断选举轮次" class="headerlink" title="判断选举轮次"></a>判断选举轮次</h3><p>收到外部投票后，首先会根据投票信息中所包含的<code>logicClock</code>来进行不同处理：</p>
+<ul>
+<li>外部投票的<code>logicClock</code>大于自己的<code>logicClock</code>。说明该服务器的选举轮次落后于其它服务器的选举轮次，立即清空自己的投票箱并将自己的<code>logicClock</code>更新为收到的<code>logicClock</code>，然后再对比自己之前的投票与收到的投票以确定是否需要变更自己的投票，最终再次将自己的投票广播出去。</li>
+<li>外部投票的<code>logicClock</code>小于自己的<code>logicClock</code>。当前服务器直接忽略该投票，继续处理下一个投票。</li>
+<li>外部投票的<code>logickClock</code>与自己的相等,进行选票PK。</li>
+</ul>
+<h3 id="选票PK"><a href="#选票PK" class="headerlink" title="选票PK"></a>选票PK</h3><p>选票PK时是基于<code>(self_id,self_zxid)</code>与<code>(vote_id,vote_zxid)</code>的对比：</p>
+<ul>
+<li>外部投票的<code>logicClock</code>大于自己的<code>logicClock</code>，则将自己的<code>logicClock</code>及自己的选票的<code>logicClock</code>变更为收到的<code>logicClock</code></li>
+<li>若<code>logicClock</code>一致，则对比二者的<code>vote_zxid</code>，若外部投票的<code>vote_zxid</code>比较大，则将自己的票中的<code>vote_zxid</code>与<code>vote_myid</code>更新为收到的票中的<code>vote_zxid</code>与<code>vote_myid</code>并广播出去，另外将收到的票及自己更新后的票放入自己的票箱。如果票箱内已存在<code>(self_myid, self_zxid)</code>相同的选票，则直接覆盖</li>
+<li>若二者<code>vote_zxid</code>一致，则比较二者的<code>vote_myid</code>，若外部投票的<code>vote_myid</code>比较大，则将自己的票中的<code>vote_myid</code>更新为收到的票中的<code>vote_myid</code>并广播出去，另外将收到的票及自己更新后的票放入自己的票箱。</li>
+</ul>
+<h3 id="统计选票"><a href="#统计选票" class="headerlink" title="统计选票"></a>统计选票</h3><p>如果已经确定有过半服务器认可了自己的投票（可能是更新后的投票），则终止投票。否则继续接收其他服务器的投票。</p>
+<h3 id="更新服务器状态"><a href="#更新服务器状态" class="headerlink" title="更新服务器状态"></a>更新服务器状态</h3><p>投票终止后，服务器开始更新自身状态。若过半的票投给了自己，则将自己的服务器状态更新为<code>LEADING</code>，否则将自己的状态更新为<code>FOLLOWING</code>。</p>
+<h1 id="4-集群启动领导选举"><a href="#4-集群启动领导选举" class="headerlink" title="4. 集群启动领导选举"></a>4. 集群启动领导选举</h1><h2 id="1-初始投票给自己"><a href="#1-初始投票给自己" class="headerlink" title="1. 初始投票给自己"></a>1. 初始投票给自己</h2><p>集群刚启动时，所有服务器的<code>logicClock</code>都为1，<code>zxid</code>都为0。各服务器初始化后，都投票给自己，并将自己的一票存入自己的票箱，如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041723580.jpg" alt="集群启动第一步"></p>
+<p>在上图中，<code>(1, 1, 0)</code>第一位数代表投出该选票的服务器的<code>logicClock</code>，第二位数代表被推荐的服务器的<code>myid</code>，第三位代表被推荐的服务器的最大的<code>zxid</code>。由于该步骤中所有选票都投给自己，所以第二位的<code>myid</code>即是自己的<code>myid</code>，第三位的<code>zxid</code>即是自己的<code>zxid</code>。</p>
+<p>此时各自的票箱中只有投给自己的一票</p>
+<h2 id="2-更新投票"><a href="#2-更新投票" class="headerlink" title="2. 更新投票"></a>2. 更新投票</h2><p>服务器收到外部投票后，进行选票PK，相应更新自己的选票并广播出去，并将合适的选票存入自己的票箱，如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041738662.jpg" alt="集群启动第二步"></p>
+<p>服务器1收到服务器2的选票<code>（1, 2, 0）</code>和服务器3的选票<code>（1, 3, 0）</code>后，由于所有的<code>logicClock</code>都相等，所有的<code>zxid</code>都相等，因此根据<code>myid</code>判断应该将自己的选票按照服务器3的选票更新为<code>（1, 3, 0）</code>，并将自己的票箱全部清空，再将服务器3的选票与自己的选票存入自己的票箱，接着将自己更新后的选票广播出去。此时服务器1票箱内的选票为<code>(1, 3)</code>，<code>(3, 3)</code>。</p>
+<p>同理，服务器2收到服务器3的选票后也将自己的选票更新为<code>（1, 3, 0）</code>并存入票箱然后广播。此时服务器2票箱内的选票为<code>(2, 3)</code>，<code>(3, ,3)</code>。</p>
+<p>服务器3根据上述规则，无须更新选票，自身的票箱内选票仍为<code>（3, 3）</code>。</p>
+<p>服务器1与服务器2更新后的选票广播出去后，由于三个服务器最新选票都相同，最后三者的票箱内都包含三张投给服务器3的选票。</p>
+<h2 id="3-根据选票确定角色"><a href="#3-根据选票确定角色" class="headerlink" title="3. 根据选票确定角色"></a>3. 根据选票确定角色</h2><p>根据上述选票，三个服务器一致认为此时服务器3应该是<code>Leader</code>。因此服务器1和2都进入<code>FOLLOWING</code>状态，而服务器3进入<code>LEADING</code>状态。之后<code>Leader</code>发起并维护与<code>Follower</code>间的心跳。</p>
+<p> <img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041757212.jpg" alt="集群启动第三步"></p>
+<h1 id="5-Follower-Leader重启选举"><a href="#5-Follower-Leader重启选举" class="headerlink" title="5. Follower/Leader重启选举"></a>5. Follower/Leader重启选举</h1><h2 id="Follower重启选举"><a href="#Follower重启选举" class="headerlink" title="Follower重启选举"></a>Follower重启选举</h2><h3 id="1-Follower重启投票给自己"><a href="#1-Follower重启投票给自己" class="headerlink" title="1. Follower重启投票给自己"></a>1. Follower重启投票给自己</h3><p><code>Follower</code>重启，或者发生网络分区后找不到<code>Leader</code>，会进入<code>LOOKING</code>状态并发起新的一轮投票。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041817539.jpg" alt="Follower重启1"></p>
+<h3 id="2-发现已有Leader后成为Follower"><a href="#2-发现已有Leader后成为Follower" class="headerlink" title="2. 发现已有Leader后成为Follower"></a>2. 发现已有Leader后成为Follower</h3><p>服务器3收到服务器1的投票后，将自己的状态<code>LEADING</code>以及选票返回给服务器1。服务器2收到服务器1的投票后，将自己的状态<code>FOLLOWING</code>及选票返回给服务器1。此时服务器1知道服务器3是<code>Leader</code>，并且通过服务器2与服务器3的选票可以确定服务器3确实得到了超过半数的选票。因此服务器1进入<code>FOLLOWING</code>状态。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041833444.jpg" alt="Follower重启2"></p>
+<h2 id="Leader重启选举"><a href="#Leader重启选举" class="headerlink" title="Leader重启选举"></a>Leader重启选举</h2><h3 id="1-Follower发起新投票"><a href="#1-Follower发起新投票" class="headerlink" title="1. Follower发起新投票"></a>1. Follower发起新投票</h3><p><code>Leader</code>（服务器3）宕机后，<code>Follower</code>（服务器1和2）发现<code>Leader</code>不工作了，因此进入<code>LOOKING</code>状态并发起新的一轮投票，并且都将票投给自己。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041907813.jpg" alt="Leader重启1"></p>
+<h3 id="2-广播更新投票"><a href="#2-广播更新投票" class="headerlink" title="2. 广播更新投票"></a>2. 广播更新投票</h3><p>服务器1和2根据外部投票确定是否要更新自身的选票。这里有两种情况：</p>
+<ul>
+<li>服务器1和2的<code>zxid</code>相同。例如在服务器3宕机前服务器1与2完全与之同步。此时选票的更新主要取决于<code>myid</code>的大小</li>
+<li>服务器1和2的<code>zxid</code>不同。在旧<code>Leader</code>宕机之前，其所主导的写操作，只需过半服务器确认即可，而不需所有服务器确认。换句话说，服务器1和2可能一个与旧<code>Leader</code>同步（即<code>zxid</code>与之相同）另一个不同步（即<code>zxid</code>比之小）。此时选票的更新主要取决于谁的<code>zxid</code>较大。</li>
+</ul>
+<p>在上图中，服务器1的<code>zxid</code>为11，而服务器2的<code>zxid</code>为10，因此服务器2将自身选票更新为<code>（3, 1, 11）</code>，如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041923754.jpg" alt="Leader重启2"></p>
+<h3 id="3-选出新的Leader"><a href="#3-选出新的Leader" class="headerlink" title="3. 选出新的Leader"></a>3. 选出新的Leader</h3><p>经过上一步选票更新后，服务器1与服务器2均将选票投给服务器1，因此服务器2成为<code>Follower</code>，而服务器1成为新的<code>Leader</code>并维护与服务器2的心跳。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041937775.jpg" alt="Leader重启3"></p>
+<h3 id="4-旧Leader恢复后发起选举"><a href="#4-旧Leader恢复后发起选举" class="headerlink" title="4. 旧Leader恢复后发起选举"></a>4. 旧Leader恢复后发起选举</h3><p>旧的<code>Leader</code>恢复后，进入<code>LOOKING</code>状态并发起新一轮领导选举，并将选票投给自己。此时服务器1会将自己的<code>LEADING</code>状态及选票<code>（3, 1, 11）</code>返回给服务器3，而服务器2将自己的<code>FOLLOWING</code>状态及选票<code>（3, 1, 11）</code>返回给服务器3。如下图所示:</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041955650.jpg" alt="Leader重启4"></p>
+<h3 id="5-旧Leader成为Follower"><a href="#5-旧Leader成为Follower" class="headerlink" title="5. 旧Leader成为Follower"></a>5. 旧Leader成为Follower</h3><p>服务器3了解到<code>Leader</code>为服务器1，且根据选票了解到服务器1确实得到过半服务器的选票，因此自己进入<code>FOLLOWING</code>状态。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042009165.jpg" alt="Leader重启5"></p>
+<h1 id="6-Zookeeper如何保证commit过的数据不丢失"><a href="#6-Zookeeper如何保证commit过的数据不丢失" class="headerlink" title="6. Zookeeper如何保证commit过的数据不丢失"></a>6. Zookeeper如何保证commit过的数据不丢失</h1><h2 id="1-Failover前状态"><a href="#1-Failover前状态" class="headerlink" title="1. Failover前状态"></a>1. Failover前状态</h2><p>如下图共有5个节点：A作为<code>Leader</code>，共收到P1、P2、P3三条消息，并且<code>Commit</code>了1和2，且总体顺序为P1、P2、C1、P3、C2。根据顺序性原则，其它<code>Follower</code>收到的消息的顺序肯定与之相同。其中B与A完全同步，C收到P1、P2、C1，D收到P1、P2，E收到P1，如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042029601.jpg" alt="Failover前状态"></p>
+<p>这里要注意：</p>
+<ul>
+<li>由于A没有C3，意味着收到P3的服务器的总个数不会超过一半，也即包含A在内最多只有两台服务器收到P3。在这里A和B收到P3，其它服务器均未收到P3</li>
+<li>由于A已写入C1、C2，说明它已经Commit了P1、P2，因此整个集群有超过一半的服务器，即最少三个服务器收到P1、P2。在这里所有服务器都收到了P1，除E外其它服务器也都收到了P2</li>
+</ul>
+<h2 id="2-选出Leader"><a href="#2-选出Leader" class="headerlink" title="2. 选出Leader"></a>2. 选出Leader</h2><p>旧<code>Leader</code>也即A宕机后，其它服务器根据上述<code>FastLeaderElection</code>算法选出B作为新的<code>Leader</code>。C、D和E成为<code>Follower</code>且以B为<code>Leader</code>后，会主动将自己最大的<code>zxid</code>发送给B，B会将<code>Follower</code>的<code>zxid</code>与自身<code>zxid</code>间的所有被<code>Commit</code>过的消息同步给<code>Follower</code>，如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042045130.jpg" alt="选出Leader"></p>
+<p>在上图中：</p>
+<ul>
+<li>P1和P2都被A Commit，因此B会通过同步保证P1、P2、C1与C2都存在于C、D和E中</li>
+<li>P3由于未被A Commit，同时幸存的所有服务器中P3未存在于大多数据服务器中，因此它不会被同步到其它<code>Follower</code></li>
+</ul>
+<h2 id="3-通知Follower可对外服务"><a href="#3-通知Follower可对外服务" class="headerlink" title="3. 通知Follower可对外服务"></a>3. 通知Follower可对外服务</h2><p>同步完数据后，B会向D、C和E发送NEWLEADER命令并等待大多数服务器的ACK（下图中D和E已返回ACK，加上B自身，已经占集群的大多数），然后向所有服务器广播<code>UPTODATE</code>命令。收到该命令后的服务器即可对外提供服务。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042058968.jpg" alt="通知Follower可对外服务"></p>
+<h2 id="未Commit过的消息对客户端不可见"><a href="#未Commit过的消息对客户端不可见" class="headerlink" title="未Commit过的消息对客户端不可见"></a>未Commit过的消息对客户端不可见</h2><p>在上例中，P3未被A Commit过，同时因为没有过半的服务器收到P3，因此B也未Commit P3（如果有过半服务器收到P3，即使A未Commit P3，B会主动Commit P3，即C3），所以它不会将P3广播出去。</p>
+<p>具体做法是，B在成为<code>Leader</code>后，先判断自身未Commit的消息（本例中即P3）是否存在于大多数服务器中从而决定是否要将其Commit。然后B可得出自身所包含的被Commit过的消息中的最小<code>zxid</code>（记为<code>min_zxid</code>）与最大<code>zxid</code>（记为<code>max_zxid</code>）。C、D和E向B发送自身Commit过的最大消息<code>zxid</code>（记为<code>max_zxid</code>）以及未被Commit过的所有消息（记为<code>zxid_set</code>）。B根据这些信息作出如下操作：</p>
+<ul>
+<li>如果<code>Follower</code>的<code>max_zxid</code>与<code>Leader</code>的<code>max_zxid</code>相等，说明该<code>Follower</code>与<code>Leader</code>完全同步，无须同步任何数据</li>
+<li>如果<code>Follower</code>的<code>max_zxid</code>在<code>Leader</code>的(<code>min_zxid</code>，<code>max_zxid</code>)范围外，<code>Leader</code>会通过<code>TRUNC</code>命令通知<code>Follower</code>将其<code>zxid_set</code>中大于<code>Follower</code>的<code>max_zxid</code>（如果有）的所有消息全部删除</li>
+</ul>
+<p>上述操作保证了未被Commit过的消息不会被Commit从而对外不可见。</p>
+<p>上述例子中Follower上并不存在未被Commit的消息。但可考虑这种情况，如果将上述例子中的服务器数量从五增加到七，服务器F包含P1、P2、C1、P3，服务器G包含P1、P2。此时服务器F、A和B都包含P3，但是因为票数未过半，因此B作为<code>Leader</code>不会Commit P3，而会通过<code>TRUNC</code>命令通知F删除P3。如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042119217.jpg" alt="未Commit过的消息对客户端不可见"></p>
+<h1 id="7-Zookeeper节点类型"><a href="#7-Zookeeper节点类型" class="headerlink" title="7. Zookeeper节点类型"></a>7. Zookeeper节点类型</h1><p>Zookeeper提供了类似于Linux文件系统的树形结构，该树形结构中每个节点都被称为<code>znode</code>，可被分为以下两类：</p>
+<ol>
+<li><strong>Persist</strong>和<strong>Ephemeral</strong></li>
+</ol>
+<ul>
+<li><code>Persist</code>节点一旦被创建，便不会意外丢失，即使服务器全部重启也依然存在。在每个<code>Persist</code>节点即可包含数据，也可包含子节点。</li>
+<li><code>Ephemeral</code>节点，在创建它的客户端与服务器间的<code>Session</code>结束时自动被删除。服务器重启会导致<code>Session</code>结束，因此<code>Ephemeral</code>类型的<code>znode</code>此时也会自动删除。</li>
+</ul>
+<ol start="2">
+<li><strong>Sequence</strong>和<strong>Non-sequence</strong></li>
+</ol>
+<ul>
+<li><code>Non-sequence</code>节点，多个客户端同时创建同一<code>Non-sequence</code>节点时，只有一个可创建成功，其它匀失败。并且创建出的节点名称与创建时指定的节点名完全一样</li>
+<li><code>Sequence</code>节点，创建出的节点名在指定的名称之后带有10位10进制数的序号。多个客户端创建同一名称的节点时，都能创建成功，只是序号不同</li>
+</ul>
+<h1 id="8-Zookeeper如何进行语义保证？"><a href="#8-Zookeeper如何进行语义保证？" class="headerlink" title="8. Zookeeper如何进行语义保证？"></a>8. Zookeeper如何进行语义保证？</h1><p>ZooKeeper简单高效，同时提供如下语义保证，从而使得可以利用这些特性提供复杂的服务。</p>
+<ul>
+<li>顺序性：客户端发起的更新会按发送顺序被应用到 ZooKeeper 上</li>
+<li>原子性：更新操作要么成功要么失败，不会出现中间状态</li>
+<li>单一系统镜像：一个客户端无论连接到哪一个服务器都能看到完全一样的系统镜像（即完全一样的树形结构）。根据<code>FastLeaderElection</code>机制的 ZAB 协议，写操作并不保证更新被所有的<code>Follower</code>立即确认，因此通过部分<code>Follower</code>读取数据并不能保证读到最新的数据，而部分<code>Follwer</code>及<code>Leader</code>可读到最新数据。如果一定要保证单一系统镜像，可在读操作前使用<code>sync</code>方法。</li>
+<li>可靠性：一个更新操作一旦被接受即不会意外丢失，除非被其它更新操作覆盖</li>
+<li>最终一致性：写操作最终（而非立即）会对客户端可见</li>
+</ul>
+<h1 id="9-Zookeeper-Watch机制"><a href="#9-Zookeeper-Watch机制" class="headerlink" title="9. Zookeeper Watch机制"></a>9. Zookeeper Watch机制</h1><p>所有对 ZooKeeper 的读操作，都可附带一个<code>Watch</code>。一旦相应的数据有变化，该<code>Watch</code>即被触发。</p>
+<p>原理如下：</p>
+<ul>
+<li>首先有一个<code>main()</code>线程</li>
+<li>在<code>main()</code>线程中创建Zookeeper客户端，这时就会创建两个线程，一个负责网络连接通信（<code>connect</code>），一个负责监听（<code>listener</code>）</li>
+<li>通过<code>connect</code>线程将注册的监听事件发送给Zookeeper</li>
+<li>在Zookeeper的注册监听器列表中将注册的监听事件添加到列表中</li>
+<li>Zookeeper监听到有数据或者路径变化，就会将这个消息发送给<code>listener</code>线程</li>
+<li><code>listener</code>线程内部调用了<code>process()</code>方法</li>
+</ul>
+<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/zookeeper%E7%9B%91%E5%90%AC%E5%99%A8%E5%8E%9F%E7%90%86.png?raw=true" alt="监听器机制"></p>
+<p><code>Watch</code>有如下特点：</p>
+<ul>
+<li>主动推送：<code>Watch</code>被触发时，由 ZooKeeper 服务器主动将更新推送给客户端，而不需要客户端轮询。</li>
+<li>一次性：数据变化时，<code>Watch</code>只会被触发一次。如果客户端想得到后续更新的通知，必须要在<code>Watch</code>被触发后重新注册一个 Watch。</li>
+<li>可见性：如果一个客户端在读请求中附带<code>Watch</code>，<code>Watch</code>被触发的同时再次读取数据，客户端在得到<code>Watch</code>消息之前肯定不可能看到更新后的数据。换句话说，更新通知先于更新结果。</li>
+<li>顺序性：如果多个更新触发了多个<code>Watch</code>，那<code>Watch</code>被触发的顺序与更新顺序一致。</li>
+</ul>
+<h1 id="10-Zookeeper实现分布式锁原理"><a href="#10-Zookeeper实现分布式锁原理" class="headerlink" title="10. Zookeeper实现分布式锁原理"></a>10. Zookeeper实现分布式锁原理</h1><p>分布式锁需要实现的关键点：</p>
+<ol>
+<li><p><strong>最多一个获取锁/称为Leader</strong>：对于分布式锁（这里特指排它锁）而言，任意时刻，最多只有一个进程（对于单进程内的锁而言是单线程）可以获得锁。</p>
+<blockquote>
+<p>这里的<code>Leader</code>指的是zookeeper的客户端，而不是服务器端</p>
+</blockquote>
+</li>
+<li><p><strong>锁重入/确认自己是Leader</strong>：对于分布式锁，需要保证获得锁的进程在释放锁之前可再次获得锁，即锁的可重入性；对于领导选举，<code>Leader</code>需要能够确认自己已经获得领导权，即确认自己是<code>Leader</code>。</p>
+</li>
+<li><p><strong>释放锁/放弃领导权</strong>：锁的获得者应该能够正确释放已经获得的锁，并且当获得锁的进程宕机时，锁应该自动释放，从而使得其它竞争方可以获得该锁，从而避免出现死锁的状态。领导应该可以主动放弃领导权，并且当领导所在进程宕机时，领导权应该自动释放，从而使得其它参与者可重新竞争领导而避免进入无主状态。</p>
+</li>
+<li><p><strong>感知锁释放 / 领导权的放弃</strong>：当获得锁的一方释放锁时，其它对于锁的竞争方需要能够感知到锁的释放，并再次尝试获取锁。原来的<code>Leader</code>放弃领导权时，其它参与方应该能够感知该事件，并重新发起选举流程。</p>
+</li>
+</ol>
+<h2 id="非公平领导选举实现分布式锁"><a href="#非公平领导选举实现分布式锁" class="headerlink" title="非公平领导选举实现分布式锁"></a>非公平领导选举实现分布式锁</h2><h3 id="1-选主过程："><a href="#1-选主过程：" class="headerlink" title="1. 选主过程："></a>1. 选主过程：</h3><p>假设有三个ZooKeeper的客户端，如下图所示，同时竞争<code>Leader</code>。这三个客户端同时向ZooKeeper集群注册<code>Ephemeral</code>且<code>Non-sequence</code>类型的节点，路径都为<code>/zkroot/leader</code>（工程实践中，路径名可自定义）。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042158212.jpg" alt="非公平领导选举"></p>
+<p>如上图所示，由于是<code>Non-sequence</code>节点，这三个客户端只会有一个创建成功，其它节点均创建失败。此时，创建成功的客户端（即上图中的Client 1）即成功竞选为<code>Leader</code>。其它客户端（即上图中的Client 2和Client 3）此时匀为<code>Follower</code>。</p>
+<h3 id="2-放弃领导权"><a href="#2-放弃领导权" class="headerlink" title="2. 放弃领导权"></a>2. 放弃领导权</h3><p>如果<code>Leader</code>打算主动放弃领导权，直接删除<code>/zkroot/leader</code>节点即可。</p>
+<p>如果<code>Leader</code>进程意外宕机，其与 ZooKeeper 间的<code>Session</code>也结束，该节点由于是<code>Ephemeral</code>类型的节点，因此也会自动被删除。</p>
+<p>此时<code>/zkroot/leader</code>节点不复存在，对于其它参与竞选的客户端而言，之前的<code>Leader</code>已经放弃了领导权。</p>
+<h3 id="3-感知领导权的放弃"><a href="#3-感知领导权的放弃" class="headerlink" title="3. 感知领导权的放弃"></a>3. 感知领导权的放弃</h3><p>由上图可见，创建节点失败的节点，除了成为<code>Follower</code>以外，还会向<code>/zkroot/leader</code>注册一个<code>Watch</code>，一旦<code>Leader</code>放弃领导权，也即该节点被删除，所有的<code>Follower</code>会收到通知。</p>
+<h3 id="4-重新选举"><a href="#4-重新选举" class="headerlink" title="4. 重新选举"></a>4. 重新选举</h3><p>感知到旧<code>Leader</code>放弃领导权后，所有的<code>Follower</code>可以再次发起新一轮的领导选举，如下图所示：</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042227598.jpg" alt="重新选举"></p>
+<p>从上图中可见：</p>
+<ul>
+<li>新一轮的领导选举方法与最初的领导选举方法完全一样，都是发起节点创建请求，创建成功即为<code>Leader</code>，否则为<code>Follower</code> ，且<code>Follower</code>会<code>Watch</code>该节点</li>
+<li>新一轮的选举结果，无法预测，与它们在第一轮选举中的顺序无关。这也是该方案被称为非公平模式的原因</li>
+</ul>
+<h3 id="非公平领导选举的优缺点"><a href="#非公平领导选举的优缺点" class="headerlink" title="非公平领导选举的优缺点"></a>非公平领导选举的优缺点</h3><p><strong>优点</strong>：</p>
+<ol>
+<li>非公平模式实现简单，每一轮选举方法都完全一样</li>
+<li>竞争参与方不多的情况下，效率高。每个<code>Follower</code>通过<code>Watch</code>感知到节点被删除的时间不完全一样，只要有一个<code>Follower</code>得到通知即发起竞选，即可保证当时有新的<code>Leader</code>被选出</li>
+</ol>
+<p><strong>缺点</strong>：<br>给 ZooKeeper 集群造成的负载大，因此扩展性差。如果有上万个客户端都参与竞选，意味着同时会有上万个写请求发送给 Zookeper。ZooKeeper 存在单点写的问题，写性能不高。同时一旦<code>Leader</code>放弃领导权，ZooKeeper 需要同时通知上万个<code>Follower</code>，负载较大。</p>
+<h2 id="公平领导选举实现分布式锁"><a href="#公平领导选举实现分布式锁" class="headerlink" title="公平领导选举实现分布式锁"></a>公平领导选举实现分布式锁</h2><h3 id="1-选主过程"><a href="#1-选主过程" class="headerlink" title="1. 选主过程"></a>1. 选主过程</h3><p>如下图所示，公平领导选举中，各客户端均创建<code>/zkroot/leader</code> 节点，且其类型为<code>Ephemeral</code>与<code>Sequence</code>。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042242375.jpg" alt="公平领导选举"></p>
+<p>由于是<code>Sequence</code>类型节点，故上图中三个客户端均创建成功，只是序号不一样。此时，每个客户端都会判断自己创建成功的节点的序号是不是当前最小的。如果是，则该客户端为<code>Leader</code>，否则即为<code>Follower</code>。</p>
+<p>在上图中，Client 1创建的节点序号为 1 ，Client 2创建的节点序号为 2，Client 3创建的节点序号为3。由于最小序号为 1 ，且该节点由Client 1创建，故Client 1为<code>Leader</code></p>
+<h3 id="2-放弃领导权-1"><a href="#2-放弃领导权-1" class="headerlink" title="2. 放弃领导权"></a>2. 放弃领导权</h3><p><code>Leader</code>如果主动放弃领导权，直接删除其创建的节点即可。</p>
+<p>如果<code>Leader</code>所在进程意外宕机，其与 ZooKeeper 间的<code>Session</code>结束，由于其创建的节点为<code>Ephemeral</code>类型，故该节点自动被删除。</p>
+<h3 id="3-感知领导权的放弃-1"><a href="#3-感知领导权的放弃-1" class="headerlink" title="3. 感知领导权的放弃"></a>3. 感知领导权的放弃</h3><p>与非公平模式不同，每个<code>Follower</code>并非都<code>Watch</code>由<code>Leader</code>创建出来的节点，而是<code>Watch</code>序号刚好比自己序号小的节点。</p>
+<p>在上图中，总共有 1、2、3 共三个节点，因此Client 2 Watch <code>/zkroot/leader1</code>，Client 3 Watch <code>/zkroot/leader2</code>。（注：序号应该是10位数字，而非一位数字，这里为了方便，以一位数字代替）</p>
+<p>一旦<code>Leader</code>宕机，<code>/zkroot/leader1</code>被删除，Client 2可得到通知。此时Client 3由于<code>Watch</code>的是<code>/zkroot/leader2</code>，故不会得到通知。</p>
+<h3 id="4-重新选举-1"><a href="#4-重新选举-1" class="headerlink" title="4. 重新选举"></a>4. 重新选举</h3><p>重新选举Client 2得到<code>/zkroot/leader1</code>被删除的通知后，不会立即成为新的<code>Leader</code>。而是先判断自己的序号 2 是不是当前最小的序号。在该场景下，其序号确为最小。因此Client 2成为新的<code>Leader</code>。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042304441.jpg" alt="重新选举"></p>
+<p>这里要注意，如果在Client 1放弃领导权之前，Client 2就宕机了，Client 3会收到通知。此时Client 3不会立即成为<code>Leader</code>，而是要先判断自己的序号 3 是否为当前最小序号。很显然，由于Client 1创建的<code>/zkroot/leader1</code>还在，因此Client 3不会成为新的<code>Leader</code>，并向Client 2序号 2 前面的序号，也即 1 创建<code>Watch</code>。该过程如下图所示。</p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042317577.jpg" alt="重新选举2"></p>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><p><strong>优点</strong>：</p>
+<ul>
+<li>扩展性好，每个客户端都只<code>Watch</code>一个节点且每次节点被删除只须通知一个客户端；</li>
+<li>旧<code>Leader</code>放弃领导权时，其它客户端根据竞选的先后顺序（也即节点序号）成为新<code>Leader</code>，这也是公平模式的由来；</li>
+</ul>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>实现相对复杂</li>
+<li>延迟相对非公平模式要高，因为它必须等待特定节点得到通知才能选出新的<code>Leader</code>。</li>
+</ul>
+<h1 id="11-Zookeeper权限控制"><a href="#11-Zookeeper权限控制" class="headerlink" title="11. Zookeeper权限控制"></a>11. Zookeeper权限控制</h1><p>Zookeeper采用ACL（AccessControlLists）策略来进行权限控制，类似于UNIX文件系统的权限控制。Zookeeper定义了如下5种权限：</p>
+<ul>
+<li><strong>CREATE</strong>：创建字节点的权限</li>
+<li><strong>READ</strong>：获取节点数据和字节点列表的权限</li>
+<li><strong>WRITE</strong>：更新节点数据的权限</li>
+<li><strong>DELETE</strong>：删除字节点的权限</li>
+<li><strong>ADMIN</strong>：设置节点的ACL权限</li>
+</ul>
+<p>其中，<code>CREATE</code>和<code>DELETE</code>这两种权限都是针对子节点的权限控制。</p>
+<h1 id="12-Zookeeper中session概念"><a href="#12-Zookeeper中session概念" class="headerlink" title="12. Zookeeper中session概念"></a>12. Zookeeper中session概念</h1><p>Session 指的是 ZooKeeper 服务器与客户端会话。在 ZooKeeper 中，一个客户端连接是指客户端和服务器之间的一个 TCP 长连接。客户端启动的时候，首先会与服务器建立一个 TCP 连接，从第一次连接建立开始，客户端会话的生命周期也开始了。通过这个连接，客户端能够通过心跳检测与服务器保持有效的会话，也能够向Zookeeper服务器发送请求并接受响应，同时还能够通过该连接接收来自服务器的<code>Watch</code>事件通知。 </p>
+<p>Session的<code>sessionTimeout</code>值用来设置一个客户端会话的超时时间。当由于服务器压力太大、网络故障或是客户端主动断开连接等各种原因导致客户端连接断开时，只要在<code>sessionTimeout</code>规定的时间内能够重新连接上集群中任意一台服务器，那么之前创建的会话仍然有效。</p>
+<p>在为客户端创建会话之前，服务端首先会为每个客户端都分配一个<code>sessionID</code>。由于 <code>sessionID</code>是 Zookeeper 会话的一个重要标识，许多与会话相关的运行机制都是基于这个<code>sessionID</code>的，因此，无论是哪台服务器为客户端分配的<code>sessionID</code>，都务必保证全局唯一。</p>
+<h1 id="13-Zookeeper的应用场景"><a href="#13-Zookeeper的应用场景" class="headerlink" title="13. Zookeeper的应用场景"></a>13. Zookeeper的应用场景</h1><ul>
+<li><strong>统一命名服务</strong>：在分布式环境下，经常需要对应用或服务进行统一命名，便于识别。例如IP不容易记，使用域名。</li>
+<li><strong>统一配置管理</strong>：在分布式环境下，一般要求在一个集群下，所有节点的配置信息是一致的。在 Zookeeper 中，可以将配置信息写入到 Zookeeper 上的一个 Znode 中。对配置文件修改后，希望能够快速同步到各个节点上。每个客户端服务器监听这个 Znode，一旦 Znode 中的数据被修改，Zookeeper 将通知各个客户端服务器。</li>
+<li><strong>统一集群管理</strong>：分布式环境中，实时掌握每个节点的状态是必要的，要求可以根据节点实时状态作出一些调整。Zookeeper 可以实现实时监控节点状态变化。可将节点信息写入到 Zookeeper 的一个 Znode，监听这个 Znode 可以获取它实时状态变化。</li>
+<li><strong>服务器动态上下线</strong>：客户端能够实时洞察到服务器上下线的变化。服务器将是否在线的状态写入到 Znode 中，客户端获取到当前在线服务器列表，并注册监听，当服务器有上下线时就会发起事件通知。</li>
+<li><strong>软负载均衡</strong>：在Zookeeper中记录每台服务器的访问数，让访问数最少的服务器去处理最新的客户端请求。</li>
+</ul>
+<p><strong>参考内容</strong></p>
+<blockquote>
+<p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/19/Zookeeper/" rel="prev" title="Zookeeper基本使用">
+      <i class="fa fa-chevron-left"></i> Zookeeper基本使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/21/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%EF%BC%88%E6%9B%B4%E6%96%B0%E4%B8%AD%EF%BC%89/" rel="next" title="消息队列(更新中...)">
+      消息队列(更新中...) <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Zookeeper-ZAB协议"><span class="nav-number">1.</span> <span class="nav-text">1. Zookeeper ZAB协议</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Zookeeper读写流程"><span class="nav-number">2.</span> <span class="nav-text">2. Zookeeper读写流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#写Leader"><span class="nav-number">2.1.</span> <span class="nav-text">写Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写Follower-Obsever"><span class="nav-number">2.2.</span> <span class="nav-text">写Follower/Obsever</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读操作"><span class="nav-number">2.3.</span> <span class="nav-text">读操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-领导选举算法"><span class="nav-number">3.</span> <span class="nav-text">3. 领导选举算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-myid"><span class="nav-number">3.1.</span> <span class="nav-text">1.  myid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-zxid"><span class="nav-number">3.2.</span> <span class="nav-text">2. zxid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-服务器状态"><span class="nav-number">3.3.</span> <span class="nav-text">3. 服务器状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-选票的数据结构"><span class="nav-number">3.4.</span> <span class="nav-text">4. 选票的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-投票流程"><span class="nav-number">3.5.</span> <span class="nav-text">5. 投票流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自增选举轮次"><span class="nav-number">3.5.1.</span> <span class="nav-text">自增选举轮次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化选票"><span class="nav-number">3.5.2.</span> <span class="nav-text">初始化选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送初始化选票"><span class="nav-number">3.5.3.</span> <span class="nav-text">发送初始化选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接收外部投票"><span class="nav-number">3.5.4.</span> <span class="nav-text">接收外部投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断选举轮次"><span class="nav-number">3.5.5.</span> <span class="nav-text">判断选举轮次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选票PK"><span class="nav-number">3.5.6.</span> <span class="nav-text">选票PK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#统计选票"><span class="nav-number">3.5.7.</span> <span class="nav-text">统计选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新服务器状态"><span class="nav-number">3.5.8.</span> <span class="nav-text">更新服务器状态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-集群启动领导选举"><span class="nav-number">4.</span> <span class="nav-text">4. 集群启动领导选举</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-初始投票给自己"><span class="nav-number">4.1.</span> <span class="nav-text">1. 初始投票给自己</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-更新投票"><span class="nav-number">4.2.</span> <span class="nav-text">2. 更新投票</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-根据选票确定角色"><span class="nav-number">4.3.</span> <span class="nav-text">3. 根据选票确定角色</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Follower-Leader重启选举"><span class="nav-number">5.</span> <span class="nav-text">5. Follower/Leader重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Follower重启选举"><span class="nav-number">5.1.</span> <span class="nav-text">Follower重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Follower重启投票给自己"><span class="nav-number">5.1.1.</span> <span class="nav-text">1. Follower重启投票给自己</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-发现已有Leader后成为Follower"><span class="nav-number">5.1.2.</span> <span class="nav-text">2. 发现已有Leader后成为Follower</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Leader重启选举"><span class="nav-number">5.2.</span> <span class="nav-text">Leader重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Follower发起新投票"><span class="nav-number">5.2.1.</span> <span class="nav-text">1. Follower发起新投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-广播更新投票"><span class="nav-number">5.2.2.</span> <span class="nav-text">2. 广播更新投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-选出新的Leader"><span class="nav-number">5.2.3.</span> <span class="nav-text">3. 选出新的Leader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-旧Leader恢复后发起选举"><span class="nav-number">5.2.4.</span> <span class="nav-text">4. 旧Leader恢复后发起选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-旧Leader成为Follower"><span class="nav-number">5.2.5.</span> <span class="nav-text">5. 旧Leader成为Follower</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-Zookeeper如何保证commit过的数据不丢失"><span class="nav-number">6.</span> <span class="nav-text">6. Zookeeper如何保证commit过的数据不丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Failover前状态"><span class="nav-number">6.1.</span> <span class="nav-text">1. Failover前状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-选出Leader"><span class="nav-number">6.2.</span> <span class="nav-text">2. 选出Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-通知Follower可对外服务"><span class="nav-number">6.3.</span> <span class="nav-text">3. 通知Follower可对外服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未Commit过的消息对客户端不可见"><span class="nav-number">6.4.</span> <span class="nav-text">未Commit过的消息对客户端不可见</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Zookeeper节点类型"><span class="nav-number">7.</span> <span class="nav-text">7. Zookeeper节点类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-Zookeeper如何进行语义保证？"><span class="nav-number">8.</span> <span class="nav-text">8. Zookeeper如何进行语义保证？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-Zookeeper-Watch机制"><span class="nav-number">9.</span> <span class="nav-text">9. Zookeeper Watch机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-Zookeeper实现分布式锁原理"><span class="nav-number">10.</span> <span class="nav-text">10. Zookeeper实现分布式锁原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#非公平领导选举实现分布式锁"><span class="nav-number">10.1.</span> <span class="nav-text">非公平领导选举实现分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-选主过程："><span class="nav-number">10.1.1.</span> <span class="nav-text">1. 选主过程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-放弃领导权"><span class="nav-number">10.1.2.</span> <span class="nav-text">2. 放弃领导权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-感知领导权的放弃"><span class="nav-number">10.1.3.</span> <span class="nav-text">3. 感知领导权的放弃</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-重新选举"><span class="nav-number">10.1.4.</span> <span class="nav-text">4. 重新选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非公平领导选举的优缺点"><span class="nav-number">10.1.5.</span> <span class="nav-text">非公平领导选举的优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公平领导选举实现分布式锁"><span class="nav-number">10.2.</span> <span class="nav-text">公平领导选举实现分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-选主过程"><span class="nav-number">10.2.1.</span> <span class="nav-text">1. 选主过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-放弃领导权-1"><span class="nav-number">10.2.2.</span> <span class="nav-text">2. 放弃领导权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-感知领导权的放弃-1"><span class="nav-number">10.2.3.</span> <span class="nav-text">3. 感知领导权的放弃</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-重新选举-1"><span class="nav-number">10.2.4.</span> <span class="nav-text">4. 重新选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点"><span class="nav-number">10.2.5.</span> <span class="nav-text">优缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#11-Zookeeper权限控制"><span class="nav-number">11.</span> <span class="nav-text">11. Zookeeper权限控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#12-Zookeeper中session概念"><span class="nav-number">12.</span> <span class="nav-text">12. Zookeeper中session概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#13-Zookeeper的应用场景"><span class="nav-number">13.</span> <span class="nav-text">13. Zookeeper的应用场景</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

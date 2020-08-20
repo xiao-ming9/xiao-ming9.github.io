@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. 为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的">
+<meta name="keywords" content="面试,权限认证,jwt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="权限认证">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;25&#x2F;%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="1. 为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190309191511382.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190309192028424.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190309192358290.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190310104505649.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190310110616439.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190310112749341.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+<meta property="og:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;201903101128293.png">
+<meta property="og:updated_time" content="2020-02-29T13:10:58.550Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;img-blog.csdnimg.cn&#x2F;20190309191511382.png?x-oss-process=image&#x2F;watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/25/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>权限认证 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/25/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          权限认证
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-25 22:26:44" itemprop="dateCreated datePublished" datetime="2019-11-25T22:26:44+08:00">2019-11-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-29 21:10:58" itemprop="dateModified" datetime="2020-02-29T21:10:58+08:00">2020-02-29</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-为什么使用jwt"><a href="#1-为什么使用jwt" class="headerlink" title="1. 为什么使用jwt"></a>1. 为什么使用jwt</h1><p>传统的用户认证流程如下：</p>
+<ol>
+<li>用户向服务器发送用户名和密码</li>
+<li>服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。</li>
+<li>服务器向用户返回一个 <code>session_id</code>，写入用户的 <code>Cookie</code>。</li>
+<li>用户随后的每一次请求，都会通过 <code>Cookie</code>，将 <code>session_id</code> 传回服务器。</li>
+<li>服务器收到 <code>session_id</code>，找到前期保存的数据，由此得知用户的身份。</li>
+</ol>
+<a id="more"></a>
+
+<p>这种模式的问题在于扩展性不好，如果是服务器集群，或者是跨域的服务导向架构，就要求 <code>session</code> 数据共享，每台服务器都能够读取 <code>session</code>。</p>
+<p>在基于 <code>Token</code> 进行身份验证的的应用程序中，服务器通过 <code>Payload</code>、<code>Header</code>和一个密钥(<code>secret</code>)创建令牌（<code>Token</code>）并将 <code>Token</code> 发送给客户端，客户端将 <code>Token</code> 保存在 <code>Cookie</code> 或者 <code>localStorage</code> 里面，以后客户端发出的所有请求都会携带这个令牌。可以把它放在 <code>Cookie</code> 里面自动发送，<strong>但是这样不能跨域</strong>，所以更好的做法是<strong>放在 <code>HTTP Header</code> 的 <code>Authorization</code>字段中</strong>： <code>Authorization: Bearer Token</code>。流程如下：</p>
+<ol>
+<li>用户向服务器发送用户名和密码用于登陆系统。</li>
+<li>身份验证服务响应并返回了签名的 JWT，上面包含了用户是谁的内容。</li>
+<li>用户以后每次向后端发请求都在Header中带上 JWT。</li>
+<li>服务端检查 JWT 并从中获取用户相关信息。</li>
+</ol>
+<h1 id="2-JWT的基本原理"><a href="#2-JWT的基本原理" class="headerlink" title="2. JWT的基本原理"></a>2. JWT的基本原理</h1><p>JWT 实际上是一个字符串，中间用点<code>.</code>分割成三部分，三部分分别如下：</p>
+<ul>
+<li>Header（头部）</li>
+<li>Payload（负载）</li>
+<li>Signature（签名）</li>
+</ul>
+<h2 id="Header"><a href="#Header" class="headerlink" title="Header"></a>Header</h2><p>Header 部分是一个 JSON 对象，描述的是JWT的元数据,表示的是 JSON 对象的签名和加密。其主要参数有以下这些，除了<code>alg</code>算法参数外，其他选项都是可选的。</p>
+<ul>
+<li><strong>alg</strong> 算法 (必选项)</li>
+<li><strong>typ</strong> 类型 (如果是 JWT 那么就带有一个值 JWT，如果存在的话)</li>
+<li><strong>kid</strong> 密钥 ID</li>
+<li><strong>cty</strong> 内容类型</li>
+<li><strong>jku</strong> JWK 指定 URL</li>
+<li><strong>jwk</strong> JSON 网络值</li>
+<li><strong>x5u</strong> X.509 URL</li>
+<li><strong>x5c</strong> X.509 证书链</li>
+<li><strong>x5t</strong> X.509 证书 SHA-1 指纹</li>
+<li><strong>x5t#S256</strong> X.509 证书 SHA-256 指纹</li>
+<li><strong>crit</strong> 临界值</li>
+</ul>
+<p>通常常用格式如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"alg"</span>: <span class="string">"HS256"</span>,</span><br><span class="line">    <span class="attr">"typ"</span>: <span class="string">"JWT"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对其进行Base64URL编码后就得到JWT的头部（Header）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</span><br></pre></td></tr></table></figure>
+
+<h2 id="Payload"><a href="#Payload" class="headerlink" title="Payload"></a>Payload</h2><p>Payload 部分同样是一个JSON对象，用来存放实际需要传递的数据，JWT规定了7个官方字段供使用：</p>
+<ul>
+<li><strong>sub</strong>:该JWT所面向的对象的值（唯一），可以用来鉴别用户</li>
+<li><strong>iat</strong>(issued at):在什么时候签发的token</li>
+<li><strong>exp</strong>(expires):token什么时候过期</li>
+<li><strong>nbf</strong>(not before):token在此时间之前不能被接收处理,表示什么时间开始生效</li>
+<li><strong>jti</strong>:JWT ID为web token提供唯一标识</li>
+<li><strong>iss</strong>:该JWT的签发者</li>
+<li><strong>aud</strong>:受众，用来确认令牌的可能接收者的字符串数值。</li>
+</ul>
+<p>后面三个参数通常是在更复杂的情况下(例如包含多个发行者时)才被使用。</p>
+<p>除了官方字段，还可以在这个部分定义私有字段：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"sub"</span>:<span class="string">"112345567"</span>,</span><br><span class="line">    <span class="attr">"name"</span>:<span class="string">"SilverBullet Ming"</span>,</span><br><span class="line">    <span class="attr">"admin"</span>:<span class="literal">true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样将将上面的JSON对象进行base64URL编码后得到的字符串就是JWT的载荷。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx</span><br><span class="line">ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD</span><br><span class="line">ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ</span><br></pre></td></tr></table></figure>
+
+<h2 id="Signature"><a href="#Signature" class="headerlink" title="Signature"></a>Signature</h2><p>Signature 部分是对前两部分的签名，防止数据被修改。</p>
+<p>首先需要指定一个密钥，这个密钥只有服务器知道，不泄露给用户。然后在 Header 中使用指定的签名算法（默认是 HMAC SHA 256）。</p>
+<p>将头部和载荷编码后的字符串用<code>.</code>连接在一起后（头部在前），将拼接完的字符串用 H256 算法进行加密，同时提供了一个密钥（<code>secret</code>）就得到了签名。</p>
+<p>按照下面的公式产生签名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(</span><br><span class="line">    base64UrlEncode(header) + &quot;.&quot; +</span><br><span class="line">    base64UrlEncode(payload),</span><br><span class="line">    secret</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>加密后的签名：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</span><br></pre></td></tr></table></figure>
+
+<p>将得到的三部分字符串拼接在一起后就得到了JWT</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.</span><br><span class="line">eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4ODExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ.</span><br><span class="line">wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-JWT有哪些特点？"><a href="#3-JWT有哪些特点？" class="headerlink" title="3. JWT有哪些特点？"></a>3. JWT有哪些特点？</h1><ol>
+<li>JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。</li>
+<li>JWT 不加密的情况下，不能将秘密数据写入 JWT。</li>
+<li>JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。</li>
+<li>JWT 的最大缺点是，由于服务器不保存 session 状态，因此无法在使用过程中废止某个 token，或者更改 token 的权限。也就是说，一旦 JWT 签发了，在到期之前就会始终有效，除非服务器部署额外的逻辑。</li>
+<li>JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。</li>
+<li>为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。</li>
+</ol>
+<h1 id="4-JWT认证的优势"><a href="#4-JWT认证的优势" class="headerlink" title="4. JWT认证的优势"></a>4. JWT认证的优势</h1><p>相比于Session认证方面来说，使用token进行身份认证有下面三个优势：</p>
+<h2 id="1-无状态"><a href="#1-无状态" class="headerlink" title="1. 无状态"></a>1. 无状态</h2><p>token 自身包含了身份验证所需要的所有信息，使得服务器不需要存储Session信息，这增加了系统的可用性和伸缩性，减轻了服务器的压力。但是，由于 token 无状态，也导致了它最大的缺点：<strong>当后端在 token 有有效期内废弃了一个 token 或者更改它的权限的话，不会立即生效，一般需要等到有效期过后才可以</strong>。另外，当用户 logout 的话，token 也仍然有效。除非在后端增加额外的逻辑处理。</p>
+<h2 id="2-有效避免了CSRF攻击"><a href="#2-有效避免了CSRF攻击" class="headerlink" title="2. 有效避免了CSRF攻击"></a>2. 有效避免了CSRF攻击</h2><p><strong>CSRF（Cross Site Request Forgery)</strong> 被称为<strong>跨站请求伪造</strong>，属于网络攻击领域范围。相比于 SQL 脚本注入、XSS 等等安全攻击方式，CSRF 知名度较低。</p>
+<p>CSRF 是攻击者通过一些技术手段欺骗用户的浏览器去访问一个自己曾经认证过的网站并运行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去运行。这利用了 web 中用户身份验证的一个漏洞：简单的身份验证只能保证请求发自某个用户的浏览器，却不能保证请求本身是用户自愿发出的。</p>
+<p>例如：</p>
+<p>小壮登录了某网上银行，他来到了网上银行的帖子区，看到一个帖子下面有一个链接写着“科学理财，年盈利率过万”，小壮好奇的点开了这个链接，结果发现自己的账户少了10000元。这是这么回事呢？原来黑客在链接中藏了一个请求，这个请求直接利用小壮的身份给银行发送了一个转账请求,也就是通过你的 Cookie 向银行发出请求。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">src</span>=<span class="string">http://www.mybank.com/Transfer?bankId</span>=<span class="string">11&amp;money</span>=<span class="string">10000</span>&gt;</span>科学理财，年盈利率过万<span class="tag">&lt;/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>进行 Session 认证的时候，我们一般使用 Cookie 来存储 SessionId,当我们登陆后后端生成一个SessionId 放在 Cookie 中返回给客户端，服务端通过 Redis 或者其他存储工具记录保存着这个Sessionid，客户端登录以后每次请求都会带上这个 SessionId，服务端通过这个 SessionId 来标示你这个人。如果别人通过 cookie 拿到了 SessionId 后就可以代替你的身份访问系统了。</p>
+<p>Session 认证中 Cookie 中的 SessionId 是由浏览器发送到服务端的，借助这个特性，攻击者就可以通过让用户误点攻击链接，达到攻击效果。</p>
+<p>但是，我们使用 token 的话就不会存在这个问题，在我们登录成功获得 token 之后，一般会选择存放在 local storage 中。然后我们在前端通过某些方式会给每个发到后端的请求加上这个 token,这样就不会出现 CSRF 漏洞的问题。因为，即使有个你点击了非法链接发送了请求到服务端，这个非法请求是不会携带 token 的，所以这个请求将是非法的。</p>
+<p>需要注意的是不论是 Cookie 还是 token 都无法避免跨站脚本攻击（Cross Site Scripting）XSS。</p>
+<blockquote>
+<p>XSS:用户在浏览网站、使用即时通讯软件、甚至在阅读电子邮件时，通常会点击其中的链接。攻击者通过在链接中插入恶意代码，就能够盗取用户信息。攻击者通常会用十六进制（或其他编码方式）将链接编码，以免用户怀疑它的合法性。网站在接收到包含恶意代码的请求之后会产成一个包含恶意代码的页面，而这个页面看起来就像是那个网站应当生成的合法页面一样。许多流行的留言本和论坛程序允许用户发表包含HTML和javascript的帖子。假设用户甲发表了一篇包含恶意脚本的帖子，那么用户乙在浏览这篇帖子时，恶意脚本就会执行，盗取用户乙的session信息。</p>
+</blockquote>
+<p>可以选择将 token 存储在标记为 <code>httpOnly</code> 的cookie 中。但是，这样又导致了必须自己提供CSRF保护。</p>
+<p>具体采用哪种方式需要是具体情况而定。大部分情况下存放在 <code>local storage</code> 下都是最好的选择，某些情况下可能需要存放在标记为 <code>httpOnly</code> 的cookie 中会更好。</p>
+<h2 id="3-适合移动端应用"><a href="#3-适合移动端应用" class="headerlink" title="3. 适合移动端应用"></a>3. 适合移动端应用</h2><p>使用 Session 进行身份认证的话，需要保存一份信息在服务器端，而且这种方式会依赖到 Cookie（需要 Cookie 保存 SessionId），所以不适合移动端。</p>
+<p>但是，使用 token 进行身份认证就不会存在这种问题，因为只要 token 可以被客户端存储就能够使用，而且 token 还可以跨语言使用。</p>
+<h2 id="4-单点登录友好"><a href="#4-单点登录友好" class="headerlink" title="4. 单点登录友好"></a>4. 单点登录友好</h2><p>使用 Session 进行身份认证的话，实现单点登陆，需要我们把用户的 Session 信息保存在一台电脑上，并且还会遇到常见的 Cookie 跨域的问题。但是，使用 token 进行认证的话， token 被保存在客户端，不会存在这些问题。</p>
+<h1 id="5-如何解决注销登录等场景下-token-还有效的问题"><a href="#5-如何解决注销登录等场景下-token-还有效的问题" class="headerlink" title="5. 如何解决注销登录等场景下 token 还有效的问题"></a>5. 如何解决注销登录等场景下 token 还有效的问题</h1><p>类似的场景还有：</p>
+<ul>
+<li>退出登录;</li>
+<li>修改密码;</li>
+<li>服务端修改了某个用户具有的权限或者角色；</li>
+<li>用户的帐户被删除/暂停；</li>
+<li>用户由管理员注销</li>
+</ul>
+<p>这个问题不存在于 Session 认证方式中，因为在 Session 认证方式中，遇到这种情况的话服务端删除对应的 Session 记录即可。但是，使用 token 认证的方式就不好解决了。解决方案有以下几种：</p>
+<ul>
+<li><strong>将 token 存入内存数据库</strong>：将 token 存入 DB 中，redis 内存数据库在这里是是不错的选择。如果需要让某个 token 失效就直接从 redis 中删除这个 token 即可。但是，这样会导致每次使用 token 发送请求都要先从 DB 中查询 token 是否存在的步骤，而且违背了 JWT 的无状态原则。</li>
+<li><strong>黑名单机制</strong>：和上面的方式类似，使用内存数据库比如 redis 维护一个黑名单，如果想让某个 token 失效的话就直接将这个 token 加入到黑名单即可。然后，每次使用 token 进行请求的话都会先判断这个 token 是否存在于黑名单中。</li>
+<li><strong>修改密钥（Secret）</strong>：为每个用户都创建一个专属密钥，如果我们想让某个 token 失效，我们直接修改对应用户的密钥即可。但是，这样相比于前两种引入内存数据库带来了危害更大，比如：</li>
+</ul>
+<ol>
+<li>如果服务是分布式的，则每次发出新的 token 时都必须在多台机器同步密钥。为此，你需要将必须将机密存储在数据库或其他外部服务中，这样和 Session 认证就没太大区别了。</li>
+<li>如果用户同时在两个浏览器打开系统，或者在手机端也打开了系统，如果它从一个地方将账号退出，那么其他地方都要重新进行登录，这是不可取的。</li>
+</ol>
+<ul>
+<li><strong>保持令牌的有效期限短并经常轮换</strong>：很简单的一种方式。但是，会导致用户登录状态不会被持久记录，而且需要用户经常登录。</li>
+</ul>
+<p>对于修改密码后 token 还有效问题的解决还是比较容易的，说一种比较好的方式：<strong>使用用户的密码的哈希值对 token 进行签名。因此，如果密码更改，则任何先前的令牌将自动无法验证。</strong></p>
+<h1 id="6-token-的续签问题"><a href="#6-token-的续签问题" class="headerlink" title="6. token 的续签问题"></a>6. token 的续签问题</h1><p>token 有效期一般都建议设置的不太长，那么 token 过期后如何认证，如何实现动态刷新 token，避免用户经常需要重新登录？</p>
+<p>在 Session 认证中一般的做法：假如 session 的有效期30分钟，如果 30 分钟内用户有访问，就把 session 有效期被延长30分钟。</p>
+<ol>
+<li><strong>类似于 Session 认证中的做法</strong>：这种方案满足于大部分场景。假设服务端给的 token 有效期设置为30分钟，服务端每次进行校验时，如果发现 token 的有效期马上快过期了，服务端就重新生成 token 给客户端。客户端每次请求都检查新旧token，如果不一致，则更新本地的 token。这种做法的问题是仅仅在快过期的时候请求才会更新 token ,对客户端不是很友好。</li>
+<li><strong>每次请求都返回新 token</strong>：这种方案的的思路很简单，但是，很明显，开销会比较大。</li>
+<li><strong>token 有效期设置到半夜</strong> ：这种方案是一种折衷的方案，保证了大部分用户白天可以正常登录，适用于对安全性要求不高的系统。</li>
+<li><strong>用户登录返回两个 token</strong>：第一个是 <code>acessToken</code> ，它的过期时间是 token 本身的过期时间比如半个小时，另外一个是 <code>refreshToken</code> 它的过期时间更长一点比如为1天。客户端登录后，将 <code>accessToken</code>和 <code>refreshToken</code> 保存在本地，每次访问将 <code>accessToken</code> 传给服务端。服务端校验 <code>accessToken</code> 的有效性，如果过期的话，就将 <code>refreshToken</code> 传给服务端。如果有效，服务端就生成新的 <code>accessToken</code> 给客户端。否则，客户端就重新登录即可。该方案的不足是:</li>
+</ol>
+<ul>
+<li>需要客户端来配合；</li>
+<li>用户注销的时候需要同时保证两个 token 都无效；</li>
+<li>重新请求获取 token 的过程中会有短暂 token 不可用的情况（可以通过在客户端设置定时器，当 <code>accessToken</code> 快过期的时候，提前去通过 <code>refreshToken</code> 获取新的 <code>accessToken</code>）。</li>
+</ul>
+<h1 id="7-什么是单点登录（单点登录的机制）"><a href="#7-什么是单点登录（单点登录的机制）" class="headerlink" title="7. 什么是单点登录（单点登录的机制）"></a>7. 什么是单点登录（单点登录的机制）</h1><p>单点登录（SSO，Single Sign On）就是在多个系统中，用户只需一次登录，各个系统即可感知该用户已经登录。</p>
+<h2 id="单系统登录机制"><a href="#单系统登录机制" class="headerlink" title="单系统登录机制"></a>单系统登录机制</h2><h3 id="http无状态协议"><a href="#http无状态协议" class="headerlink" title="http无状态协议"></a>http无状态协议</h3><p>web应用采用 browser/server 架构，http 作为通信协议。http 是无状态协议，浏览器的每一次请求，服务器会独立处理，不与之前或之后的请求产生关联。这也同时意味着，任何用户都能通过浏览器访问服务器资源，如果想保护服务器的某些资源，必须限制浏览器请求；要限制浏览器请求，必须鉴别浏览器请求，响应合法请求，忽略非法请求；要鉴别浏览器请求，必须清楚浏览器请求状态。既然http协议无状态，那就需要服务器和浏览器共同维护一个状态，这就是会话机制。</p>
+<h3 id="会话机制"><a href="#会话机制" class="headerlink" title="会话机制"></a>会话机制</h3><p>浏览器第一次请求服务器，服务器创建一个会话，并将会话的 id 作为响应的一部分发送给浏览器，浏览器存储会话 id，并在后续第二次和第三次请求中带上会话 id，服务器取得请求中的会话 id 就知道是不是同一个用户了（登录的用户在 session 里面是可以查询到已经存储的 isLogin 属性设置为 true），这个过程用下图说明，后续请求与第一次请求产生了关联</p>
+<p><img src="https://img-blog.csdnimg.cn/20190309191511382.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="会话机制"></p>
+<p>服务器在内存中保存会话对象，浏览器保存会话 id 有两种方式：</p>
+<ul>
+<li>请求参数</li>
+<li>通过cookie实现</li>
+</ul>
+<p>将会话 id 作为每一个请求的参数，服务器接收请求自然能解析参数获得会话 id，并借此判断是否来自同一会话，很明显，这种方式不靠谱。</p>
+<p>另外的方法是让浏览器自己来维护这个会话 id，每次发送 http 请求时浏览器自动发送会话 id，cookie 机制正好用来做这件事。cookie 是浏览器用来存储少量数据的一种机制，数据以<code>key/value</code>形式存储，浏览器发送 http 请求时自动附带 cookie 信息</p>
+<p>tomcat 会话机制也实现 了cookie（就是当客户端访问 tomcat 的时候，tomcat 也可以给客户端发送一个 cookie），访问 tomcat 服务器时，浏览器中可以看到一个名为<code>JSESSIONID</code>的 cookie，这就是 tomcat 会话机制维护的会话 id，使用了 cookie 的请求响应过程如下图:</p>
+<p><img src="https://img-blog.csdnimg.cn/20190309192028424.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="tomcat实现会话机制原理"></p>
+<h3 id="登录状态"><a href="#登录状态" class="headerlink" title="登录状态"></a>登录状态</h3><p>有了会话机制，登录状态就好明白了，假设浏览器第一次请求服务器需要输入用户名与密码验证身份，服务器拿到用户名密码去数据库比对，正确的话说明当前持有这个会话的用户是合法用户，应该将这个会话标记为“已授权”或者“已登录”等等之类的状态，既然是会话的状态，自然要保存在会话对象中，tomcat 在会话对象中设置登录状态如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/20190309192358290.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="Tomcat登录状态"></p>
+<p>每次请求受保护资源时都会检查会话对象中的登录状态，只有 <code>isLogin=true</code> 的会话才能访问，登录机制因此而实现。</p>
+<p>多系统下一个应用可能有很多系统组成，单系统登录功能主要是用 Session 保存用户信息来实现的，但是，多系统即可能有多个 Tomcat，而 Session 是依赖当前系统的Tomcat，所以系统 A 的 Session 和系统 B 的 Session 是不共享的。</p>
+<p>这时候就需要使用单点登录。</p>
+<h2 id="单点登录机制和实现方法"><a href="#单点登录机制和实现方法" class="headerlink" title="单点登录机制和实现方法"></a>单点登录机制和实现方法</h2><p>相比于单系统登录，sso 需要一个独立的认证中心，只有认证中心能接受用户的用户名密码等安全信息，其他系统不提供登录入口，只接受认证中心的间接授权。间接授权通过令牌（tokens）实现，sso 认证中心验证用户的用户名密码没问题，创建授权令牌，在接下来的跳转过程中，授权令牌作为参数发送给各个子系统，子系统拿到令牌，即得到了授权，可以借此创建局部会话，局部会话登录方式与单系统的登录方式相同。这个过程，也就是单点登录的原理，用下图说明：</p>
+<p><img src="https://img-blog.csdnimg.cn/20190310104505649.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="单点登录原理"></p>
+<p>浏览器首先访问系统1，系统1检测到用户没有登录。于是带上系统1的地址转发到 sso 认证中心，也发现没有登录，于是带上系统1的地址来到登录页面进行登录，登录完毕之后，sso 认证中心就开始创建全局会话</p>
+<p><img src="https://img-blog.csdnimg.cn/20190310110616439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="单点登录过程"></p>
+<blockquote>
+<p>如何创建全局会话的？<br>答：sso认证中心校验用户信息，创建用户与 sso 认证中心之间的会话，称为全局会话），创建授权令牌 tokens,接着有了 tokens 令牌之后就可以跳转到系统1的地址了，这个时候系统1向 sso 认证中心校验令牌有效，sso 认证中心把系统1的地址注册到 sso 认证中心上，然后返回给系统1，令牌有效，于是浏览器就可以访问系统1了。<br>再接着如果浏览器要访问系统2的话，在系统2上一验证，发现没有登录，这个时候就带着系统2的地址跳去 sso 认证中心，sso认证中心上验证已经登录，于是把令牌 tokens 发送给系统2，这个时候系统2再次带着系统2的地址和令牌来到 sso 认证中心验证时，令牌肯定是有效的，然后 sso 中心把系统2的地址注册到本地上，接着告诉系统2，令牌有效，于是浏览器就可以和系统2进行局部会话了</p>
+</blockquote>
+<p>注销登录过程：</p>
+<p><img src="https://img-blog.csdnimg.cn/20190310112749341.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzQwMjQxOTU3,size_16,color_FFFFFF,t_70" alt="单点登录注销登录过程"></p>
+<p><img src="https://img-blog.csdnimg.cn/201903101128293.png" alt="单点登录注销登录流程说明"></p>
+<h1 id="8-如何使用Session进行身份验证？"><a href="#8-如何使用Session进行身份验证？" class="headerlink" title="8. 如何使用Session进行身份验证？"></a>8. 如何使用Session进行身份验证？</h1><p>很多时候都是通过 SessionID 来实现特定的用户，SessionID 一般会选择存放在 Redis 中。举个例子：用户成功登陆系统，然后返回给客户端具有 SessionID 的 Cookie，当用户向后端发起请求的时候会把 SessionID 带上，这样后端就知道你的身份状态了。关于这种认证方式更详细的过程如下：</p>
+<ol>
+<li>用户向服务器发送用户名和密码用于登陆系统。</li>
+<li>服务器验证通过后，服务器为用户创建一个 Session，并将 Session信息存储 起来。</li>
+<li>服务器向用户返回一个 SessionID，写入用户的 Cookie。</li>
+<li>当用户保持登录状态时，Cookie 将与每个后续请求一起被发送出去。</li>
+<li>服务器可以将存储在 Cookie 上的 Session ID 与存储在内存中或者数据库中的 Session 信息进行比较，以验证用户的身份，返回给用户客户端响应信息的时候会附带用户当前的状态。</li>
+</ol>
+<p>使用 Session 的时候需要注意下面几个点：</p>
+<ul>
+<li>依赖Session的关键业务一定要确保客户端开启了Cookie。</li>
+<li>注意Session的过期时间</li>
+</ul>
+<h1 id="9-如果没有Cookie的话Session还能用吗？"><a href="#9-如果没有Cookie的话Session还能用吗？" class="headerlink" title="9. 如果没有Cookie的话Session还能用吗？"></a>9. 如果没有Cookie的话Session还能用吗？</h1><p>一般是通过 Cookie 来保存 SessionID ，假如使用了 Cookie 保存 SessionID的方案的话， 如果客户端禁用了Cookie，那么Seesion就无法正常工作。</p>
+<p>但是，并不是没有 Cookie 之后就不能用 Session 了，比如可以将 SessionID 放在请求的 url 里面<code>https://javaguide.cn/?session_id=xxx</code> 。这种方案的话可行，但是安全性和用户体验感降低。当然，为了安全也可以对 SessionID 进行一次加密之后再传入后端。</p>
+<h1 id="10-什么是OAuth-2-0？"><a href="#10-什么是OAuth-2-0？" class="headerlink" title="10. 什么是OAuth 2.0？"></a>10. 什么是OAuth 2.0？</h1><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，OAuth 2.0 更快，更容易实现，OAuth 1.0 已经被废弃。</p>
+<p>实际上它就是一种授权机制，它的最终目的是为第三方应用颁发一个有时效性的令牌 token，使得第三方应用能够通过该令牌获取相关的资源。</p>
+<p>OAuth 2.0 比较常用的场景就是第三方登录，当你的网站接入了第三方登录的时候一般就是使用的 OAuth 2.0 协议。</p>
+<p>另外，现在OAuth 2.0也常见于支付场景（微信支付、支付宝支付）和开发平台（微信开放平台、阿里开放平台等等）。</p>
+<h2 id="和-SSO-区别"><a href="#和-SSO-区别" class="headerlink" title="和 SSO 区别"></a>和 SSO 区别</h2><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。SSO 解决的是一个公司的多个相关的自系统的之间的登陆问题比如京东旗下相关子系统京东金融、京东超市、京东家电等等。</p>
+<p><strong>参考内容</strong></p>
+<blockquote>
+<p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81/" rel="tag"># 权限认证</a>
+              <a href="/tags/jwt/" rel="tag"># jwt</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/25/RabbitMQ/" rel="prev" title="RabbitMQ">
+      <i class="fa fa-chevron-left"></i> RabbitMQ
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/27/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/" rel="next" title="动态规划算法基本思想">
+      动态规划算法基本思想 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-为什么使用jwt"><span class="nav-number">1.</span> <span class="nav-text">1. 为什么使用jwt</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-JWT的基本原理"><span class="nav-number">2.</span> <span class="nav-text">2. JWT的基本原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Header"><span class="nav-number">2.1.</span> <span class="nav-text">Header</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Payload"><span class="nav-number">2.2.</span> <span class="nav-text">Payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Signature"><span class="nav-number">2.3.</span> <span class="nav-text">Signature</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-JWT有哪些特点？"><span class="nav-number">3.</span> <span class="nav-text">3. JWT有哪些特点？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-JWT认证的优势"><span class="nav-number">4.</span> <span class="nav-text">4. JWT认证的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-无状态"><span class="nav-number">4.1.</span> <span class="nav-text">1. 无状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-有效避免了CSRF攻击"><span class="nav-number">4.2.</span> <span class="nav-text">2. 有效避免了CSRF攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-适合移动端应用"><span class="nav-number">4.3.</span> <span class="nav-text">3. 适合移动端应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-单点登录友好"><span class="nav-number">4.4.</span> <span class="nav-text">4. 单点登录友好</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-如何解决注销登录等场景下-token-还有效的问题"><span class="nav-number">5.</span> <span class="nav-text">5. 如何解决注销登录等场景下 token 还有效的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-token-的续签问题"><span class="nav-number">6.</span> <span class="nav-text">6. token 的续签问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-什么是单点登录（单点登录的机制）"><span class="nav-number">7.</span> <span class="nav-text">7. 什么是单点登录（单点登录的机制）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单系统登录机制"><span class="nav-number">7.1.</span> <span class="nav-text">单系统登录机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http无状态协议"><span class="nav-number">7.1.1.</span> <span class="nav-text">http无状态协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#会话机制"><span class="nav-number">7.1.2.</span> <span class="nav-text">会话机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#登录状态"><span class="nav-number">7.1.3.</span> <span class="nav-text">登录状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单点登录机制和实现方法"><span class="nav-number">7.2.</span> <span class="nav-text">单点登录机制和实现方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-如何使用Session进行身份验证？"><span class="nav-number">8.</span> <span class="nav-text">8. 如何使用Session进行身份验证？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-如果没有Cookie的话Session还能用吗？"><span class="nav-number">9.</span> <span class="nav-text">9. 如果没有Cookie的话Session还能用吗？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-什么是OAuth-2-0？"><span class="nav-number">10.</span> <span class="nav-text">10. 什么是OAuth 2.0？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#和-SSO-区别"><span class="nav-number">10.1.</span> <span class="nav-text">和 SSO 区别</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

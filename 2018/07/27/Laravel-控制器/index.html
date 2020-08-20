@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="控制器用于组织管理相对复杂的业务逻辑处理的一个类，存放在app&#x2F;Http&#x2F;Controllers目录下   定义控制器在Laravel目录下，使用Artisan命令会在app&#x2F;Http&#x2F;Controllers目录下创建一个控制器UserController.php  php artisan make:controller UserController    所有的Laravel控制器都继承控制器基">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel—控制器">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;27&#x2F;Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="控制器用于组织管理相对复杂的业务逻辑处理的一个类，存放在app&#x2F;Http&#x2F;Controllers目录下   定义控制器在Laravel目录下，使用Artisan命令会在app&#x2F;Http&#x2F;Controllers目录下创建一个控制器UserController.php  php artisan make:controller UserController    所有的Laravel控制器都继承控制器基">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-27T06:48:20.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Laravel—控制器 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel—控制器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2018-07-27 07:26:04 / 修改时间：14:48:20" itemprop="dateCreated datePublished" datetime="2018-07-27T07:26:04+08:00">2018-07-27</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h1><p>用于组织管理相对复杂的业务逻辑处理的一个类，存放在<code>app/Http/Controllers</code>目录下  </p>
+<h2 id="定义控制器"><a href="#定义控制器" class="headerlink" title="定义控制器"></a>定义控制器</h2><p>在Laravel目录下，使用Artisan命令会在<code>app/Http/Controllers</code>目录下创建一个控制器<code>UserController.php</code></p>
+<blockquote>
+<p>php artisan make:controller UserController  </p>
+</blockquote>
+<p>所有的Laravel控制器都继承控制器基类<code>App\Http\Controllers\Controller</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Http</span>\<span class="title">Request</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserController</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/*在这里添加相应的代码*/</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 为指定用户显示详情</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Response</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@author</span> blog</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">show</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'the user_id is'</span> . $id; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>用以下方法定义指向该控制器的路由：</p>
+<blockquote>
+<p>Route::get(‘user/{id}’,‘UserController@show’);  </p>
+</blockquote>
+<p>如果一个请求匹配到上面路由的URI，就会调用UserController里面的<strong>show</strong>方法执行  </p>
+<h2 id="单动作控制器"><a href="#单动作控制器" class="headerlink" title="单动作控制器"></a>单动作控制器</h2><p>定义一个只处理一个动作的控制器，可以在这个控制器中定义<code>__invoke</code>,当为这个控制器注册路由的时候，不需要指定方法，PHP会<strong>自动调用__invoke()方法</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Http</span>\<span class="title">Request</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShowProfile</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/*在这里添加相应的代码*/</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__invoke</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'自动调用函数'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//路由调用方法：</span></span><br><span class="line">Route::get(<span class="string">'user'</span>,<span class="string">'ShowProfile'</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="控制器中间件"><a href="#控制器中间件" class="headerlink" title="控制器中间件"></a>控制器中间件</h2><p>中间件可以分配给控制器路由：</p>
+<blockquote>
+<p>Route::get(‘user’,‘UserController@show’)-&gt;middleware(‘token’);  </p>
+</blockquote>
+<p>还可以直接把中间件放在控制器的<strong>构造函数</strong>中，这样该中间件对所有控制器都生效</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Http</span>\<span class="title">Request</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserController</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">//在这里添加相应的代码</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">//构造函数</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//对所有函数都生效</span></span><br><span class="line">        this-&gt;middleware(<span class="string">'token'</span>);</span><br><span class="line">        <span class="comment">//只对show方法生效</span></span><br><span class="line">        this-&gt;middleware(<span class="string">'handle'</span>)-&gt;only(<span class="string">'show'</span>);</span><br><span class="line">        <span class="comment">//对除show以外的所与方法生效</span></span><br><span class="line">        this-&gt;middleware(<span class="string">'handle'</span>)-&gt;expect(<span class="string">'show'</span>);</span><br><span class="line">        <span class="comment">//以数组形式指定多个控制器方法</span></span><br><span class="line">        this-&gt;middleware(<span class="string">'auth'</span>)-&gt;only/expect([<span class="string">'show'</span>,<span class="string">'index'</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 为指定用户显示详情</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> int $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> Response</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@author</span> blog</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">show</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">'the user_id is'</span> . $id; </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">index</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//代码</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还可以使用闭包注册中间件，即在控制器中直接定义相应的中间件，不需要先创建中间件</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;middleware(<span class="function"><span class="keyword">function</span> <span class="params">($request,$nest)</span></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $next($request);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="资源控制器"><a href="#资源控制器" class="headerlink" title="资源控制器"></a>资源控制器</h2><p>也称为RESTful控制器，可以根据相应的URL调用控制器的相应函数进行处理,使用以下指令创建资源控制器</p>
+<blockquote>
+<p>php artisan make:controller PostController –resource  </p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Http</span>\<span class="title">Request</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PostControlle</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Display a listing of the resource.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">index</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Show the form for creating a new resource.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">create</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Store a newly created resource in storage.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  \Illuminate\Http\Request  $request</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">store</span><span class="params">(Request $request)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Display the specified resource.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  int  $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">show</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Show the form for editing the specified resource.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  int  $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">edit</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Update the specified resource in storage.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  \Illuminate\Http\Request  $request</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  int  $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">update</span><span class="params">(Request $request, $id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Remove the specified resource from storage.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  int  $id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\Response</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">destroy</span><span class="params">($id)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在路由器中通过使用<code>resource</code>方法为控制器注册路由</p>
+<blockquote>
+<p>Route::resource(‘foos’,’PostController’)  </p>
+</blockquote>
+<p>对于<code>localhost/foos/</code>后面跟不同的动作，控制器会自动调用不同的参数进行处理<br>还可以通过一个数组传入<code>resource</code>方法的方式一次性创建多个资源控制器</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Route::resources([</span><br><span class="line">    <span class="string">'posts'</span>=&gt;<span class="string">'PostController'</span>,</span><br><span class="line">    <span class="string">'photos'</span>=&gt;<span class="string">'PhotoController'</span></span><br><span class="line">]);</span><br></pre></td></tr></table></figure>
+
+<p><strong>资源控制器处理的动作</strong>  </p>
+<table>
+<thead>
+<tr>
+<th>请求方式</th>
+<th>URI路径</th>
+<th>控制器方法</th>
+<th>路由名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td>/foos</td>
+<td>index</td>
+<td>foos.index</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/foos/create</td>
+<td>create</td>
+<td>foos.create</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>/foos</td>
+<td>store</td>
+<td>foos.store</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/foos/{foo}</td>
+<td>show</td>
+<td>foos.show</td>
+</tr>
+<tr>
+<td>GET</td>
+<td>/foos/{foo}/edit</td>
+<td>edit</td>
+<td>foos.edit</td>
+</tr>
+<tr>
+<td>PUT/PATCH</td>
+<td>/foos/{foo}</td>
+<td>update</td>
+<td>foos.update</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>/foos/{foo}</td>
+<td>destroy</td>
+<td>foos.destroy</td>
+</tr>
+</tbody></table>
+<p><strong>对于PUT、PATCH、DELETE请求要用伪造表单的方法</strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">form</span> <span class="attr">action</span>=<span class="string">"/foos/bar"</span> <span class="attr">metho</span>=<span class="string">"POST"</span>&gt;</span></span><br><span class="line">    @method('PUT/DELETE/PATCH)</span><br><span class="line">    @csrf</span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="部分资源控制器"><a href="#部分资源控制器" class="headerlink" title="部分资源控制器"></a>部分资源控制器</h3><p>声明资源路由时可以指定该路由处理的动作子集：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Route::resouce(<span class="string">'poos'</span>,<span class="string">'PostController'</span>,[<span class="string">'only'</span>=&gt;</span><br><span class="line">    [<span class="string">'index'</span>,<span class="string">'show'</span>]</span><br><span class="line">]);</span><br><span class="line"></span><br><span class="line">Route::resouce(<span class="string">'poos'</span>,<span class="string">'PostController'</span>,[<span class="string">'except'</span>]=&gt;</span><br><span class="line">    [<span class="string">'create'</span>,<span class="string">'store'</span>,<span class="string">'update'</span>,<span class="string">'destroy'</span>]</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<h2 id="更改资源控制器中的函数名称"><a href="#更改资源控制器中的函数名称" class="headerlink" title="更改资源控制器中的函数名称"></a>更改资源控制器中的函数名称</h2><p>即本地化资源URI，如果要自定义资源控制器的函数名称，可以在<code>AppserviceProvider</code>的<code>boot</code>方法中实现,使用<code>Route::resourceVerbs</code>方法</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppServiceProvider</span> <span class="keyword">extends</span> <span class="title">ServiceProvider</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Bootstrap any application services.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">boot</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">       </span><br><span class="line">       Route::resourceVerbs([</span><br><span class="line">           <span class="string">'create'</span> =&gt; <span class="string">'xinzeng'</span>,</span><br><span class="line">           <span class="string">'edit'</span>=&gt; <span class="string">'bianji'</span>,</span><br><span class="line">       ]);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="路由缓存"><a href="#路由缓存" class="headerlink" title="路由缓存"></a>路由缓存</h2><p>路由缓存可以加快路由注册速度，使用以下指令生成路由缓存：</p>
+<blockquote>
+<p>php artisan route:cache  </p>
+</blockquote>
+<p>运行完成后，每次请求都会从缓存中读取路由，如果添加了新的路由则重新生成路由缓存<br>想要移除路由缓存，执行以下命令：</p>
+<blockquote>
+<p>php artisan route:clear</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/26/Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="prev" title="Laravel—中间件">
+      <i class="fa fa-chevron-left"></i> Laravel—中间件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/27/Laravel%E2%80%94%E8%AF%B7%E6%B1%82/" rel="next" title="Laravel—请求">
+      Laravel—请求 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#控制器"><span class="nav-number">1.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义控制器"><span class="nav-number">1.1.</span> <span class="nav-text">定义控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单动作控制器"><span class="nav-number">1.2.</span> <span class="nav-text">单动作控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制器中间件"><span class="nav-number">1.3.</span> <span class="nav-text">控制器中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源控制器"><span class="nav-number">1.4.</span> <span class="nav-text">资源控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部分资源控制器"><span class="nav-number">1.4.1.</span> <span class="nav-text">部分资源控制器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更改资源控制器中的函数名称"><span class="nav-number">1.5.</span> <span class="nav-text">更改资源控制器中的函数名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由缓存"><span class="nav-number">1.6.</span> <span class="nav-text">路由缓存</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

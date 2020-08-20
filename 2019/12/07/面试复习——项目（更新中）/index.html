@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. 数据库 数据表分类可以通过添加 parent_id 以及“第几级分类”字段来进行级别划分，避免一个级别建一个数据表的操作。 使用业务无关自增 id 作为主键：   防止后期业务发生变化需要重构某个字段（方便业务扩展）； 如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如果不是自增主键，那么可能会在中间插入，在中间插入，B">
+<meta name="keywords" content="面试,项目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目经验">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;07&#x2F;%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E9%A1%B9%E7%9B%AE%EF%BC%88%E6%9B%B4%E6%96%B0%E4%B8%AD%EF%BC%89&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="1. 数据库 数据表分类可以通过添加 parent_id 以及“第几级分类”字段来进行级别划分，避免一个级别建一个数据表的操作。 使用业务无关自增 id 作为主键：   防止后期业务发生变化需要重构某个字段（方便业务扩展）； 如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如果不是自增主键，那么可能会在中间插入，在中间插入，B">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;DFA%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2.jpeg">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;HashMap%E5%AE%9E%E7%8E%B0%E7%9A%84DFA%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%95%99%E5%B8%88%E8%B5%84%E6%A0%BC%E8%AF%81%E5%9F%B9%E8%AE%AD%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%86%A0%E7%86%A0%E6%98%9F%E5%85%89%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%9E%B6%E6%9E%84%E5%9B%BE.png">
+<meta property="og:updated_time" content="2020-04-02T03:05:09.810Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;DFA%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2.jpeg">
+
+<link rel="canonical" href="http://yoursite.com/2019/12/07/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E9%A1%B9%E7%9B%AE%EF%BC%88%E6%9B%B4%E6%96%B0%E4%B8%AD%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>项目经验 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/07/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E9%A1%B9%E7%9B%AE%EF%BC%88%E6%9B%B4%E6%96%B0%E4%B8%AD%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          项目经验
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-07 00:18:55" itemprop="dateCreated datePublished" datetime="2019-12-07T00:18:55+08:00">2019-12-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-02 11:05:09" itemprop="dateModified" datetime="2020-04-02T11:05:09+08:00">2020-04-02</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="1-数据库"><a href="#1-数据库" class="headerlink" title="1. 数据库"></a>1. 数据库</h1><ol>
+<li>数据表分类可以通过添加 <code>parent_id</code> 以及“第几级分类”字段来进行级别划分，避免一个级别建一个数据表的操作。</li>
+<li>使用业务无关自增 id 作为主键：</li>
+</ol>
+<ul>
+<li>防止后期业务发生变化需要重构某个字段（方便业务扩展）；</li>
+<li>如果表使用自增主键，那么每次插入新的记录，记录就会顺序添加到当前索引节点的后续位置，当一页写满，就会自动开辟一个新的页。如果不是自增主键，那么可能会在中间插入，在中间插入，B+ 树为了维持平衡，引起B+ 树的节点分裂。 总的来说用自增主键是可以提高查询和插入的性能。（性能考量）</li>
+</ul>
+<ol start="3">
+<li>课程模块：</li>
+</ol>
+<ul>
+<li>课程分类作为一张表</li>
+<li>课程作为一个单独的表</li>
+<li>课程内容表（一个课程对应多集课程内容）</li>
+<li>课程练习表（一集对应多道练习题：选择、填空）</li>
+<li>课程评价表</li>
+</ul>
+<ol start="4">
+<li>用户模块</li>
+</ol>
+<ul>
+<li>用户信息表</li>
+<li>用户订单表</li>
+<li>用户观看历史表</li>
+<li>用户答题信息表</li>
+</ul>
+<ol start="5">
+<li>题库模块</li>
+</ol>
+<ul>
+<li>试卷信息表</li>
+<li>题目信息表（所属试卷，题型题号，正确答案等）</li>
+<li>选项信息表</li>
+</ul>
+<h1 id="2-项目使用的技术"><a href="#2-项目使用的技术" class="headerlink" title="2. 项目使用的技术"></a>2. 项目使用的技术</h1><h2 id="使用-Redis"><a href="#使用-Redis" class="headerlink" title="使用 Redis"></a>使用 Redis</h2><p>项目中使用 Redis 实现短信验证码的存储验证以及观看视频历史缓存。</p>
+<a id="more"></a>
+
+<h3 id="短信存储验证"><a href="#短信存储验证" class="headerlink" title="短信存储验证"></a>短信存储验证</h3><p>使用 String 字符串,随机生成字符数字拼接后传入字符串。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CommonResult <span class="title">generateAuthCode</span><span class="params">(String telephone)</span> </span>&#123;</span><br><span class="line">    StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    Random random = <span class="keyword">new</span> Random();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">6</span>; i++) &#123;</span><br><span class="line">        sb.append(random.nextInt(<span class="number">10</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//验证码绑定手机号并存储到redis</span></span><br><span class="line">    redisService.set(REDIS_KEY_PREFIX_AUTH_CODE + telephone, sb.toString());</span><br><span class="line">    redisService.expire(REDIS_KEY_PREFIX_AUTH_CODE + telephone, AUTH_CODE_EXPIRE_SECONDS);</span><br><span class="line">    <span class="keyword">return</span> CommonResult.success(sb.toString(), <span class="string">"获取验证码成功"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>验证：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> CommonResult <span class="title">verifyAuthCode</span><span class="params">(String telephone, String authCode)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isEmpty(authCode)) &#123;</span><br><span class="line">        <span class="keyword">return</span> CommonResult.failed(<span class="string">"请输入验证码"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    String realAuthCode = redisService.get(REDIS_KEY_PREFIX_AUTH_CODE + telephone);</span><br><span class="line">    <span class="keyword">boolean</span> result = authCode.equals(realAuthCode);</span><br><span class="line">    <span class="keyword">if</span> (result) &#123;</span><br><span class="line">        <span class="keyword">return</span> CommonResult.success(<span class="keyword">null</span>, <span class="string">"验证码校验成功"</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> CommonResult.failed(<span class="string">"验证码不正确"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="集数缓存"><a href="#集数缓存" class="headerlink" title="集数缓存"></a>集数缓存</h3><p>使用 Set 集合保存用户观看的集数，用数字表示（利用不允许有重复元素，并且集合中的元素是无序的）</p>
+<p>存储：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(Redis::exists(<span class="string">'education2_video_number_usr:'</span>.$user-&gt;id.<span class="string">'_number:'</span>.$courseId))&#123;</span><br><span class="line">    Redis::sAdd(<span class="string">'education2_video_number_usr:'</span>.$user-&gt;id.<span class="string">'_number:'</span>.$courseId, $currentNumber);</span><br><span class="line">&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">    Redis::sAdd(<span class="string">'education2_video_number_usr:'</span>.$user-&gt;id.<span class="string">'_number:'</span>.$courseId, $currentNumber);</span><br><span class="line">    $course = Course::where(<span class="string">'id'</span>,$courseId)-&gt;first();</span><br><span class="line">    $days = $course-&gt;days;</span><br><span class="line">    Redis::expire(<span class="string">'education2_video_number_usr:'</span>.$user-&gt;id.<span class="string">'_number:'</span>.$courseId,<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*$days+<span class="number">60</span>*<span class="number">60</span>*<span class="number">24</span>*<span class="number">365</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$numbers = Redis::smembers(<span class="string">'education2_video_number_usr:'</span>.$user-&gt;id.<span class="string">'_number:'</span>.$courseId);</span><br></pre></td></tr></table></figure>
+<h3 id="热搜功能"><a href="#热搜功能" class="headerlink" title="热搜功能"></a>热搜功能</h3><p>使用 Zset 实现热搜功能：将<code>&lt;搜索词,词频&gt;</code>放到 Redis 缓存中，同时将搜索时间通过 String 存入<code>&lt;搜索词,时间&gt;</code>，通过 <code>SpringTask</code> 定时任务每五分钟进行一次获取，同时判断时间是否超过一周，超过一周热度归零。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//首先注入RedisTemplate</span></span><br><span class="line"><span class="keyword">private</span> RedisTemplate&lt;Object, Object&gt; template;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//入参每次搜索时输入的字符串，每次都放入ZSet中</span></span><br><span class="line"><span class="keyword">if</span> (StringUtils.isNotBlank(searchStr)) &#123;</span><br><span class="line">            <span class="comment">//将查询参数添加到redis的zset中</span></span><br><span class="line">            template.opsForZSet().incrementScore(<span class="string">"hwords"</span>, searchStr, <span class="number">1</span>);</span><br><span class="line">            <span class="comment">//时间存入</span></span><br><span class="line">            valueOperations.getAndSet(searchStr, now);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//获取热词</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> List <span class="title">getRedisScoreMaxVal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List list = <span class="keyword">new</span> ArrayList();</span><br><span class="line">        <span class="comment">//参数1（redis的K值），参数2（从第几条开始），参数3（从0开始截取多少位）</span></span><br><span class="line">        Set&lt;ZSetOperations.TypedTuple&lt;Object&gt;&gt; typedTupleSet = template.opsForZSet().reverseRangeWithScores(<span class="string">"hwords"</span>, <span class="number">0</span>, <span class="number">4</span>);</span><br><span class="line">        Iterator iterator = typedTupleSet.iterator();</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            ZSetOperations.TypedTuple&lt;Object&gt; typedTuple = (ZSetOperations.TypedTuple&lt;Object&gt;) iterator.next();</span><br><span class="line">            Object value = typedTuple.getValue();</span><br><span class="line">            <span class="keyword">if</span> ((now - time) &gt;= <span class="number">2592000000L</span>) &#123;</span><br><span class="line">                <span class="comment">//时间超过一个月没搜索就把这个词热度归0</span></span><br><span class="line">                zSetOperations.add(<span class="string">"hwords"</span>, value, <span class="number">0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            list.add(value);</span><br><span class="line">            <span class="comment">//获取score值</span></span><br><span class="line">            <span class="keyword">double</span> score = typedTuple.getScore();</span><br><span class="line">            </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> list;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="SpringTask"><a href="#SpringTask" class="headerlink" title="SpringTask"></a>SpringTask</h2><p>在配置类中添加一个 <code>@EnableScheduling</code> 注解开启SpringTask的定时任务能力;</p>
+<p>编写定时任务：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GetHotWordTask</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SingleClass singleClass;<span class="comment">//某一个存储热搜的单例对象</span></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * cron表达式：Seconds Minutes Hours DayofMonth Month DayofWeek [Year]</span></span><br><span class="line"><span class="comment">     * 每5分钟扫描一次，扫描设定超时时间之前下的订单，如果没支付则取消该订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">     @<span class="meta">@Scheduled</span>(cron = <span class="string">"0 0/5 * ? * ?"</span>)</span><br><span class="line">     <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cancelTimeOutOrder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//这是一个单例的List</span></span><br><span class="line">        singleClass.hotWords = getRedisScoreMaxVal();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 SpringTask 的原因：SpringTask 是 Spring 自主研发的轻量级定时任务工具，相比于 Quartz 更加简单方便，且不需要引入其他依赖即可使用。将它看成一个轻量级的Quartz，使用起来比 Quartz 简单很多，在 Spring 应用中，直接使用 @Scheduled 注解即可，但对于集群项目比较麻烦，需要避免集群环境下任务被多次调用的情况，而且不能动态维护，任务启动以后不能修改、暂停等。</p>
+<blockquote>
+<p>Timer：jdk自带的java.util.Timer类，这个类允许你调度一个java.util.TimerTask任务。使用这种方式可以让程序按照某一个频度执行，但不能在指定时间运行，一般很少使用，主要用于非Spring项目简单的任务调度。</p>
+</blockquote>
+<h2 id="使用-RabbitMQ进行异步处理"><a href="#使用-RabbitMQ进行异步处理" class="headerlink" title="使用 RabbitMQ进行异步处理"></a>使用 RabbitMQ进行异步处理</h2><p>用于解决用户下单以后，订单超时如何取消订单的问题。</p>
+<ul>
+<li>用户进行下单操作；</li>
+<li>生成订单，获取订单的id；</li>
+<li>获取到设置的订单超时时间（设置为30分钟不支付取消订单）；</li>
+<li>按订单超时时间发送一个延迟消息给RabbitMQ，让它在订单超时后触发取消订单的操作；</li>
+<li>检查队列中订单的状态，如果为未付款，进行取消订单操作。</li>
+</ul>
+<p>队列说明：</p>
+<p>使用 Direct Exchange 处理路由键，之所以使用两个队列，是利用死信队列转发的特点实现延迟消费，不然到 MQ 里的消息如果不阻塞的话会被马上消费。</p>
+<ul>
+<li><code>order.direct</code>（取消订单消息队列所绑定的交换机）:绑定的队列为<code>order.cancel</code>，一旦有消息以<code>order.cancel</code>为路由键发过来，会发送到此队列。</li>
+<li><code>direct.ttl</code>（订单延迟消息队列所绑定的交换机）:绑定的队列为<code>order.cancel.ttl</code>，一旦有消息以<code>order.cancel.ttl</code>为路由键发送过来，会转发到此队列，并在此队列保存一定时间，等到超时后会自动将消息发送到<code>order.cancel</code>（取消订单消息消费队列）。</li>
+</ul>
+<p>设置 ttl 队列延迟转发到订单取消队列：</p>
+<blockquote>
+<p>RabbitMQ 的 Queue 可以配置 <code>x-dead-letter-exchange</code> 和 <code>x-dead-letter-routing-key</code>（可选）两个参数，如果队列内出现了 dead letter，则按照这两个参数重新路由转发到指定的队列。  </p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Queue <span class="title">orderTtlQueue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> QueueBuilder</span><br><span class="line">            .durable(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getName())</span><br><span class="line">            .withArgument(<span class="string">"x-dead-letter-exchange"</span>, QueueEnum.QUEUE_ORDER_CANCEL.getExchange())<span class="comment">//到期后转发的交换机</span></span><br><span class="line">            .withArgument(<span class="string">"x-dead-letter-routing-key"</span>, QueueEnum.QUEUE_ORDER_CANCEL.getRouteKey())<span class="comment">//到期后转发的路由键</span></span><br><span class="line">            .build();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>用户下单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"> <span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> CommonResult <span class="title">generateOrder</span><span class="params">(OrderParam orderParam)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//todo 执行一系类下单操作，具体参考mall项目</span></span><br><span class="line">    LOGGER.info(<span class="string">"process generateOrder"</span>);</span><br><span class="line">    <span class="comment">//下单完成后开启一个延迟消息，用于当用户没有付款时取消订单（orderId应该在下单后生成）</span></span><br><span class="line">   <span class="comment">//给延迟队列发送消息</span></span><br><span class="line">    amqpTemplate.convertAndSend(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getExchange(), QueueEnum.QUEUE_TTL_ORDER_CANCEL.getRouteKey(), orderId, <span class="keyword">new</span> MessagePostProcessor() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Message <span class="title">postProcessMessage</span><span class="params">(Message message)</span> <span class="keyword">throws</span> AmqpException </span>&#123;</span><br><span class="line">            <span class="comment">//给消息设置延迟毫秒值</span></span><br><span class="line">            message.getMessageProperties().setExpiration(String.valueOf(delayTimes));</span><br><span class="line">            <span class="keyword">return</span> message;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"><span class="keyword">return</span> CommonResult.success(<span class="keyword">null</span>, <span class="string">"下单成功"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>订单取消队列的操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@RabbitListener</span>(queues = <span class="string">"mall.order.cancel"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CancelOrderReceiver</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Logger LOGGER =LoggerFactory.getLogger(CancelOrderReceiver<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OmsPortalOrderService portalOrderService;</span><br><span class="line">    <span class="meta">@RabbitHandler</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handle</span><span class="params">(Long orderId)</span></span>&#123;</span><br><span class="line">        LOGGER.info(<span class="string">"receive delay message orderId:&#123;&#125;"</span>,orderId);</span><br><span class="line">        portalOrderService.cancelOrder(orderId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>优化：对于订单取消回滚，涉及到许多操作，以后业务扩展会有更多操作需要回滚，可以使用模版方法模式。</p>
+<h2 id="使用七牛云-CDN-存储视频、图片等文件"><a href="#使用七牛云-CDN-存储视频、图片等文件" class="headerlink" title="使用七牛云 CDN 存储视频、图片等文件"></a>使用七牛云 CDN 存储视频、图片等文件</h2><p>CDN 加速 (将一些静态资源比如图片、视频等等缓存到离用户最近的网络节点)</p>
+<h2 id="使用连接池（数据库连接池）"><a href="#使用连接池（数据库连接池）" class="headerlink" title="使用连接池（数据库连接池）"></a>使用连接池（数据库连接池）</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">environments</span> <span class="attr">default</span>=<span class="string">"development"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">environment</span> <span class="attr">id</span>=<span class="string">"development"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">transactionManager</span> <span class="attr">type</span>=<span class="string">"JDBC"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dataSource</span> <span class="attr">type</span>=<span class="string">"POOLED"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driver"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.driver&#125;"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"url"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"username"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dataSource</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">environment</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">environments</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>POOLED: 使用连接池，可以设置 <code>poolMaximumActiveConnection</code> 最大连接数量；<code>poolMaximumIdleConnections</code> 最大空闲数；<code>poolMaximumCheckoutTime</code> 在被强制返回之前连接超时时间，默认20000毫秒（20秒）；<code>poolTimeWait</code> 超时时间（默认20秒）等等</li>
+</ul>
+<h2 id="多线程开发（线程池）"><a href="#多线程开发（线程池）" class="headerlink" title="多线程开发（线程池）"></a>多线程开发（线程池）</h2><ul>
+<li><p>后台管理系统用于上传课程文件，因为视频文件较大（几十兆到几百兆），所以使用多线程开发，在文件上传控制器上开一个子进程进行文件上传以及更新地址操作，主线程写入数据库信息后直接返回，同时后台管理系统状态栏显示“文件上传中”，当子线程完成后显示文件地址。</p>
+</li>
+<li><p>做登录业务时使用到 sms 短信网关业务,创建子线程,让子线程去调用 sms 服务,主线程则返回,提高用户的体验度</p>
+</li>
+</ul>
+<h2 id="使用JWT进行单点登录"><a href="#使用JWT进行单点登录" class="headerlink" title="使用JWT进行单点登录"></a>使用JWT进行单点登录</h2><p>创建JWT token工具类，包括根据用户信息生成 token，从 token 中获取 jwt 的负载，从 token 中获取用户名，设置 token 过期时间，刷新 token 等等。</p>
+<p>使用Spring Security进行相关配置</p>
+<h1 id="3-如何提升网站性能-可用性以及并发量-如何设计一个高并发的系统"><a href="#3-如何提升网站性能-可用性以及并发量-如何设计一个高并发的系统" class="headerlink" title="3. 如何提升网站性能,可用性以及并发量/如何设计一个高并发的系统"></a>3. 如何提升网站性能,可用性以及并发量/如何设计一个高并发的系统</h1><ul>
+<li>采用分布式开发，不同的服务部署在不同的机器节点上，并且一个服务也可以部署在多台机器上进行集群，然后利用 Nginx 负载均衡访问。这样就解决了单点部署(All In)的缺点，大大提高的系统并发量，扛住初步的并发压力</li>
+<li>数据库分库分表（水平分表、垂直分表）+ 读写分离</li>
+<li>使用缓存（本地缓存：本地可以使用JDK自带的 Map、Guava Cache.分布式缓存：Redis、Memcache.本地缓存不适用于提高系统并发量，一般是用在程序中。比如Spring是如何实现单例的呢？大家如果看过源码的话，应该知道，Spring把已经初始过的变量放在一个Map中，下次再要使用这个变量的时候，先判断Map中有没有，这也就是系统中常见的单例模式的实现。）大部分的高并发场景，都是读多写少，那完全可以在数据库和缓存里都写一份，然后读的时候大量走缓存就可以了。</li>
+<li>消息队列 （解耦+削峰+异步）</li>
+<li>提高硬件能力、增加系统服务器。（当服务器增加到某个程度的时候系统所能提供的并发访问量几乎不变，所以不能根本解决问题）</li>
+<li>CDN 加速 (将一些静态资源比如图片、视频等等缓存到离用户最近的网络节点)</li>
+<li>浏览器缓存</li>
+<li>使用合适的连接池（数据库连接池、线程池等等）</li>
+<li>适当使用多线程进行开发。</li>
+</ul>
+<h1 id="4-设计高可用系统的常用手段"><a href="#4-设计高可用系统的常用手段" class="headerlink" title="4. 设计高可用系统的常用手段"></a>4. 设计高可用系统的常用手段</h1><ul>
+<li>降级： 服务降级是当服务器压力剧增的情况下，根据当前业务情况及流量对一些服务和页面有策略的降级，以此释放服务器资源以保证核心任务的正常运行。降级往往会指定不同的级别，面临不同的异常等级执行不同的处理。根据服务方式：可以拒接服务，可以延迟服务，也有时候可以随机服务。根据服务范围：可以砍掉某个功能，也可以砍掉某些模块。总之服务降级需要根据不同的业务需求采用不同的降级策略。主要的目的就是服务虽然有损但是总比没有好；</li>
+<li>限流： 防止恶意请求流量、恶意攻击，或者防止流量超出系统峰值；</li>
+<li>熔断：当一个服务因为各种原因停止响应时，调用方通常会等待一段时间，然后超时或者收到错误返回。如果调用链路比较长，可能会导致请求堆积，整条链路占用大量资源一直在等待下游响应。所以当多次访问一个服务失败时，应熔断，标记该服务已停止工作，直接返回错误。直至该服务恢复正常后再重新建立连接。</li>
+<li>缓存： 避免大量请求直接落到数据库，将数据库击垮；</li>
+<li>超时和重试机制： 避免请求堆积造成雪崩；</li>
+<li>回滚机制： 快速修复错误版本。</li>
+<li>进行资源隔离：使系统在故障的情况下，不会耗尽系统的所有资源，比如线程资源</li>
+<li>服务监控</li>
+</ul>
+<h1 id="5-现代互联网应用系统通常具有哪些特点"><a href="#5-现代互联网应用系统通常具有哪些特点" class="headerlink" title="5. 现代互联网应用系统通常具有哪些特点?"></a>5. 现代互联网应用系统通常具有哪些特点?</h1><ul>
+<li>高并发，大流量；</li>
+<li>高可用：系统7×24小时不间断服务；</li>
+<li>海量数据：需要存储、管理海量数据，需要使用大量服务器；</li>
+<li>用户分布广泛，网络情况复杂：许多大型互联网都是为全球用户提供服务的，用户分布范围广，各地网络情况千差万别；</li>
+<li>安全环境恶劣：由于互联网的开放性，使得互联网更容易受到攻击，大型网站几乎每天都会被黑客攻击；</li>
+<li>需求快速变更，发布频繁：和传统软件的版本发布频率不同，互联网产品为快速适应市场，满足用户需求，其产品发布频率是极高的；</li>
+<li>渐进式发展：与传统软件产品或企业应用系统一开始就规划好全部的功能和非功能需求不同，几乎所有的大型互联网网站都是从一个小网站开始，渐进地发展起来。</li>
+</ul>
+<h1 id="6-项目遇到了什么问题"><a href="#6-项目遇到了什么问题" class="headerlink" title="6. 项目遇到了什么问题"></a>6. 项目遇到了什么问题</h1><h2 id="php开发和java开发问题"><a href="#php开发和java开发问题" class="headerlink" title="php开发和java开发问题"></a>php开发和java开发问题</h2><p>项目前期用的是 php 开发，后面因为我们使用的技术栈是java，所以在用户登录认证统一上存在问题；另外 PHP 使用的服务器是 nginx，Java使用的服务器是Tomcat。</p>
+<p><strong>解决方案</strong>：使用 JWT token 作为登录凭证，两者都可以都 token 进行解析，同时利用 Nginx 的反向代理配置访问 Java 模块后台接口。</p>
+<h2 id="跨域问题"><a href="#跨域问题" class="headerlink" title="跨域问题"></a>跨域问题</h2><p>项目前后端分析，前端使用 Nginx 作为服务器，后台使用 Tomcat，在对接接口时发现前端一直无法访问后台接口。</p>
+<p><strong>解决方案</strong>：通过 Nginx 反向代理访问后台接口，同时在 Nginx 中通过跨域资源共享 CORS 解决跨域问题。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 表示允许全部站点</span><br><span class="line">add_header &apos;Access-Control-Allow-Origin&apos; &apos;*&apos;;  </span><br><span class="line"># 为true的时候指请求时可带上Cookie           </span><br><span class="line">add_header &apos;Access-Control-Allow-Credentials&apos; &apos;true&apos;;</span><br><span class="line"># 表示允许哪些方式</span><br><span class="line">add_header &apos;Access-Control-Allow-Methods&apos; &apos;POST,GET,OPTION,DELETE&apos;;</span><br><span class="line"># 允许的请求头</span><br><span class="line">add_header &apos;Access-Control-Allow-Headers&apos; &apos;X-Requested-With,Authorization&apos;;</span><br></pre></td></tr></table></figure>
+
+<h2 id="后台管理系统上传视频文件速度慢问题"><a href="#后台管理系统上传视频文件速度慢问题" class="headerlink" title="后台管理系统上传视频文件速度慢问题"></a>后台管理系统上传视频文件速度慢问题</h2><p>甲方反应后台管理系统在上传视频文件速度较慢，需要等的时间较长。</p>
+<p><strong>解决方案</strong>：在文件上传控制器上开一个子进程进行文件上传以及更新地址操作，主线程写入数据库信息后直接返回，同时后台管理系统状态栏显示“文件上传中”，当子线程完成后显示文件地址。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UploadController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UploadService uploadService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/Upload"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">uploadQiniu</span><span class="params">(@RequestParam MultipartFile file, HttpServletRequest request)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//TODO：写入数据库，地址字段写"文件上传中..."</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//<span class="doctag">TODO:</span>优化：使用线程池</span></span><br><span class="line">        Thread uploadThrea = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                String result;</span><br><span class="line">                <span class="keyword">if</span>(file.isEmpty()) &#123;</span><br><span class="line">                    result = <span class="string">"文件为空"</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        result = uploadService.uploadFileQiniu(file,request);</span><br><span class="line">                        <span class="comment">//TODO：将地址写入数据库</span></span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        uploadThrea.start();</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"文件上传中..."</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="热搜功能实现"><a href="#热搜功能实现" class="headerlink" title="热搜功能实现"></a>热搜功能实现</h2><ul>
+<li>使用 Redis 中 Zset 数据结构实现</li>
+<li>使用 HashMap 进行 <code>&lt;搜索词,词频&gt;</code> 存储，每五分钟通过 <code>SpringTask</code> 定时任务对 HashMap 进行一次堆（最小堆）排序，然后后序遍历最小堆。</li>
+</ul>
+<h2 id="敏感词汇过滤"><a href="#敏感词汇过滤" class="headerlink" title="敏感词汇过滤"></a>敏感词汇过滤</h2><p>有以下方法：</p>
+<ul>
+<li>每次从 redis 中取出敏感词集合，然后做遍历操作，使用 indexOf 查看是否出现在聊天消息中</li>
+<li>正则匹配</li>
+<li>KMP匹配</li>
+<li>DFA字典树实现（当敏感词库较大时，占用较大内存空间，效率上没问题）</li>
+</ul>
+<h3 id="DFA-简介"><a href="#DFA-简介" class="headerlink" title="DFA 简介"></a>DFA 简介</h3><p>DFA 即 Deterministic Finite Automaton，也就是确定有穷自动机，它是是通过 event 和当前的 state 得到下一个 state，即 event+state=nextstate。下图展示了其状态的转换：</p>
+<p><img src="http://qiniu.xiaoming.net.cn/DFA%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2.jpeg" alt="DFA 状态转换"></p>
+<p>定义：一个确定有穷自动机（DFA）M 是一个五元组：<code>M=（K，Σ，f，S，Z）</code>其中</p>
+<ol>
+<li>K 是一个有穷集，它的每个元素称为一个状态；</li>
+<li>Σ 是一个有穷字母表，它的每个元素称为一个输入符号，所以也称 Σ 为输入符号字母表；</li>
+<li>f 是转换函数，是 <code>K×Σ→K</code> 上的映射(且可以是部分函数)，即，如 f（ki，a）=kj，（ki∈K，kj∈K）就意味着，当前状态为 ki，输入符为 a 时，将转换为下一个状态 kj，我们把 kj 称作 ki 的一个后继状态；</li>
+<li><code>S ∈ K</code> 是唯一的一个初态；</li>
+<li><code>Z ⊂ K</code> 是一个终态集，终态也称可接受状态或结束状态。</li>
+</ol>
+<p>对于 Σ* 中的任何符号串 t，若存在一条从初态到某一终态的道路，且这条道路上所有弧的标记连接成的字符串等于 t，则称 t 可为 DFA M 所接受，若 M 的初态同时又是终态，则空字可为 M 所识别（接受）。</p>
+<p>即：若 t∈ Σ* ， f(S, t)=P， 其中 S 为 M 的开始状态，P∈Z，Z 为终态集。</p>
+<p>则称 t 为 DFA M 所接受（识别）。</p>
+<p>如果看懂了DFA的介绍，我们可以这么理解敏感词过滤系统。用需要被过滤的敏感词构建一个DFA（确定有穷自动机 ），然后遍历需要过滤的文本，判断文本中是否有 DFA 可接受（识别）的字符串即可。</p>
+<h3 id="字典树实现-DFA"><a href="#字典树实现-DFA" class="headerlink" title="字典树实现 DFA"></a>字典树实现 DFA</h3><p>见算法第 21 题。</p>
+<h3 id="字典树算法改进"><a href="#字典树算法改进" class="headerlink" title="字典树算法改进"></a>字典树算法改进</h3><p>防止出现有相同后缀的敏感词汇<br>如 <code>fabcd</code>，<code>abc</code>，当字符串最后 <code>fabc</code>, 此时指 <code>begin</code> 指 f, 此时 <code>position</code>指到 c, 根据循环中的判断 c 的 <code>isKeywordsEnd</code> 为 true, <code>position++</code>, 此时跳出循环, 然后将 <code>fabc</code> 加到<code>StringBuilder</code> 中, 但是 <code>abc</code> 这个敏感词没有被过滤掉</p>
+<h3 id="HashMap-实现方式"><a href="#HashMap-实现方式" class="headerlink" title="HashMap 实现方式"></a>HashMap 实现方式</h3><p>我们可以认为，通过 S query U、V，通过 U query V、P，通过 V query U P。通过这样的转变我们可以将状态的转换转变为使用Java集合的查找。</p>
+<p>诚然，加入在我们的敏感词库中存在如下几个敏感词：日本人、日本鬼子、毛泽东。那么我需要构建成一个什么样的结构呢？</p>
+<p>首先：<code>query 日 ---&gt; {本}</code>、<code>query 本 ---&gt;{人、鬼子}</code>、<code>query 人 ---&gt;{null}</code>、<code>query 鬼 ---&gt; {子}</code>。形如下结构：</p>
+<p><img src="http://qiniu.xiaoming.net.cn/HashMap%E5%AE%9E%E7%8E%B0%E7%9A%84DFA%E7%BB%93%E6%9E%84.png" alt="HashMap实现的DFA结构"></p>
+<p>这样就将敏感词库构建成了一个类似于一颗一颗的树，这样判断一个词是否为敏感词时就大大减少了检索的匹配范围。比如要判断日本人，根据第一个字就可以确认需要检索的是那棵树，然后再在这棵树中进行检索。</p>
+<p>但是如何来判断一个敏感词已经结束了呢？利用标识位来判断。</p>
+<h4 id="构建-DFA"><a href="#构建-DFA" class="headerlink" title="构建 DFA"></a>构建 DFA</h4><p>所以对于这个关键是如何来构建一棵棵这样的敏感词树。下面以 Java 中的 HashMap 为例来实现 DFA 算法。具体过程如下：</p>
+<p>日本人，日本鬼子为例:</p>
+<ol>
+<li>在 hashMap 中查询”日”看其是否在 hashMap 中存在，如果不存在，则证明已”日”开头的敏感词还不存在，则我们直接构建这样的一棵树。跳至3。</li>
+<li>如果在 hashMap 中查找到了，表明存在以“日”开头的敏感词，设置 <code>hashMap = hashMap.get(&quot;日&quot;)</code>，跳至1，依次匹配“本”、“人”。</li>
+<li>判断该字是否为该词中的最后一个字。若是表示敏感词结束，设置标志位 isEnd = 1，否则设置标志位<code>isEnd = 0</code></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">initSensitiveWordMap</span><span class="params">(Set&lt;String&gt; sensitiveWordSet)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//初始化敏感词容器，减少扩容操作</span></span><br><span class="line">    sensitiveWordMap = <span class="keyword">new</span> HashMap(sensitiveWordSet.size());</span><br><span class="line">    String key;</span><br><span class="line">    Map nowMap;</span><br><span class="line">    Map&lt;String, String&gt; newWorMap;</span><br><span class="line">    <span class="comment">//迭代sensitiveWordSet</span></span><br><span class="line">    Iterator&lt;String&gt; iterator = sensitiveWordSet.iterator();</span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">        <span class="comment">//关键字</span></span><br><span class="line">        key = iterator.next();</span><br><span class="line">        nowMap = sensitiveWordMap;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; key.length(); i++) &#123;</span><br><span class="line">            <span class="comment">//转换成char型</span></span><br><span class="line">            <span class="keyword">char</span> keyChar = key.charAt(i);</span><br><span class="line">            <span class="comment">//库中获取关键字</span></span><br><span class="line">            Object wordMap = nowMap.get(keyChar);</span><br><span class="line">            <span class="comment">//如果存在该key，直接赋值，用于下一个循环获取</span></span><br><span class="line">            <span class="keyword">if</span> (wordMap != <span class="keyword">null</span>) &#123;</span><br><span class="line">                nowMap = (Map) wordMap;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">//不存在则，则构建一个map，同时将isEnd设置为0，因为他不是最后一个</span></span><br><span class="line">                newWorMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">                <span class="comment">//不是最后一个</span></span><br><span class="line">                newWorMap.put(<span class="string">"isEnd"</span>, <span class="string">"0"</span>);</span><br><span class="line">                nowMap.put(keyChar, newWorMap);</span><br><span class="line">                nowMap = newWorMap;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (i == key.length() - <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">//最后一个</span></span><br><span class="line">                nowMap.put(<span class="string">"isEnd"</span>, <span class="string">"1"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="查询过程"><a href="#查询过程" class="headerlink" title="查询过程"></a>查询过程</h4><p>检索过程无非就是 hashMap 的 get 实现，找到就证明该词为敏感词，否则不为敏感词。过程如下：假如匹配“中国人民万岁”。</p>
+<ol>
+<li>第一个字“中”，在 hashMap 中可以找到。得到一个新的 <code>map = hashMap.get(&quot;中&quot;)</code>。</li>
+<li>如果map == null，则不是敏感词。否则跳至3</li>
+<li>获取 map 中的 isEnd，通过 isEnd 是否等于1来判断该词是否为最后一个。如果 isEnd == 1 表示该词为敏感词，否则跳至 1。</li>
+</ol>
+<p>通过这个步骤可以判断“中国人民”为敏感词，但是如果输入“中国女人”则不是敏感词了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">checkSensitiveWord</span><span class="params">(String txt, <span class="keyword">int</span> beginIndex, <span class="keyword">int</span> matchType)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//敏感词结束标识位：用于敏感词只有1位的情况</span></span><br><span class="line">    <span class="keyword">boolean</span> flag = <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">//匹配标识数默认为0</span></span><br><span class="line">    <span class="keyword">int</span> matchFlag = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">char</span> word;</span><br><span class="line">    Map nowMap = sensitiveWordMap;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = beginIndex; i &lt; txt.length(); i++) &#123;</span><br><span class="line">        word = txt.charAt(i);</span><br><span class="line">        <span class="comment">//获取指定key</span></span><br><span class="line">        nowMap = (Map) nowMap.get(word);</span><br><span class="line">        <span class="keyword">if</span> (nowMap != <span class="keyword">null</span>) &#123;<span class="comment">//存在，则判断是否为最后一个</span></span><br><span class="line">            <span class="comment">//找到相应key，匹配标识+1</span></span><br><span class="line">            matchFlag++;</span><br><span class="line">            <span class="comment">//如果为最后一个匹配规则,结束循环，返回匹配标识数</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="string">"1"</span>.equals(nowMap.get(<span class="string">"isEnd"</span>))) &#123;</span><br><span class="line">                <span class="comment">//结束标志位为true</span></span><br><span class="line">                flag = <span class="keyword">true</span>;</span><br><span class="line">                <span class="comment">//最小规则，直接返回,最大规则还需继续查找</span></span><br><span class="line">                <span class="keyword">if</span> (MinMatchTYpe == matchType) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;<span class="comment">//不存在，直接返回</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (matchFlag &lt; <span class="number">2</span> || !flag) &#123;<span class="comment">//长度必须大于等于1，为词</span></span><br><span class="line">        matchFlag = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> matchFlag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="两种实现方式对比"><a href="#两种实现方式对比" class="headerlink" title="两种实现方式对比"></a>两种实现方式对比</h3><p>两种方法本质上是一样的，都是通过构造 HashMap，在 Map 中包含了另外一个子 Map，所以空间复杂度相等，O（n*m）（n的敏感词，每个m长），时间复杂度方面，如果敏感词的长度为 m，则每个敏感词的查找时间复杂度是 O(m)，字符串的长度为 n，我们需要遍历 n 遍，所以敏感词查找这个过程的时间复杂度是 O(n * m)。如果有 t 个敏感词的话，构建 trie 树的时间复杂度是 O(t * m)。基于 Tire 树实现的方式，相对结构比较直观，实现方法上比较容易理解。</p>
+<h1 id="7-项目架构"><a href="#7-项目架构" class="headerlink" title="7. 项目架构"></a>7. 项目架构</h1><p>教师资格证培训平台：</p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E6%95%99%E5%B8%88%E8%B5%84%E6%A0%BC%E8%AF%81%E5%9F%B9%E8%AE%AD%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="教师资格证培训平台"></p>
+<p>熠熠星光小程序：</p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E7%86%A0%E7%86%A0%E6%98%9F%E5%85%89%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="熠熠星光小程序"></p>
+<h1 id="8-Docker-部署项目流程"><a href="#8-Docker-部署项目流程" class="headerlink" title="8. Docker 部署项目流程"></a>8. Docker 部署项目流程</h1><ol>
+<li>首先需要将项目打包</li>
+<li>下载相关需要配置的镜像（Nginx，MySQL，AabbitMQ等等）</li>
+<li>设置相应本地挂载的目录</li>
+<li>编写 docker-compose 脚本构建项目并启动</li>
+<li>开启防火墙既可以被访问：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop firewalld</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h1 id="9-订单功能使用-RabbitMQ，而注册、文件上传使用多线程的原因"><a href="#9-订单功能使用-RabbitMQ，而注册、文件上传使用多线程的原因" class="headerlink" title="9. 订单功能使用 RabbitMQ，而注册、文件上传使用多线程的原因"></a>9. 订单功能使用 RabbitMQ，而注册、文件上传使用多线程的原因</h1><p>订单功能考虑到实际业务场景可能出现抢购，这个时候并发量高，单纯使用线程池可能会导致大量阻塞，而使用消息队列可以达到削峰、减少响应所需时间的目的。而注册、视频文件上传等业务不会出现太高的并发量，主要是提高用户体验度。</p>
+<p>之所以选用 RabbitMQ：性能好响应快，吞吐量到万级，而且开源版本就提供了非常完备的功能，包括监控界面等等，开源社区很活跃，特别适合中小型企业使用，不用承担社区黄掉的风险。</p>
+<h1 id="10-后台接口防刷"><a href="#10-后台接口防刷" class="headerlink" title="10. 后台接口防刷"></a>10. 后台接口防刷</h1><p>实现：对 ip 访问速率进行限制</p>
+<p>使用 Redis 中的 String 存储，以 ip 为 key，访问次数为值递增，同时设置过期时间。如果访问次数超过限制则加入黑名单 n 秒。每次访问先检查黑名单中是否存在，黑名单使用 zSet 结构，以 “blacklist” 为键，时间作为 score，ip 作为 value。</p>
+<p>实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">preventRefresh</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//首先获取ip</span></span><br><span class="line">    String ip = request.getRemoteAddr();</span><br><span class="line">    <span class="comment">//1秒内调用接口次数不超过5次</span></span><br><span class="line">    <span class="keyword">int</span> limit = <span class="number">5</span>;</span><br><span class="line">    <span class="keyword">int</span> expireTime = <span class="number">1</span>;</span><br><span class="line">    <span class="comment">//限制5秒内不能再访问</span></span><br><span class="line">    <span class="keyword">int</span> limitTime = <span class="number">5000</span>；</span><br><span class="line">    <span class="comment">//获取当前时间(毫秒)</span></span><br><span class="line">    Long now = System.currentTimeMillis();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//判断ip地址是否在黑名单中</span></span><br><span class="line">    <span class="comment">//获取当前 ip 地址在黑名单中的生成时间</span></span><br><span class="line">    Long createTime = redisService.zScore(<span class="string">"blacklist"</span>,ip);</span><br><span class="line">    <span class="keyword">if</span>(createTime != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span>(now - creteTime &lt; limitTime) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"接口调用过于频繁"</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">//解除限制</span></span><br><span class="line">            redisService.zRem(<span class="string">"blacklist"</span>,ip);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取当前ip访问次数</span></span><br><span class="line">    <span class="keyword">int</span> count = redisService.get(ip);</span><br><span class="line">    <span class="keyword">if</span>(count == <span class="keyword">null</span>) &#123;</span><br><span class="line">        count = redisService.incr(ip);</span><br><span class="line">        redisService.setExpire(ip,expireTime);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        count = redisService.incr(ip);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(count &gt; limit) &#123;</span><br><span class="line">        <span class="comment">//访问次数过多</span></span><br><span class="line">        redisService.zAdd(<span class="string">"blacklist"</span>,now,ip);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"接口访问过于频繁"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"正常访问"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其他实现方法：</p>
+<ul>
+<li>http 请求头信息校验，例如 host（请求资源所在服务器），User-Agent（HTTP 客户端程序的信息），Referer（对请求中 URI 的原始获取方）</li>
+<li>验证码</li>
+<li>令桶牌法：</li>
+</ul>
+<ol>
+<li>假设有一个桶，不断的向桶中投放 token，并且我们也可以从桶中取出token。</li>
+<li>投放token的速率是恒定的r1，桶满了token数量则不会再增长。</li>
+<li>取出的速率是随机的r2。如果桶是空的，则无法取出token。</li>
+<li>所有的请求都必须从桶中取出token才是有效的。否则该请求会被拒绝。</li>
+</ol>
+<p>举个例子，假设桶的容量是 10，每秒放 2 个token进去。</p>
+<p>如果现在每秒 2 个请求，那么所有这样的请求都是没有问题的，都会拿到 token。<br>如果现在每秒 4 个请求,10 + 2x = 4x。也就是 x=5 秒后请求就没法及时拿到 token，被丢弃。</p>
+<p>总结出以下特点:</p>
+<ul>
+<li>如果请求速率过快，到一段时间后会受到限制</li>
+<li>允许突发请求</li>
+</ul>
+<h1 id="11-如何设计一个秒杀系统"><a href="#11-如何设计一个秒杀系统" class="headerlink" title="11. 如何设计一个秒杀系统"></a>11. 如何设计一个秒杀系统</h1><p>一个秒杀系统需要解决的问题：</p>
+<ul>
+<li>高并发</li>
+<li>超卖</li>
+<li>恶意请求</li>
+<li>链接暴露</li>
+<li>数据库性能</li>
+</ul>
+<h2 id="针对高并发情况"><a href="#针对高并发情况" class="headerlink" title="针对高并发情况"></a>针对高并发情况</h2><h3 id="资源静态化"><a href="#资源静态化" class="headerlink" title="资源静态化"></a>资源静态化</h3><p>秒杀一般都是特定的商品还有页面模板，现在一般都是前后端分离的，所以页面一般都是不会经过后端的，前端那就把能提前放入cdn服务器的东西都放进去，反正把所有能提升效率的步骤都做一下，减少真正秒杀时候服务器的压力。</p>
+<h3 id="按钮控制"><a href="#按钮控制" class="headerlink" title="按钮控制"></a>按钮控制</h3><p>没到秒杀前，按钮置灰，只有时间到了，才能点击。防止大家在时间快到的最后几秒秒疯狂请求服务器，然后还没到秒杀的时候基本上服务器就挂了。这个时候就需要前端的配合，定时去请求的后端服务器，获取最新的北京时间，到时间点再给按钮可用状态。</p>
+<p>按钮可以点击之后也置灰几秒，从而限制流量</p>
+<h3 id="限流"><a href="#限流" class="headerlink" title="限流"></a>限流</h3><p>限流这里应该分为前端限流和后端限流。</p>
+<p><strong>前端限流</strong>：这个很简单，一般秒杀不会让你一直点的，一般都是点击一下或者两下然后几秒之后才可以继续点击，这也是保护服务器的一种手段。</p>
+<p><strong>后端限流</strong>：秒杀的时候肯定是涉及到后续的订单生成和支付等操作，但是都只是成功的幸运儿才会走到那一步，那一旦100个产品卖光了，return 了一个 false，前端直接秒杀结束，然后后端也关闭后续无效请求的介入了。</p>
+<p>另外 Nginx 负载均衡，Redis 集群、读写分离</p>
+<h2 id="MQ-削峰"><a href="#MQ-削峰" class="headerlink" title="MQ 削峰"></a>MQ 削峰</h2><p>对于写请求，做请求队列，每次只透有限的写请求去数据层，如果均成功再放下一批，如果库存不够则队列里的写请求全部返回“已售完” 。</p>
+<h2 id="针对链接暴露和恶意请求"><a href="#针对链接暴露和恶意请求" class="headerlink" title="针对链接暴露和恶意请求"></a>针对链接暴露和恶意请求</h2><p>设置后台接口防刷</p>
+<h2 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h2><p>使用非关系型的数据库Redis，开始秒杀前把商品的库存加载到 Redis 中去，让整个流程都在Redis里面去做，每卖出一件库存减一同时写入 MQ 队列，再异步的去修改库存就好了。</p>
+<h2 id="超卖问题"><a href="#超卖问题" class="headerlink" title="超卖问题"></a>超卖问题</h2><p>如果现在库存只剩下1个了，但是由于是高并发嘛，4个服务器一起查询了发现都是还有1个，那大家都觉得是自己抢到了，就都去扣库存，那结果就变成了-3，这就会出现超卖的情况。</p>
+<p>解决方式是在 Redis 中使用乐观锁的方式，在存放库存的同时加一个 version 字段，每次读取后更改完，再读取一遍，只有当前 <code>version == expectVersion</code> 才能扣除成功，否则直接返回购买失败。</p>
+<p>如果是在防不住，考虑熔断、降级。</p>
+<h1 id="12-项目-接口-设计原则"><a href="#12-项目-接口-设计原则" class="headerlink" title="12. 项目(接口)设计原则"></a>12. 项目(接口)设计原则</h1><h2 id="单一原则"><a href="#单一原则" class="headerlink" title="单一原则"></a>单一原则</h2><p>一个类只负责一个功能领域的相应职责，或者可以定义为，就一个类而言，应该只有一个引起它变化的原因。 </p>
+<p>说得比较官方一点就是：使这个类改变的因数只有唯一的一个时，那么这个类符合单一原则。</p>
+<p>对应项目：每一个类一个功能，例如一个 User 表对应一个 User 类</p>
+<h2 id="开闭原则"><a href="#开闭原则" class="headerlink" title="开闭原则"></a>开闭原则</h2><p>软件实现应该对扩展开放，对修改关闭</p>
+<p>一个软件产品只要在生命周期内，都会发生变化，即然变化是一个事实，我们就应该在设计时尽量适应这些变化，以提高项目的稳定性和灵活性，真正实现“拥抱变化”。开闭原则告诉我们应尽量通过扩展软件实体的行为来实现变化，而不是通过修改现有代码来完成变化，它是为软件实体的未来事件而制定的对现行开发设计进行约束的一个原则。</p>
+<h3 id="第一：抽象约束"><a href="#第一：抽象约束" class="headerlink" title="第一：抽象约束"></a>第一：抽象约束</h3><p>抽象是对一组事物的通用描述，没有具体的实现，也就表示它可以有非常多的可能性，可以跟随需求的变化而变化。因此，通过接口或抽象类可以约束一组可能变化的行为，并且能够实现对扩展开放，其包含三层含义：</p>
+<ul>
+<li>通过接口或抽象类约束扩散，对扩展进行边界限定，不允许出现在接口或抽象类中不存在的public方法。</li>
+<li>参数类型，引用对象尽量使用接口或抽象类，而不是实现类，这主要是实现里氏替换原则的一个要求</li>
+<li>抽象层尽量保持稳定，一旦确定就不要修改</li>
+</ul>
+<h3 id="第二：元数据-metadata-控件模块行为"><a href="#第二：元数据-metadata-控件模块行为" class="headerlink" title="第二：元数据(metadata)控件模块行为"></a>第二：元数据(metadata)控件模块行为</h3><p>编程是一个很苦很累的活，那怎么才能减轻压力呢？答案是尽量使用元数据来控制程序的行为，减少重复开发。什么是元数据？用来描述环境和数据的数据，通俗的说就是配置参数，参数可以从文件中获得，也可以从数据库中获得，同时也应该考虑数据库表的通用性和扩张性（配置文件）</p>
+<h3 id="第三：制定项目章程"><a href="#第三：制定项目章程" class="headerlink" title="第三：制定项目章程"></a>第三：制定项目章程</h3><p>在一个团队中，建立项目章程是非常重要的，因为章程是所有人员都必须遵守的约定，对项目来说，约定优于配置。这比通过接口或抽象类进行约束效率更高，而扩展性一点也没有减少。</p>
+<h3 id="第四：封装变化"><a href="#第四：封装变化" class="headerlink" title="第四：封装变化"></a>第四：封装变化</h3><p>对变化封装包含两层含义： </p>
+<ol>
+<li>将相同的变化封装到一个接口或抽象类中 </li>
+<li>将不同的变化封装到不同的接口或抽象类中，不应该有两个不同的变化出现在同一个接口或抽象类中。 </li>
+</ol>
+<p>封装变化，也就是受保护的变化，找出预计有变化或不稳定的点，我们为这些变化点创建稳定的接口。</p>
+<h2 id="伯斯塔尔原则"><a href="#伯斯塔尔原则" class="headerlink" title="伯斯塔尔原则"></a>伯斯塔尔原则</h2><p>按照伯斯塔尔法则的思想来设计实现服务调用时，发送的数据要更保守，意味着最小化的传送必要的信息，接收时更开放意味着要最大限度的容忍信息的兼容性。多余的信息不认识可以忽略，而不应该拒绝或抛出错误。 </p>
+<h2 id="里氏替换原则"><a href="#里氏替换原则" class="headerlink" title="里氏替换原则"></a>里氏替换原则</h2><p>所有引用父类的地方，必须能透明的使用其子类对象</p>
+<p>父类的一个方法的返回值是一个类型 T，子类的相同方法的返回值为 S，那么里氏替换原则就要求 S 必须小于等于 T。采用里氏替换原则的目的就是增强程序的健壮性，版本升级时也可以保持非常好的兼容性。即使增加子类，原有的子类还可以继续运行。在实际项目中，每个子类对应不同的业务含义，使用父类作为参数，传递不同的子类完成不同的业务逻辑，非常完美。</p>
+<h2 id="接口隔离原则"><a href="#接口隔离原则" class="headerlink" title="接口隔离原则"></a>接口隔离原则</h2><p>使用多个专门的接口，而不使用单一的总接口。 其实接口隔离原则说白了就是单一职责的扩展，或者说细化，将单一的概念扩展至接口，或者说具体的函数。对于一个个比较细化的接口，优点简洁且明显，那就是更小的接口，更有利于书写单元测试，也更有利于调试。</p>
+<p>而如果能有比较多专门的接口，无疑会极大降低阅读理解代码的成本，阅读者往往只需要了解任务的分发逻辑就好，不需要一不小心就沉到底层繁琐的逻辑中，一个大的接口在阅读的时候，往往是任务分发逻辑和任务执行逻辑严重耦合在一起的，当你以为你在了解任务分发部分的逻辑的时候，你可能已经在读具体业务处理逻辑了。然而其实往往你根本不需要关系具体的某个功能的逻辑，多数时候，你只是需要修改一点分发逻辑。这个时候细粒度的接口就体现出优点，更为细粒度的接口，有利于隔离业务处理和业务分发的逻辑，可以提高阅读代码效率。不要小瞧这点，试想一个团队招来的新人，全部都在解决老坑的路上步履蹒跚，拖累了开发新功能进度，而这些老的东西很难再创造价值了，而能创造价值的东西，却总是在拖延中，拖过了市场，再来价值就缩水的厉害了。</p>
+<h2 id="合成复用原则"><a href="#合成复用原则" class="headerlink" title="合成复用原则"></a>合成复用原则</h2><p>优先使用组合而不是继承。继承必须在 is-a 的关系成立的时候才能使用，否则使用组合，之所以不使用继承，是因为继承会将基类的实现细节暴露给子类，这个就导致如果基类发生改变，那么子类也不得不改变，相对而言，使用组合，可以有更好的封装性。</p>
+<p>适用场景：对于数据库连接，可能存在多个中数据库，则可以把 <code>getConnection</code> 抽象出来，适用如下组合实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">DBConnection</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> String <span class="title">getConnection</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProductDao</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> DBConnection dbConnection;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDbConnection</span><span class="params">(DBConnection dbConnection)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.dbConnection = dbConnection;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addProduct</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String conn = dbConnection.getConnection();</span><br><span class="line">        System.out.println(<span class="string">"使用"</span> + conn + <span class="string">"增加产品"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="依赖倒置原则"><a href="#依赖倒置原则" class="headerlink" title="依赖倒置原则"></a>依赖倒置原则</h2><p>抽象不依赖于细节，细节应该依赖于抽象。</p>
+<p>在实现依赖倒转的原则的时候，我们最常使用的技术就是依赖注入（Dependency Injection,DI),通过依赖注入来对一个抽象的对象注入一个具体的实例。 对于设计模式来说，尽可能的开闭是目标，里氏替换是实现开闭的基础，而依赖倒转是具体的手段。</p>
+<h2 id="迪米特法则"><a href="#迪米特法则" class="headerlink" title="迪米特法则"></a>迪米特法则</h2><p>一个软件实体应当尽可能少的与其它实体发生相互作用。 最能体现这种思想是中介者模式，在中介者模式中，各个对象之间存在通信，但是对象之间并不会互相引用，而是维持一个中介者的引用，当我们需要添加一个成员的时候，我们往往增加一个对象再修改一下中介者就好了，大部分的时候，其它对象是无感知的。 迪米特法则的好处，在于满足迪米特法则的类，通常都是可测试的类。不过想写出这样的类可不容易，这个时候可以考虑 TDD 的方法，不过这就是另一个话题了。</p>
+<h1 id="13-为什么使用前后端分离"><a href="#13-为什么使用前后端分离" class="headerlink" title="13. 为什么使用前后端分离"></a>13. 为什么使用前后端分离</h1><ul>
+<li>可以实现真正的前后端解耦，前端服务器使用nginx。前端/WEB服务器放的是css，js，图片等等一系列静态资源（甚至你还可以css，js，图片等资源放到特定的文件服务器，例如阿里云的oss，并使用cdn加速），前端服务器负责控制页面引用，跳转或路由，前端页面异步调用后端的接口，后端/应用服务器使用tomcat（把tomcat想象成一个数据提供者），加快整体响应速度。（这里需要使用一些前端工程化的框架比如nodejs，react，router，react，redux，webpack）</li>
+<li>发现 bug，可以快速定位是谁的问题，不会出现互相踢皮球的现象。页面逻辑，跳转错误，浏览器兼容性问题，脚本错误，页面样式等问题，全部由前端工程师来负责。接口数据出错，数据没有提交成功，应答超时等问题，全部由后端工程师来解决。双方互不干扰，前端与后端是相亲相爱的一家人。</li>
+<li>在大并发情况下，我可以同时水平扩展前后端服务器，比如淘宝的一个首页就需要 2000+ 台前端服务器做集群来抗住日均多少亿+的日均 pv。（阿里的 web 容器都是自己写的，就算他单实例抗 10 万 http 并发，2000 台是 2 亿 http 并发，并且他们还可以根据预知洪峰来无限拓展。）</li>
+<li>减少后端服务器的并发/负载压力。除了接口以外的其他所有 http 请求全部转移到前端 nginx 上，接口的请求调用 tomcat，参考 nginx 反向代理 tomcat。且除了第一次页面请求外，浏览器会大量调用本地缓存。- 即使后端服务暂时超时或者宕机了，前端页面也会正常访问，只不过数据刷不出来而已。也许你也需要有微信相关的轻应用，那样你的接口完全可以共用，如果也有 app 相关的服务，那么只要通过一些代码重构，也可以大量复用接口，提升效率。（多端应用）</li>
+<li>页面显示的东西再多也不怕，因为是异步加载。</li>
+<li>nginx 支持页面热部署，不用重启服务器，前端升级更无缝。</li>
+<li>增加代码的维护性&amp;易读性（前后端耦在一起的代码读起来相当费劲）。</li>
+<li>提升开发效率，因为可以前后端并行开发，而不是像以前的强依赖。</li>
+<li>在nginx中部署证书，外网使用https访问，并且只开放 443 和 80 端口，其他端口一律关闭（防止黑客端口扫描），内网使用http，性能和安全都有保障。</li>
+<li>前端大量的组件代码得以复用，组件化，提升开发效率，抽出来！</li>
+</ul>
+<h1 id="14-如果线上用户出现502错误怎么排查"><a href="#14-如果线上用户出现502错误怎么排查" class="headerlink" title="14. 如果线上用户出现502错误怎么排查?"></a>14. 如果线上用户出现502错误怎么排查?</h1><p>通过查看日志分析问题，Nginx 中有 error 日志和 access 日志。还可以查看服务器的负载情况。</p>
+<p>以 php 为例，</p>
+<ol>
+<li>php问题：</li>
+</ol>
+<ul>
+<li>进程数不够 （max_children最大子进程数）</li>
+<li>最长执行时间（request_terminate_timeout）</li>
+</ul>
+<ol start="2">
+<li>nginx问题</li>
+</ol>
+<ul>
+<li>FastCGI 进程是否已经启动</li>
+<li>FastCGI worker进程数是否不够</li>
+<li>FastCGI 执行时间过长：nginx.conf 里的 <code>fastcgi_connect_timeout</code>，<code>fastcgi_send_timeout</code>，<code>fastcgi_read_timeout</code> 都调大一点。</li>
+<li>FastCGI Buffer 不够，nginx和apache一样，有前端缓冲限制，可以调整缓冲参数<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fastcgi_buffer_size 32k;  </span><br><span class="line">fastcgi_buffers 8 32k;</span><br></pre></td></tr></table></figure></li>
+<li>Proxy Buffer 不够    如果用了 Proxying，调整:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">proxy_buffer_size 16k;  </span><br><span class="line">proxy_buffers 4 16k;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="3">
+<li>数据库</li>
+<li>代理有问题</li>
+</ol>
+<p>解决方案:</p>
+<ol>
+<li>提高 Web 服务器的响应速度，也即减少内部的调用关系，可以把需要的页面、素材或数据，缓存在内存中，可以是专门的缓存服务器 ，也可以Web服务器自身的缓存，提高响应速度；</li>
+<li>网络带宽的问题，则对传输的数据包进行压缩处理，或者向IDC申请增加带宽；</li>
+<li>属于内部网络的故障或设置问题，也即内部网络拥塞，可能内部存在大量的数据调用或交互造成的，则需要优化内部网络传输或协议；</li>
+<li>数据库的数据读取造成前端服务器 ，响应用户的请求变慢，那么必须提高数据库的处理能力，若是只读业务可以增加数据缓存的模式 或者增加数据库备机，分散读压力；若是写的压力，则可以考虑延迟写的模式。</li>
+</ol>
+<h1 id="15-接口规范定义"><a href="#15-接口规范定义" class="headerlink" title="15. 接口规范定义"></a>15. 接口规范定义</h1><h2 id="协议规范"><a href="#协议规范" class="headerlink" title="协议规范"></a>协议规范</h2><p>为了确保不同系统/模块间的数据交互，需要事先约定好通讯协议，如：TCP、HTTP、HTTPS协议。为了确保数据交互安全，建议使用HTTPS协议。</p>
+<h2 id="接口路径规范"><a href="#接口路径规范" class="headerlink" title="接口路径规范"></a>接口路径规范</h2><p>作为接口路径，为了方便清晰的区分来自不同的系统，可以采用不同系统/模块名作为接口路径前缀。</p>
+<p>格式规范如下：</p>
+<ul>
+<li>支付模块   /pay/xx</li>
+<li>订单模块  /order/xx</li>
+</ul>
+<h2 id="版本控制规范"><a href="#版本控制规范" class="headerlink" title="版本控制规范"></a>版本控制规范</h2><p>为了便于后期接口的升级和维护，在接口路径中加入版本号，便于管理，实现接口多版本的可维护性。如果细心留意过的话，会发现好多框架对外提供的API接口中(如：Eureka)，都带有版本号的。如：接口路径中添加类似”v1”、”v2”等版本号。</p>
+<p>格式规范如下：</p>
+<ul>
+<li>/xx/v1/xx</li>
+</ul>
+<p>更新版本后可以使用 v2、v3 等、依次递加。</p>
+<h2 id="接口命名规范"><a href="#接口命名规范" class="headerlink" title="接口命名规范"></a>接口命名规范</h2><p>和Java命名规范一样，好的、统一的接口命名规范，不仅可以增强其可读性，而且还会减少很多不必要的口头/书面上的解释。</p>
+<p>可结合【接口路径规范】、【版本控制规范】，外加具体接口命名(路径中可包含请求数据，如：id等)，建议具体接口命名也要规范些，可使用”驼峰命名法”按照实现接口的业务类型、业务场景等命名，有必要时可采取多级目录命名，但目录不宜过长，两级目录较为适宜。</p>
+<p>格式规范如下：</p>
+<ul>
+<li>/user/v1/sys/login     用户服务/模块的系统登录接口</li>
+<li>/zoo/v1/zoos/{ID}       动物园服务/模块中，获取id为ID的动物</li>
+</ul>
+<p>具体接口命名，通常有以下两种方式：</p>
+<ol>
+<li>接口名称动词前/后缀化（项目采用这种）</li>
+</ol>
+<p>接口名称以接口数据操作的动词为前/后缀，常见动词有：add、delete、update、query、get、send、save、detail、list 等，如：新建用户 addUser、查询订单详情 queryOrderDetail。</p>
+<ol start="2">
+<li>接口名称动词+请求方式</li>
+</ol>
+<p>接口路径中包含具体接口名称的名词，接口数据操作动作以HTTP请求方式来区分。常用的HTTP请求方式有：</p>
+<ul>
+<li>GET：从服务器取出资源（一项或多项）。</li>
+<li>POST：在服务器新建一个资源。</li>
+<li>PUT：在服务器更新资源（客户端提供改变后的完整资源）。</li>
+<li>PATCH：在服务器更新资源（客户端提供改变的属性）。</li>
+<li>DELETE：从服务器删除资源。</li>
+</ul>
+<p>如：</p>
+<ul>
+<li>GET /zoo/v1/zoos：列出所有动物园</li>
+<li>POST /zoo/v1/zoos：新建一个动物园</li>
+<li>GET /zoo/v1/zoos/{ID}：获取某个指定动物园的信息</li>
+<li>PUT /zoo/v1/zoos/{ID}：更新某个指定动物园的信息（提供该动物园的全部信息）</li>
+<li>PATCH /zoo/v1/zoos/{ID}：更新某个指定动物园的信息（提供该动物园的部分信息）</li>
+<li>DELETE /zoo/v1/zoos/{ID}：删除某个动物园</li>
+<li>GET /zoo/v1/zoos/{ID}/animals：列出某个指定动物园的所有动物</li>
+<li>DELETE /zoo/v1/zoos/ID/animals/ID：删除某个指定动物园的指定动物</li>
+</ul>
+<h2 id="请求参数规范"><a href="#请求参数规范" class="headerlink" title="请求参数规范"></a>请求参数规范</h2><p>请求方式：按照 GET、POST、PUT 等含义定义，避免出现不一致现象，对人造成误解、歧义。</p>
+<p>请求头：请求头根据项目需求添加配置参数。如：请求数据格式，<code>accept=&#39;application/json&#39;</code>等。请求头根据项目需求要求传入用户 token、唯一验签码等加密数据。</p>
+<p>请求参数/请求体：请求参数字段，尽可能与数据库表字段、对象属性名等保持一致，因为保持一致最省事，最舒服的一件事。</p>
+<h2 id="返回数据规范"><a href="#返回数据规范" class="headerlink" title="返回数据规范"></a>返回数据规范</h2><p>统一规范返回数据的格式，对前端后台接口对接都有好处，此处以 json 格式为例。返回数据应包含：返回状态码、返回状态信息、具体数据。</p>
+<p>返回数据中的状态码、状态信息，常指具体的业务状态，不建议和 HTTP 状态码混在一起。HTTP 状态，是用来体现 HTTP 链路状态情况，如：404-Not Found。HTTP 状态码和 json 结果中的状态码，并存尚可，用于体现不同维度的状态。</p>
+<h2 id="接口管理工具"><a href="#接口管理工具" class="headerlink" title="接口管理工具"></a>接口管理工具</h2><p>使用 RAP2，RAP是阿里开源的一套接口管理系统，RAP 可以比较方便的管理公司所有系统的接口，同时还有比较完善的权限管理，还可以做接口 mock，方便开发人员在接口功能还没有完成的时候能够及时发布出去，给调用方去使用。但是 RAP 的缺点就是每个接口都需要维护进去，接口修改后也需要及时维护，当时我们在使用的时候遇到的最大的问题也是经常碰到接口没有及时维护的问题。</p>
+<p><strong>参考内容</strong></p>
+<blockquote>
+<p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a><br><a href="https://github.com/shishan100/Java-Interview-Advanced" target="_blank" rel="noopener">中华石杉–互联网Java进阶面试训练营</a><br><a href="https://www.myway5.com/index.php/2018/04/16/%E6%8E%A5%E5%8F%A3%E8%AF%B7%E6%B1%82%E9%80%9F%E7%8E%87%EF%BC%88%E6%8E%A5%E5%8F%A3%E9%98%B2%E5%88%B7%EF%BC%89%E9%99%90%E5%88%B6%E6%96%B9%E6%A1%88/" target="_blank" rel="noopener">接口请求速率（接口防刷）限制方案</a><br><a href="https://blog.csdn.net/DuTianTian_csdn/article/details/81277189" target="_blank" rel="noopener">关于接口安全 接口防刷 RSA 鉴权 签名 实现</a><br><a href="https://github.com/Advanced-Frontend/Daily-Interview-Question/issues/254" target="_blank" rel="noopener">第 131 题：接口如何防刷</a><br><a href="https://www.zhihu.com/question/27603761" target="_blank" rel="noopener">使用自增主键是否总是最佳实践？</a><br><a href="https://www.zhihu.com/question/54895548" target="_blank" rel="noopener">如何设计秒杀系统？</a><br><a href="https://blog.csdn.net/chenxuegui1234/article/details/97276203" target="_blank" rel="noopener">接口设计原则</a><br><a href="https://juejin.im/post/5b71302351882560ea4afbb8#heading-5" target="_blank" rel="noopener">你不得不了解的前后端分离原理！</a><br><a href="https://www.zhihu.com/question/21647204" target="_blank" rel="noopener">502 Bad Gateway 怎么解决？</a><br><a href="https://blog.csdn.net/Time888/article/details/78951216" target="_blank" rel="noopener">502 Bad Gateway 错误排查</a><br><a href="http://www.yunliaoim.com/im/1149.html" target="_blank" rel="noopener">怎么设计高效的敏感词过滤系统（一）</a><br><a href="https://www.cnblogs.com/zyguo/p/4705086.html" target="_blank" rel="noopener">敏感词过滤的算法原理之DFA算法</a><br><a href="https://www.jianshu.com/p/2e84eacc3cc8" target="_blank" rel="noopener">Java实现敏感词过滤 - DFA算法</a><br><a href="https://juejin.im/post/5cf900746fb9a07ea4206e4a" target="_blank" rel="noopener">Nginx 是如何实现高并发？常见的优化手段有哪些？</a><br><a href="https://blog.csdn.net/xcbeyond/article/details/95163525" target="_blank" rel="noopener">如何写出完美的接口：接口规范定义、接口管理工具推荐</a><br><a href="https://juejin.im/post/5d8d5b19518825282d3dde6c" target="_blank" rel="noopener">设计模式 - 七大设计原则（四）- 合成复用原则与设计原则总结</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag"># 项目</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/04/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/" rel="prev" title="排序算法总结">
+      <i class="fa fa-chevron-left"></i> 排序算法总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/07/SpringBoot%E4%BD%BF%E7%94%A8Swagger2%E5%AE%9E%E7%8E%B0%E5%9C%A8%E7%BA%BF%E6%8E%A5%E5%8F%A3%E6%96%87%E6%A1%A3/" rel="next" title="Spring Boot 使用 Swagger2-UI 实现在线接口文档">
+      Spring Boot 使用 Swagger2-UI 实现在线接口文档 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-数据库"><span class="nav-number">1.</span> <span class="nav-text">1. 数据库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-项目使用的技术"><span class="nav-number">2.</span> <span class="nav-text">2. 项目使用的技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Redis"><span class="nav-number">2.1.</span> <span class="nav-text">使用 Redis</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#短信存储验证"><span class="nav-number">2.1.1.</span> <span class="nav-text">短信存储验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集数缓存"><span class="nav-number">2.1.2.</span> <span class="nav-text">集数缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#热搜功能"><span class="nav-number">2.1.3.</span> <span class="nav-text">热搜功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringTask"><span class="nav-number">2.2.</span> <span class="nav-text">SpringTask</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-RabbitMQ进行异步处理"><span class="nav-number">2.3.</span> <span class="nav-text">使用 RabbitMQ进行异步处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用七牛云-CDN-存储视频、图片等文件"><span class="nav-number">2.4.</span> <span class="nav-text">使用七牛云 CDN 存储视频、图片等文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用连接池（数据库连接池）"><span class="nav-number">2.5.</span> <span class="nav-text">使用连接池（数据库连接池）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多线程开发（线程池）"><span class="nav-number">2.6.</span> <span class="nav-text">多线程开发（线程池）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用JWT进行单点登录"><span class="nav-number">2.7.</span> <span class="nav-text">使用JWT进行单点登录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-如何提升网站性能-可用性以及并发量-如何设计一个高并发的系统"><span class="nav-number">3.</span> <span class="nav-text">3. 如何提升网站性能,可用性以及并发量/如何设计一个高并发的系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-设计高可用系统的常用手段"><span class="nav-number">4.</span> <span class="nav-text">4. 设计高可用系统的常用手段</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-现代互联网应用系统通常具有哪些特点"><span class="nav-number">5.</span> <span class="nav-text">5. 现代互联网应用系统通常具有哪些特点?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-项目遇到了什么问题"><span class="nav-number">6.</span> <span class="nav-text">6. 项目遇到了什么问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#php开发和java开发问题"><span class="nav-number">6.1.</span> <span class="nav-text">php开发和java开发问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跨域问题"><span class="nav-number">6.2.</span> <span class="nav-text">跨域问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后台管理系统上传视频文件速度慢问题"><span class="nav-number">6.3.</span> <span class="nav-text">后台管理系统上传视频文件速度慢问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#热搜功能实现"><span class="nav-number">6.4.</span> <span class="nav-text">热搜功能实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#敏感词汇过滤"><span class="nav-number">6.5.</span> <span class="nav-text">敏感词汇过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DFA-简介"><span class="nav-number">6.5.1.</span> <span class="nav-text">DFA 简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字典树实现-DFA"><span class="nav-number">6.5.2.</span> <span class="nav-text">字典树实现 DFA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字典树算法改进"><span class="nav-number">6.5.3.</span> <span class="nav-text">字典树算法改进</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HashMap-实现方式"><span class="nav-number">6.5.4.</span> <span class="nav-text">HashMap 实现方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构建-DFA"><span class="nav-number">6.5.4.1.</span> <span class="nav-text">构建 DFA</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查询过程"><span class="nav-number">6.5.4.2.</span> <span class="nav-text">查询过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两种实现方式对比"><span class="nav-number">6.5.5.</span> <span class="nav-text">两种实现方式对比</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-项目架构"><span class="nav-number">7.</span> <span class="nav-text">7. 项目架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-Docker-部署项目流程"><span class="nav-number">8.</span> <span class="nav-text">8. Docker 部署项目流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-订单功能使用-RabbitMQ，而注册、文件上传使用多线程的原因"><span class="nav-number">9.</span> <span class="nav-text">9. 订单功能使用 RabbitMQ，而注册、文件上传使用多线程的原因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-后台接口防刷"><span class="nav-number">10.</span> <span class="nav-text">10. 后台接口防刷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#11-如何设计一个秒杀系统"><span class="nav-number">11.</span> <span class="nav-text">11. 如何设计一个秒杀系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#针对高并发情况"><span class="nav-number">11.1.</span> <span class="nav-text">针对高并发情况</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#资源静态化"><span class="nav-number">11.1.1.</span> <span class="nav-text">资源静态化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#按钮控制"><span class="nav-number">11.1.2.</span> <span class="nav-text">按钮控制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#限流"><span class="nav-number">11.1.3.</span> <span class="nav-text">限流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MQ-削峰"><span class="nav-number">11.2.</span> <span class="nav-text">MQ 削峰</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对链接暴露和恶意请求"><span class="nav-number">11.3.</span> <span class="nav-text">针对链接暴露和恶意请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库"><span class="nav-number">11.4.</span> <span class="nav-text">数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超卖问题"><span class="nav-number">11.5.</span> <span class="nav-text">超卖问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#12-项目-接口-设计原则"><span class="nav-number">12.</span> <span class="nav-text">12. 项目(接口)设计原则</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单一原则"><span class="nav-number">12.1.</span> <span class="nav-text">单一原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开闭原则"><span class="nav-number">12.2.</span> <span class="nav-text">开闭原则</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一：抽象约束"><span class="nav-number">12.2.1.</span> <span class="nav-text">第一：抽象约束</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二：元数据-metadata-控件模块行为"><span class="nav-number">12.2.2.</span> <span class="nav-text">第二：元数据(metadata)控件模块行为</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三：制定项目章程"><span class="nav-number">12.2.3.</span> <span class="nav-text">第三：制定项目章程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四：封装变化"><span class="nav-number">12.2.4.</span> <span class="nav-text">第四：封装变化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#伯斯塔尔原则"><span class="nav-number">12.3.</span> <span class="nav-text">伯斯塔尔原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#里氏替换原则"><span class="nav-number">12.4.</span> <span class="nav-text">里氏替换原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口隔离原则"><span class="nav-number">12.5.</span> <span class="nav-text">接口隔离原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合成复用原则"><span class="nav-number">12.6.</span> <span class="nav-text">合成复用原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖倒置原则"><span class="nav-number">12.7.</span> <span class="nav-text">依赖倒置原则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迪米特法则"><span class="nav-number">12.8.</span> <span class="nav-text">迪米特法则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#13-为什么使用前后端分离"><span class="nav-number">13.</span> <span class="nav-text">13. 为什么使用前后端分离</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#14-如果线上用户出现502错误怎么排查"><span class="nav-number">14.</span> <span class="nav-text">14. 如果线上用户出现502错误怎么排查?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#15-接口规范定义"><span class="nav-number">15.</span> <span class="nav-text">15. 接口规范定义</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#协议规范"><span class="nav-number">15.1.</span> <span class="nav-text">协议规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口路径规范"><span class="nav-number">15.2.</span> <span class="nav-text">接口路径规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#版本控制规范"><span class="nav-number">15.3.</span> <span class="nav-text">版本控制规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口命名规范"><span class="nav-number">15.4.</span> <span class="nav-text">接口命名规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求参数规范"><span class="nav-number">15.5.</span> <span class="nav-text">请求参数规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#返回数据规范"><span class="nav-number">15.6.</span> <span class="nav-text">返回数据规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口管理工具"><span class="nav-number">15.7.</span> <span class="nav-text">接口管理工具</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

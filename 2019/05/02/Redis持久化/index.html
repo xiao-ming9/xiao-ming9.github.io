@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Redis提供RDB和AOF两种持久化机制，持久化功能能够避免因进程推出造成的数据丢失问题，当下次重启时利用持久化的文件即可实现数据恢复 RDB持久化RDB持久化是把当前进程数据生成快照保存到硬盘的过程，触发RDB持久化的过程分为手动触发和自动触发 触发机制手动触发手动触发的命令有save,bgsave  save：阻塞当前Redis，知道RDB过程完成，对于内存比较大的实例会造成阻塞，已经被淘汰">
+<meta name="keywords" content="数据库,Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis持久化">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;05&#x2F;02&#x2F;Redis%E6%8C%81%E4%B9%85%E5%8C%96&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="Redis提供RDB和AOF两种持久化机制，持久化功能能够避免因进程推出造成的数据丢失问题，当下次重启时利用持久化的文件即可实现数据恢复 RDB持久化RDB持久化是把当前进程数据生成快照保存到硬盘的过程，触发RDB持久化的过程分为手动触发和自动触发 触发机制手动触发手动触发的命令有save,bgsave  save：阻塞当前Redis，知道RDB过程完成，对于内存比较大的实例会造成阻塞，已经被淘汰">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-08T02:53:21.330Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/05/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis持久化 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/02/Redis%E6%8C%81%E4%B9%85%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis持久化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-02 11:03:23" itemprop="dateCreated datePublished" datetime="2019-05-02T11:03:23+08:00">2019-05-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-07-08 10:53:21" itemprop="dateModified" datetime="2019-07-08T10:53:21+08:00">2019-07-08</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Redis提供RDB和AOF两种持久化机制，持久化功能能够避免因进程推出造成的数据丢失问题，当下次重启时利用持久化的文件即可实现数据恢复</p>
+<h1 id="RDB持久化"><a href="#RDB持久化" class="headerlink" title="RDB持久化"></a>RDB持久化</h1><p>RDB持久化是把当前进程数据生成快照保存到硬盘的过程，触发RDB持久化的过程分为手动触发和自动触发</p>
+<h2 id="触发机制"><a href="#触发机制" class="headerlink" title="触发机制"></a>触发机制</h2><h3 id="手动触发"><a href="#手动触发" class="headerlink" title="手动触发"></a>手动触发</h3><p>手动触发的命令有<code>save</code>,<code>bgsave</code></p>
+<ul>
+<li>save：阻塞当前Redis，知道RDB过程完成，对于内存比较大的实例会造成阻塞，已经被淘汰</li>
+<li>bgsave：Redis进程执行fork操作创建子进程，RDB持久化过程由子进程完成，完成后自动结束，阻塞只发生在fork阶段，一般时间很短<a id="more"></a>
+
+</li>
+</ul>
+<h3 id="自动触发"><a href="#自动触发" class="headerlink" title="自动触发"></a>自动触发</h3><ol>
+<li>使用save相关配置，<code>save m n</code>表示m秒内数据集存在n次修改时，自动触发bgsave</li>
+<li>如果从节点执行全量复制操作，主节点自动执行bgsave生成RDB文件并发送给从节点</li>
+<li>执行debug reload命令时重新加载Redis时，也会自动触发save操作</li>
+<li>默认情况下执行shutdown命令，如果没有开启AOF持久化功能则自动执行bgsave</li>
+</ol>
+<h2 id="流程说明"><a href="#流程说明" class="headerlink" title="流程说明"></a>流程说明</h2><p>bgsave执行的流程如下：</p>
+<ol>
+<li>执行bgsave命令，Redis父进程判断当前是否存在正在执行的子进程，如RDB/AOF子进程，存在则则直接返回</li>
+<li>父进程执行fork操作创建子进程，fork操作过程中父进程会阻塞，通过<code>info stats</code>可以查看latest_fork_usec选项，获得最近一个fork操作的耗时，单位为微秒</li>
+<li>父进程fork完成后，bgsave命令返回“Background saving started”信息并不在阻塞父进程，可以继续响应其他命令</li>
+<li>子进程创建RDB文件，根据父进程内存生成的临时快照文件，完成后对原有文件进行原子替换,执行<code>lastsave</code>可以获取最后一次生成RDB的时间，对应info统计的rdb_last_save_time</li>
+<li>进程发送信号给父进程表示完成，父进程更新统计信息，存放在info的Persistence下</li>
+</ol>
+<h2 id="RDB对文件的处理"><a href="#RDB对文件的处理" class="headerlink" title="RDB对文件的处理"></a>RDB对文件的处理</h2><p><strong>保存</strong>：RDB文件保存在配置文件<code>dir</code>指定的目录中，文件名通过<code>dbfilename</code>配置指定，可以通过<code>config set dir {new Dir}</code>和<code>config set dbfilename {newFileName}</code>运行期动态执行，当下次运行时RDB文件会保存在新目录中<br><strong>压缩</strong>：Redis默认采用LZF算法对生成的RDB文件做压缩处理，压缩会消耗CPU内存，但是可以大幅度降低文件体积，可以通过参数<code>config set rdbcompression {yes|no}</code>动态修改<br><strong>校验</strong>：Redis加载损坏的RDB文件时拒绝启动，可以使用<code>redis-check-dump</code>工具检测</p>
+<h2 id="RDB优缺点"><a href="#RDB优缺点" class="headerlink" title="RDB优缺点"></a>RDB优缺点</h2><p><strong>优点</strong></p>
+<ul>
+<li>RDB是一个紧凑压缩的二进制文件，代表Redis在某个时间点上的一个数据快照，非常适用于备份，全量复制等场景</li>
+<li>Redis加载RDB恢复数据远远快于AOF的方式</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>没法做到实时持久化/秒级持久化</li>
+<li>RDB使用特定的二进制格式保存，Redis演变过程中有很多RDB版本，存在老版本无法兼容新版本的问题</li>
+</ul>
+<h1 id="AOF持久化"><a href="#AOF持久化" class="headerlink" title="AOF持久化"></a>AOF持久化</h1><p>以独立日志的方式记录每次写命令，重启时再重新执行AOF文件中的命令达到恢复数据的目的。AOF的主要作用是解决数据持久化的实时性</p>
+<h2 id="使用AOF"><a href="#使用AOF" class="headerlink" title="使用AOF"></a>使用AOF</h2><p>在配置文件中选择，默认不开启，可以通过<code>appendfilename</code>配置文件名，<code>dir</code>配置文件路径</p>
+<blockquote>
+<p>appendonly yes  </p>
+</blockquote>
+<h3 id="AOF工作流程"><a href="#AOF工作流程" class="headerlink" title="AOF工作流程"></a>AOF工作流程</h3><ol>
+<li>写入命令（append）<br>所有的写入命令都会被追加到<code>aof_buf</code>缓冲区中</li>
+<li>文件同步（aync）<br>AOF缓冲区根据对应的策略向硬盘做同步操作</li>
+<li>文件重写（rewrite）<br>随着AOF文件越来越大，定期对AOF文件进行重写，达到压缩的目的</li>
+<li>重启加载（load）<br>当Redis服务器重启时，可以加载AOF文件进行数据恢复</li>
+</ol>
+<p><strong>文件写入</strong><br>AOF文件写入的内容直接是文本协议格式（兼容性强，避免二次处理开销，具有可读性，方便修改和处理）<br><strong>文件同步</strong><br>可以通过配置文件配置多种AOF缓冲区同步文件策略，由参数<code>appendfsync</code>控制</p>
+<ul>
+<li><code>always</code>:写入aof_buf后调用系统fsync操作同步到AOF文件，fsync完成后线程返回；每次写入都要进行文件同步，一般不建议配置</li>
+<li><code>everysec</code>:命令写入aof_buf后调用系统write操作，完成后线程返回。fsync同步文件操作由专门线程每秒调用一次；建议的策略，理论上在系统突然宕机的情况下会丢失1秒数据，fsync完成后会与上次fsync时间做对比，超过两秒后主线程阻塞，直到同步操作完成</li>
+<li><code>no</code>:命令写入aof_buf后调用系统write操作，不对AOF文件做fsync同步，同步硬盘操作由操作系统负责，通常同步周期最长30秒，周期不可控，加大每次同步的数据量，虽然提升了性能，安全性无法保证</li>
+</ul>
+<blockquote>
+<p><strong>write</strong>操作会触发延迟写机制，在写入系统缓冲区后直接返回，同步硬盘操作依赖于系统调度机制，同步文件之前，如果此时系统故障宕机，缓冲区内的数据将丢失<br><strong>fsync</strong>针对单个文件操作，做强制硬盘同步，fsync将阻塞直到写入硬盘完成后返回，保证了数据持久化</p>
+</blockquote>
+<p><strong>重写机制</strong><br>随着命令不断写入AOF，文件会越来越大，Redis引入重写机制压缩文件体积，AOF文件重写是把Redis进程内的数据转化为写命令同步到新AOF文件的过程<br>重写后AOF文件变小的原理：</p>
+<ol>
+<li>进程内已经超时的数据不再写入文件</li>
+<li>旧的AOF文件含有无效命令，如del key，hdel key2，srem keys，set a1，set a2等，重写时使用进程内的数据直接生成，这样新的AOF文件只保留最终数据的写入命令</li>
+<li>多条写的命令合并为一条，如lpush list a，lpush list b转化为lpush list a b，为了防止过多造成客户端缓冲区溢出，以64个元素为界拆分多条</li>
+</ol>
+<p>重写的优点：降低文件占用空间，更快的被Redis加载<br>重写过程的触发：</p>
+<ul>
+<li>手动触发：使用<code>bgrewriteaof</code>命令</li>
+<li>自动触发：配置文件配置<code>auto-aof-rewrite-min-size</code>,<code>auto-aof-rewrite-percentage</code>,前者表示AOF重写时文件最小体积，默认64MB，后者代表AOF文件空间（aof_current_size）和上一次重写后AOF文件空间（aof_base_size）的比值</li>
+</ul>
+<p><strong>重写流程</strong></p>
+<ol>
+<li>执行AOF重写请求，如果当前进程正在执行AOF重写，请求不执行；如果当前进程正在执行bgsave操作，重写命令延迟到bgsave完成之后再执行</li>
+<li>父进程执行<code>fork</code>创建子进程，开销等同于bgsave</li>
+<li>(1). 主进程fork操作完成后，继续响应其他命令，所有修改命令依然写入AOF缓冲区并根据appendfsync策略同步到硬盘，保证原有AOF机制正确性<br>(2). 由于fork操作运用写时复制技术，子进程只能共享fork操作时的内部数据。由于父进程依然响应命令，Redis使用“AOF重写缓冲区”保证这部分新数据，防止新的AOF文件生成期间丢失这部分数据</li>
+<li>子进程根据内存快照，按照命令合并规则写入到新的AOF文件，每次批量写入硬盘数据量由配置<code>aof-rewrite-incremental-fsync</code>控制，默认32MB，防止单次刷盘数据过多造成硬盘阻塞</li>
+<li>(1). 新AOF文件写入完成后，子进程发送信号给父进程，父进程更新统计信息<br>(2). 父进程把AOF重写缓冲区的数据写入到新的AOF文件<br>(3). 使用新的AOF文件替换老文件，重写完成</li>
+</ol>
+<p><strong>重启机制</strong><br>AOF持久化开启且存在AOF文件时，优先加载AOF文件；AOF关闭或者文件不存在时，加载RDB文件，加载后启动成功，如果错误则启动失败并打印错误信息<br><strong>文件校验</strong><br>对于错误格式的AOF文件，先进行备份，然后可以采取<code>redis-check-aof--fix</code>命令进行修复，修复后可以使用<code>diff-u</code>进行数据差异对比，找出丢失的数据<br>AOF文件可能存在结尾不完整的情况，可以使用<code>aof-load-truncate</code>配置来兼容这种情况，默认开启。加载AOF文件时，当遇到此问题会忽略并继续启动，同时打印警告日志</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/01/Maven/" rel="prev" title="Maven">
+      <i class="fa fa-chevron-left"></i> Maven
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/06/SpringIOC/" rel="next" title="SpringIoC">
+      SpringIoC <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RDB持久化"><span class="nav-number">1.</span> <span class="nav-text">RDB持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#触发机制"><span class="nav-number">1.1.</span> <span class="nav-text">触发机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#手动触发"><span class="nav-number">1.1.1.</span> <span class="nav-text">手动触发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动触发"><span class="nav-number">1.1.2.</span> <span class="nav-text">自动触发</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程说明"><span class="nav-number">1.2.</span> <span class="nav-text">流程说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB对文件的处理"><span class="nav-number">1.3.</span> <span class="nav-text">RDB对文件的处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RDB优缺点"><span class="nav-number">1.4.</span> <span class="nav-text">RDB优缺点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AOF持久化"><span class="nav-number">2.</span> <span class="nav-text">AOF持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用AOF"><span class="nav-number">2.1.</span> <span class="nav-text">使用AOF</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF工作流程"><span class="nav-number">2.1.1.</span> <span class="nav-text">AOF工作流程</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

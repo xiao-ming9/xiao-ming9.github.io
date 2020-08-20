@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Nginx常见问题 多个server配置了相同的server_name优先级访问：优先使用最先读取到的配置 location匹配优先级：由高到低分别是：   =进行普通字符精确匹配，即完全匹配 ^~表示普通字符匹配，使用前缀匹配，表示以什么开头 ~开头表示区分大小写的正则匹配 ~* 开头表示不区分大小写的正则匹配 &#x2F;通用匹配，任何请求都会匹配到   try_files的使用用于按顺序检查文件是否存">
+<meta name="keywords" content="nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx架构">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;07&#x2F;24&#x2F;Nginx%E6%9E%B6%E6%9E%84&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="Nginx常见问题 多个server配置了相同的server_name优先级访问：优先使用最先读取到的配置 location匹配优先级：由高到低分别是：   =进行普通字符精确匹配，即完全匹配 ^~表示普通字符匹配，使用前缀匹配，表示以什么开头 ~开头表示区分大小写的正则匹配 ~* 开头表示不区分大小写的正则匹配 &#x2F;通用匹配，任何请求都会匹配到   try_files的使用用于按顺序检查文件是否存">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-24T09:07:58.100Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/07/24/Nginx%E6%9E%B6%E6%9E%84/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Nginx架构 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/24/Nginx%E6%9E%B6%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx架构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2019-07-24 07:59:56 / 修改时间：17:07:58" itemprop="dateCreated datePublished" datetime="2019-07-24T07:59:56+08:00">2019-07-24</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Nginx常见问题"><a href="#Nginx常见问题" class="headerlink" title="Nginx常见问题"></a>Nginx常见问题</h1><ol>
+<li>多个server配置了相同的server_name优先级访问：<br>优先使用最先读取到的配置</li>
+<li>location匹配优先级：<br>由高到低分别是：</li>
+</ol>
+<ul>
+<li><code>=</code>进行普通字符精确匹配，即完全匹配</li>
+<li><code>^~</code>表示普通字符匹配，使用前缀匹配，表示以什么开头</li>
+<li><code>~</code>开头表示区分大小写的正则匹配</li>
+<li><code>~*</code> 开头表示不区分大小写的正则匹配</li>
+<li><code>/</code>通用匹配，任何请求都会匹配到</li>
+</ul>
+<ol start="3">
+<li><p>try_files的使用<br>用于按顺序检查文件是否存在</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span> / &#123;</span><br><span class="line">		<span class="comment"># 首先查找$rui路径是否存在，不存在则查找$uri/路径，如果也不存在则跳转到/index.php目录</span></span><br><span class="line">		<span class="attribute">try_files</span> <span class="variable">$uri</span> <span class="variable">$uri</span>/ /index.php</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>alias和root的区别</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当访问路径为http://www.test.com/request_path/image/cat.png</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 实际访问路径为/local_path/image/request_path/image/cat.png</span></span><br><span class="line"><span class="attribute">location</span> /request_path/image/ &#123;</span><br><span class="line">		<span class="attribute">root</span> /local_path/image/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 实际访问路径为/local_path/image/cat.png</span></span><br><span class="line"><span class="attribute">location</span> /request_path/image/ &#123;</span><br><span class="line">		<span class="attribute">alias</span> /local_path/image/;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li><p>获取用户真实ip地址<br>对第一层代理设置头信息存储ip，这样后端服务就可以通过$x_real_ip获得真实ip</p>
+<blockquote>
+<p>set x_real_ip = $remote_addr  </p>
+</blockquote>
+</li>
+<li><p>常见错误码</p>
+</li>
+</ol>
+<ul>
+<li>413 Request Entity Too Large</li>
+</ul>
+<p><strong>解决方法</strong>： 用户上传文件限制 <code>client_max_body_size</code></p>
+<ul>
+<li>502 bad geteway：后端服务无响应</li>
+<li>504 Geteway Time-out：后端服务执行超时</li>
+</ul>
+<h1 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h1><p>接口压力测试工具：<code>ab</code></p>
+<ol>
+<li>需要先安装<code>http-tools</code></li>
+<li>使用：<blockquote>
+<p>ab -n 2000 -c 2 <a href="http://127.0..0.1/" target="_blank" rel="noopener">http://127.0..0.1/</a>  </p>
+</blockquote>
+</li>
+</ol>
+<ul>
+<li>n 总的请求数</li>
+<li>c 并发数</li>
+<li>k 是否开启长连接</li>
+</ul>
+<h2 id="设置Nginx文件句柄"><a href="#设置Nginx文件句柄" class="headerlink" title="设置Nginx文件句柄"></a>设置Nginx文件句柄</h2><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 指定一个nginx进程可以打开的最多文件描述符数目</span></span><br><span class="line"><span class="attribute">worker_rlimit_nofile</span> num;</span><br></pre></td></tr></table></figure>
+
+<h2 id="CPU亲和"><a href="#CPU亲和" class="headerlink" title="CPU亲和"></a>CPU亲和</h2><p>将nginx设置与当前机器物理cpu个数相等，同时配置核心数<br>总核心数=cpu个数*每个核心数</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动多少个worker进程，建议与cpu总核心数一致,默认1</span></span><br><span class="line"><span class="attribute">worker_processes</span> num;</span><br><span class="line"><span class="comment"># cpu亲缘 ，将工作进程绑定到CPU组。</span></span><br><span class="line"><span class="attribute">worker_cpu_affinity</span> cpumask...;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置工作进程可以打开的最大并发连接数</span></span><br><span class="line"><span class="comment"># 配置在events，默认512</span></span><br><span class="line"><span class="comment"># 这个数字包括所有连接（例如与代理服务器的连接等），而不仅仅是与客户端的连接。另一个考虑因素是实际的并发连接数不能超过最大打开文件数的当前限制，可以通过 worker_rlimit_nofile更改。</span></span><br><span class="line"><span class="attribute">worker_connections</span> number;</span><br></pre></td></tr></table></figure>
+
+<p><strong>worker_cpu_affinity配置方法</strong></p>
+<ol>
+<li><p>使用位掩码表示:绑定到cpu0，cpu1，cpu2，cpu3</p>
+<blockquote>
+<p>worker_cpu_affinity 0001 0010 0100 1000;  </p>
+</blockquote>
+</li>
+<li><p>将工作进程绑定到CPU组,将第一个工作进程绑定到CPU0 / CPU2，将第二个工作进程绑定到CPU1 / CPU3。</p>
+<blockquote>
+<p>worker_processes 2;<br>worker_cpu_affinity 0101 1010;  </p>
+</blockquote>
+</li>
+<li><p>使用<code>auto</code>允许将工作进程自动绑定到可用的CPU：</p>
+<blockquote>
+<p>worker_processes auto;<br>worker_cpu_affinity auto;  </p>
+</blockquote>
+</li>
+</ol>
+<h1 id="Nginx安全"><a href="#Nginx安全" class="headerlink" title="Nginx安全"></a>Nginx安全</h1><h2 id="常见恶意行为"><a href="#常见恶意行为" class="headerlink" title="常见恶意行为"></a>常见恶意行为</h2><p>爬虫行为和恶意抓取，资源盗用<br><strong>解决方式</strong>：</p>
+<ul>
+<li>使用基础防盗链功能，不让恶意用户能轻易的爬去网站对外数据</li>
+<li>secure_link_module:对数据安全性提高加密验证和实效性，适合如核心重要数据</li>
+<li>access_module:对后台、部分用户服务的数据提供IP防控 </li>
+</ul>
+<h2 id="常见攻击手段"><a href="#常见攻击手段" class="headerlink" title="常见攻击手段"></a>常见攻击手段</h2><ol>
+<li>后台密码撞库：通过猜测密码字典不断对后台系统登录性尝试，获取后台登录密码</li>
+</ol>
+<p><strong>解决方式</strong>：</p>
+<ul>
+<li>后台登录密码复杂度</li>
+<li>access_module:对后台提供IP防控</li>
+<li>预警机制</li>
+</ul>
+<ol start="2">
+<li>文件上传漏洞：利用这些可以上传文件的接口将恶意代码植入到服务器中，再通过url去访问以执行代码<br>例如：在Nginx早期版本：<blockquote>
+<p><a href="http://www.server_name.com/upload/1.jpg/1.php" target="_blank" rel="noopener">http://www.server_name.com/upload/1.jpg/1.php</a>  </p>
+</blockquote>
+</li>
+</ol>
+<p>nginx会将其作为php代码执行<br><strong>解决方式</strong>：检查文件上传格式是否合规</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">location</span><span class="regexp"> ^~</span> /upload&#123;</span><br><span class="line">		<span class="attribute">root</span> /opt/app/images;</span><br><span class="line">		if($request_filename ~* (.*)\.php)&#123;</span><br><span class="line">				<span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>SQL注入：利用未过滤，未审核用户输入的攻击方法，让应用运行本不应该运行的SQL代码</li>
+</ol>
+<p><strong>解决方式</strong><br>Nginx+LUA防火墙：拦截Cookie类型攻击，异常post请求，cc攻击(对某一个接口高频率访问），拦截URL，arg（get请求提交的参数）</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/23/Nginx%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB,rewrite%E8%A7%84%E5%88%99,HTTPS%E6%9C%8D%E5%8A%A1/" rel="prev" title="Nginx动静分离,rewrite规则,HTTPS服务">
+      <i class="fa fa-chevron-left"></i> Nginx动静分离,rewrite规则,HTTPS服务
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/29/GOF23/" rel="next" title="GOF23">
+      GOF23 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx常见问题"><span class="nav-number">1.</span> <span class="nav-text">Nginx常见问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#性能优化"><span class="nav-number">2.</span> <span class="nav-text">性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置Nginx文件句柄"><span class="nav-number">2.1.</span> <span class="nav-text">设置Nginx文件句柄</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU亲和"><span class="nav-number">2.2.</span> <span class="nav-text">CPU亲和</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx安全"><span class="nav-number">3.</span> <span class="nav-text">Nginx安全</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#常见恶意行为"><span class="nav-number">3.1.</span> <span class="nav-text">常见恶意行为</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见攻击手段"><span class="nav-number">3.2.</span> <span class="nav-text">常见攻击手段</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

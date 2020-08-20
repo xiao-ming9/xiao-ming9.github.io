@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="配置方式建立复制 先再复制一个配置文件，更改端口号，启动redis-server并指定到该配置（实际应用一般主从节点部署在不同机器上） 建立主从节点复制1）在配置文件中加入slaveof {masterHost} {masterPort}，随Redis启动生效2）在redis-server启动命令后加入 --slaveof {masterHost} {masterPort}生效3）直接使用命令：s">
+<meta name="keywords" content="数据库,Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis主从复制">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;07&#x2F;08&#x2F;Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="配置方式建立复制 先再复制一个配置文件，更改端口号，启动redis-server并指定到该配置（实际应用一般主从节点部署在不同机器上） 建立主从节点复制1）在配置文件中加入slaveof {masterHost} {masterPort}，随Redis启动生效2）在redis-server启动命令后加入 --slaveof {masterHost} {masterPort}生效3）直接使用命令：s">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-12T08:53:20.440Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/07/08/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis主从复制 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/08/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis主从复制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-08 11:56:54" itemprop="dateCreated datePublished" datetime="2019-07-08T11:56:54+08:00">2019-07-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-07-12 16:53:20" itemprop="dateModified" datetime="2019-07-12T16:53:20+08:00">2019-07-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="配置方式"><a href="#配置方式" class="headerlink" title="配置方式"></a>配置方式</h1><h2 id="建立复制"><a href="#建立复制" class="headerlink" title="建立复制"></a>建立复制</h2><ol>
+<li>先再复制一个配置文件，更改端口号，启动redis-server并指定到该配置（实际应用一般主从节点部署在不同机器上）</li>
+<li>建立主从节点复制<br>1）在配置文件中加入<code>slaveof {masterHost} {masterPort}</code>，随Redis启动生效<br>2）在redis-server启动命令后加入 <code>--slaveof {masterHost} {masterPort}</code>生效<br>3）直接使用命令：<code>slaveof {masterHost} {masterPort}</code>生效<blockquote>
+<p>slaveof命令指定祝节点，并将当前节点设置为从节点，建立成功后，从节点会复制主节点的数据  </p>
+</blockquote>
+</li>
+</ol>
+<a id="more"></a>
+<h2 id="断开复制"><a href="#断开复制" class="headerlink" title="断开复制"></a>断开复制</h2><p><code>slaveof no one</code>可以用来断开与主节点的复制关系，断开后从节点晋升为主节点，原有数据不会丢失</p>
+<p>还可以使用<code>slaveof</code>命令重新指定新的从节点，此时原有数据会被删除</p>
+<ol>
+<li>断开与旧主节点复制关系</li>
+<li>与新主节点建立复制关系</li>
+<li>删除从节点当前所有数据</li>
+<li>对新主节点进行复制</li>
+</ol>
+<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>对于数据比较重要的节点，可以通过设置<code>requirepass</code>参数进行密码验证，此时所有客户端访问必须使用auth命令实行校验。从节点需要配置<code>masterauth</code>参数与主节点密码保持一致</p>
+<h2 id="只读"><a href="#只读" class="headerlink" title="只读"></a>只读</h2><p>默认情况下，从节点使用<code>slave-read-only=yes</code>配置为只读模式。</p>
+<h2 id="传输延迟"><a href="#传输延迟" class="headerlink" title="传输延迟"></a>传输延迟</h2><p>主从节点一般部署在不同机器上，所以传输会有网络延迟<br>Redis可以通过<code>repl-dissable-tcp-nodelay</code>参数用于控制是否关闭TCP_NODELAY，默认是no，即开启tcp-nodelay功能</p>
+<blockquote>
+<p>开启时，主节点会合并较小的TCP数据包从而节省带宽，但增大了主从复制之间的延迟<br>关闭时，主节点产生的命令无论大小都及时发送给从节点，延迟变小，但是消耗的带宽会增大  </p>
+</blockquote>
+<h1 id="拓扑"><a href="#拓扑" class="headerlink" title="拓扑"></a>拓扑</h1><p>Redis的复制拓扑结构有三种：</p>
+<ul>
+<li><strong>一主一从</strong>：最简单的复制拓扑结构，用于主节点出现宕机时从节点提供故障转移支持。当应用写命令并发量高时，可以在从节点上开启AOF，这样既保证数据安全性同时也避免了持 久化对主节点的性能干扰。但是当主节点关闭持久化功能时，要避免主节点脱机自动重启操作。因为主节点没有数据持久化，重启后数据为空，从节点会复制主节点数据而导致从节点也为空。安全的做法是在从节点上执行 slaveof no one断开与主节点的复制关系，再重启主节点从而避免这一问题。</li>
+<li><strong>一主多从</strong>：一主多从结构（又称为星形拓扑结构）使得应用端可以利用多个从节点实现读写分离。对于读占比较大的场景，可以把读命令发送到从节点来分担主节点压力。对于写并发量较高的场景，多 个从节点会导致主节点写命令的多次发送从而过度消耗网络带宽，同时也加 重了主节点的负载影响服务稳定性。</li>
+<li><strong>树状主从结构</strong>：树状主从结构（又称为树状拓扑结构）使得从节点不但可以复制主节点 数据，同时可以作为其他从节点的主节点继续向下层复制。通过引入复制中 间层，可以有效降低主节点负载和需要传送给从节点的数据量。</li>
+</ul>
+<h1 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h1><h2 id="复制过程"><a href="#复制过程" class="headerlink" title="复制过程"></a>复制过程</h2><ol>
+<li>保存主节点信息<br>执行slaveof后从节点只保存主节点的地址信息便直接返回，还未建立复制的完整流程</li>
+<li>主从建立socket连接<br>从节点内部通过每秒运行的定时任务维护复制的相关逻辑，当定时任务发现存在新的主节点后，会尝试与该节点建立网络连接（通过建立socket套接字，接受主节点发送的复制命令）。如果从节点无法建立连接，定时任务会无限重试直到连接成功或者执行slaveof no one</li>
+<li>发送ping命令<br>连接建立成功后，从节点发送ping命令请求首次通信，检测主从之间网络套接字是否可用，同时检测主节点当前是否可接受处理命令。如果发送ping命令后，从节点没有收到主节点的pong回复或者超时，比如网络超时或者主节点正在阻塞无法响应命令，从节点会断开复制连接，下次定时任务会发起重连</li>
+<li>权限验证<br>如果主节点设置了requirepass参数，则需要密码验证， 从节点必须配置masterauth参数保证与主节点相同的密码才能通过验证；如果验证失败复制将终止，从节点重新发起复制流程。</li>
+<li>同步数据集<br>主从复制连接正常通信后，对于首次建立复制的场 景，主节点会把持有的数据全部发送给从节点，这部分操作是耗时最长的步 骤。Redis在2.8版本以后采用新复制命令psync进行数据同步，原来的sync命令依然支持，保证新旧版本的兼容性。新版同步划分两种情况：全量同步和部分同步。</li>
+<li>命令持续复制<br>当主节点把当前的数据同步给从节点后，便完成了复制的建立流程。接下来主节点会持续地把写命令发送给从节点，保证主从数据一致性。</li>
+</ol>
+<h2 id="数据同步"><a href="#数据同步" class="headerlink" title="数据同步"></a>数据同步</h2><p>2.8以后Redis使用<code>psync</code>命令完成主从数据复制，数据同步过程分为全量复制和部分复制</p>
+<ul>
+<li><strong>全量复制</strong>：一般用于初次复制场景，Redis早期支持的复制功能只有全 量复制，它会把主节点全部数据一次性发送给从节点，当数据量较大时，会对主从节点和网络造成很大的开销。</li>
+<li><strong>部分复制</strong>：用于处理在主从复制中因网络闪断等原因造成的数据丢失场景，当从节点再次连上主节点后，如果条件允许，主节点会补发丢失数据给从节点。因为补发的数据远远小于全量数据，可以有效避免全量复制的过高开销。<br>psync命令运行需要一下组件：</li>
+</ul>
+<ol>
+<li>主从节点各自复制偏移量</li>
+<li>主节点复制积压缓冲区</li>
+<li>主节点运行id</li>
+</ol>
+<h2 id="复制偏移量"><a href="#复制偏移量" class="headerlink" title="复制偏移量"></a>复制偏移量</h2><p>参与复制的主从节点都会维护自身复制偏移量。主节点（master）在处理完写入命令后，会把命令的字节长度做累加记录，统计信息在info relication中的<code>master_repl_offset</code>指标中</p>
+<h2 id="复制积压缓冲区"><a href="#复制积压缓冲区" class="headerlink" title="复制积压缓冲区"></a>复制积压缓冲区</h2><p>复制积压缓冲区是保存在主节点上的一个固定长度的队列，默认大小为 1MB，当主节点有连接的从节点（slave）时被创建，这时主节点（master） 响应写命令时，不但会把命令发送给从节点，还会写入复制积压缓冲区。<br>由于缓冲区本质上是先进先出的定长队列，所以能实现保存最近已复制 数据的功能，用于部分复制和复制命令丢失的数据补救。复制缓冲区相关统计信息保存在主节点的info replication中。</p>
+<h2 id="主节点运行ID"><a href="#主节点运行ID" class="headerlink" title="主节点运行ID"></a>主节点运行ID</h2><p>每个Redis节点启动后都会动态分配一个40位的十六进制字符串作为运 行ID。运行ID的主要作用是用来唯一识别Redis节点。是Redis关闭再启动后，运行ID会随之改变。</p>
+<blockquote>
+<p>在不改变运行ID的情况下重启：以使用<code>debug reload</code>命令重新加载RDB并保持运行ID不变，从而有效避免不必要的全量复制  </p>
+</blockquote>
+<h2 id="psync命令"><a href="#psync命令" class="headerlink" title="psync命令"></a>psync命令</h2><p>从节点使用psync命令完成部分复制和全量复制功能，命令格式为：<code>psync {runId} {offset}</code></p>
+<ul>
+<li>runId:从节点所复制主节点运行id</li>
+<li>offset：</li>
+</ul>
+<h3 id="流程说明："><a href="#流程说明：" class="headerlink" title="流程说明："></a>流程说明：</h3><ol>
+<li>从节点（slave）发送psync命令给主节点，参数runId是当前从节点保存的主节点运行ID，如果没有则默认值为，参数offset是当前从节点保存的 复制偏移量，如果是第一次参与复制则默认值为-1。</li>
+<li>主节点（master）根据psync参数和自身数据情况决定响应结果:</li>
+</ol>
+<ul>
+<li>如果回复+FULLRESYNC{runId}{offset}，那么从节点将触发全量复制 374 流程。 </li>
+<li>如果回复+CONTINUE，从节点将触发部分复制流程。 </li>
+<li>如果回复+ERR，说明主节点版本低于Redis2.8，无法识别psync命令， 从节点将发送旧版的sync命令触发全量复制流程。</li>
+</ul>
+<h2 id="全量复制"><a href="#全量复制" class="headerlink" title="全量复制"></a>全量复制</h2><p>主从第一次复制必须经历的阶段，触发全量复制的命令是sync和psync<br>流程说明：</p>
+<ol>
+<li><p>发送psync命令进行数据同步，由于是第一次进行复制，从节点没有复制偏移量和主节点的运行ID，所以发送<code>psync ? -1</code>。</p>
+</li>
+<li><p>主节点根据<code>psync ? -1</code>解析出当前为全量复制，回复<code>+FULLRESYNC</code>响 应。</p>
+</li>
+<li><p>从节点接收主节点的响应数据保存运行ID和偏移量offset。</p>
+</li>
+<li><p>主节点执行bgsave保存RDB文件到本地。</p>
+</li>
+<li><p>主节点发送RDB文件给从节点，从节点把接收的RDB文件保存在本 地并直接作为从节点的数据文件。</p>
+<blockquote>
+<p>如果传输总时间超过<code>repl-timeout</code>所配置的时间（默认60秒），从节点将放弃接受RDB文件并清理已 经下载的临时文件，导致全量复制失败。  </p>
+</blockquote>
+</li>
+<li><p>对于从节点开始接收RDB快照到接收完成期间，主节点仍然响应读写命令，因此主节点会把这期间写命令数据保存在复制客户端缓冲区内，当从节点加载完RDB文件后，主节点再把缓冲区内的数据发送给从节点，保证主从之间数据一致性。如果主节点创建和传输RDB的时间过长，对于高流量写入场景非常容易造成主节点复制客户端缓冲区溢出。默认配置为<code>clientoutput-buffer-limit  slave 256MB 64MB 60</code>，如果60秒内缓冲区消耗持续大于 64MB或者直接超过256MB时，主节点将直接关闭复制客户端连接，造成全 量同步失败。</p>
+<blockquote>
+<p>对于主节点，当发送完所有数据就认为全量复制完成，但是从节点仍然没有完成  </p>
+</blockquote>
+</li>
+<li><p>从节点接受完主节点传送过来的全部数据后，清空自身旧数据。</p>
+</li>
+<li><p>从节点加载RDB文件</p>
+<blockquote>
+<p>对于线上做读写分离的场景，从节点也负责响应读命令。如果此时从节点正处于全量复制阶段或者复制中断，那么从节点在响应读命令可能拿到过期或错误的数据。对于这种场景，Redis复制提供了<code>slave-serve-stale-data</code>参数，默认开启状态。如果开启则从节点依然响应所有命令。对于无法容忍不 一致的应用场景可以设置<code>no</code>来关闭命令执行，此时从节点除了info和slaveof 命令之外所有的命令只返回“SYNC with master in progress”信息  </p>
+</blockquote>
+</li>
+<li><p>从节点成功加载完RDB后，如果当前节点开启了AOF持久化功能， 它会立刻做<code>bgrewriteaof</code>操作，为了保证全量复制后AOF持久化文件立刻可用。</p>
+</li>
+</ol>
+<h2 id="部分复制"><a href="#部分复制" class="headerlink" title="部分复制"></a>部分复制</h2><p>使用<code>psync {runId} {offset}</code>命令实现。当从节点正在复制主节点 时，如果出现网络闪断或者命令丢失等异常情况时，从节点会向主节点要求补发丢失的命令数据，如果主节点的复制积压缓冲区内存在这部分数据则直接发送给从节点，这样就可以保持主从节点复制的一致性。补发的这部分数据一般远远小于全量数据，所以开销很小。</p>
+<p><strong>流程说明</strong></p>
+<ol>
+<li>当主从节点之间网络出现中断时，如果超过<code>repl-timeout</code>时间，主节点会认为从节点故障并中断复制连接。</li>
+<li>主从连接中断期间主节点依然响应命令，但因复制连接中断命令无法发送给从节点，不过主节点内部存在的复制积压缓冲区，依然可以保存最近一段时间的写命令数据，默认最大缓存1MB。</li>
+<li>当主从节点网络恢复后，从节点会再次连上主节点.</li>
+<li>当主从连接恢复后，由于从节点之前保存了自身已复制的偏移量和主节点的运行ID。因此会把它们当作psync参数发送给主节点，要求进行部分复制操作。</li>
+<li>主节点接到psync命令后首先核对参数runId是否与自身一致，如果一致，说明之前复制的是当前主节点；之后根据参数offset在自身复制积压缓冲区查找，如果偏移量之后的数据存在缓冲区中，则对从节点发送<code>+CONTINUE</code>响应，表示可以进行部分复制。</li>
+<li>主节点根据偏移量把复制积压缓冲区里的数据发送给从节点，保证主从复制进入正常状态。</li>
+</ol>
+<h2 id="心跳"><a href="#心跳" class="headerlink" title="心跳"></a>心跳</h2><p>主从节点在建立复制后，它们之间维护着长连接并彼此发送心跳命令<br><strong>判断机制</strong></p>
+<ol>
+<li>主从节点彼此都有心跳检测机制，各自模拟成对方的客户端进行通信，通过<code>client list</code>命令查看复制相关客户端信息，主节点连接状态为flags=M，从节点连接状态为flags=S。</li>
+<li>主节点点默认每隔10秒对从节点发送ping命令，判断从节点的存活性和连接状态。可通过参数<code>repl-ping-slave-period</code>控制发送频率。</li>
+<li>从节点在主线程中每隔1秒发送<code>replconf ack{offset}</code>命令，给主节点 上报自身当前的复制偏移量。replconf命令主要作用如下：</li>
+</ol>
+<ul>
+<li>实时监测主从节点网络状态</li>
+<li>上报自身复制偏移量，检查复制数据是否丢失，如果从节点数据丢失，再从主节点的复制缓冲区中拉取丢失数据</li>
+<li>实现保证从节点的数量和延迟性功能，通过<code>min-slaves-to-write</code>,<code>min-slaves-max-lag</code>参数配置定义。<blockquote>
+<p>主节点根据replconf命令判断从节点超时时间，体现在info replication统计中的lag信息中，lag表示与从节点最后一次通信延迟的秒数，正常延迟应该在0和1之间。如果超过repl-timeout配置的值（默认60秒），则判定从节点下线并断开复制客户端连接。即使主节点判定从节点下线后，如果从节点重新恢复，心跳检测会继续进行。  </p>
+</blockquote>
+</li>
+</ul>
+<h2 id="异步复制"><a href="#异步复制" class="headerlink" title="异步复制"></a>异步复制</h2><p>主节点不但负责数据读写，还负责把写命令同步给从节点。写命令的发 送过程是异步完成，也就是说主节点自身处理完写命令后直接返回给客户 端，并不等待从节点复制完成。</p>
+<blockquote>
+<p>由于主从复制过程是异步的，就会造成从节点的数据相对主节点存在延迟。具体延迟多少字节，我们可以在主节点执行info replication命令查看相关指标获得。  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/04/SSM%E6%95%B4%E5%90%88/" rel="prev" title="SSM框架整合">
+      <i class="fa fa-chevron-left"></i> SSM框架整合
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/11/Redis%E5%93%A8%E5%85%B5/" rel="next" title="Redis哨兵">
+      Redis哨兵 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置方式"><span class="nav-number">1.</span> <span class="nav-text">配置方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#建立复制"><span class="nav-number">1.1.</span> <span class="nav-text">建立复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#断开复制"><span class="nav-number">1.2.</span> <span class="nav-text">断开复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安全性"><span class="nav-number">1.3.</span> <span class="nav-text">安全性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只读"><span class="nav-number">1.4.</span> <span class="nav-text">只读</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传输延迟"><span class="nav-number">1.5.</span> <span class="nav-text">传输延迟</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拓扑"><span class="nav-number">2.</span> <span class="nav-text">拓扑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原理"><span class="nav-number">3.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#复制过程"><span class="nav-number">3.1.</span> <span class="nav-text">复制过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据同步"><span class="nav-number">3.2.</span> <span class="nav-text">数据同步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制偏移量"><span class="nav-number">3.3.</span> <span class="nav-text">复制偏移量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制积压缓冲区"><span class="nav-number">3.4.</span> <span class="nav-text">复制积压缓冲区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主节点运行ID"><span class="nav-number">3.5.</span> <span class="nav-text">主节点运行ID</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#psync命令"><span class="nav-number">3.6.</span> <span class="nav-text">psync命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#流程说明："><span class="nav-number">3.6.1.</span> <span class="nav-text">流程说明：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全量复制"><span class="nav-number">3.7.</span> <span class="nav-text">全量复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部分复制"><span class="nav-number">3.8.</span> <span class="nav-text">部分复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#心跳"><span class="nav-number">3.9.</span> <span class="nav-text">心跳</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异步复制"><span class="nav-number">3.10.</span> <span class="nav-text">异步复制</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

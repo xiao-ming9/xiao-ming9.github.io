@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="基本概念Redis哨兵（Sentinel）是Redis提供的一种高可用实现方案，Redis在主从复制下，一旦主节点出现问题，需要人工干预，手动将一个从节点更新为主节点（slaveof no one），同时还要通知应用方新的主节点，让其他从节点去复制新的从节点。这种方式存在弊端大，Redis Sentinel高可用方案就是为了解决这种问题">
+<meta name="keywords" content="数据库,Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis哨兵">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;07&#x2F;11&#x2F;Redis%E5%93%A8%E5%85%B5&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="基本概念Redis哨兵（Sentinel）是Redis提供的一种高可用实现方案，Redis在主从复制下，一旦主节点出现问题，需要人工干预，手动将一个从节点更新为主节点（slaveof no one），同时还要通知应用方新的主节点，让其他从节点去复制新的从节点。这种方式存在弊端大，Redis Sentinel高可用方案就是为了解决这种问题">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-12T08:53:05.440Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/07/11/Redis%E5%93%A8%E5%85%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Redis哨兵 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/11/Redis%E5%93%A8%E5%85%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis哨兵
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-07-11 10:48:23" itemprop="dateCreated datePublished" datetime="2019-07-11T10:48:23+08:00">2019-07-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-07-12 16:53:05" itemprop="dateModified" datetime="2019-07-12T16:53:05+08:00">2019-07-12</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>Redis哨兵（Sentinel）是Redis提供的一种高可用实现方案，Redis在主从复制下，一旦主节点出现问题，需要人工干预，手动将一个从节点更新为主节点（slaveof no one），同时还要通知应用方新的主节点，让其他从节点去复制新的从节点。这种方式存在弊端大，Redis Sentinel高可用方案就是为了解决这种问题</p>
+<a id="more"></a>
+
+<h1 id="Redis-Sentinel的高可用性"><a href="#Redis-Sentinel的高可用性" class="headerlink" title="Redis Sentinel的高可用性"></a>Redis Sentinel的高可用性</h1><p>Redis Sentinel是一个分布式架构，其中包含若干个Sentinel节点和Redis数据节点，每个Sentinel节点会对数据节点和其余Sentinel节点进行监控，当它发现节点不可达时，会对节点做下线标识。如果被标识的是主节点，它还会和其他Sentinel节点进行“协商”，当大多数Sentinel节点都认为主节点不可达时，它们会选举出一个Sentinel节点来完成自动故障转移的工作，同时会将这个变化实时通知给Redis应用方。</p>
+<h1 id="部署方式"><a href="#部署方式" class="headerlink" title="部署方式"></a>部署方式</h1><ul>
+<li>首先部署主节点和从节点</li>
+<li>部署sentinel节点<br>在Redis安装目录下有一个<strong>sentinel.conf</strong>的文件，是默认的sentinel节点配置文件，对其进行复制和修改</li>
+<li>启动Sentinel节点<blockquote>
+<p>Sentinel节点默认的端口是26379  </p>
+</blockquote>
+</li>
+</ul>
+<p>启动节点的方式有两种：</p>
+<ol>
+<li><p>使用redis-sentinel命令</p>
+<blockquote>
+<p>redis-sentinel sentinel配置文件.conf  </p>
+</blockquote>
+</li>
+<li><p>使用redis-server命令加上<code>--sentinel</code>参数</p>
+<blockquote>
+<p>redis-server sentinel配置文件.conf —sentinel  </p>
+</blockquote>
+</li>
+</ol>
+<blockquote>
+<p>每个sentinel节点会对主节点和所有从节点进行监控，同时Sentinel节点之间也会相互监控  </p>
+</blockquote>
+<h2 id="Sentinel相关配置"><a href="#Sentinel相关配置" class="headerlink" title="Sentinel相关配置"></a>Sentinel相关配置</h2><ul>
+<li>port ：端口</li>
+<li>dir：Sentinel工作目录</li>
+<li>sentinel monitor：master-name是对要监控的节点起一个名字，quorum是用于判断主节点最终不可达需要的票数。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sentinel monitor &lt;master-name&gt; &lt;ip&gt; &lt;port&gt; &lt;quorum&gt;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>领导者选举至少要有sentinel节点个数/2+1和quorum的较大值个节点，才能选举出领导者  </p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>如果一个Sentinel要监控多个主节点，只需要指定多个masterName来区分不同的主节点即可，即写两个sentinel monitor  </p>
+</blockquote>
+<h2 id="动态调整"><a href="#动态调整" class="headerlink" title="动态调整"></a>动态调整</h2><p>Sentinel提供了<code>sentinel set</code>命令用于动态设置参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sentinel set &lt;param&gt; &lt;value&gt;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>sentinel set 命令只对当前Sentinel节点有效</li>
+<li>sentinel set命令如果执行成功会立即刷新配置文件，和Redis普通数据节点需要执行config rewrite刷新配置文件不同</li>
+</ol>
+<h1 id="API"><a href="#API" class="headerlink" title="API"></a>API</h1><p>Sentinel节点是一个特殊的Redis节点，有自己专属的API</p>
+<ol>
+<li>sentinel masters：展示所有被监控的主节点状态以及相关的统计信息</li>
+<li>sentinel master  masterName：展示指定的主节点状态以及相关的统计信息</li>
+<li>sentinel slaves masterName：展示指定主节点的从节点状态及相关统计信息</li>
+<li>sentinel get-master-addr-by-name masterName：返回指定主节点的IP地址和端口</li>
+<li>sentinel sentinels masterName：展示指定的Sentinel节点集合（不包含当前Sentinel节）</li>
+<li>sentinel failover masterName：对指定主节点进行强制故障转移（没有和其他Sentinel节点“协商”），当故障转移完成后，其他Sentinel节点按照故障转移的结果更新自身配置</li>
+</ol>
+<h1 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h1><h2 id="三个定时监控任务"><a href="#三个定时监控任务" class="headerlink" title="三个定时监控任务"></a>三个定时监控任务</h2><p>Redis Sentinel通过三个定时监控任务完成对每个节点发现和监控</p>
+<ol>
+<li>每隔10秒，每个Sentinel节点会向主节点和从节点发送info命令获取最新的拓扑结构，Sentinel节点可以通过info replication的结果进行解析找到相应的从节点。</li>
+</ol>
+<p><strong>该定时任务的作用：</strong></p>
+<ul>
+<li>通过向主节点执行info命令，获取从节点的信息，这也是为什么 Sentinel节点不需要显式配置监控从节点</li>
+<li>当有新的从节点加入时都可以立刻感知出来。</li>
+<li>节点不可达或者故障转移后，可以通过info命令实时更新节点拓扑信息。</li>
+</ul>
+<ol start="2">
+<li>每隔2秒，每个Sentinel会向Redis数据节点的<code>__sentinel__:hello</code>频道发送该Sentinel节点的信息，同时每个Sentinel节点也会订阅该频道，来了解其他Sentinel节点以及他们对主节点的判断</li>
+</ol>
+<p><strong>该定时任务的作用</strong>：</p>
+<ul>
+<li>发现新的Sentinel节点：通过订阅主节点的<code>__sentinel__：hello</code>了解其他 的Sentinel节点信息，如果是新加入的Sentinel节点，将该Sentinel节点信息保存起来，并与该Sentinel节点创建连接</li>
+<li>Sentinel节点之间交换主节点的状态，作为后面客观下线以及领导者选举的依据。</li>
+</ul>
+<ol start="3">
+<li>每隔1秒，每个Sentinel节点会向主节点、从节点、其余Sentinel节点发送一条ping命令做一次心跳检测，来却仍这些节点当前是否可达。</li>
+</ol>
+<p><strong>该定时任务的作用：</strong><br>通过对上面的定时任务，Sentinel节点对主节点，从节点，其余Sentinel节点都建立起连接，实现对每个节点的监控，这个定时任务是节点失败判定的重要依据。</p>
+<h2 id="主观下线和客观下线"><a href="#主观下线和客观下线" class="headerlink" title="主观下线和客观下线"></a>主观下线和客观下线</h2><h3 id="主观下线"><a href="#主观下线" class="headerlink" title="主观下线"></a>主观下线</h3><p>每个Sentinel节点每隔1秒对主节点、从节点、其他Sentinel节点发送ping命令做心脏检测，当这些节点超过<code>down-after-milliseconds</code>没有进行有效恢复时，Seintinel节点会对该节点做失败判定，这个行为称为主观下线。</p>
+<h3 id="客观下线"><a href="#客观下线" class="headerlink" title="客观下线"></a>客观下线</h3><p>当Sentinel主观下线的节点是主节点时，该Sentinel节点会通过<code>sentinel is-master-down-by-addr</code>命令向其他Sentinel节点询问对主节点的判断。当超过quorum个数Sentinel节点认为主节点确实有问题，这时就会做出客观下线的决定</p>
+<h2 id="关于sentinel-is-master-down-by-addr命令"><a href="#关于sentinel-is-master-down-by-addr命令" class="headerlink" title="关于sentinel is-master-down-by-addr命令"></a>关于sentinel is-master-down-by-addr命令</h2><pre><code>sentinel is-master-down-by-addr &lt;ip&gt; &lt;port&gt; &lt;current_epoch&gt; &lt;runid&gt;</code></pre><ul>
+<li>current_epoch:当前配置纪元</li>
+<li>runid：此参数有两种类型：<ol>
+<li>当runid等于<code>*</code>时，作用是Sentinel节点直接交换对主节点下线的判定。</li>
+<li>当runid等于当前Sentinel节点的runid时，作用是当前Sentinel节点希望目 标Sentinel节点同意自己成为领导者的请求</li>
+</ol>
+</li>
+</ul>
+<p>此命令返回结果包含三个参数：</p>
+<ul>
+<li>down_state：目标Sentinel节点对于主节点的下线判断，1是下线，0是在线</li>
+<li>leader_runid：当leader_runid等于“*”时，代表返回结果是用来做主节点是否不可达，当leader_runid等于具体的runid，代表目标节点同意runid成为领导者。</li>
+<li>leader_epoch：领导者纪元。</li>
+</ul>
+<h2 id="领导者Sentinel节点的选取"><a href="#领导者Sentinel节点的选取" class="headerlink" title="领导者Sentinel节点的选取"></a>领导者Sentinel节点的选取</h2><pre><code>1. 每个在线的Sentinel节点都有资格成为领导者，当它确认主节点主观下线时候，会向其他Sentinel节点发送`sentinel is-master-down-by-addr`命令， 要求将自己设置为领导者。
+2. 收到命令的Sentinel节点，如果没有同意过其他Sentinel节点的sentinel is-master-down-by-addr命令，将同意该请求，否则拒绝。
+3.  如果该Sentinel节点发现自己的票数已经大于等于max（quorum， num（sentinels）/2+1），那么它将成为领导者。 
+4. 如果此过程没有选举出领导者，将进入下一次选举。</code></pre><blockquote>
+<p>事实上每个Sectinel只有一票，会最先给发起请求的节点。基本上谁先完成客观下线，就会成为领导者  </p>
+</blockquote>
+<h2 id="故障转移"><a href="#故障转移" class="headerlink" title="故障转移"></a>故障转移</h2><ol>
+<li>在从节点列表中选出一个节点作为新的主节点，选择方法如下： </li>
+</ol>
+<ul>
+<li>过滤：“不健康”（主观下线、断线）、5秒内没有回复过Sentinel节点ping响应、与主节点失联超过down-after-milliseconds*10秒。</li>
+<li>选择slave-priority（从节点优先级）最高的从节点列表，如果存在则返回，不存在则继续。</li>
+<li>选择复制偏移量最大的从节点（复制的最完整），如果存在则返回，不存在则继续。</li>
+<li>选择runid最小的从节点。</li>
+</ul>
+<ol start="2">
+<li>Sentinel领导者节点会对第一步选出来的从节点执行slaveof no one命令让其成为主节点。</li>
+<li>Sentinel领导者节点会向剩余的从节点发送命令，让它们成为新主节点的从节点，复制规则和parallel-syncs参数有关</li>
+<li>Sentinel节点集合会将原来的主节点更新为从节点，并保持着对其关注，当其恢复后命令它去复制新的主节点。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" rel="tag"># 数据库</a>
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/07/08/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6/" rel="prev" title="Redis主从复制">
+      <i class="fa fa-chevron-left"></i> Redis主从复制
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/07/12/Redis%E9%9B%86%E7%BE%A4/" rel="next" title="Redis集群">
+      Redis集群 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Redis-Sentinel的高可用性"><span class="nav-number">2.</span> <span class="nav-text">Redis Sentinel的高可用性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署方式"><span class="nav-number">3.</span> <span class="nav-text">部署方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Sentinel相关配置"><span class="nav-number">3.1.</span> <span class="nav-text">Sentinel相关配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态调整"><span class="nav-number">3.2.</span> <span class="nav-text">动态调整</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#API"><span class="nav-number">4.</span> <span class="nav-text">API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现原理"><span class="nav-number">5.</span> <span class="nav-text">实现原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#三个定时监控任务"><span class="nav-number">5.1.</span> <span class="nav-text">三个定时监控任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主观下线和客观下线"><span class="nav-number">5.2.</span> <span class="nav-text">主观下线和客观下线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主观下线"><span class="nav-number">5.2.1.</span> <span class="nav-text">主观下线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客观下线"><span class="nav-number">5.2.2.</span> <span class="nav-text">客观下线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于sentinel-is-master-down-by-addr命令"><span class="nav-number">5.3.</span> <span class="nav-text">关于sentinel is-master-down-by-addr命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#领导者Sentinel节点的选取"><span class="nav-number">5.4.</span> <span class="nav-text">领导者Sentinel节点的选取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#故障转移"><span class="nav-number">5.5.</span> <span class="nav-text">故障转移</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

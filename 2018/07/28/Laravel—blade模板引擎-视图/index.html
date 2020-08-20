@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="视图视图包含应用的HTML代码，视图文件存放在resource&#x2F;views目录   访问视图view辅助函数能够返回视图,第一个参数为views目录下的文件名称，第二个参数可选，是一个包含在视图中有用的数据，若存在子目录，使用.来引用 1234Route::get(&amp;apos;&#x2F;&amp;apos;,function()&amp;#123;    return view(&amp;apos;welcome&amp;apos;,[&amp;apos;name&amp;apos;=&amp;gt;&amp;apos;xiaoming">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel—视图、Blade模板引擎">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;28&#x2F;Laravel%E2%80%94blade%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E-%E8%A7%86%E5%9B%BE&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="视图视图包含应用的HTML代码，视图文件存放在resource&#x2F;views目录   访问视图view辅助函数能够返回视图,第一个参数为views目录下的文件名称，第二个参数可选，是一个包含在视图中有用的数据，若存在子目录，使用.来引用 1234Route::get(&amp;apos;&#x2F;&amp;apos;,function()&amp;#123;    return view(&amp;apos;welcome&amp;apos;,[&amp;apos;name&amp;apos;=&amp;gt;&amp;apos;xiaoming">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-07-29T09:14:00.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/28/Laravel%E2%80%94blade%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E-%E8%A7%86%E5%9B%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Laravel—视图、Blade模板引擎 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/28/Laravel%E2%80%94blade%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E-%E8%A7%86%E5%9B%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel—视图、Blade模板引擎
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-28 13:18:21" itemprop="dateCreated datePublished" datetime="2018-07-28T13:18:21+08:00">2018-07-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-07-29 17:14:00" itemprop="dateModified" datetime="2018-07-29T17:14:00+08:00">2018-07-29</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="视图"><a href="#视图" class="headerlink" title="视图"></a>视图</h1><p>视图包含应用的HTML代码，视图文件存放在<code>resource/views</code>目录  </p>
+<h2 id="访问视图"><a href="#访问视图" class="headerlink" title="访问视图"></a>访问视图</h2><p><code>view</code>辅助函数能够返回视图,第一个参数为views目录下的文件名称，第二个参数可选，是一个<strong>包含在视图中有用的数据</strong>，若存在子目录，使用<code>.</code>来引用</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> view(<span class="string">'welcome'</span>,[<span class="string">'name'</span>=&gt;<span class="string">'xiaoming'</span>]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p><code>View</code>门面上的<code>exists</code>方法用于判断是否存在视图</p>
+<blockquote>
+<p>View::exists(‘emails.customer)  </p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="传递数据到视图"><a href="#传递数据到视图" class="headerlink" title="传递数据到视图"></a>传递数据到视图</h2><p>两种方法：</p>
+<blockquote>
+<p>return view(‘welcome’,[‘name’=&gt;’xiaoming’]);<br>$view = $view(‘welcome’)-&gt;<code>with</code>(‘name’,’xiaoming’);  </p>
+</blockquote>
+<h3 id="在视图之间共享数据"><a href="#在视图之间共享数据" class="headerlink" title="在视图之间共享数据"></a>在视图之间共享数据</h3><p>在<code>AppServiceProvider</code>中或生成独立的服务提供者中添加<strong>视图门面</strong>的<code>share</code>方法，就可以在所有视图中共享数据</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Providers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">ServiceProvider</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppServiceProvider</span> <span class="keyword">extends</span> <span class="title">ServiceProvider</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Bootstrap any application services.</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * 启动所有应用服务</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">boot</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        View::share(<span class="string">'key'</span>,<span class="string">'value'</span>);</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Register any application services.</span></span><br><span class="line"><span class="comment">     * 注册服务提供者</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">register</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Blade模板引擎"><a href="#Blade模板引擎" class="headerlink" title="Blade模板引擎"></a>Blade模板引擎</h1><p>Blade视图文件使用<code>.blade.php</code>文件拓展并存放在<code>resources/views</code>目录下  </p>
+<h2 id="数据显示"><a href="#数据显示" class="headerlink" title="数据显示"></a>数据显示</h2><p>传入Blade视图的数据可以使用<strong>两个花括号</strong>包括变量来显示传递到视图的数据(即在HTML代码中使用PHP变量的方式)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;$name&#125;&#125;</span><br></pre></td></tr></table></figure>
+<p>在HTML中使用的所有PHP代码，都可以用这种方式来使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;time()&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="显示存在的数据-设置默认值"><a href="#显示存在的数据-设置默认值" class="headerlink" title="显示存在的数据/设置默认值"></a>显示存在的数据/设置默认值</h3><p>两种方法：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;isset($name)?$name:&apos;Default&apos;&#125;&#125;  </span><br><span class="line">&#123;&#123;$name or &apos;Default&apos;&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="显示原生代码-未转义的数据"><a href="#显示原生代码-未转义的数据" class="headerlink" title="显示原生代码/未转义的数据"></a>显示原生代码/未转义的数据</h3><p>如果要输出带HTML的文本，则应该使用显示原生代码，否则会直接把HTML代码显示出来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;!$name!&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="显示子视图"><a href="#显示子视图" class="headerlink" title="显示子视图"></a>显示子视图</h2><p><code>@include</code>指令允许在一个视图中包含另一个视图，即子视图继承父视图，还可以传递额外的参数到被子视图</p>
+<blockquote>
+<p>@include(‘view.name’,[‘some’=&gt;’data])  </p>
+</blockquote>
+<h2 id="模板继承"><a href="#模板继承" class="headerlink" title="模板继承"></a>模板继承</h2><p><code>@extends</code>指令能够指定视图继承另外一个视图<br>在HTML代码中，用<code>@section</code>，<code>@show</code>包围的代码区域，可以继承的子视图中进行重新定义，用<code>@yield</code>标记单标签，可以在继承的视图里面直接定义该位置的值<br>继承的子视图在<code>@section(&#39;name&#39;)</code>、<code>@endsection</code>之间指定替换内容，若在替换内容前加上<code>@parent</code>则便是添加内容<br><strong>代码后面不用加；</strong></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- index.blade.php --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 指定标记名1 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span>@yield('title')<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 要指定这部分的标记名2 --&gt;</span></span><br><span class="line">        @section('body') </span><br><span class="line">        <span class="comment">&lt;!-- 把这部分的内容包围起来 --&gt;</span></span><br><span class="line">        @show</span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- extends.blade.php --&gt;</span></span><br><span class="line">@extends('index.php')</span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 重写titile，即单标签1 --&gt;</span></span><br><span class="line">@section('title','Larevel')</span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 重写标签块2 --&gt;</span></span><br><span class="line">@section('body')</span><br><span class="line">  @parent</span><br><span class="line">  <span class="comment">&lt;!-- 这里时替换的内容 在前面加上@parent则表示追加 --&gt;</span> </span><br><span class="line">@endsection</span><br></pre></td></tr></table></figure>
+<h2 id="路程控制"><a href="#路程控制" class="headerlink" title="路程控制"></a>路程控制</h2><h3 id="if语句"><a href="#if语句" class="headerlink" title="if语句"></a>if语句</h3><p>可以在视图中使用<code>@if</code>,<code>@elseif</code>,<code>@else</code>,<code>@endif</code>来构造if语句，使用方式和PHP相同<br>Blade模板还提供<code>@unless</code>指令，表示除非<br>此外还有<code>@isset</code>、``@empty`指令</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@unless</span><br><span class="line">...</span><br><span class="line">@endunless</span><br><span class="line"></span><br><span class="line">@empty</span><br><span class="line">...</span><br><span class="line">@endempty</span><br></pre></td></tr></table></figure>
+
+<h3 id="Switch语句"><a href="#Switch语句" class="headerlink" title="Switch语句"></a>Switch语句</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">@switch($i)</span><br><span class="line">    @case(1)</span><br><span class="line">       //...</span><br><span class="line">       @break</span><br><span class="line"></span><br><span class="line">    @case(2)</span><br><span class="line">       //</span><br><span class="line">       @break</span><br><span class="line"></span><br><span class="line">    @default </span><br><span class="line">       //</span><br><span class="line">@endswitch</span><br></pre></td></tr></table></figure>
+
+<h3 id="循环"><a href="#循环" class="headerlink" title="循环"></a>循环</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">@for ($i = 0;$i <span class="tag">&lt; <span class="attr">10</span>; $<span class="attr">i</span>++)</span></span><br><span class="line"><span class="tag">    //<span class="attr">...</span></span></span><br><span class="line"><span class="tag">@<span class="attr">endfor</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">@<span class="attr">foreach</span> ($<span class="attr">users</span> <span class="attr">as</span> $<span class="attr">user</span>)</span></span><br><span class="line"><span class="tag">    //<span class="attr">...</span></span></span><br><span class="line"><span class="tag">@<span class="attr">endforeach</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">@<span class="attr">forelse</span> ($<span class="attr">users</span> <span class="attr">as</span> $<span class="attr">user</span>)</span></span><br><span class="line"><span class="tag">   //<span class="attr">...</span></span></span><br><span class="line"><span class="tag">@<span class="attr">endforelse</span></span></span><br><span class="line"><span class="tag"></span></span><br><span class="line"><span class="tag">@<span class="attr">while</span>()</span></span><br><span class="line"><span class="tag">   //<span class="attr">...</span></span></span><br><span class="line"><span class="tag">@<span class="attr">endwhile</span></span></span><br></pre></td></tr></table></figure>
+<p>还可以在<code>@php</code>、<code>@endphp</code>之间直接执行一段PHP代码</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/28/Laravel%E2%80%94%E5%93%8D%E5%BA%94/" rel="prev" title="Laravel—响应">
+      <i class="fa fa-chevron-left"></i> Laravel—响应
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/29/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C/" rel="next" title="Laravel—数据库操作">
+      Laravel—数据库操作 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#视图"><span class="nav-number">1.</span> <span class="nav-text">视图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#访问视图"><span class="nav-number">1.1.</span> <span class="nav-text">访问视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递数据到视图"><span class="nav-number">1.2.</span> <span class="nav-text">传递数据到视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在视图之间共享数据"><span class="nav-number">1.2.1.</span> <span class="nav-text">在视图之间共享数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Blade模板引擎"><span class="nav-number">2.</span> <span class="nav-text">Blade模板引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据显示"><span class="nav-number">2.1.</span> <span class="nav-text">数据显示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#显示存在的数据-设置默认值"><span class="nav-number">2.1.1.</span> <span class="nav-text">显示存在的数据/设置默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示原生代码-未转义的数据"><span class="nav-number">2.1.2.</span> <span class="nav-text">显示原生代码/未转义的数据</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#显示子视图"><span class="nav-number">2.2.</span> <span class="nav-text">显示子视图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板继承"><span class="nav-number">2.3.</span> <span class="nav-text">模板继承</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路程控制"><span class="nav-number">2.4.</span> <span class="nav-text">路程控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#if语句"><span class="nav-number">2.4.1.</span> <span class="nav-text">if语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Switch语句"><span class="nav-number">2.4.2.</span> <span class="nav-text">Switch语句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#循环"><span class="nav-number">2.4.3.</span> <span class="nav-text">循环</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

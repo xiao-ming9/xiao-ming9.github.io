@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Nginx 高并发实现模型Nginx 采用的是多进程（单线程）和多路IO复用模型。使用了 I&#x2F;O 多路复用技术的 Nginx，就成了“并发事件驱动”的服务器。">
+<meta name="keywords" content="nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx 高并发高性能实现">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;04&#x2F;01&#x2F;Nginx%E9%AB%98%E5%B9%B6%E5%8F%91%E5%AE%9E%E7%8E%B0&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="Nginx 高并发实现模型Nginx 采用的是多进程（单线程）和多路IO复用模型。使用了 I&#x2F;O 多路复用技术的 Nginx，就成了“并发事件驱动”的服务器。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Nginx%20worker%E5%92%8Cmaster%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Nginx%E4%B8%ADgzip%E9%85%8D%E7%BD%AE">
+<meta property="og:updated_time" content="2020-04-01T15:14:33.490Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Nginx%20worker%E5%92%8Cmaster%E6%A8%A1%E5%9E%8B.png">
+
+<link rel="canonical" href="http://yoursite.com/2020/04/01/Nginx%E9%AB%98%E5%B9%B6%E5%8F%91%E5%AE%9E%E7%8E%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Nginx 高并发高性能实现 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/04/01/Nginx%E9%AB%98%E5%B9%B6%E5%8F%91%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Nginx 高并发高性能实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-04-01 22:41:10 / 修改时间：23:14:33" itemprop="dateCreated datePublished" datetime="2020-04-01T22:41:10+08:00">2020-04-01</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Nginx-高并发实现模型"><a href="#Nginx-高并发实现模型" class="headerlink" title="Nginx 高并发实现模型"></a>Nginx 高并发实现模型</h1><p>Nginx 采用的是多进程（单线程）和多路IO复用模型。使用了 I/O 多路复用技术的 Nginx，就成了“并发事件驱动”的服务器。</p>
+<a id="more"></a>
+
+<p>Nginx 在启动后，会有一个 master 进程和多个相互独立的 worker 进程。master 接收来自外界的信号，向各 worker 进程发送信号，每个进程都有可能来处理这个连接。同时，master 进程能监控 worker 进程的运行状态，当 worker 进程退出后(异常情况下)，会自动启动新的 worker 进程。</p>
+<p>orker 进程数，一般会设置成机器 cpu 核数。因为更多的 worker 数，只会导致进程相互竞争 cpu，从而带来不必要的上下文切换。</p>
+<p>使用多进程模式，不仅能提高并发率，而且进程之间相互独立，一个 worker 进程挂了不会影响到其他 worker 进程。</p>
+<p><img src="http://qiniu.xiaoming.net.cn/Nginx%20worker%E5%92%8Cmaster%E6%A8%A1%E5%9E%8B.png" alt="Nginx master和worker模型"></p>
+<p>在 nginx 中的 work 进程中，为了应对高并发场景，采取了 Reactor 模型（也就是I/O多路复用，NIO）：</p>
+<ul>
+<li>每一个worker进程通过 I/O 多路复用处理多个连接请求；</li>
+<li>为了减少进程切换（需要系统调用）的性能损耗，一般设置 worker 进程数量和CPU数量一致。</li>
+</ul>
+<p><strong>I/O 多路复用模型</strong>：在 I/O 多路复用模型中，最重要的系统调用函数就是 select（其他的还有epoll等），该方法的能够同时监控多个文件描述符的可读可写情况（每一个网络连接其实都对应一个文件描述符），当其中的某些文件描述符可读或者可写时，select 方法就会返回可读以及可写的文件描述符个数。</p>
+<p>nginx work进程使用 I/O 多路复用模块（epoll）同时监听多个 FD（文件描述符），当 accept、read、write 和 close 事件产生时，操作系统就会回调 FD 绑定的事件处理器，这时候 work 进程再去处理相应事件，而不是阻塞在某个请求连接上等待。这样就可以实现一个进程同时处理多个连接。</p>
+<p>Nginx 的异步非阻塞工作方式把当中的等待时间利用起来了。在需要等待的时候，这些进程就空闲出来待命了，因此表现为少数几个进程就解决了大量的并发问题。每进来一个 request，会有一个 worker 进程去处理。但不是全程的处理，处理到什么程度呢?处理到可能发生阻塞的地方，比如向上游(后端)服务器转发 request，并等待请求返回。那么，这个处理的worker很聪明，他会在发送完请求后，注册一个事件：“如果 upstream 返回了，告诉我一声，我再接着干”。于是他就休息去了。此时，如果再有 request 进来，他就可以很快再按这种方式处理。而一旦上游服务器返回了，就会触发这个事件，worker 才会来接手，这个 request 才会接着往下走。</p>
+<h1 id="为什么-Nginx-不使用多线程"><a href="#为什么-Nginx-不使用多线程" class="headerlink" title="为什么 Nginx 不使用多线程?"></a>为什么 Nginx 不使用多线程?</h1><ul>
+<li>Apache: 创建多个进程或线程，而每个进程或线程都会为其分配 cpu 和内存(线程要比进程小的多，所以 worker 支持比 perfork 高的并发)，并发过大会耗光服务器资源。    </li>
+<li>Nginx: 采用单线程来异步非阻塞处理请求(管理员可以配置 Nginx 主进程的工作进程的数量)(epoll)，不会为每个请求分配 cpu 和内存资源，节省了大量资源，同时也减少了大量的 CPU 的上下文切换。所以才使得 Nginx 支持更高的并发。</li>
+</ul>
+<h1 id="常用调优配置"><a href="#常用调优配置" class="headerlink" title="常用调优配置"></a>常用调优配置</h1><h2 id="调整-worker-processes"><a href="#调整-worker-processes" class="headerlink" title="调整 worker_processes"></a>调整 <code>worker_processes</code></h2><p>指 Nginx 要生成的 worker 数量,最佳实践是每个 CPU 运行 1 个工作进程。</p>
+<p>了解系统中的CPU核心数，输入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ grep processor / proc / cpuinfo | wc -l</span><br></pre></td></tr></table></figure>
+
+<h2 id="最大化-worker-connections"><a href="#最大化-worker-connections" class="headerlink" title="最大化 worker_connections"></a>最大化 <code>worker_connections</code></h2><p>Nginx Web 服务器可以同时提供服务的客户端数。与 <code>worker_processes</code> 结合使用时，获得每秒可以服务的最大客户端数</p>
+<p>最大客户端数/秒 = 工作进程 * 工作者连接数</p>
+<p>为了最大化 Nginx 的全部潜力，应将工作者连接设置为核心一次可以运行的允许的最大进程数 1024。</p>
+<h2 id="启用Gzip压缩"><a href="#启用Gzip压缩" class="headerlink" title="启用Gzip压缩"></a>启用Gzip压缩</h2><p>压缩文件大小，减少了客户端 http 的传输带宽，因此提高了页面加载速度</p>
+<p>建议的 gzip 配置示例如下:( 在http部分内)        </p>
+<p><img src="http://qiniu.xiaoming.net.cn/Nginx%E4%B8%ADgzip%E9%85%8D%E7%BD%AE" alt="nginx中gzip配置"></p>
+<h2 id="为静态文件启用缓存"><a href="#为静态文件启用缓存" class="headerlink" title="为静态文件启用缓存"></a>为静态文件启用缓存</h2><p>为静态文件启用缓存，以减少带宽并提高性能，可以添加下面的命令，限定计算机缓存网页的静态文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location ~* .(jpg|jpeg|png|gif|ico|css|js)$ &#123;  </span><br><span class="line">expires 365d;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Timeouts"><a href="#Timeouts" class="headerlink" title="Timeouts"></a>Timeouts</h2><p>keepalive 连接减少了打开和关闭连接所需的 CPU 和网络开销，获得最佳性能需要调整的变量可参考：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">client_body_timeout 12;</span><br><span class="line">client_header_timeout 12;</span><br><span class="line">keepalive_timeout 15;</span><br><span class="line">send_timeout 10;</span><br></pre></td></tr></table></figure>
+
+<h2 id="禁用-access-logs"><a href="#禁用-access-logs" class="headerlink" title="禁用 access_logs"></a>禁用 <code>access_logs</code></h2><p>访问日志记录，它记录每个 nginx 请求，因此消耗了大量 CPU 资源，从而降低了 nginx 性能。</p>
+<p>完全禁用访问日志记录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">access_log off;</span><br></pre></td></tr></table></figure>
+<p>如果必须具有访问日志记录，则启用访问日志缓冲:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">access_log /var/log/nginx/access.log主缓冲区= 16k</span><br></pre></td></tr></table></figure>
+
+<h1 id="Nginx-与-多进程模式-Apache-的比较"><a href="#Nginx-与-多进程模式-Apache-的比较" class="headerlink" title="Nginx 与 多进程模式 Apache 的比较"></a>Nginx 与 多进程模式 Apache 的比较</h1><p>对于Apache，每个请求都会独占一个工作线程，当并发数到达几千时，就同时有几千的线程在处理请求了。这对于操作系统来说，占用的内存非常大，线程的上下文切换带来的 cpu 开销也很大，性能就难以上去，同时这些开销是完全没有意义的。</p>
+<p>对于Nginx来讲，一个进程只有一个主线程，通过异步非阻塞的事件处理机制，实现了循环处理多个准备好的事件，从而实现轻量级和高并发。</p>
+<p>事件驱动适合于 I/O 密集型服务，多进程或线程适合于 CPU 密集型服务： </p>
+<ol>
+<li>Nginx 更主要是作为反向代理，而非 Web 服务器使用。其模式是事件驱动。 </li>
+<li>事件驱动服务器，最适合做的就是这种 I/O 密集型工作，如反向代理，它在客户端与 WEB 服务器之间起一个数据中转作用，纯粹是 I/O 操作，自身并不涉及到复杂计算。因为进程在一个地方进行计算时，那么这个进程就不能处理其他事件了。 </li>
+<li>Nginx 只需要少量进程配合事件驱动，几个进程跑 libevent，不像 Apache 多进程模型那样动辄数百的进程数。 </li>
+<li>Nginx 处理静态文件效果也很好，那是因为读写文件和网络通信其实都是 I/O操作，处理过程一样。</li>
+</ol>
+<p><strong>参考文章</strong></p>
+<blockquote>
+<p><a href="https://juejin.im/post/5cf900746fb9a07ea4206e4a" target="_blank" rel="noopener">Nginx 是如何实现高并发？常见的优化手段有哪些？</a><br><a href="https://blog.csdn.net/m0_38110132/article/details/75126316" target="_blank" rel="noopener">nginx实现高并发的原理</a><br><a href="https://zhuanlan.zhihu.com/p/49847413" target="_blank" rel="noopener">nginx高并发是如何设计</a>  </p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/nginx/" rel="tag"># nginx</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/03/23/Nginx%E9%9B%86%E7%BE%A4/" rel="prev" title="Nginx 集群">
+      <i class="fa fa-chevron-left"></i> Nginx 集群
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/08/Dubbo%E5%85%A5%E9%97%A8/" rel="next" title="Dubbo入门">
+      Dubbo入门 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx-高并发实现模型"><span class="nav-number">1.</span> <span class="nav-text">Nginx 高并发实现模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么-Nginx-不使用多线程"><span class="nav-number">2.</span> <span class="nav-text">为什么 Nginx 不使用多线程?</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用调优配置"><span class="nav-number">3.</span> <span class="nav-text">常用调优配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#调整-worker-processes"><span class="nav-number">3.1.</span> <span class="nav-text">调整 worker_processes</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最大化-worker-connections"><span class="nav-number">3.2.</span> <span class="nav-text">最大化 worker_connections</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启用Gzip压缩"><span class="nav-number">3.3.</span> <span class="nav-text">启用Gzip压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为静态文件启用缓存"><span class="nav-number">3.4.</span> <span class="nav-text">为静态文件启用缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Timeouts"><span class="nav-number">3.5.</span> <span class="nav-text">Timeouts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#禁用-access-logs"><span class="nav-number">3.6.</span> <span class="nav-text">禁用 access_logs</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Nginx-与-多进程模式-Apache-的比较"><span class="nav-number">4.</span> <span class="nav-text">Nginx 与 多进程模式 Apache 的比较</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

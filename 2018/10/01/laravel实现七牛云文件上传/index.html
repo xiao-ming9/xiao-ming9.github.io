@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="建立七牛云存储空间注册七牛云并完成实名后，进入七牛云开发者中心——对象存储——存储空间，创建一个存储空间，之后点击融合 CDN 加速域名，域名可以是经过解析的子域名    域名解析相关：     主机记录：       类型 用途    www 解析后域名为www.你的域名   * 泛解析，匹配所有*.你的域名   mail 将域名解析为mail.你的域名   二级域名 如abc.你的域名，填写a">
+<meta property="og:type" content="article">
+<meta property="og:title" content="laravel实现七牛云文件上传">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;10&#x2F;01&#x2F;laravel%E5%AE%9E%E7%8E%B0%E4%B8%83%E7%89%9B%E4%BA%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="建立七牛云存储空间注册七牛云并完成实名后，进入七牛云开发者中心——对象存储——存储空间，创建一个存储空间，之后点击融合 CDN 加速域名，域名可以是经过解析的子域名    域名解析相关：     主机记录：       类型 用途    www 解析后域名为www.你的域名   * 泛解析，匹配所有*.你的域名   mail 将域名解析为mail.你的域名   二级域名 如abc.你的域名，填写a">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-10-16T06:43:26.000Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/10/01/laravel%E5%AE%9E%E7%8E%B0%E4%B8%83%E7%89%9B%E4%BA%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>laravel实现七牛云文件上传 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/01/laravel%E5%AE%9E%E7%8E%B0%E4%B8%83%E7%89%9B%E4%BA%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          laravel实现七牛云文件上传
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-10-01 18:06:53" itemprop="dateCreated datePublished" datetime="2018-10-01T18:06:53+08:00">2018-10-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2018-10-16 14:43:26" itemprop="dateModified" datetime="2018-10-16T14:43:26+08:00">2018-10-16</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="建立七牛云存储空间"><a href="#建立七牛云存储空间" class="headerlink" title="建立七牛云存储空间"></a>建立七牛云存储空间</h1><p>注册七牛云并完成实名后，进入七牛云开发者中心——对象存储——存储空间，创建一个存储空间，之后点击<code>融合 CDN 加速域名</code>，域名可以是经过解析的子域名  </p>
+<blockquote>
+<p>域名解析相关：  </p>
+</blockquote>
+<ul>
+<li>主机记录：  </li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>www</td>
+<td>解析后域名为www.你的域名</td>
+</tr>
+<tr>
+<td>*</td>
+<td>泛解析，匹配所有*.你的域名</td>
+</tr>
+<tr>
+<td>mail</td>
+<td>将域名解析为mail.你的域名</td>
+</tr>
+<tr>
+<td>二级域名</td>
+<td>如abc.你的域名，填写abc（七牛云选用子域名）</td>
+</tr>
+<tr>
+<td>手机域名</td>
+<td>如m.你的域名，填写m</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+<ul>
+<li>记录类型：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>用来指定域名的IPv4地址（如8.8.8.8),如果需要将域名指向一个ip地址，就需要添加A记录(域名绑定ip地址)</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>将域名指向另一个域名，在由另一个域名提供ip地址（七牛云绑定类型）</td>
+</tr>
+<tr>
+<td>NS</td>
+<td>域名服务器记录，如果需要把子域名交给其他DNS服务商解析，就需要添加NS记录</td>
+</tr>
+</tbody></table>
+<ul>
+<li>记录值填写七牛云提供的CNAME</li>
+</ul>
+<p>解析完成后就可以在laravel中配置使用了</p>
+<h1 id="laravel配置使用七牛云"><a href="#laravel配置使用七牛云" class="headerlink" title="laravel配置使用七牛云"></a>laravel配置使用七牛云</h1><p><a href="https://packagist.org/packages/zgldh/qiniu-laravel-storage#v0.10.0" target="_blank" rel="noopener">七牛云composer包链接</a></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li><code>composer require zgldh/qiniu-laravel-storage</code></li>
+<li><code>config/app.php</code>里面的<code>providers</code>数组， 加上一行<code>zgldh\QiniuStorage\QiniuFilesystemServiceProvider::class</code></li>
+<li><code>config/filesystem.php</code>里面的<code>disks</code>数组加上：<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">  <span class="string">'disks'</span> =&gt; [</span><br><span class="line">        ... ,</span><br><span class="line">        <span class="string">'qiniu'</span> =&gt; [</span><br><span class="line">            <span class="string">'driver'</span>  =&gt; <span class="string">'qiniu'</span>,</span><br><span class="line">            <span class="string">'domains'</span> =&gt; [</span><br><span class="line">                <span class="string">'default'</span>   =&gt; <span class="string">'xxxxx.com1.z0.glb.clouddn.com'</span>, <span class="comment">//上面配置的域名</span></span><br><span class="line">                <span class="string">'https'</span>     =&gt; <span class="string">'dn-yourdomain.qbox.me'</span>,         <span class="comment">//你的HTTPS域名</span></span><br><span class="line">                <span class="string">'custom'</span>    =&gt; <span class="string">'static.abc.com'</span>,                <span class="comment">//Useless 没啥用，请直接使用上面的 default 项</span></span><br><span class="line">             ],</span><br><span class="line">            <span class="string">'access_key'</span>=&gt; <span class="string">''</span>,  <span class="comment">//在个人中心密匙管理哪里，有两个，随便填一个</span></span><br><span class="line">            <span class="string">'secret_key'</span>=&gt; <span class="string">''</span>,  <span class="comment">//SecretKey</span></span><br><span class="line">            <span class="string">'bucket'</span>    =&gt; <span class="string">''</span>,  <span class="comment">//上面创建的对象存储的名称</span></span><br><span class="line">            <span class="string">'notify_url'</span>=&gt; <span class="string">''</span>,  <span class="comment">//持久化处理回调地址</span></span><br><span class="line">            <span class="string">'access'</span>    =&gt; <span class="string">'public'</span>  <span class="comment">//空间访问控制public或private（在创建时定义的权限）</span></span><br><span class="line">            <span class="string">'hotlink_prevention_key'</span> =&gt; <span class="string">'afc89ff8bd2axxxxxxxxxxxxxxbb'</span>, <span class="comment">// CDN 时间戳防盗链的 key。 设置为 null 则不启用本功能。</span></span><br><span class="line"><span class="comment">//          'hotlink_prevention_key' =&gt; 'cbab68a279xxxxxxxxxxab509a', // 同上，备用</span></span><br><span class="line">        ],</span><br><span class="line">    ],</span><br></pre></td></tr></table></figure>
+<h1 id="使用的两种方法"><a href="#使用的两种方法" class="headerlink" title="使用的两种方法"></a>使用的两种方法</h1></li>
+</ul>
+<p><strong>第一种</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">$disk = \Storage::disk(<span class="string">'qiniu'</span>);</span><br><span class="line">   $disk-&gt;exists(<span class="string">'file.jpg'</span>);                      <span class="comment">//文件是否存在</span></span><br><span class="line">   $disk-&gt;get(<span class="string">'file.jpg'</span>);                         <span class="comment">//获取文件内容</span></span><br><span class="line">   $disk-&gt;put(<span class="string">'file.jpg'</span>,$contents);               <span class="comment">//上传文件</span></span><br><span class="line">   $disk-&gt;put(<span class="string">'file.jpg'</span>,fopen(<span class="string">'path/to/big.jpg'</span>,<span class="string">'r+'</span>)); <span class="comment">//分段上传文件。建议大文件&gt;10Mb使用。    </span></span><br><span class="line">   $disk-&gt;prepend(<span class="string">'file.log'</span>, <span class="string">'Prepended Text'</span>);   <span class="comment">//附加内容到文件开头</span></span><br><span class="line">   $disk-&gt;append(<span class="string">'file.log'</span>, <span class="string">'Appended Text'</span>);     <span class="comment">//附加内容到文件结尾</span></span><br><span class="line">   $disk-&gt;delete(<span class="string">'file.jpg'</span>);                      <span class="comment">//删除文件</span></span><br><span class="line">   $disk-&gt;delete([<span class="string">'file1.jpg'</span>, <span class="string">'file2.jpg'</span>]);</span><br><span class="line">   $disk-&gt;copy(<span class="string">'old/file1.jpg'</span>, <span class="string">'new/file1.jpg'</span>);  <span class="comment">//复制文件到新的路径</span></span><br><span class="line">   $disk-&gt;move(<span class="string">'old/file1.jpg'</span>, <span class="string">'new/file1.jpg'</span>);  <span class="comment">//移动文件到新的路径</span></span><br><span class="line">   $size = $disk-&gt;size(<span class="string">'file1.jpg'</span>);               <span class="comment">//取得文件大小</span></span><br><span class="line">   $time = $disk-&gt;lastModified(<span class="string">'file1.jpg'</span>);       <span class="comment">//取得最近修改时间 (UNIX)</span></span><br><span class="line">   $files = $disk-&gt;files($directory);              <span class="comment">//取得目录下所有文件</span></span><br><span class="line">   $files = $disk-&gt;allFiles($directory);               <span class="comment">//这个没实现。。。</span></span><br><span class="line">   $directories = $disk-&gt;directories($directory);      <span class="comment">//这个也没实现。。。</span></span><br><span class="line">   $directories = $disk-&gt;allDirectories($directory);   <span class="comment">//这个也没实现。。。</span></span><br><span class="line">   $disk-&gt;makeDirectory($directory);               <span class="comment">//这个其实没有任何作用</span></span><br><span class="line">   $disk-&gt;deleteDirectory($directory);             <span class="comment">//删除目录，包括目录下所有子文件子目录</span></span><br><span class="line">   $disk-&gt;url(<span class="string">'a.png'</span>);                            <span class="comment">//返回文件的URL</span></span><br><span class="line">   $disk-&gt;url([<span class="string">'path'</span> =&gt; <span class="string">'a.png'</span>, <span class="string">'domainType'</span> =&gt; <span class="string">'default'</span>]); <span class="comment">//返回文件的URL</span></span><br><span class="line"></span><br><span class="line">   $disk-&gt;getDriver()-&gt;uploadToken();              <span class="comment">//获取上传Token</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;uploadToken(<span class="string">'file.jpg'</span>);    <span class="comment">//获取上传Token</span></span><br><span class="line"></span><br><span class="line">   $disk-&gt;getDriver()-&gt;withUploadToken($token);    <span class="comment">// 使用自定义的 uploadToken 进行上传，</span></span><br><span class="line">   $disk-&gt;put(<span class="string">'file.jpg'</span>,$content);                <span class="comment">// 则本次的 put 操作，将使用上述的 $token 进行上传。</span></span><br><span class="line">                                                   <span class="comment">// 常用于自动触发持久化处理 https://github.com/qiniu/php-sdk/blob/master/examples/upload_and_pfop.php</span></span><br><span class="line">   </span><br><span class="line">   $disk-&gt;getDriver()-&gt;downloadUrl(<span class="string">'file.jpg'</span>);                <span class="comment">//获取下载地址</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;downloadUrl(<span class="string">'file.jpg'</span>)</span><br><span class="line">                     -&gt;setDownload(<span class="string">'foo.jpg'</span>);                 <span class="comment">//获取下载地址，文件名为 foo.jpg</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;downloadUrl(<span class="string">'file.jpg'</span>, <span class="string">'https'</span>);       <span class="comment">//获取HTTPS下载地址</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>);         <span class="comment">//获取私有bucket下载地址</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;privateDownloadUrl(<span class="string">'file.jpg?attname=foo.jpg'</span>);         </span><br><span class="line">                                                               <span class="comment">//获取私有bucket下载地址，文件名为 foo.jpg</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>, <span class="string">'https'</span>);<span class="comment">//获取私有bucket的HTTPS下载地址</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>,</span><br><span class="line">                                       [</span><br><span class="line">                                           <span class="string">'domain'</span>=&gt;<span class="string">'https'</span>,</span><br><span class="line">                                           <span class="string">'expires'</span>=&gt;<span class="number">3600</span></span><br><span class="line">                                       ]);                     <span class="comment">//获取私有bucket的HTTPS下载地址。超时 3600 秒。</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;avInfo(<span class="string">'file.mp3'</span>);                     <span class="comment">//获取多媒体文件信息</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;imageInfo(<span class="string">'file.jpg'</span>);                  <span class="comment">//获取图片信息</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;imageExif(<span class="string">'file.jpg'</span>);                  <span class="comment">//获取图片EXIF信息</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;imagePreviewUrl(<span class="string">'file.jpg'</span>,<span class="string">'imageView2/0/w/100/h/200'</span>);                         <span class="comment">//获取图片预览URL</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;privateImagePreviewUrl(<span class="string">'file.jpg'</span>,<span class="string">'imageView2/0/w/100/h/200'</span>);                  <span class="comment">//获取私有bucket图片预览URL</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;verifyCallback(<span class="string">'application/x-www-form-urlencoded'</span>, $request-&gt;header(<span class="string">'Authorization'</span>), <span class="string">'callback url'</span>, $request-&gt;getContent());<span class="comment">//验证回调内容是否合法</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;persistentFop(<span class="string">'file.flv'</span>,<span class="string">'avthumb/m3u8/segtime/40/vcodec/libx264/s/320x240'</span>);   <span class="comment">//执行持久化数据处理</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;persistentFop(<span class="string">'file.flv'</span>,<span class="string">'fop'</span>,<span class="string">'队列名'</span>);   <span class="comment">//使用私有队列执行持久化数据处理</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;persistentStatus($persistent_fop_id);       <span class="comment">//查看持久化数据处理的状态。</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;fetch(<span class="string">'http://abc.com/foo.jpg'</span>, <span class="string">'bar.jpg'</span>); <span class="comment">//调用fetch将 foo.jpg 数据以 bar.jpg 的名字储存起来。</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;qetag();        <span class="comment">//得到最后一次执行 put, copy, append 等写入操作后，得到的hash值。详见 https://github.com/qiniu/qetag</span></span><br><span class="line">   $disk-&gt;getDriver()-&gt;lastReturn();   <span class="comment">//得到最后一次执行 put, copy, append 等写入操作后，得到的返回值。</span></span><br></pre></td></tr></table></figure>
+<p><strong>第二种方法</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">use</span> <span class="title">zgldh</span>\<span class="title">QiniuStorage</span>\<span class="title">QiniuStorage</span>;</span><br><span class="line"></span><br><span class="line">    $disk = QiniuStorage::disk(<span class="string">'qiniu'</span>);</span><br><span class="line">    $disk-&gt;exists(<span class="string">'file.jpg'</span>);                      <span class="comment">//文件是否存在</span></span><br><span class="line">    $disk-&gt;get(<span class="string">'file.jpg'</span>);                         <span class="comment">//获取文件内容</span></span><br><span class="line">    $disk-&gt;put(<span class="string">'file.jpg'</span>,$contents);               <span class="comment">//上传文件</span></span><br><span class="line">    $disk-&gt;put(<span class="string">'file.jpg'</span>,fopen(<span class="string">'path/to/big.jpg'</span>,<span class="string">'r+'</span>)); <span class="comment">//分段上传文件。建议大文件&gt;10Mb使用。</span></span><br><span class="line">    $disk-&gt;prepend(<span class="string">'file.log'</span>, <span class="string">'Prepended Text'</span>);   <span class="comment">//附加内容到文件开头</span></span><br><span class="line">    $disk-&gt;append(<span class="string">'file.log'</span>, <span class="string">'Appended Text'</span>);     <span class="comment">//附加内容到文件结尾</span></span><br><span class="line">    $disk-&gt;delete(<span class="string">'file.jpg'</span>);                      <span class="comment">//删除文件</span></span><br><span class="line">    $disk-&gt;delete([<span class="string">'file1.jpg'</span>, <span class="string">'file2.jpg'</span>]);</span><br><span class="line">    $disk-&gt;copy(<span class="string">'old/file1.jpg'</span>, <span class="string">'new/file1.jpg'</span>);  <span class="comment">//复制文件到新的路径</span></span><br><span class="line">    $disk-&gt;move(<span class="string">'old/file1.jpg'</span>, <span class="string">'new/file1.jpg'</span>);  <span class="comment">//移动文件到新的路径</span></span><br><span class="line">    $size = $disk-&gt;size(<span class="string">'file1.jpg'</span>);               <span class="comment">//取得文件大小</span></span><br><span class="line">    $time = $disk-&gt;lastModified(<span class="string">'file1.jpg'</span>);       <span class="comment">//取得最近修改时间 (UNIX)</span></span><br><span class="line">    $files = $disk-&gt;files($directory);              <span class="comment">//取得目录下所有文件</span></span><br><span class="line">    $files = $disk-&gt;allFiles($directory);               <span class="comment">//这个没实现。。。</span></span><br><span class="line">    $directories = $disk-&gt;directories($directory);      <span class="comment">//这个也没实现。。。</span></span><br><span class="line">    $directories = $disk-&gt;allDirectories($directory);   <span class="comment">//这个也没实现。。。</span></span><br><span class="line">    $disk-&gt;makeDirectory($directory);               <span class="comment">//这个其实没有任何作用</span></span><br><span class="line">    $disk-&gt;deleteDirectory($directory);             <span class="comment">//删除目录，包括目录下所有子文件子目录</span></span><br><span class="line"></span><br><span class="line">    $disk-&gt;uploadToken();                           <span class="comment">//获取上传Token</span></span><br><span class="line">    $disk-&gt;uploadToken(<span class="string">'file.jpg'</span>);                 <span class="comment">//获取上传Token</span></span><br><span class="line">    </span><br><span class="line">    $disk-&gt;withUploadToken($token);                 <span class="comment">// 使用自定义的 uploadToken 进行上传，</span></span><br><span class="line">    $disk-&gt;put(<span class="string">'file.jpg'</span>,$content);                <span class="comment">// 则本次的 put 操作，将使用上述的 $token 进行上传。</span></span><br><span class="line">                                                    <span class="comment">// 常用于自动触发持久化处理 https://github.com/qiniu/php-sdk/blob/master/examples/upload_and_pfop.php</span></span><br><span class="line">    </span><br><span class="line">    $disk-&gt;downloadUrl(<span class="string">'file.jpg'</span>);                     <span class="comment">//获取下载地址</span></span><br><span class="line">    $disk-&gt;downloadUrl(<span class="string">'file.jpg'</span>)</span><br><span class="line">         -&gt;setDownload(<span class="string">'foo.jpg'</span>);                      <span class="comment">//获取下载地址，文件名为 foo.jpg</span></span><br><span class="line">    $disk-&gt;downloadUrl(<span class="string">'file.jpg'</span>, <span class="string">'https'</span>);            <span class="comment">//获取HTTPS下载地址</span></span><br><span class="line">    $disk-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>);              <span class="comment">//获取私有bucket下载地址</span></span><br><span class="line">    $disk-&gt;privateDownloadUrl(<span class="string">'file.jpg?attname=foo.jpg'</span>);         </span><br><span class="line">                                                                <span class="comment">//获取私有bucket下载地址，文件名为 foo.jpg</span></span><br><span class="line">    $disk-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>, <span class="string">'https'</span>);     <span class="comment">//获取私有bucket的HTTPS下载地址</span></span><br><span class="line">    $disk-&gt;privateDownloadUrl(<span class="string">'file.jpg'</span>,</span><br><span class="line">                            [</span><br><span class="line">                                <span class="string">'domain'</span>=&gt;<span class="string">'https'</span>,</span><br><span class="line">                                <span class="string">'expires'</span>=&gt;<span class="number">3600</span></span><br><span class="line">                            ]);                         <span class="comment">//获取私有bucket的HTTPS下载地址。超时 3600 秒。</span></span><br><span class="line">    $disk-&gt;avInfo(<span class="string">'file.mp3'</span>);                          <span class="comment">//获取多媒体文件信息</span></span><br><span class="line">    $disk-&gt;imageInfo(<span class="string">'file.jpg'</span>);                       <span class="comment">//获取图片信息</span></span><br><span class="line">    $disk-&gt;imageExif(<span class="string">'file.jpg'</span>);                       <span class="comment">//获取图片EXIF信息</span></span><br><span class="line">    $disk-&gt;imagePreviewUrl(<span class="string">'file.jpg'</span>,<span class="string">'imageView2/0/w/100/h/200'</span>);                          <span class="comment">//获取图片预览URL</span></span><br><span class="line">    $disk-&gt;privateImagePreviewUrl(<span class="string">'file.jpg'</span>,<span class="string">'imageView2/0/w/100/h/200'</span>);                   <span class="comment">//获取私有bucket图片预览URL</span></span><br><span class="line">    $disk-&gt;verifyCallback(<span class="string">'application/x-www-form-urlencoded'</span>, $request-&gt;header(<span class="string">'Authorization'</span>), <span class="string">'callback url'</span>, $request-&gt;getContent());<span class="comment">//验证回调内容是否合法</span></span><br><span class="line">    $disk-&gt;persistentFop(<span class="string">'file.flv'</span>,<span class="string">'avthumb/m3u8/segtime/40/vcodec/libx264/s/320x240'</span>);    <span class="comment">//执行持久化数据处理</span></span><br><span class="line">    $disk-&gt;persistentFop(<span class="string">'file.flv'</span>,<span class="string">'fop'</span>,<span class="string">'队列名'</span>);    <span class="comment">//使用私有队列执行持久化数据处理</span></span><br><span class="line">    $disk-&gt;persistentStatus($persistent_fop_id);        <span class="comment">//查看持久化数据处理的状态。</span></span><br><span class="line"></span><br><span class="line">    $disk-&gt;fetch(<span class="string">'http://abc.com/foo.jpg'</span>, <span class="string">'bar.jpg'</span>); <span class="comment">//调用fetch将 foo.jpg 数据以 bar.jpg 的名字储存起来。</span></span><br><span class="line">    $disk-&gt;qetag();     <span class="comment">//得到最后一次执行 put, copy, append 等写入操作后，得到的hash值。详见 https://github.com/qiniu/qetag</span></span><br><span class="line">    $disk-&gt;lastReturn();<span class="comment">//得到最后一次执行 put, copy, append 等写入操作后，得到的返回值。</span></span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/09/18/Laravel-JWT/" rel="prev" title="Laravel-JWT">
+      <i class="fa fa-chevron-left"></i> Laravel-JWT
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/10/16/Laravel%E9%9B%86%E6%88%90JWT+dingo/" rel="next" title="Laravel集成dingo+jwt">
+      Laravel集成dingo+jwt <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#建立七牛云存储空间"><span class="nav-number">1.</span> <span class="nav-text">建立七牛云存储空间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#laravel配置使用七牛云"><span class="nav-number">2.</span> <span class="nav-text">laravel配置使用七牛云</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">2.1.</span> <span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用的两种方法"><span class="nav-number">3.</span> <span class="nav-text">使用的两种方法</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
