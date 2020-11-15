@@ -222,10 +222,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-08-20 11:45:18 / 修改时间：12:01:08" itemprop="dateCreated datePublished" datetime="2020-08-20T11:45:18+08:00">2020-08-20</time>
+              <time title="创建时间：2020-08-20 11:45:18" itemprop="dateCreated datePublished" datetime="2020-08-20T11:45:18+08:00">2020-08-20</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-15 16:05:08" itemprop="dateModified" datetime="2020-11-15T16:05:08+08:00">2020-11-15</time>
+              </span>
 
           
 
@@ -241,11 +247,23 @@
           <h1 id="常用代码段"><a href="#常用代码段" class="headerlink" title="常用代码段"></a>常用代码段</h1><h2 id="字符串拼接"><a href="#字符串拼接" class="headerlink" title="字符串拼接"></a>字符串拼接</h2><p>当需要对一个字符串进行频繁的操作时，谨记在 go 语言中字符串是不可变的（类似 java 和 c#）。使用诸如 <code>a += b</code> 形式连接字符串效率低下，尤其在一个循环内部使用这种形式。这会导致大量的内存开销和拷贝。<strong>应该使用一个字符数组代替字符串，将字符串内容写入一个缓存中</strong>。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> b bytes.Buffer</span><br><span class="line">...</span><br><span class="line"><span class="keyword">for</span> condition &#123;</span><br><span class="line">    b.WriteString(str) <span class="comment">// 将字符串str写入缓存buffer</span></span><br><span class="line">&#125;</span><br><span class="line">    <span class="keyword">return</span> b.String()</span><br></pre></td></tr></table></figure>
 
+<h2 id="打印字符串"><a href="#打印字符串" class="headerlink" title="打印字符串"></a>打印字符串</h2><p>函数 <code>Printf</code> 主要用于打印输出到控制台。通常使用的格式化字符串作为第一个参数：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Printf</span><span class="params">(format <span class="keyword">string</span>, list of variables to be printed)</span></span></span><br></pre></td></tr></table></figure>
 
+<p>这个格式化字符串可以含有一个或多个的格式化标识符，例如：<code>%..</code>，其中 <code>..</code> 可以被不同类型所对应的标识符替换，如 <code>%s</code> 代表字符串标识符、<code>%v</code> 代表使用类型的默认输出格式的标识符。<strong>这些标识符所对应的值从格式化字符串后的第一个逗号开始按照相同顺序添加</strong>，如果参数超过 1 个则需要使用逗号分隔。使用这些占位符可以很好地控制格式化输出的文本。</p>
+<p>函数 <code>fmt.Sprintf</code> 与 <code>Printf</code> 的作用是完全相同的，<strong>不过前者将格式化后的字符串以返回值的形式返回给调用者</strong>，因此可以在程序中使用包含变量的字符串。</p>
+<p>函数 <code>fmt.Print</code> 和 <code>fmt.Println</code> 会自动使用格式化标识符 <code>%v</code> 对字符串进行格式化，两者都会在每个参数之间自动增加空格，而后者还会在字符串的最后加上一个换行符。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Print(<span class="string">"Hello:"</span>, <span class="number">23</span>)</span><br></pre></td></tr></table></figure>
 
-
-
-
+<p>将输出：<code>Hello: 23</code>。</p>
+<p><strong>格式化说明符</strong></p>
+<p>在格式化字符串里，<code>%d</code> 用于格式化整数（<code>%x</code> 和 <code>%X</code> 用于格式化 16 进制表示的数字），<code>%g</code> 用于格式化浮点型（<code>%f</code> 输出浮点数，<code>%e</code> 输出科学计数表示法），<code>%0d</code> 用于规定输出定长的整数，其中开头的数字 0 是必须的。</p>
+<p><code>%n.mg</code> 用于表示数字 n 并精确到小数点后 m 位，除了使用 g 之外，还可以使用 e 或者 f，例如：使用格式化字符串 <code>%5.2e</code> 来输出 3.4 的结果为 <code>3.40e+00</code>。</p>
+<p><code>%b</code> 是用于表示位的格式化标识符。</p>
+<p>格式化说明符 <code>%c</code> 用于表示字符；当和字符配合使用时，<code>%v</code> 或 <code>%d</code> 会输出用于表示该字符的整数；<code>%U</code> 输出格式为 U+hhhh 的字符串</p>
+<p>指针的格式化标识符为 <code>%p</code></p>
+<h2 id="优雅实现存储单位的常量枚举"><a href="#优雅实现存储单位的常量枚举" class="headerlink" title="优雅实现存储单位的常量枚举"></a>优雅实现存储单位的常量枚举</h2><p>使用位左移与 iota 计数配合可优雅地实现存储单位的常量枚举：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ByteSize <span class="keyword">float64</span></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">    _ = <span class="literal">iota</span> <span class="comment">// 通过赋值给空白标识符来忽略值</span></span><br><span class="line">    KB ByteSize = <span class="number">1</span>&lt;&lt;(<span class="number">10</span>*<span class="literal">iota</span>)</span><br><span class="line">    MB</span><br><span class="line">    GB</span><br><span class="line">    TB</span><br><span class="line">    PB</span><br><span class="line">    EB</span><br><span class="line">    ZB</span><br><span class="line">    YB</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
 <h1 id="常见错误"><a href="#常见错误" class="headerlink" title="常见错误"></a>常见错误</h1><h2 id="短变量声明导致变量覆盖"><a href="#短变量声明导致变量覆盖" class="headerlink" title="短变量声明导致变量覆盖"></a>短变量声明导致变量覆盖</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> remember <span class="keyword">bool</span> = <span class="literal">false</span></span><br><span class="line"><span class="keyword">if</span> something &#123;</span><br><span class="line">    remember := <span class="literal">true</span> <span class="comment">//错误</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 使用remember</span></span><br></pre></td></tr></table></figure>
 
@@ -312,7 +330,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-08-20 11:43:59" itemprop="dateModified" datetime="2020-08-20T11:43:59+08:00">2020-08-20</time>
+                <time title="修改时间：2020-11-15 21:29:16" itemprop="dateModified" datetime="2020-11-15T21:29:16+08:00">2020-11-15</time>
               </span>
 
           
