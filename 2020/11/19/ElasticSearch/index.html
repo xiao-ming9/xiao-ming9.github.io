@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="简介Elasticsearch 是一个分布式文档储存中间件，它不会将信息储存为列数据行，而是储存已序列化为 JSON 文档的复杂数据结构。当在一个集群中有多个节点时，储存的文档分布在整个集群里面，并且立刻可以从任意节点去访问。 当文档被储存时，它将建立索引并且近实时（1s）被搜索。 Elasticsearch 使用一种被称为倒排索引的数据结构，该结构支持快速全文搜索。在倒排索引里列出了所有文档中出">
+<meta name="keywords" content="ElasticSearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;11&#x2F;19&#x2F;ElasticSearch&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="简介Elasticsearch 是一个分布式文档储存中间件，它不会将信息储存为列数据行，而是储存已序列化为 JSON 文档的复杂数据结构。当在一个集群中有多个节点时，储存的文档分布在整个集群里面，并且立刻可以从任意节点去访问。 当文档被储存时，它将建立索引并且近实时（1s）被搜索。 Elasticsearch 使用一种被称为倒排索引的数据结构，该结构支持快速全文搜索。在倒排索引里列出了所有文档中出">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;ElasticSearch%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;ElastricSearchHead%E7%95%8C%E9%9D%A2.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Kibana%E9%A1%B5%E9%9D%A2.jpg">
+<meta property="og:updated_time" content="2020-11-19T14:18:07.469Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;ElasticSearch%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2020/11/19/ElasticSearch/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>ElasticSearch | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/11/19/ElasticSearch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ElasticSearch
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-11-19 12:31:15 / 修改时间：22:18:07" itemprop="dateCreated datePublished" datetime="2020-11-19T12:31:15+08:00">2020-11-19</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>Elasticsearch 是一个分布式文档储存中间件，它不会将信息储存为列数据行，而是储存已序列化为 JSON 文档的复杂数据结构。当在一个集群中有多个节点时，储存的文档分布在整个集群里面，并且立刻可以从任意节点去访问。</p>
+<p>当文档被储存时，它将建立索引并且近实时（1s）被搜索。 Elasticsearch 使用一种被称为倒排索引的数据结构，该结构支持快速全文搜索。在倒排索引里列出了所有文档中出现的每一个唯一单词并分别标识了每个单词在哪一个文档中。</p>
+<p>索引可以被认为是文档的优化集合，每个文档索引都是字段的集合，这些字段是包含了数据的键值对。默认情况下，Elasticsearch 为每个字段中的所有数据建立倒排索引，并且每个索引字段都有专门的优化数据结构。例如：文本字段在倒排索引里，数值和地理字段被储存在 BKD 树中。正是因为通过使用按字段数据结构组合，才使得 Elasticsearch 拥有如此快速的搜索能力。</p>
+<p>Elasticsearch 具备默认模式的能力，这意味着文档建立索引的时候无需明确指定每个字段的数据类型。当启用动态映射时，Elasticsearch 自动检测并将新字段添加到索引。该默认行为使索引和浏览数据变得容易，只要文档开始建立索引， Elasticsearch 就会检测布尔值，浮点数和整数值，日期和字符串，并将其映射到对应的数据类型中。</p>
+<p>但是，最终开发者应该比程序更加了解自己的数据结构以及如何去使用它们。可以定义动态映射的规则，并明确的定义 <code>mapping</code> 去更深度的控制字段的存储和索引方式。</p>
+<p>定义自己的 <code>mapping</code> 能够：</p>
+<ul>
+<li>区分全文本字符串字段和精确值字符串字段</li>
+<li>执行特定的语言文本分词器</li>
+<li>使用自定义日期格式</li>
+<li>使用无法自动检测到的数据类型， 比如 <code>geo_point</code> and <code>geo_shape</code></li>
+</ul>
+<p>为不同的目的以不同的方式对同一字段建立索引通常很有用。例如，可能希望将一个字符串字段索引为全文搜索的文本字段，以及作为排序或汇总数据的关键字字段。或者，可能选择使用多个分词器来处理包含用户输入的字符串字段的内容。</p>
+<p>在搜索时也会使用在索引期间应用于全文字段的分析链。当查询全文字段时，对查询文本进行相同的分析，然后再在索引中查找术语。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><h2 id="ElasticSearch-安装"><a href="#ElasticSearch-安装" class="headerlink" title="ElasticSearch 安装"></a>ElasticSearch 安装</h2><p>通过 <a href="https://www.elastic.co/cn/" target="_blank" rel="noopener">ElasticSearch官网</a>下载压缩包解压后，直接在 <code>bin</code> 目录下的 <code>./elasticserch</code> 即可启动。启动后默认端口是 9200，页面如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/ElasticSearch%E5%90%AF%E5%8A%A8%E9%A1%B5%E9%9D%A2.jpg" alt="ElasticSearch启动页面"></p>
+<p>ElasticSearch 的目录结构如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">bin				启动文件</span><br><span class="line">config		配置文件</span><br><span class="line">	log4j2							日志配置文件</span><br><span class="line">	jvm.options					java虚拟机相关的配置</span><br><span class="line">	elasticsearch.yml		elasticsearch的配置文件，默认 9200 端口；跨域等</span><br><span class="line">lib				相关jar包</span><br><span class="line">logs			日志</span><br><span class="line">modules		功能模块</span><br><span class="line">plugins		插件</span><br></pre></td></tr></table></figure>
+
+<h2 id="ElasticSearch-可视化"><a href="#ElasticSearch-可视化" class="headerlink" title="ElasticSearch 可视化"></a>ElasticSearch 可视化</h2><p>ElasticSearch 可视化有两个工具，一个是 ElasticsearchHead，最简单的方式是直接安装 Chrome浏览器拓展：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/ElastricSearchHead%E7%95%8C%E9%9D%A2.png" alt="ElastricSearchHead"></p>
+<p>另外一个是 Kibana，通过 <a href="https://www.elastic.co/cn/" target="_blank" rel="noopener">ElasticSearch官网</a>下载压缩包解压后在 <code>bin</code> 目录下运行 <code>./kibana</code> 命令即可启动，这里可以对其进行汉化，汉化包在 <code>/x-pack/plugins/translations/translations/zh-CN.json</code>下，通过在 <code>config</code> 目录下修改 <code>kibana.yml</code>文件，最后一行修改或加入：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">i18n.locale:</span> <span class="string">"zh-CN"</span></span><br></pre></td></tr></table></figure>
+
+<p>重新启动即可看到汉化版的界面：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Kibana%E9%A1%B5%E9%9D%A2.jpg" alt="Kibana界面"></p>
+<blockquote>
+<p> <strong>参考目录</strong>：</p>
+<p><a href="https://learnku.com/docs/elasticsearch73/7.3" target="_blank" rel="noopener">Elasticsearch中文文档</a></p>
+<p><a href="https://www.bilibili.com/video/BV17a4y1x7zq?from=search&seid=12148825921682017310" target="_blank" rel="noopener">B站狂神视频教程</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpeg" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ElasticSearch/" rel="tag"># ElasticSearch</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/20/go%20%E5%AE%9E%E7%94%A8%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5%E5%92%8C%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9/" rel="prev" title="go 实用代码片段和注意事项">
+      <i class="fa fa-chevron-left"></i> go 实用代码片段和注意事项
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ElasticSearch-安装"><span class="nav-number">2.1.</span> <span class="nav-text">ElasticSearch 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ElasticSearch-可视化"><span class="nav-number">2.2.</span> <span class="nav-text">ElasticSearch 可视化</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">115</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">34</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
