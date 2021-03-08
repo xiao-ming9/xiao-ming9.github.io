@@ -100,7 +100,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%88%86%E6%AE%B5%E6%A0%88%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%BF%9E%E7%BB%AD%E6%A0%88.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%85%A8%E5%B1%80%E7%BC%93%E5%AD%98%E6%B1%A0%E7%9A%84%E7%BB%93%E6%9E%84.png">
-<meta property="og:updated_time" content="2020-12-21T16:44:51.759Z">
+<meta property="og:updated_time" content="2020-12-26T08:05:46.293Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp">
 
@@ -283,7 +283,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-22 00:44:51" itemprop="dateModified" datetime="2020-12-22T00:44:51+08:00">2020-12-22</time>
+                <time title="修改时间：2020-12-26 16:05:46" itemprop="dateModified" datetime="2020-12-26T16:05:46+08:00">2020-12-26</time>
               </span>
 
           
@@ -708,7 +708,7 @@
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">DoAllocate</span><span class="params">(nKB <span class="keyword">int</span>, wg *sync.WaitGroup)</span></span> &#123;</span><br><span class="line">	<span class="keyword">var</span> slice []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; nKB; i++ &#123;</span><br><span class="line">		t := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>) <span class="comment">// 1KB</span></span><br><span class="line">		slice = <span class="built_in">append</span>(slice, t...)</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Done()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>在 <code>main</code> 函数中执行多个 groutine 进行内存分配调用，这里内存一直增长就会达到触发 GC 的阈值：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t0 := time.Now()</span><br><span class="line">	n := <span class="number">10</span></span><br><span class="line">	wg := <span class="built_in">new</span>(sync.WaitGroup)</span><br><span class="line">	wg.Add(n)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; n; i++ &#123;</span><br><span class="line">    <span class="comment">// 程序运行时最多分配 50MB-100MB 内存, 防止影响宿主机</span></span><br><span class="line">		<span class="keyword">go</span> DoAllocate(<span class="number">50</span>*<span class="number">1024</span>, wg)</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">	<span class="built_in">println</span>(<span class="string">"time used"</span>, time.Since(t0).Milliseconds(), <span class="string">"ms"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t0 := time.Now()</span><br><span class="line">	n := <span class="number">10</span></span><br><span class="line">	wg := <span class="built_in">new</span>(sync.WaitGroup)</span><br><span class="line">	wg.Add(n)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; n; i++ &#123;</span><br><span class="line">    	<span class="comment">// 程序运行时最多分配 50MB-100MB 内存, 防止影响宿主机</span></span><br><span class="line">		<span class="keyword">go</span> DoAllocate(<span class="number">50</span>*<span class="number">1024</span>, wg)</span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">	<span class="built_in">println</span>(<span class="string">"time used"</span>, time.Since(t0).Milliseconds(), <span class="string">"ms"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>通过下面的脚本 <code>run.sh</code> 在不同的 <code>GOGC</code> 下运行：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">data=( -1 10 50 100 200 400 800 1600 3200)</span><br><span class="line">for i in $&#123;data[@]&#125; ; do</span><br><span class="line">echo "==== start", GOGC=$i "===="</span><br><span class="line">GOGC=$i go run main.go</span><br><span class="line">echo</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
@@ -718,7 +718,7 @@
 
 <p>可以看到最快是 470 ms，最慢是 1602 ms，最快和最慢的速度几乎相差了 4 倍，一个简单的修改就可以造成性能巨大的改变。</p>
 <h2 id="go-垃圾回收的时机"><a href="#go-垃圾回收的时机" class="headerlink" title="go 垃圾回收的时机"></a>go 垃圾回收的时机</h2><h3 id="自动触发"><a href="#自动触发" class="headerlink" title="自动触发"></a>自动触发</h3><p>运行时会在应用程序启动时在后台开启一个用于强制触发垃圾收集的 Goroutine，该 Goroutine 的职责非常简单：调用 <code>runtime.gcStart</code> 方法尝试启动新一轮的垃圾收集，其实现如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> forcegchelper()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">forcegchelper</span><span class="params">()</span></span> &#123;</span><br><span class="line">	forcegc.g = getg()</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		lock(&amp;forcegc.lock)</span><br><span class="line">		<span class="keyword">if</span> forcegc.idle != <span class="number">0</span> &#123;</span><br><span class="line">			throw(<span class="string">"forcegc: phase error"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		atomic.Store(&amp;forcegc.idle, <span class="number">1</span>)</span><br><span class="line">    <span class="comment">// 主动陷入休眠</span></span><br><span class="line">		goparkunlock(&amp;forcegc.lock, waitReasonForceGGIdle, traceEvGoBlock, <span class="number">1</span>)</span><br><span class="line">		<span class="comment">// this goroutine is explicitly resumed by sysmon</span></span><br><span class="line">		<span class="keyword">if</span> debug.gctrace &gt; <span class="number">0</span> &#123;</span><br><span class="line">			<span class="built_in">println</span>(<span class="string">"GC forced"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 尝试启动新一轮的垃圾收集</span></span><br><span class="line">		gcStart(gcTrigger&#123;kind: gcTriggerTime, now: nanotime()&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> forcegchelper()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">forcegchelper</span><span class="params">()</span></span> &#123;</span><br><span class="line">	forcegc.g = getg()</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		lock(&amp;forcegc.lock)</span><br><span class="line">		<span class="keyword">if</span> forcegc.idle != <span class="number">0</span> &#123;</span><br><span class="line">			throw(<span class="string">"forcegc: phase error"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		atomic.Store(&amp;forcegc.idle, <span class="number">1</span>)</span><br><span class="line">    	<span class="comment">// 主动陷入休眠</span></span><br><span class="line">		goparkunlock(&amp;forcegc.lock, waitReasonForceGGIdle, traceEvGoBlock, <span class="number">1</span>)</span><br><span class="line">		<span class="comment">// this goroutine is explicitly resumed by sysmon</span></span><br><span class="line">		<span class="keyword">if</span> debug.gctrace &gt; <span class="number">0</span> &#123;</span><br><span class="line">			<span class="built_in">println</span>(<span class="string">"GC forced"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 尝试启动新一轮的垃圾收集</span></span><br><span class="line">		gcStart(gcTrigger&#123;kind: gcTriggerTime, now: nanotime()&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>为了减少对计算资源的占用，该 Goroutine 会在循环中调用 <code>runtime.goparkunlock</code> 主动陷入休眠等待其他 Goroutine 的唤醒，所以 <code>runtime.forcegchelper</code> 在大多数时间都是陷入休眠的，但是它会被系统监控器 <code>runtime.sysmon</code> 在满足垃圾收集条件时唤醒。</p>
 <p>自动垃圾回收的自动触发条件有两个：</p>
@@ -998,7 +998,10 @@
     <a href="/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/" rel="prev" title="goroutine 调度器原理">
       <i class="fa fa-chevron-left"></i> goroutine 调度器原理
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/" rel="next" title="go 常用基本类型源码设计分析">
+      go 常用基本类型源码设计分析 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -1050,7 +1053,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">119</span>
+          <span class="site-state-item-count">120</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1082,7 +1085,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
@@ -1091,12 +1094,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">1.8m</span>
+    <span title="站点总字数">1.9m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">26:43</span>
+    <span title="站点阅读时长">28:12</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
   </div>
@@ -1171,6 +1174,56 @@
 
 
   
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
 
   
 
