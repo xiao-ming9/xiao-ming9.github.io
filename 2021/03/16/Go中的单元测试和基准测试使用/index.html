@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="go test 工具go test 命令是一个按照一定约定和组织的测试代码的驱动程序。在包目录内，所有以 _test.go 为后缀名的源代码文件都是 go test 测试的一部分，不会被 go build 编译到最终的可执行文件中。 在 *_test.go 文件中有三种类型的函数，单元测试函数、基准测试函数和示例函数：">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 中的单元测试和基准测试的使用">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;03&#x2F;16&#x2F;Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="go test 工具go test 命令是一个按照一定约定和组织的测试代码的驱动程序。在包目录内，所有以 _test.go 为后缀名的源代码文件都是 go test 测试的一部分，不会被 go build 编译到最终的可执行文件中。 在 *_test.go 文件中有三种类型的函数，单元测试函数、基准测试函数和示例函数：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go-cover%20%E6%8A%A5%E5%91%8A.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0%E6%96%87%E6%A1%A3%E7%A4%BA%E4%BE%8B.png">
+<meta property="og:updated_time" content="2021-03-17T13:10:17.158Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go-cover%20%E6%8A%A5%E5%91%8A.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Go 中的单元测试和基准测试的使用 | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go 中的单元测试和基准测试的使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-16 17:16:10" itemprop="dateCreated datePublished" datetime="2021-03-16T17:16:10+08:00">2021-03-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-17 21:10:17" itemprop="dateModified" datetime="2021-03-17T21:10:17+08:00">2021-03-17</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="go-test-工具"><a href="#go-test-工具" class="headerlink" title="go test 工具"></a>go test 工具</h1><p><code>go test</code> 命令是一个按照一定约定和组织的测试代码的驱动程序。在包目录内，所有以 <code>_test.go</code> 为后缀名的源代码文件都是 <code>go test</code> 测试的一部分，不会被 <code>go build</code> 编译到最终的可执行文件中。</p>
+<p>在 <code>*_test.go</code> 文件中有三种类型的函数，单元测试函数、基准测试函数和示例函数：</p>
+<a id="more"></a>
+
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">格式</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>测试函数</strong></td>
+<td align="left">函数名前缀为Test</td>
+<td align="left">测试程序的一些逻辑行为是否正确</td>
+</tr>
+<tr>
+<td align="left"><strong>基准函数</strong></td>
+<td align="left">函数名前缀为Benchmark</td>
+<td align="left">测试函数的性能</td>
+</tr>
+<tr>
+<td align="left"><strong>示例函数</strong></td>
+<td align="left">函数名前缀为Example</td>
+<td align="left">为文档提供示例文档</td>
+</tr>
+</tbody></table>
+<p><code>go test</code> 命令会遍历所有的 <code>*_test.go</code> 文件中符合上述命名规则的函数，然后生成一个临时的main包用于调用相应的测试函数，然后构建并运行、报告测试结果，最后清理测试中生成的临时文件。</p>
+<p>Golang 单元测试对文件名和方法名，参数都有很严格的要求。</p>
+<ol>
+<li>文件名必须以 <code>xx_test.go</code> 命名</li>
+<li>方法必须是 <code>Test</code> 开头</li>
+<li>方法参数必须 <code>t *testing.T</code></li>
+<li>使用 <code>go test</code> 执行单元测试</li>
+</ol>
+<h2 id="go-test-的参数"><a href="#go-test-的参数" class="headerlink" title="go test 的参数"></a>go test 的参数</h2><p>go test 是 go 语言自带的测试工具，其中包含的是两类，单元测试和性能测试</p>
+<p>通过 <code>go help test</code> 可以看到 go test 的使用说明：</p>
+<p>格式形如： </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go test [-c] [-i] [build flags] [packages] [flags for test binary]</span><br></pre></td></tr></table></figure>
+
+<p>参数解读：</p>
+<ul>
+<li><p>-c : 编译 go test 成为可执行的二进制文件，但是不运行测试。</p>
+</li>
+<li><p>-i : 安装测试包依赖的 package，但是不运行测试。</p>
+</li>
+<li><p>关于 build flags，调用 go help build，这些是编译运行过程中需要使用到的参数，一般设置为空</p>
+</li>
+<li><p>关于 packages，调用 go help packages，这些是关于包的管理，一般设置为空</p>
+</li>
+<li><p>关于 flags for test binary，调用 go help flags for test binary，这些是 go test 过程中经常使用到的参数</p>
+</li>
+</ul>
+<p>常用示例如下：</p>
+<ul>
+<li>-test.v : 是否输出全部的单元测试用例（不管成功或者失败），默认没有加上，所以只输出失败的单元测试用例。</li>
+<li>-test.run pattern: 只跑哪些单元测试用例</li>
+<li>-test.bench patten: 只跑那些性能测试用例</li>
+<li>-test.benchmem : 是否在性能测试的时候输出内存情况</li>
+<li>-test.benchtime t : 性能测试运行的时间，默认是1s</li>
+<li>-test.cpuprofile cpu.out : 是否输出cpu性能分析文件</li>
+<li>-test.memprofile mem.out : 是否输出内存性能分析文件</li>
+<li>-test.blockprofile block.out : 是否输出内部goroutine阻塞的性能分析文件</li>
+<li>-test.memprofilerate n : 内存性能分析的时候有一个分配了多少的时候才打点记录的问题。这个参数就是设置打点的内存分配间隔，也就是 profile 中一个 sample 代表的内存大小。默认是设置为 512 * 1024 的。如果将它设置为 1，则每分配一个内存块就会在 profile 中有个打点，那么生成的 profile 的 sample 就会非常多。如果设置为0，那就是不做打点了。可以通过设置 <code>memprofilerate=1</code> 和 <code>GOGC=off</code> 来关闭内存回收，并且对每个内存块的分配进行观察。</li>
+<li>-test.blockprofilerate n: 基本同上，控制的是 goroutine 阻塞时候打点的纳秒数。默认不设置就相当于 <code>-test.blockprofilerate=1</code>，每一纳秒都打点记录一下</li>
+<li>-test.parallel n : 性能测试的程序并行 cpu 数，默认等于 GOMAXPROCS。</li>
+<li>-test.timeout t : 如果测试用例运行时间超过t，则抛出 panic</li>
+<li>-test.cpu 1,2,4 : 程序运行在哪些 CPU 上面，使用二进制的1所在位代表，和 nginx 的 nginx_worker_cpu_affinity 是一个道理</li>
+<li>-test.short : 将那些运行时间较长的测试用例运行时间缩短</li>
+</ul>
+<h1 id="单元测试函数"><a href="#单元测试函数" class="headerlink" title="单元测试函数"></a>单元测试函数</h1><h2 id="单元测试函数的格式"><a href="#单元测试函数的格式" class="headerlink" title="单元测试函数的格式"></a>单元测试函数的格式</h2><p>测试函数必须导入 testing 包，基本格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestName</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">//...    </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试函数的名字必须以 Test 开头，可选的后缀名必须是以大写字母开头，例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestAdd</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSum</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestLog</span><span class="params">(t *testing.T)</span></span>&#123; ... &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中，参数 t 是用于报告测试失败和附加的日志信息的，<code>testing.T</code> 拥有的方法如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Cleanup(<span class="function"><span class="keyword">func</span><span class="params">()</span>)</span></span><br><span class="line">Error(args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Errorf(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Fail()</span><br><span class="line">FailNow()</span><br><span class="line">Failed() <span class="keyword">bool</span></span><br><span class="line">Fatal(args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Fatalf(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Helper()</span><br><span class="line">Log(args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Logf(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Name() <span class="keyword">string</span></span><br><span class="line">Skip(args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">SkipNow()</span><br><span class="line">Skipf(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span><br><span class="line">Skipped() <span class="keyword">bool</span></span><br><span class="line">TempDir() <span class="keyword">string</span></span><br></pre></td></tr></table></figure>
+
+<p>其中，</p>
+<ul>
+<li>Fail，Error：该测试失败，该测试继续，其他测试继续执行</li>
+<li>FailNow，Fatal：该测试失败，该测试终止，其他测试继续执行</li>
+</ul>
+<h2 id="单元测试函数的使用示例"><a href="#单元测试函数的使用示例" class="headerlink" title="单元测试函数的使用示例"></a>单元测试函数的使用示例</h2><p>在 split 包中定义一个 Split 函数，实现如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"strings"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Split</span><span class="params">(s, sep <span class="keyword">string</span>)</span> <span class="params">(result []<span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	i := strings.Index(s, sep)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i &gt; <span class="number">-1</span> &#123;</span><br><span class="line">		result = <span class="built_in">append</span>(result, s[:i])</span><br><span class="line">		s = s[i+<span class="number">1</span>:]</span><br><span class="line">		i = strings.Index(s, sep)</span><br><span class="line">	&#125;</span><br><span class="line">	result = <span class="built_in">append</span>(result, s)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在新建一个文件命名为 <code>split_test</code>，内容如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"reflect"</span></span><br><span class="line">	<span class="string">"testing"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	got := Split(<span class="string">"a:b:c"</span>, <span class="string">":"</span>)      <span class="comment">// 程序输出的结果</span></span><br><span class="line">	want := []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125; <span class="comment">// 期望的结果</span></span><br><span class="line">	<span class="comment">// slice 不能直接比较，借助反射包中的方法进行比价</span></span><br><span class="line">	<span class="keyword">if</span> !reflect.DeepEqual(want, got) &#123;</span><br><span class="line">		t.Errorf(<span class="string">"excepted:%v, got %v"</span>, want, got)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 split 目录下运行 go test 命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">split » go test</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>再写一个多个字符切割字符串的测试用例：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestMoreSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	got := Split(<span class="string">"abcd"</span>,<span class="string">"bc"</span>) <span class="comment">// 按照当前 split 的实现，这里 got 应该是[a,cd]</span></span><br><span class="line">	want := []<span class="keyword">string</span>&#123;<span class="string">"a"</span>,<span class="string">"d"</span>&#125;</span><br><span class="line">	<span class="keyword">if</span> !reflect.DeepEqual(want, got) &#123;</span><br><span class="line">		t.Errorf(<span class="string">"excepted:%v, got %v"</span>, want, got)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再次运行 go test，结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">--- FAIL: TestMoreSplit (0.00s)</span><br><span class="line">    split_test.go:21: excepted:[a d], got [a cd]</span><br><span class="line">FAIL</span><br><span class="line">exit status 1</span><br><span class="line">FAIL    algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>可以看到测试不通过，这里可以通过添加 <code>-v</code> 参数，查看测试函数的名称和运行时间：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// go test -v</span><br><span class="line"></span><br><span class="line">=== RUN   TestSplit</span><br><span class="line">--- PASS: TestSplit (0.00s)</span><br><span class="line">=== RUN   TestMoreSplit</span><br><span class="line">    split_test.go:21: excepted:[a d], got [a cd]</span><br><span class="line">--- FAIL: TestMoreSplit (0.00s)</span><br><span class="line">FAIL</span><br><span class="line">exit status 1</span><br><span class="line">FAIL    algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>这样就可以看出哪个函数通过而哪个函数没有通过。</p>
+<p>还可以在 go test 命中后添加 -run 参数，它对应一个正则表达式，只有函数名匹配上的测试函数才会被 go test 命令执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">~ » go test -v -run=&quot;More&quot;</span><br><span class="line">=== RUN   TestMoreSplit</span><br><span class="line">    split_test.go:21: excepted:[a d], got [a cd]</span><br><span class="line">--- FAIL: TestMoreSplit (0.00s)</span><br><span class="line">FAIL</span><br><span class="line">exit status 1</span><br><span class="line">FAIL    algorithm/split 0.006s</span><br></pre></td></tr></table></figure>
+
+<p>对于上面代码的 bug 进行修复：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"strings"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Split</span><span class="params">(s, sep <span class="keyword">string</span>)</span> <span class="params">(result []<span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	i := strings.Index(s, sep)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i &gt; <span class="number">-1</span> &#123;</span><br><span class="line">		result = <span class="built_in">append</span>(result, s[:i])</span><br><span class="line">		s = s[i+<span class="built_in">len</span>(sep):] <span class="comment">// 这里使用 len(sep) 获取 sep 的长度</span></span><br><span class="line">		i = strings.Index(s, sep)</span><br><span class="line">	&#125;</span><br><span class="line">	result = <span class="built_in">append</span>(result, s)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后重新进行测试，需要注意，<strong>修改了代码之后不要仅仅执行那些失败的测试函数，还应该完整的运行所有的测试，保证不会因为修改代码而引入了新的问题</strong>。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">=== RUN   TestSplit</span><br><span class="line">--- PASS: TestSplit (<span class="number">0.00</span>s)</span><br><span class="line">=== RUN   TestMoreSplit</span><br><span class="line">--- PASS: TestMoreSplit (<span class="number">0.00</span>s)</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split <span class="number">0.005</span>s</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试组"><a href="#测试组" class="headerlink" title="测试组"></a>测试组</h2><p>接下来在测试一下 split 函数对于中文字符串的支持，这个时候一种方式是再编写一个 TestChineseSplit 测试函数，更好的方式是使用如下的方法来添加更多的测试用例：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"reflect"</span></span><br><span class="line">	<span class="string">"testing"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 定义一个测试用例类型</span></span><br><span class="line">	<span class="keyword">type</span> test <span class="keyword">struct</span> &#123;</span><br><span class="line">		input <span class="keyword">string</span></span><br><span class="line">		sep   <span class="keyword">string</span></span><br><span class="line">		want  []<span class="keyword">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 定义一个存储测试用例的切片</span></span><br><span class="line">	tests := []test&#123;</span><br><span class="line">		&#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">":"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;&#125;,</span><br><span class="line">		&#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">","</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a:b:c"</span>&#125;&#125;,</span><br><span class="line">		&#123;input: <span class="string">"abcd"</span>, sep: <span class="string">"bc"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"d"</span>&#125;&#125;,</span><br><span class="line">		&#123;input: <span class="string">"枯藤老树昏鸦"</span>, sep: <span class="string">"老"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"枯藤"</span>, <span class="string">"树昏鸦"</span>&#125;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 遍历切片，逐一执行测试用例</span></span><br><span class="line">	<span class="keyword">for</span> _, tc := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		got := Split(tc.input, tc.sep)</span><br><span class="line">		<span class="keyword">if</span> !reflect.DeepEqual(got, tc.want) &#123;</span><br><span class="line">			<span class="comment">// 使用 %#v 格式化的方式</span></span><br><span class="line">			t.Errorf(<span class="string">"excepted:%#v, got:%#v"</span>, tc.want, got)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="自测试-t-Run"><a href="#自测试-t-Run" class="headerlink" title="自测试 t.Run"></a>自测试 t.Run</h2><p>对于上面的测试，如果测试用例比较多的时候，是没办法一眼看出来具体是哪个测试用例失败了。可以通过如下的解决方法：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"reflect"</span></span><br><span class="line">	<span class="string">"testing"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 定义一个测试用例类型</span></span><br><span class="line">	<span class="keyword">type</span> test <span class="keyword">struct</span> &#123;</span><br><span class="line">		input <span class="keyword">string</span></span><br><span class="line">		sep   <span class="keyword">string</span></span><br><span class="line">		want  []<span class="keyword">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 通过 map 存储测试用例</span></span><br><span class="line">	tests := <span class="keyword">map</span>[<span class="keyword">string</span>]test&#123;</span><br><span class="line">		<span class="string">"simple"</span>:      &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">":"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"wrong sep"</span>:   &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">","</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a:b:c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"more sep"</span>:    &#123;input: <span class="string">"abcd"</span>, sep: <span class="string">"bc"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"d"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"leading sep"</span>: &#123;input: <span class="string">"枯藤老树昏鸦"</span>, sep: <span class="string">"老"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"枯藤"</span>, <span class="string">"树昏鸦"</span>&#125;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 遍历切片，逐一执行测试用例</span></span><br><span class="line">	<span class="keyword">for</span> name, tc := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		got := Split(tc.input, tc.sep)</span><br><span class="line">		<span class="keyword">if</span> !reflect.DeepEqual(got, tc.want) &#123;</span><br><span class="line">			<span class="comment">// 使用 %#v 格式化的方式</span></span><br><span class="line">			t.Errorf(<span class="string">"name:%s excepted:%#v, got:%#v"</span>, name, tc.want, got)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，go1.7+ 中新增了子测试，可以按照如下方式使用 t.Run 执行子测试：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"reflect"</span></span><br><span class="line">	<span class="string">"testing"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 定义一个测试用例类型</span></span><br><span class="line">	<span class="keyword">type</span> test <span class="keyword">struct</span> &#123;</span><br><span class="line">		input <span class="keyword">string</span></span><br><span class="line">		sep   <span class="keyword">string</span></span><br><span class="line">		want  []<span class="keyword">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 通过 map 存储测试用例</span></span><br><span class="line">	tests := <span class="keyword">map</span>[<span class="keyword">string</span>]test&#123;</span><br><span class="line">		<span class="string">"simple"</span>:      &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">":"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"wrong sep"</span>:   &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">","</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a:b:c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"more sep"</span>:    &#123;input: <span class="string">"abcd"</span>, sep: <span class="string">"bc"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"d"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"leading sep"</span>: &#123;input: <span class="string">"枯藤老树昏鸦"</span>, sep: <span class="string">"老"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"枯藤"</span>, <span class="string">"树昏鸦"</span>&#125;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 遍历切片，逐一执行测试用例</span></span><br><span class="line">	<span class="keyword">for</span> name, tc := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		t.Run(name, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">			<span class="comment">// 使用 t.Run() 执行子测试</span></span><br><span class="line">			got := Split(tc.input, tc.sep)</span><br><span class="line">			<span class="keyword">if</span> !reflect.DeepEqual(got, tc.want) &#123;</span><br><span class="line">				<span class="comment">// 使用 %#v 格式化的方式</span></span><br><span class="line">				t.Errorf(<span class="string">"name:%s excepted:%#v, got:%#v"</span>, name, tc.want, got)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行 go test -v 命令就可以看到清晰的输出内容了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">=== RUN   TestSplit</span><br><span class="line">=== RUN   TestSplit/simple</span><br><span class="line">=== RUN   TestSplit/wrong_sep</span><br><span class="line">=== RUN   TestSplit/more_sep</span><br><span class="line">=== RUN   TestSplit/leading_sep</span><br><span class="line">--- PASS: TestSplit (0.00s)</span><br><span class="line">    --- PASS: TestSplit/simple (0.00s)</span><br><span class="line">    --- PASS: TestSplit/wrong_sep (0.00s)</span><br><span class="line">    --- PASS: TestSplit/more_sep (0.00s)</span><br><span class="line">    --- PASS: TestSplit/leading_sep (0.00s)</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>可以通过 <code>-run=RegExp</code> 来指定运行的测试用例，还可以通过 / 来指定要运行的子测试用例，<strong>例如：<code>go test -v -run=Split/simple</code> 只会运行 simple 对应的子测试用例</strong>。</p>
+<h2 id="测试覆盖率-go-test-cover"><a href="#测试覆盖率-go-test-cover" class="headerlink" title="测试覆盖率 go test -cover"></a>测试覆盖率 go test -cover</h2><p><strong>测试覆盖率是代码被测试套件覆盖的百分比。</strong>通常使用的都是语句的覆盖率，也就是在测试中至少被运行一次的代码占总代码的比例。</p>
+<p>GO 提供内置功能来检查代码覆盖率。可以使用 <code>go test -cover</code> 来查看测试覆盖率。例如:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ go test -cover </span><br><span class="line"></span><br><span class="line">PASS</span><br><span class="line">coverage: 100.0% of statements</span><br><span class="line">ok      algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>可以看到测试用例的代码覆盖率是 100%。</p>
+<p>Go 还提供了额外的 <code>-coverprofile</code> 参数，用来将覆盖率相关的记录信息输出到一个文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">go test -cover -coverprofile=c.out</span><br><span class="line"></span><br><span class="line">PASS</span><br><span class="line">coverage: 100.0% of statements</span><br><span class="line">ok      algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<p>上面的命令会将覆盖率相关的信息输出到当前文件夹下面的 c.out 文件中，然后执行 <code>go tool cover -html=c.out</code>，使用 cover 工具来处理生成的记录信息，该命令会打开本地的浏览器窗口生成一个 HTML 报告:</p>
+<p><img src="https://qiniu.xiaoming.net.cn/go-cover%20%E6%8A%A5%E5%91%8A.jpg" alt="go cover 报告"></p>
+<h1 id="基准测试函数"><a href="#基准测试函数" class="headerlink" title="基准测试函数"></a>基准测试函数</h1><p>基准测试就是在一定的工作负载下检测程序性能的一种方法。基准测试的基本格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkName</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 与性能测试无关的代码</span></span><br><span class="line">    </span><br><span class="line">    b.ResetTimer()</span><br><span class="line">    <span class="keyword">for</span> i:=<span class="number">0</span>;i&lt;b.N;i++ &#123;</span><br><span class="line">        <span class="comment">// 测试代码</span></span><br><span class="line">    &#125;</span><br><span class="line">    b.StopTimer()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 与性能测试无关的代码</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基准测试以 Benchmark 为前缀，需要一个 <code>*testing.B</code> 类型的参数b，<strong>基准测试必须要执行 b.N 次，这样的测试才有对照性</strong>，b.N 的值是系统根据实际情况去调整的，从而保证测试的稳定性。 testing.B 拥有的方法如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Error</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Errorf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fail</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">FailNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Failed</span><span class="params">()</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fatal</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Fatalf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Log</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Logf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Name</span><span class="params">()</span> <span class="title">string</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">ReportAllocs</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">ResetTimer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">Run</span><span class="params">(name <span class="keyword">string</span>, f <span class="keyword">func</span>(b *B)</span>) <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">RunParallel</span><span class="params">(body <span class="keyword">func</span>(*PB)</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">SetBytes</span><span class="params">(n <span class="keyword">int64</span>)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">SetParallelism</span><span class="params">(p <span class="keyword">int</span>)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skip</span><span class="params">(args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">SkipNow</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skipf</span><span class="params">(format <span class="keyword">string</span>, args ...<span class="keyword">interface</span>&#123;&#125;)</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(c *B)</span> <span class="title">Skipped</span><span class="params">()</span> <span class="title">bool</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">StartTimer</span><span class="params">()</span></span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">StopTimer</span><span class="params">()</span></span></span><br></pre></td></tr></table></figure>
+
+<h2 id="基准测试示例"><a href="#基准测试示例" class="headerlink" title="基准测试示例"></a>基准测试示例</h2><p>为 split 包中的 Split 函数编写基准测试如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkSplit</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">		Split(<span class="string">"枯藤老树昏鸦"</span>,<span class="string">"老"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>基准测试并不会默认执行，需要增加 <code>-bench</code> 参数，通过执行 <code>go test -bench=Split</code> 命令执行基准测试，输出结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=Split</span><br><span class="line"> </span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/split</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkSplit-4         9540991               121.5 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 1.294s</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>其中 BenchmarkSplit-4 表示对 Split 函数进行基准测试，数字 4 表示 GOMAXPROCS 的值，这个对于并发基准测试很重要。</li>
+<li>9540991 和 121.5 ns/op 表示每次调用 Split 函数耗时 121.5ns，这个结果是 9540991 次调用的平均值。</li>
+</ul>
+<p>还可以添加 <code>-benchmem</code> 参数，来获得内存分配的统计数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=Split -benchmem</span><br><span class="line"></span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/split</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkSplit-4         9606978               121.7 ns/op            48 B/op          2 allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 1.303s</span><br></pre></td></tr></table></figure>
+
+<p>其中，<strong>48 B/op表示每次操作内存分配了 48 字节，2 allocs/op则表示每次操作进行了 2 次内存分配</strong>。</p>
+<p>对 Split 函数进行优化：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Split</span><span class="params">(s, sep <span class="keyword">string</span>)</span> <span class="params">(result []<span class="keyword">string</span>)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 提前使用 make 为 result 分配一个容量足够大的切片</span></span><br><span class="line">	result = <span class="built_in">make</span>([]<span class="keyword">string</span>,<span class="number">0</span>,strings.Count(s,sep) +<span class="number">1</span>)</span><br><span class="line">	i := strings.Index(s, sep)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i &gt; <span class="number">-1</span> &#123;</span><br><span class="line">		result = <span class="built_in">append</span>(result, s[:i])</span><br><span class="line">		s = s[i+<span class="built_in">len</span>(sep):] <span class="comment">// 这里使用 len(sep) 获取 sep 的长度</span></span><br><span class="line">		i = strings.Index(s, sep)</span><br><span class="line">	&#125;</span><br><span class="line">	result = <span class="built_in">append</span>(result, s)</span><br><span class="line">	<span class="keyword">return</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再次运行测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=Split -benchmem</span><br><span class="line"></span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/split</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkSplit-4        10998399                95.64 ns/op           32 B/op          1 allocs/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 1.170s</span><br></pre></td></tr></table></figure>
+
+<p>可以看到每次分配的内存将为 32 字节，而且只进行了 1 次内存分配。</p>
+<h2 id="性能比较函数"><a href="#性能比较函数" class="headerlink" title="性能比较函数"></a>性能比较函数</h2><p>上面的基准测试只能得到给定操作的绝对耗时，但是在很多性能问题是：</p>
+<ol>
+<li>发生在两个不同操作之间的相对耗时，比如同一个函数处理 1000 个元素的耗时与处理 1 万甚至 100 万个元素的耗时的差别是多少？</li>
+<li>再或者对于同一个任务究竟使用哪种算法性能最佳？通常需要对两个不同算法的实现使用相同的输入来进行基准比较测试。</li>
+</ol>
+<p>性能比较函数通常是一个带有参数的函数，被多个不同的 Benchmark 函数传入不同的值来调用。举个例子如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">benchmark</span><span class="params">(b *testing.B, size <span class="keyword">int</span>)</span></span>&#123;<span class="comment">/* ... */</span>&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark10</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">10</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark100</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">100</span>) &#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Benchmark1000</span><span class="params">(b *testing.B)</span></span>&#123; benchmark(b, <span class="number">1000</span>) &#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>例如编写了一个计算斐波那契数列的函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fib</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Fib</span><span class="params">(n <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> n &lt; <span class="number">2</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> n</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> Fib(n<span class="number">-1</span>) + Fib(n<span class="number">-2</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>性能测试函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fib</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">benchmarkFib</span><span class="params">(b *testing.B,n <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">		Fib(n)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib1</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">1</span>)&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib2</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">2</span>)&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib3</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">3</span>)&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib10</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">10</span>)&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib20</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">20</span>)&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib40</span><span class="params">(b *testing.B)</span></span> &#123;benchmarkFib(b,<span class="number">40</span>)&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行基准测试：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=.</span><br><span class="line"> </span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/fib</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkFib1-4         654152845                1.772 ns/op</span><br><span class="line">BenchmarkFib2-4         227844997                5.229 ns/op</span><br><span class="line">BenchmarkFib3-4         142425820                8.411 ns/op</span><br><span class="line">BenchmarkFib10-4         3659920               323.4 ns/op</span><br><span class="line">BenchmarkFib20-4           29044             41357 ns/op</span><br><span class="line">BenchmarkFib40-4               2         609840838 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/fib   10.091s</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意的是，默认情况下，<strong>每个基准测试至少运行1秒</strong>。如果在 Benchmark 函数返回时没有到 1 秒，则 b.N 的值会按1,2,5,10,20,50，…增加，并且函数再次运行。</p>
+<p>最终的 BenchmarkFib40 只运行了两次，每次运行的平均值只有不到一秒。像这种情况下应该可以使用 -benchtime 标志增加最小基准时间，以产生更准确的结果。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=Fib40 -benchtime=20s</span><br><span class="line"> </span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/fib</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkFib40-4              38         614229184 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/fib   23.965s</span><br></pre></td></tr></table></figure>
+
+<p>这一次 BenchmarkFib40 运行了 38 次。</p>
+<p><strong>使用性能比较函数做测试的时候，一个容易犯的错误就是把 b.N 作为输入的大小</strong>，例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误示范1</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFibWrong</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> n := <span class="number">0</span>; n &lt; b.N; n++ &#123;</span><br><span class="line">        Fib(n)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"> </span><br><span class="line"><span class="comment">// 错误示范2</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFibWrong2</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    Fib(b.N)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="重置时间-ResetTimer"><a href="#重置时间-ResetTimer" class="headerlink" title="重置时间 ResetTimer()"></a>重置时间 ResetTimer()</h2><p><code>b.ResetTimer()</code> 之前的处理不会被放到执行时间里，也不会输出到报告中，所以可以在之前做一些不计划作为测试报告的操作：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkSplit</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">    time.Sleep(<span class="number">5</span> * time.Second) <span class="comment">// 假设需要做一些耗时的无关操作</span></span><br><span class="line">    b.ResetTimer()              <span class="comment">// 重置计时器</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">        Split(<span class="string">"枯藤老树昏鸦"</span>, <span class="string">"老"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="并行测试-RunParallel"><a href="#并行测试-RunParallel" class="headerlink" title="并行测试 RunParallel"></a>并行测试 RunParallel</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(b *B)</span> <span class="title">RunParallel</span><span class="params">(body <span class="keyword">func</span>(*PB)</span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>该函数会以并行的方式执行给定的基准测试：</p>
+<ul>
+<li>RunParallel 会创建出多个 goroutine，并将 b.N 分配给这些 goroutine 执行， 其中 goroutine 数量的默认值为 GOMAXPROCS</li>
+<li>用户如果想要增加非CPU受限（non-CPU-bound）基准测试的并行性， 那么可以在 RunParallel 之前调用 SetParallelism 。</li>
+<li>RunParallel 通常会与 -cpu 标志一同使用。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkSplitParallel</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	<span class="comment">//b.SetParallelism(1) // 设置使用的 cpu 数量</span></span><br><span class="line">	b.RunParallel(<span class="function"><span class="keyword">func</span><span class="params">(pb *testing.PB)</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> pb.Next() &#123;</span><br><span class="line">			Split(<span class="string">"枯藤老树昏鸦"</span>, <span class="string">"老"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行测试后：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ go test -bench=.</span><br><span class="line"> </span><br><span class="line">goos: darwin</span><br><span class="line">goarch: amd64</span><br><span class="line">pkg: algorithm/split</span><br><span class="line">cpu: Intel(R) Core(TM) i5-7360U CPU @ 2.30GHz</span><br><span class="line">BenchmarkSplitParallel-4        21511131                52.12 ns/op</span><br><span class="line">PASS</span><br><span class="line">ok      algorithm/split 1.185s</span><br></pre></td></tr></table></figure>
+
+<h2 id="结合-pprof-性能监控"><a href="#结合-pprof-性能监控" class="headerlink" title="结合 pprof 性能监控"></a>结合 pprof 性能监控</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fib</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">"testing"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">BenchmarkFib10</span><span class="params">(b *testing.B)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; b.N; i++ &#123;</span><br><span class="line">		Fib(<span class="number">10</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">go test -bench=. -benchmem -cpuprofile profile.out</span><br><span class="line">// 还可以同时查看内存</span><br><span class="line">go test -bench=. -benchmem -memprofile memprofile.out -cpuprofile profile.out</span><br></pre></td></tr></table></figure>
+
+<p>这会在当前目录下生成 <code>memprofile.out</code> 和 <code>profile.out</code> 文件，接下来可以用输出的文件使用 pprof：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">go tool pprof profile.out </span><br><span class="line"></span><br><span class="line">Type: cpu</span><br><span class="line">Time: Mar 17, 2021 at 8:22pm (CST)</span><br><span class="line">Duration: 1.65s, Total samples = 1.32s (80.06%)</span><br><span class="line">Entering interactive mode (type &quot;help&quot; for commands, &quot;o&quot; for options)</span><br><span class="line">(pprof) top</span><br><span class="line">Showing nodes accounting for 1320ms, 100% of 1320ms total</span><br><span class="line">      flat  flat%   sum%        cum   cum%</span><br><span class="line">    1300ms 98.48% 98.48%     1320ms   100%  algorithm/fib.Fib</span><br><span class="line">      20ms  1.52%   100%       20ms  1.52%  runtime.newstack</span><br><span class="line">         0     0%   100%     1320ms   100%  algorithm/fib.BenchmarkFib10</span><br><span class="line">         0     0%   100%     1320ms   100%  testing.(*B).launch</span><br><span class="line">         0     0%   100%     1320ms   100%  testing.(*B).runN</span><br><span class="line">(pprof)</span><br></pre></td></tr></table></figure>
+
+<p>这个是使用 cpu 文件， 也可以使用内存文件</p>
+<p>然后也可以用 list 命令检查函数需要的时间:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">(pprof) list Fib</span><br><span class="line">Total: 1.32s</span><br><span class="line">ROUTINE ======================== algorithm/fib.BenchmarkFib10 in /Users/silverming/go-project/algorithm/fib/fib_test.go</span><br><span class="line">         0      1.32s (flat, cum)   100% of Total</span><br><span class="line">         .          .      2:</span><br><span class="line">         .          .      3:import &quot;testing&quot;</span><br><span class="line">         .          .      4:</span><br><span class="line">         .          .      5:func BenchmarkFib10(b *testing.B) &#123;</span><br><span class="line">         .          .      6:   for i := 0; i &lt; b.N; i++ &#123;</span><br><span class="line">         .      1.32s      7:           Fib(10)</span><br><span class="line">         .          .      8:   &#125;</span><br><span class="line">         .          .      9:&#125;</span><br><span class="line">ROUTINE ======================== algorithm/fib.Fib in /Users/silverming/go-project/algorithm/fib/fib.go</span><br><span class="line">     1.30s      1.91s (flat, cum) 144.70% of Total</span><br><span class="line">         .          .      1:package fib</span><br><span class="line">         .          .      2:</span><br><span class="line">     260ms      280ms      3:func Fib(n int) int &#123;</span><br><span class="line">     150ms      150ms      4:   if n &lt; 2 &#123;</span><br><span class="line">     170ms      170ms      5:           return n</span><br><span class="line">         .          .      6:   &#125;</span><br><span class="line">     720ms      1.31s      7:   return Fib(n-1) + Fib(n-2)</span><br><span class="line">         .          .      8:&#125;</span><br></pre></td></tr></table></figure>
+
+<p>还可以通过 web 命令生成图像（没有测试成功）。。。</p>
+<h2 id="Setup-与-TearDown"><a href="#Setup-与-TearDown" class="headerlink" title="Setup 与 TearDown"></a>Setup 与 TearDown</h2><p>测试程序有时需要在测试之前进行额外的设置（setup）或在测试之后进行拆卸（teardown）。</p>
+<h3 id="TestMain"><a href="#TestMain" class="headerlink" title="TestMain"></a>TestMain</h3><p>通过在 <code>*_test.go</code> 文件中定义 TestMain 函数，可以在测试之前进行额外的设置（setup）或在测试之后进行拆卸（teardown）操作。</p>
+<p>如果测试文件包含函数 <code>func TestMain(m *testing.M)</code> ，<strong>那么生成的测试会先调用 TestMain(m)，然后再运行具体测试</strong>。</p>
+<p>TestMain 运行在主 goroutine 中, 可以在调用 m.Run 前后做任何设置（setup）和拆卸（teardown）。</p>
+<p><strong>退出测试的时候应该使用 m.Run 的返回值作为参数调用 os.Exit</strong>。</p>
+<p>一个使用  TestMain 来设置 Setup 和 TearDown 的示例如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestMain</span><span class="params">(m *testing.M)</span></span> &#123;</span><br><span class="line">    fmt.Println(<span class="string">"write setup code here..."</span>) <span class="comment">// 测试之前的做一些设置</span></span><br><span class="line">    <span class="comment">// 如果 TestMain 使用了 flags，这里应该加上flag.Parse()</span></span><br><span class="line">    retCode := m.Run()                         <span class="comment">// 执行测试</span></span><br><span class="line">    fmt.Println(<span class="string">"write teardown code here..."</span>) <span class="comment">// 测试之后做一些拆卸工作</span></span><br><span class="line">    os.Exit(retCode)                           <span class="comment">// 退出测试</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是：<strong>在调用TestMain时， flag.Parse 并没有被调用。</strong>所以如果 TestMain 依赖于 command-line 标志 (包括 testing 包的标记)，则应该显示的调用 flag.Parse。</p>
+<h3 id="子测试的-Setup-与-Teardown"><a href="#子测试的-Setup-与-Teardown" class="headerlink" title="子测试的 Setup 与 Teardown"></a>子测试的 Setup 与 Teardown</h3><p>有时候可能需要为每个测试集设置 Setup 与 Teardown，也有可能需要为每个子测试设置 Setup 与 Teardown。</p>
+<p>下面定义两个函数工具函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 测试集的 Setup 和 Teardown</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setupTestCase</span><span class="params">(t *testing.T)</span> <span class="title">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	t.Log(<span class="string">"如有需要哦在此执行：测试之前的 setup"</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">		t.Log(<span class="string">"如有需要在此执行：测试之后的 teardown"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 子测试的 Setup 和 Teardown</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">setupSubTest</span><span class="params">(t *testing.T)</span> <span class="title">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	t.Log(<span class="string">"如有需要在此执行：子测试之前的 setup"</span>)</span><br><span class="line">	<span class="keyword">return</span> <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">		t.Log(<span class="string">"如有需要在此执行：子测试之后的 teardown"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用方式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestSplit</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="keyword">type</span> test <span class="keyword">struct</span> &#123; <span class="comment">// 定义test结构体</span></span><br><span class="line">		input <span class="keyword">string</span></span><br><span class="line">		sep   <span class="keyword">string</span></span><br><span class="line">		want  []<span class="keyword">string</span></span><br><span class="line">	&#125;</span><br><span class="line">	tests := <span class="keyword">map</span>[<span class="keyword">string</span>]test&#123; <span class="comment">// 测试用例使用map存储</span></span><br><span class="line">		<span class="string">"simple"</span>:      &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">":"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"wrong sep"</span>:   &#123;input: <span class="string">"a:b:c"</span>, sep: <span class="string">","</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a:b:c"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"more sep"</span>:    &#123;input: <span class="string">"abcd"</span>, sep: <span class="string">"bc"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">"a"</span>, <span class="string">"d"</span>&#125;&#125;,</span><br><span class="line">		<span class="string">"leading sep"</span>: &#123;input: <span class="string">"枯藤老树昏鸦"</span>, sep: <span class="string">"老"</span>, want: []<span class="keyword">string</span>&#123;<span class="string">""</span>, <span class="string">"枯藤"</span>, <span class="string">"树昏鸦"</span>&#125;&#125;,</span><br><span class="line">	&#125;</span><br><span class="line">	teardownTestCase := setupTestCase(t) <span class="comment">// 测试之前执行 setup 操作</span></span><br><span class="line">	<span class="keyword">defer</span> teardownTestCase(t)            <span class="comment">// 测试之后执行 teardown 操作</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> name, tc := <span class="keyword">range</span> tests &#123;</span><br><span class="line">		t.Run(name, <span class="function"><span class="keyword">func</span><span class="params">(t *testing.T)</span></span> &#123; <span class="comment">// 使用 t.Run() 执行子测试</span></span><br><span class="line">			teardownSubTest := setupSubTest(t) <span class="comment">// 子测试之前执行 setup 操作</span></span><br><span class="line">			<span class="keyword">defer</span> teardownSubTest(t)           <span class="comment">// 测试之后执行 teardown 操作</span></span><br><span class="line">			got := Split(tc.input, tc.sep)</span><br><span class="line">			<span class="keyword">if</span> !reflect.DeepEqual(got, tc.want) &#123;</span><br><span class="line">				t.Errorf(<span class="string">"excepted:%#v, got:%#v"</span>, tc.want, got)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">$ go test -v                                                                                                    silverming@ZIMINGXING-MB1</span><br><span class="line">=== RUN   TestSplit</span><br><span class="line">    split_test.go:10: 如有需要哦在此执行：测试之前的 setup</span><br><span class="line">=== RUN   TestSplit/more_sep</span><br><span class="line">    split_test.go:18: 如有需要在此执行：子测试之前的 setup</span><br><span class="line">    split_test.go:20: 如有需要在此执行：子测试之后的 teardown</span><br><span class="line">=== RUN   TestSplit/leading_sep</span><br><span class="line">    split_test.go:18: 如有需要在此执行：子测试之前的 setup</span><br><span class="line">    split_test.go:46: excepted:[]string&#123;&quot;&quot;, &quot;枯藤&quot;, &quot;树昏鸦&quot;&#125;, got:[]string&#123;&quot;枯藤&quot;, &quot;树昏鸦&quot;&#125;</span><br><span class="line">    split_test.go:20: 如有需要在此执行：子测试之后的 teardown</span><br><span class="line">=== RUN   TestSplit/simple</span><br><span class="line">    split_test.go:18: 如有需要在此执行：子测试之前的 setup</span><br><span class="line">    split_test.go:20: 如有需要在此执行：子测试之后的 teardown</span><br><span class="line">=== RUN   TestSplit/wrong_sep</span><br><span class="line">    split_test.go:18: 如有需要在此执行：子测试之前的 setup</span><br><span class="line">    split_test.go:20: 如有需要在此执行：子测试之后的 teardown</span><br><span class="line">=== CONT  TestSplit</span><br><span class="line">    split_test.go:12: 如有需要在此执行：测试之后的 teardown</span><br><span class="line">--- FAIL: TestSplit (0.00s)</span><br><span class="line">    --- PASS: TestSplit/more_sep (0.00s)</span><br><span class="line">    --- FAIL: TestSplit/leading_sep (0.00s)</span><br><span class="line">    --- PASS: TestSplit/simple (0.00s)</span><br><span class="line">    --- PASS: TestSplit/wrong_sep (0.00s)</span><br><span class="line">FAIL</span><br><span class="line">exit status 1</span><br><span class="line">FAIL    algorithm/split 0.005s</span><br></pre></td></tr></table></figure>
+
+<h1 id="示例函数-Example"><a href="#示例函数-Example" class="headerlink" title="示例函数 Example"></a>示例函数 Example</h1><h2 id="示例函数的格式"><a href="#示例函数的格式" class="headerlink" title="示例函数的格式"></a>示例函数的格式</h2><p>被 go test 特殊对待的第三种函数就是示例函数，它们的函数名以 Example 为前缀。它们既没有参数也没有返回值。标准格式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ExampleName</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="示例函数示例"><a href="#示例函数示例" class="headerlink" title="示例函数示例"></a>示例函数示例</h2><p>为 Split 函数编写一个示例函数如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> split_test</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"algorithm/split"</span></span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ExampleSplit</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(split.Split(<span class="string">"a:b:c"</span>,<span class="string">":"</span>))</span><br><span class="line">	fmt.Println(split.Split(<span class="string">"枯藤老树昏鸦"</span>,<span class="string">"老"</span>))</span><br><span class="line">	<span class="comment">// Output</span></span><br><span class="line">	<span class="comment">// [a b c]</span></span><br><span class="line">	<span class="comment">// [枯藤 树昏鸦]</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候函数就会生成相应的文档：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E7%A4%BA%E4%BE%8B%E5%87%BD%E6%95%B0%E6%96%87%E6%A1%A3%E7%A4%BA%E4%BE%8B.png" alt="示例函数文档示例"></p>
+<p>为代码编写示例代码有如下三个用处：</p>
+<ol>
+<li><p>示例函数能够作为文档直接使用，例如基于 web 的 godoc 中能把示例函数与对应的函数或包相关联。</p>
+</li>
+<li><p>示例函数只要包含了 <code>// Output:</code> 也是可以通过 go test 运行的可执行测试。</p>
+<pre><code>split $ go test -run Example
+PASS
+ok      github.com/pprof/studygo/code_demo/test_demo/split       0.006s</code></pre></li>
+</ol>
+<ol start="3">
+<li>示例函数提供了可以直接运行的示例代码，可以直接在 golang.org 的 godoc 文档服务器上使用 Go Playground 运行示例代码。</li>
+</ol>
+<p><strong>参考文章：</strong></p>
+<blockquote>
+<p><a href="https://blog.csdn.net/fly910905/article/details/105905491" target="_blank" rel="noopener">Go基础：如何做单元测试和基准测试</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/16/go%E4%B8%ADContext%E5%8C%85/" rel="prev" title="Go 中 Context 包">
+      <i class="fa fa-chevron-left"></i> Go 中 Context 包
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#go-test-工具"><span class="nav-number">1.</span> <span class="nav-text">go test 工具</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-test-的参数"><span class="nav-number">1.1.</span> <span class="nav-text">go test 的参数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单元测试函数"><span class="nav-number">2.</span> <span class="nav-text">单元测试函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单元测试函数的格式"><span class="nav-number">2.1.</span> <span class="nav-text">单元测试函数的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单元测试函数的使用示例"><span class="nav-number">2.2.</span> <span class="nav-text">单元测试函数的使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试组"><span class="nav-number">2.3.</span> <span class="nav-text">测试组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自测试-t-Run"><span class="nav-number">2.4.</span> <span class="nav-text">自测试 t.Run</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试覆盖率-go-test-cover"><span class="nav-number">2.5.</span> <span class="nav-text">测试覆盖率 go test -cover</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基准测试函数"><span class="nav-number">3.</span> <span class="nav-text">基准测试函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基准测试示例"><span class="nav-number">3.1.</span> <span class="nav-text">基准测试示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能比较函数"><span class="nav-number">3.2.</span> <span class="nav-text">性能比较函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重置时间-ResetTimer"><span class="nav-number">3.3.</span> <span class="nav-text">重置时间 ResetTimer()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并行测试-RunParallel"><span class="nav-number">3.4.</span> <span class="nav-text">并行测试 RunParallel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结合-pprof-性能监控"><span class="nav-number">3.5.</span> <span class="nav-text">结合 pprof 性能监控</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Setup-与-TearDown"><span class="nav-number">3.6.</span> <span class="nav-text">Setup 与 TearDown</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TestMain"><span class="nav-number">3.6.1.</span> <span class="nav-text">TestMain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#子测试的-Setup-与-Teardown"><span class="nav-number">3.6.2.</span> <span class="nav-text">子测试的 Setup 与 Teardown</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#示例函数-Example"><span class="nav-number">4.</span> <span class="nav-text">示例函数 Example</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#示例函数的格式"><span class="nav-number">4.1.</span> <span class="nav-text">示例函数的格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例函数示例"><span class="nav-number">4.2.</span> <span class="nav-text">示例函数示例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">122</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">1.9m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">28:42</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
