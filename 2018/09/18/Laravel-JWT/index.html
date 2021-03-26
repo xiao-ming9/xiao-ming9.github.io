@@ -1,278 +1,25 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Laravel-JWT</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="JWT简介JWT(JSON Web Token)实际上是一个字符串，包括头部、载荷、签名   载荷12345678&amp;#123;    &quot;sub&quot;: &quot;1&quot;,    &quot;iss&quot;: &quot;http:&#x2F;&#x2F;localhost:8000&#x2F;auth&#x2F;login&quot;,    &quot;iat&quot;: 1451888119,    &quot;exp&quot;: 1454516119,    &quot;nbf&quot;: 1451888119,    &quot;jti&quot;:">
-<meta name="keywords" content="Laravel,php">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Laravel-JWT">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;09&#x2F;18&#x2F;Laravel-JWT&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="JWT简介JWT(JSON Web Token)实际上是一个字符串，包括头部、载荷、签名   载荷12345678&amp;#123;    &quot;sub&quot;: &quot;1&quot;,    &quot;iss&quot;: &quot;http:&#x2F;&#x2F;localhost:8000&#x2F;auth&#x2F;login&quot;,    &quot;iat&quot;: 1451888119,    &quot;exp&quot;: 1454516119,    &quot;nbf&quot;: 1451888119,    &quot;jti&quot;:">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-12-01T10:39:08.310Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2018/09/18/Laravel-JWT/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Laravel-JWT | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/Laravel-JWT/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Laravel-JWT
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-09-18 15:39:54" itemprop="dateCreated datePublished" datetime="2018-09-18T15:39:54+08:00">2018-09-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:39:08" itemprop="dateModified" datetime="2020-12-01T18:39:08+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="JWT简介"><a href="#JWT简介" class="headerlink" title="JWT简介"></a>JWT简介</h1><p>JWT(JSON Web Token)实际上是一个字符串，包括头部、载荷、签名  </p>
-<h2 id="载荷"><a href="#载荷" class="headerlink" title="载荷"></a>载荷</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"sub"</span>: <span class="string">"1"</span>,</span><br><span class="line">    <span class="attr">"iss"</span>: <span class="string">"http://localhost:8000/auth/login"</span>,</span><br><span class="line">    <span class="attr">"iat"</span>: <span class="number">1451888119</span>,</span><br><span class="line">    <span class="attr">"exp"</span>: <span class="number">1454516119</span>,</span><br><span class="line">    <span class="attr">"nbf"</span>: <span class="number">1451888119</span>,</span><br><span class="line">    <span class="attr">"jti"</span>: <span class="string">"37c107e4609ddbcc9c096ea5ee76c667"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Laravel-JWT</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JWT简介"><span class="toc-text">JWT简介</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#载荷"><span class="toc-text">载荷</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#头部"><span class="toc-text">头部</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#签名"><span class="toc-text">签名</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Laravel使用JWT"><span class="toc-text">Laravel使用JWT</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用composer安装"><span class="toc-text">使用composer安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型使用"><span class="toc-text">模型使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#配置文件修改"><span class="toc-text">配置文件修改</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#注册两个Facade"><span class="toc-text">注册两个Facade</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改auth-php"><span class="toc-text">修改auth.php</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#注册路由"><span class="toc-text">注册路由</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建控制器"><span class="toc-text">创建控制器</span></a></li></ol></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/Laravel"><i class="tag post-item-tag">Laravel</i></a><a href="/tags/php"><i class="tag post-item-tag">php</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Laravel-JWT</h1><time class="has-text-grey" datetime="2018-09-18T07:39:54.000Z">2018-09-18</time><article class="mt-2 post-content"><h1 id="JWT简介"><a href="#JWT简介" class="headerlink" title="JWT简介"></a>JWT简介</h1><p>JWT(JSON Web Token)实际上是一个字符串，包括头部、载荷、签名  </p>
+<h2 id="载荷"><a href="#载荷" class="headerlink" title="载荷"></a>载荷</h2><pre><code class="json">{
+    &quot;sub&quot;: &quot;1&quot;,
+    &quot;iss&quot;: &quot;http://localhost:8000/auth/login&quot;,
+    &quot;iat&quot;: 1451888119,
+    &quot;exp&quot;: 1454516119,
+    &quot;nbf&quot;: 1451888119,
+    &quot;jti&quot;: &quot;37c107e4609ddbcc9c096ea5ee76c667&quot;
+}</code></pre>
 <p>这6个字段是由JWT标准所定义的</p>
 <ul>
 <li>sub:该JWT所面向的对象</li>
@@ -283,20 +30,34 @@
 <li>jti:JWT ID为web token提供唯一标识  </li>
 </ul>
 <p>将上面的JSON对象进行base64编码后得到的字符串就是JWT的载荷</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx</span><br><span class="line">ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD</span><br><span class="line">ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ</span><br></pre></td></tr></table></figure>
+<pre><code class="json">yJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx
+ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD
+ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ</code></pre>
 <a id="more"></a>
 <h2 id="头部"><a href="#头部" class="headerlink" title="头部"></a>头部</h2><p>WT还需要一个头部，头部用于描述关于该JWT的最基本的信息</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="comment">//表明其类型和签名算法</span></span><br><span class="line">  <span class="attr">"typ"</span>: <span class="string">"JWT"</span>,</span><br><span class="line">  <span class="attr">"alg"</span>: <span class="string">"HS256"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="json">{
+  //表明其类型和签名算法
+  &quot;typ&quot;: &quot;JWT&quot;,
+  &quot;alg&quot;: &quot;HS256&quot;
+}</code></pre>
 <p>对其进行Base64编码后就得到JWT的头部（Header）</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</span><br></pre></td></tr></table></figure>
+<pre><code class="json">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9</code></pre>
 <h2 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h2><p>将头部和荷载编码后的字符串用<code>.</code>连接在一起（<strong>头部在前</strong>）：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx</span><br><span class="line">ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD</span><br><span class="line">ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ</span><br></pre></td></tr></table></figure>
+<pre><code class="json">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx
+ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD
+ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ</code></pre>
 <p>将上面拼接完的字符串用HS256算法进行加密，同时提供一个密匙（secret）：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HMACSHA256(</span><br><span class="line">    base64UrlEncode(header) + "." +</span><br><span class="line">    base64UrlEncode(payload),</span><br><span class="line">    secret</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<pre><code class="json">HMACSHA256(
+    base64UrlEncode(header) + &quot;.&quot; +
+    base64UrlEncode(payload),
+    secret
+)</code></pre>
 <p>加密后的到的字符串称为签名：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</span><br></pre></td></tr></table></figure>
+<pre><code class="json">wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</code></pre>
 <p>将这一部分拼接在被签名的字符串后面就形成了JWT</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx</span><br><span class="line">ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD</span><br><span class="line">ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ.wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</span><br></pre></td></tr></table></figure>
+<pre><code class="json">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWx
+ob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4OD
+ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ.wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4</code></pre>
 <h1 id="Laravel使用JWT"><a href="#Laravel使用JWT" class="headerlink" title="Laravel使用JWT"></a>Laravel使用JWT</h1><h2 id="使用composer安装"><a href="#使用composer安装" class="headerlink" title="使用composer安装"></a>使用composer安装</h2><blockquote>
 <p>composer require tymon/jwt-auth 1.0.0-rc.3<br><strong>指定版本号，可以根据官网，不指定在生成配置文件时无法生成（坑）</strong></p>
 </blockquote>
@@ -326,239 +87,141 @@
 </li>
 </ul>
 <h2 id="模型使用"><a href="#模型使用" class="headerlink" title="模型使用"></a>模型使用</h2><p>如果使用User表生成token，需要增加一些代码</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Tymon</span>\<span class="title">JWTAuth</span>\<span class="title">Contracts</span>\<span class="title">JWTSubject</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Notifications</span>\<span class="title">Notifiable</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Foundation</span>\<span class="title">Auth</span>\<span class="title">User</span> <span class="title">as</span> <span class="title">Authenticatable</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">extends</span> <span class="title">Authenticatable</span> <span class="keyword">implements</span> <span class="title">JWTSubject</span>    # 这里别忘了加</span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">use</span> <span class="title">Notifiable</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getJWTIdentifier</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;getKey();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getJWTCustomClaims</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> [];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+namespace App;
+
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable implements JWTSubject    # 这里别忘了加
+{
+    use Notifiable;
+
+    public function getJWTIdentifier()
+    {
+        return $this-&gt;getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
+}
+&gt;</code></pre>
 <h2 id="配置文件修改"><a href="#配置文件修改" class="headerlink" title="配置文件修改"></a>配置文件修改</h2><h3 id="注册两个Facade"><a href="#注册两个Facade" class="headerlink" title="注册两个Facade"></a>注册两个Facade</h3><p><strong>config/app.php</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'aliases'</span> =&gt; [</span><br><span class="line">    <span class="comment">//添加以下两行</span></span><br><span class="line">    <span class="string">'JWTAuth'</span> =&gt; <span class="string">'Tymon\JWTAuth\Facades\JWTAuth'</span>,</span><br><span class="line">    <span class="string">'JWTFactory'</span> =&gt; <span class="string">'Tymon\JWTAuth\Facades\JWTFactory'</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<pre><code class="php">&#39;aliases&#39; =&gt; [
+    //添加以下两行
+    &#39;JWTAuth&#39; =&gt; &#39;Tymon\JWTAuth\Facades\JWTAuth&#39;,
+    &#39;JWTFactory&#39; =&gt; &#39;Tymon\JWTAuth\Facades\JWTFactory&#39;,
+]</code></pre>
 <p>也可以不注册使用这两个Facede，而使用<code>auth()</code>函数  </p>
 <h3 id="修改auth-php"><a href="#修改auth-php" class="headerlink" title="修改auth.php"></a>修改auth.php</h3><p><strong>config/auth.php</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'guards'</span> =&gt; [</span><br><span class="line">    <span class="string">'web'</span> =&gt; [</span><br><span class="line">        <span class="string">'driver'</span> =&gt; <span class="string">'session'</span>,<span class="comment">//改不改视具体情况而定</span></span><br><span class="line">        <span class="string">'provider'</span> =&gt; <span class="string">'users'</span>,</span><br><span class="line">    ],</span><br><span class="line"></span><br><span class="line">    <span class="string">'api'</span> =&gt; [</span><br><span class="line">        <span class="string">'driver'</span> =&gt; <span class="string">'jwt'</span>,      <span class="comment">// 原来是 token 改成 jwt</span></span><br><span class="line">        <span class="string">'provider'</span> =&gt; <span class="string">'users'</span>,</span><br><span class="line">    ],</span><br><span class="line">],</span><br></pre></td></tr></table></figure>
-<h3 id="注册路由"><a href="#注册路由" class="headerlink" title="注册路由"></a>注册路由</h3><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Route::group([</span><br><span class="line">    <span class="string">'middleware'</span> =&gt; <span class="string">'api'</span>,</span><br><span class="line">    <span class="string">'prefix'</span> =&gt; <span class="string">'auth'</span></span><br><span class="line">],<span class="function"><span class="keyword">function</span> <span class="params">($router)</span></span>&#123;</span><br><span class="line">    Route::post(<span class="string">'login'</span>,<span class="string">'AuthController@login'</span>);</span><br><span class="line">    Route::post(<span class="string">'logout'</span>,<span class="string">'AuthController@logout'</span>);</span><br><span class="line">    Route::post(<span class="string">'refresh'</span>,<span class="string">'AuthController@refresh'</span>);</span><br><span class="line">    Route::post(<span class="string">'me'</span>,<span class="string">'AuthController@me'</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<pre><code class="php">&#39;guards&#39; =&gt; [
+    &#39;web&#39; =&gt; [
+        &#39;driver&#39; =&gt; &#39;session&#39;,//改不改视具体情况而定
+        &#39;provider&#39; =&gt; &#39;users&#39;,
+    ],
+
+    &#39;api&#39; =&gt; [
+        &#39;driver&#39; =&gt; &#39;jwt&#39;,      // 原来是 token 改成 jwt
+        &#39;provider&#39; =&gt; &#39;users&#39;,
+    ],
+],</code></pre>
+<h3 id="注册路由"><a href="#注册路由" class="headerlink" title="注册路由"></a>注册路由</h3><pre><code class="php">Route::group([
+    &#39;middleware&#39; =&gt; &#39;api&#39;,
+    &#39;prefix&#39; =&gt; &#39;auth&#39;
+],function ($router){
+    Route::post(&#39;login&#39;,&#39;AuthController@login&#39;);
+    Route::post(&#39;logout&#39;,&#39;AuthController@logout&#39;);
+    Route::post(&#39;refresh&#39;,&#39;AuthController@refresh&#39;);
+    Route::post(&#39;me&#39;,&#39;AuthController@me&#39;);
+});</code></pre>
 <h3 id="创建控制器"><a href="#创建控制器" class="headerlink" title="创建控制器"></a>创建控制器</h3><blockquote>
 <p>php artisan make:controller AuthController  </p>
 </blockquote>
 <p>AuthController内容</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Controllers</span>\<span class="title">Controller</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Http</span>\<span class="title">Request</span>;<span class="comment">//自定义验证字段时要引入请求</span></span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">Facades</span>\<span class="title">Auth</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthController</span> <span class="keyword">extends</span> <span class="title">Controller</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;middleware(<span class="string">'auth:api'</span>,[<span class="string">'except'</span>=&gt; [<span class="string">'login'</span>]]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get a JWT via given credentials.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\JsonResponse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">login</span><span class="params">(Request $request)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        $credentials = [</span><br><span class="line">            <span class="string">'username'</span> =&gt; $request-&gt;input(<span class="string">'username'</span>),</span><br><span class="line">            <span class="string">'password'</span> =&gt; $request-&gt;input(<span class="string">'password'</span>)</span><br><span class="line">        ];</span><br><span class="line"></span><br><span class="line">        <span class="comment">//标记用户登录成功</span></span><br><span class="line">        <span class="keyword">if</span> (! $token = auth(<span class="string">'api'</span>)-&gt;attempt($credentials)) &#123;</span><br><span class="line">            <span class="keyword">return</span> response()-&gt;json([<span class="string">'error'</span> =&gt; <span class="string">'Unauthorized'</span>], <span class="number">401</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;respondWithToken($token);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get the authenticated User.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\JsonResponse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">me</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> response()-&gt;json(auth(<span class="string">'api'</span>)-&gt;user());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Log the user out (Invalidate the token).</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\JsonResponse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">logout</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        auth()-&gt;logout();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> response()-&gt;json([<span class="string">'message'</span> =&gt; <span class="string">'Successfully logged out'</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Refresh a token.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\JsonResponse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">refresh</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;respondWithToken(auth(<span class="string">'api'</span>)-&gt;refresh());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Get the token array structure.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  string $token</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> \Illuminate\Http\JsonResponse</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">respondWithToken</span><span class="params">($token)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> response()-&gt;json([</span><br><span class="line">            <span class="string">'access_token'</span> =&gt; $token,</span><br><span class="line">            <span class="string">'token_type'</span> =&gt; <span class="string">'bearer'</span>,</span><br><span class="line">            <span class="string">'expires_in'</span> =&gt; auth(<span class="string">'api'</span>)-&gt;factory()-&gt;getTTL() * <span class="number">60</span></span><br><span class="line">        ]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-    </div>
+<pre><code class="php">&lt;?php
 
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
+namespace App\Http\Controllers;
 
-  </div>
-</div>
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;//自定义验证字段时要引入请求
+use Illuminate\Support\Facades\Auth;
 
+class AuthController extends Controller
+{
+    public function __construct()
+    {
+        $this-&gt;middleware(&#39;auth:api&#39;,[&#39;except&#39;=&gt; [&#39;login&#39;]]);
+    }
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
-              <a href="/tags/php/" rel="tag"># php</a>
-          </div>
+    /**
+     * Get a JWT via given credentials.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function login(Request $request)
+    {
+        $credentials = [
+            &#39;username&#39; =&gt; $request-&gt;input(&#39;username&#39;),
+            &#39;password&#39; =&gt; $request-&gt;input(&#39;password&#39;)
+        ];
 
-        
+        //标记用户登录成功
+        if (! $token = auth(&#39;api&#39;)-&gt;attempt($credentials)) {
+            return response()-&gt;json([&#39;error&#39; =&gt; &#39;Unauthorized&#39;], 401);
+        }
 
+        return $this-&gt;respondWithToken($token);
+    }
 
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2018/09/07/laravel-admin/" rel="prev" title="Laravel-admin">
-      <i class="fa fa-chevron-left"></i> Laravel-admin
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2018/10/01/laravel%E5%AE%9E%E7%8E%B0%E4%B8%83%E7%89%9B%E4%BA%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" rel="next" title="laravel实现七牛云文件上传">
-      laravel实现七牛云文件上传 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
+    /**
+     * Get the authenticated User.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function me()
+    {
+        return response()-&gt;json(auth(&#39;api&#39;)-&gt;user());
+    }
 
-  </div>
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
+    {
+        auth()-&gt;logout();
 
+        return response()-&gt;json([&#39;message&#39; =&gt; &#39;Successfully logged out&#39;]);
+    }
 
-          </div>
-          
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this-&gt;respondWithToken(auth(&#39;api&#39;)-&gt;refresh());
+    }
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#JWT简介"><span class="nav-number">1.</span> <span class="nav-text">JWT简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#载荷"><span class="nav-number">1.1.</span> <span class="nav-text">载荷</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#头部"><span class="nav-number">1.2.</span> <span class="nav-text">头部</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#签名"><span class="nav-number">1.3.</span> <span class="nav-text">签名</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Laravel使用JWT"><span class="nav-number">2.</span> <span class="nav-text">Laravel使用JWT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用composer安装"><span class="nav-number">2.1.</span> <span class="nav-text">使用composer安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型使用"><span class="nav-number">2.2.</span> <span class="nav-text">模型使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件修改"><span class="nav-number">2.3.</span> <span class="nav-text">配置文件修改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注册两个Facade"><span class="nav-number">2.3.1.</span> <span class="nav-text">注册两个Facade</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改auth-php"><span class="nav-number">2.3.2.</span> <span class="nav-text">修改auth.php</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册路由"><span class="nav-number">2.3.3.</span> <span class="nav-text">注册路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建控制器"><span class="nav-number">2.3.4.</span> <span class="nav-text">创建控制器</span></a></li></ol></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithToken($token)
+    {
+        return response()-&gt;json([
+            &#39;access_token&#39; =&gt; $token,
+            &#39;token_type&#39; =&gt; &#39;bearer&#39;,
+            &#39;expires_in&#39; =&gt; auth(&#39;api&#39;)-&gt;factory()-&gt;getTTL() * 60
+        ]);
+    }
+}</code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2018/10/01/laravel%E5%AE%9E%E7%8E%B0%E4%B8%83%E7%89%9B%E4%BA%91%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/" title="laravel实现七牛云文件上传"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: laravel实现七牛云文件上传</span></a><a class="button is-default" href="/2018/09/07/laravel-admin/" title="Laravel-admin"><span class="has-text-weight-semibold">下一页: Laravel-admin</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

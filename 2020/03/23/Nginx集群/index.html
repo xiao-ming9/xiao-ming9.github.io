@@ -1,277 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Nginx 集群</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="集群实现方案NGINX实现主从备份目前主流方案是 Keepalived + Nginx 实现双机热备。 Keepalived介绍Keepalived 是一个基于 VRRP 协议来实现的服务高可用方案，可以利用其来避免 IP 单点故障，类似的工具还有heartbeat、corosync、pacemaker。但是它一般不会单独出现，而是与其它负载均衡技术（如lvs、haproxy、nginx）一起工作">
-<meta name="keywords" content="nginx">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Nginx 集群">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;03&#x2F;23&#x2F;Nginx%E9%9B%86%E7%BE%A4&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="集群实现方案NGINX实现主从备份目前主流方案是 Keepalived + Nginx 实现双机热备。 Keepalived介绍Keepalived 是一个基于 VRRP 协议来实现的服务高可用方案，可以利用其来避免 IP 单点故障，类似的工具还有heartbeat、corosync、pacemaker。但是它一般不会单独出现，而是与其它负载均衡技术（如lvs、haproxy、nginx）一起工作">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-12-01T10:40:55.304Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2020/03/23/Nginx%E9%9B%86%E7%BE%A4/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Nginx 集群 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/23/Nginx%E9%9B%86%E7%BE%A4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Nginx 集群
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2020-03-23 15:52:02" itemprop="dateCreated datePublished" datetime="2020-03-23T15:52:02+08:00">2020-03-23</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:40:55" itemprop="dateModified" datetime="2020-12-01T18:40:55+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>5.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>5 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="集群实现方案"><a href="#集群实现方案" class="headerlink" title="集群实现方案"></a>集群实现方案</h1><p>NGINX实现主从备份目前主流方案是 Keepalived + Nginx 实现双机热备。</p>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Nginx 集群</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#集群实现方案"><span class="toc-text">集群实现方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Keepalived介绍"><span class="toc-text">Keepalived介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#VRRP协议"><span class="toc-text">VRRP协议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#具体实现上"><span class="toc-text">具体实现上</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#配置"><span class="toc-text">配置</span></a></li></ol></li></ol></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/nginx"><i class="tag post-item-tag">nginx</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Nginx 集群</h1><time class="has-text-grey" datetime="2020-03-23T07:52:02.000Z">2020-03-23</time><article class="mt-2 post-content"><h1 id="集群实现方案"><a href="#集群实现方案" class="headerlink" title="集群实现方案"></a>集群实现方案</h1><p>NGINX实现主从备份目前主流方案是 Keepalived + Nginx 实现双机热备。</p>
 <h2 id="Keepalived介绍"><a href="#Keepalived介绍" class="headerlink" title="Keepalived介绍"></a>Keepalived介绍</h2><p>Keepalived 是一个基于 VRRP 协议来实现的服务高可用方案，可以利用其来避免 IP 单点故障，类似的工具还有heartbeat、corosync、pacemaker。但是它一般不会单独出现，而是与其它负载均衡技术（如lvs、haproxy、nginx）一起工作来达到集群的高可用。</p>
 <a id="more"></a>
 
@@ -287,286 +27,221 @@
 <p>Master 和 Backup 两边都开启 nginx 服务，无论 Master 还是 Backup，当其中的一个 keepalived 服务停止后，vip 都会漂移到 keepalived 服务还在的节点上。</p>
 <h2 id="具体实现上"><a href="#具体实现上" class="headerlink" title="具体实现上"></a>具体实现上</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><p>前端两台主机分别安装nginx和keepalived。</p>
 <p>安装keepalived：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 安装依赖</span><br><span class="line">yum install kernel-* gcc make openssl-*</span><br><span class="line"># 下载keepalived-1.2.19.tar.gz</span><br><span class="line">wget http://www.keepalived.org/software/keepalived-1.2.19.tar.gz</span><br><span class="line"># 解压</span><br><span class="line">tar xvzf keepalived-1.2.19.tar.gz </span><br><span class="line">cd keepalived-1.2.19</span><br><span class="line"># 配置</span><br><span class="line">./configure --sysconfdir=/etc --with-kernel-dir=/usr/src/kernels/2.6.32-504.el6.x86_64</span><br><span class="line"># 编译并安装</span><br><span class="line">make &amp;&amp; make install</span><br><span class="line"># 查看keepalived版本，验证安装成功</span><br><span class="line">keepalived -v</span><br><span class="line"># 设置开机自启动</span><br><span class="line">chkconfig keepalived on</span><br></pre></td></tr></table></figure>
-<p>注：用 yum 也可安装 keepalived，不过版本要低一些。</p>
+<pre><code># 安装依赖
+yum install kernel-* gcc make openssl-*
+# 下载keepalived-1.2.19.tar.gz
+wget http://www.keepalived.org/software/keepalived-1.2.19.tar.gz
+# 解压
+tar xvzf keepalived-1.2.19.tar.gz 
+cd keepalived-1.2.19
+# 配置
+./configure --sysconfdir=/etc --with-kernel-dir=/usr/src/kernels/2.6.32-504.el6.x86_64
+# 编译并安装
+make &amp;&amp; make install
+# 查看keepalived版本，验证安装成功
+keepalived -v
+# 设置开机自启动
+chkconfig keepalived on</code></pre><p>注：用 yum 也可安装 keepalived，不过版本要低一些。</p>
 <p>RPM包安装Nginx</p>
 <p>官方nginx yum源：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[nginx]</span><br><span class="line">name=nginx repo</span><br><span class="line">baseurl=http://nginx.org/packages/centos/$releasever/$basearch/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line">    yum源设置好后直接安装即可：</span><br><span class="line"></span><br><span class="line">yum install nginx</span><br><span class="line">chkconfig nginx on</span><br></pre></td></tr></table></figure>
+<pre><code>[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
+enabled=1
+gpgcheck=0
+    yum源设置好后直接安装即可：
 
-<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><ol>
+yum install nginx
+chkconfig nginx on</code></pre><h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><ol>
 <li>前端两台主机nginx的配置完全一样</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"># vim /etc/nginx/conf.d/upstream.conf </span><br><span class="line"></span><br><span class="line">upstream tomcatclu_16915 &#123;</span><br><span class="line">        server 192.168.60.51:16915;</span><br><span class="line">        server 192.168.60.52:16915;</span><br><span class="line">        server 192.168.60.53:16915;</span><br><span class="line">        ip_hash;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">upstream tomcatclu_16916 &#123;</span><br><span class="line">        server 192.168.60.51:16916;</span><br><span class="line">        server 192.168.60.52:16916;</span><br><span class="line">        server 192.168.60.53:16916;</span><br><span class="line">        ip_hash;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># vim /etc/nginx/conf.d/server.conf</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 16915;</span><br><span class="line">    server_name _;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://tomcatclu_16915;</span><br><span class="line">    &#125;</span><br><span class="line">    location /nginx_status&#123;</span><br><span class="line">        stub_status on;</span><br><span class="line">        access_log off;</span><br><span class="line">        allow 127.0.0.1;</span><br><span class="line">        # 要允许公司ip访问nginx status</span><br><span class="line">        allow 192.168.252.0/24;</span><br><span class="line">        deny all;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">    listen 16916;</span><br><span class="line">    server_name _;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">        proxy_pass http://tomcatclu_16916;</span><br><span class="line">    &#125;</span><br><span class="line">    location /nginx_status&#123;</span><br><span class="line">        stub_status on;</span><br><span class="line">        access_log off;</span><br><span class="line">        allow 127.0.0.1;</span><br><span class="line">        # 要允许公司ip访问nginx status</span><br><span class="line">        allow 192.168.252.0/24;</span><br><span class="line">        deny all;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="conf"># vim /etc/nginx/conf.d/upstream.conf 
 
+upstream tomcatclu_16915 {
+        server 192.168.60.51:16915;
+        server 192.168.60.52:16915;
+        server 192.168.60.53:16915;
+        ip_hash;
+}
+
+upstream tomcatclu_16916 {
+        server 192.168.60.51:16916;
+        server 192.168.60.52:16916;
+        server 192.168.60.53:16916;
+        ip_hash;
+}
+
+# vim /etc/nginx/conf.d/server.conf
+
+server {
+    listen 16915;
+    server_name _;
+
+    location / {
+        proxy_pass http://tomcatclu_16915;
+    }
+    location /nginx_status{
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        # 要允许公司ip访问nginx status
+        allow 192.168.252.0/24;
+        deny all;
+    }
+}
+
+server {
+    listen 16916;
+    server_name _;
+
+    location / {
+        proxy_pass http://tomcatclu_16916;
+    }
+    location /nginx_status{
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        # 要允许公司ip访问nginx status
+        allow 192.168.252.0/24;
+        deny all;
+    }
+}</code></pre>
 <ol start="2">
 <li>nginx_master的keepalived配置</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[root@nginx_master ~]# vim /etc/keepalived/keepalived.conf </span><br><span class="line"></span><br><span class="line">! Configuration File for keepalived</span><br><span class="line"></span><br><span class="line">global_defs &#123;</span><br><span class="line">   router_id nginx-ha1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_script check_nginx &#123;</span><br><span class="line">    # 检查nginx状态的脚本，文章后面给出</span><br><span class="line">    script &quot;/data/script/check_nginx.sh&quot;</span><br><span class="line">    # 执行间隔2秒</span><br><span class="line">    interval 2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    # 两台主机都是BACKUP</span><br><span class="line">    state BACKUP</span><br><span class="line">    interface eth0</span><br><span class="line">    # 同一keepalived集群的virtual_router_id 必须相同，默认51</span><br><span class="line">    virtual_router_id 55</span><br><span class="line">    # 主的优先级高</span><br><span class="line">    priority 100</span><br><span class="line">    advert_int 1</span><br><span class="line">    # 不抢占：如果集群里已存在MASTER状态的主机，即使优先级高于MASTER也不抢占为MASTER。只在优先级高的主机上设置即可。</span><br><span class="line">    nopreempt</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass 1111</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        # 虚拟IP</span><br><span class="line">        192.168.60.50</span><br><span class="line">    &#125;</span><br><span class="line">    track_script &#123;</span><br><span class="line">        check_nginx</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="conf">[root@nginx_master ~]# vim /etc/keepalived/keepalived.conf 
 
+! Configuration File for keepalived
+
+global_defs {
+   router_id nginx-ha1
+}
+
+vrrp_script check_nginx {
+    # 检查nginx状态的脚本，文章后面给出
+    script &quot;/data/script/check_nginx.sh&quot;
+    # 执行间隔2秒
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    # 两台主机都是BACKUP
+    state BACKUP
+    interface eth0
+    # 同一keepalived集群的virtual_router_id 必须相同，默认51
+    virtual_router_id 55
+    # 主的优先级高
+    priority 100
+    advert_int 1
+    # 不抢占：如果集群里已存在MASTER状态的主机，即使优先级高于MASTER也不抢占为MASTER。只在优先级高的主机上设置即可。
+    nopreempt
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        # 虚拟IP
+        192.168.60.50
+    }
+    track_script {
+        check_nginx
+    }
+}</code></pre>
 <ol start="3">
 <li>nginx_slave 的 keepalived 配置</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">[root@nginx_slave ~]# vim /etc/keepalived/keepalived.conf </span><br><span class="line"></span><br><span class="line">! Configuration File for keepalived</span><br><span class="line"></span><br><span class="line">global_defs &#123;</span><br><span class="line">   router_id nginx-ha2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_script check_nginx &#123;</span><br><span class="line">    script &quot;/data/script/check_nginx.sh&quot;</span><br><span class="line">    interval 2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">vrrp_instance VI_1 &#123;</span><br><span class="line">    state BACKUP</span><br><span class="line">    interface eth0</span><br><span class="line">    virtual_router_id 55</span><br><span class="line">    # 备的优先级低</span><br><span class="line">    priority 80</span><br><span class="line">    advert_int 1</span><br><span class="line">    authentication &#123;</span><br><span class="line">        auth_type PASS</span><br><span class="line">        auth_pass 1111</span><br><span class="line">    &#125;</span><br><span class="line">    virtual_ipaddress &#123;</span><br><span class="line">        192.168.60.50</span><br><span class="line">    &#125;</span><br><span class="line">    track_script &#123;</span><br><span class="line">        check_nginx</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="conf">[root@nginx_slave ~]# vim /etc/keepalived/keepalived.conf 
 
+! Configuration File for keepalived
+
+global_defs {
+   router_id nginx-ha2
+}
+
+vrrp_script check_nginx {
+    script &quot;/data/script/check_nginx.sh&quot;
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    state BACKUP
+    interface eth0
+    virtual_router_id 55
+    # 备的优先级低
+    priority 80
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        192.168.60.50
+    }
+    track_script {
+        check_nginx
+    }
+}</code></pre>
 <ol start="4">
 <li>防火墙设置</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># iptables放行组播地址流量:</span><br><span class="line">iptables -I INPUT -d 224.0.0.18 -j ACCEPT</span><br><span class="line">service iptables save</span><br></pre></td></tr></table></figure>
-
-<p>VRRP 报文是通过 IP 多播形式发送的，组播地址224.0.0.18是VRRP报文的目的地址。<br>本实验里，两个主机都是BACKUP，如果同时启动 keepalived，VRRP 协议通过竞选使优先级高的主机做为 MASTER。如果防火墙没有允许 VRRP 报文通过的话，两个 BACKUP 都会成为 MASTER，会发现两个主机都启动了虚拟 IP。</p>
+<pre><code># iptables放行组播地址流量:
+iptables -I INPUT -d 224.0.0.18 -j ACCEPT
+service iptables save</code></pre><p>VRRP 报文是通过 IP 多播形式发送的，组播地址224.0.0.18是VRRP报文的目的地址。<br>本实验里，两个主机都是BACKUP，如果同时启动 keepalived，VRRP 协议通过竞选使优先级高的主机做为 MASTER。如果防火墙没有允许 VRRP 报文通过的话，两个 BACKUP 都会成为 MASTER，会发现两个主机都启动了虚拟 IP。</p>
 <ol start="5">
 <li>部署nginx状态检查脚本 check_nginx.sh</li>
 </ol>
 <p><code>/data/script/check_nginx.sh</code> 检查脚本内容如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> check nginx server status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> http://qicheng0211.blog.51cto.com</span></span><br><span class="line"> </span><br><span class="line"><span class="meta">#</span><span class="bash"> nginx端口</span></span><br><span class="line">PORTS="16915 16916"</span><br><span class="line"></span><br><span class="line">function check_ports &#123;</span><br><span class="line">    for port in $PORTS;do</span><br><span class="line">        nc -z 127.0.0.1 $port | grep -q succeeded</span><br><span class="line">        [ "$&#123;PIPESTATUS[1]&#125;" -eq 0 ] &amp;&amp; mark=$&#123;mark&#125;1</span><br><span class="line">    done</span><br><span class="line">    # 如果mark值为空说明两个端口都不通。</span><br><span class="line">    # 如果mark等于1，说明有一个端口是通的。</span><br><span class="line">    # 如果mark等于11，说明两个端口都是通的。</span><br><span class="line">    echo $mark</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ret1=$(check_ports)</span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果nginx端口不通，会尝试重启一次nginx</span></span><br><span class="line">if [ "$ret1" != 11 ];then</span><br><span class="line">    /sbin/service nginx stop</span><br><span class="line">    /sbin/service nginx start</span><br><span class="line">    sleep 1</span><br><span class="line">    ret2=$(check_ports)</span><br><span class="line">    # 如果还是有端口不通，表示nginx服务不正常，则停掉keepalived，使VIP发生切换</span><br><span class="line">    [ "$ret2" != 11 ] &amp;&amp; /etc/init.d/keepalived stop</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+# check nginx server status
+# http://qicheng0211.blog.51cto.com
 
+# nginx端口
+PORTS=&quot;16915 16916&quot;
+
+function check_ports {
+    for port in $PORTS;do
+        nc -z 127.0.0.1 $port | grep -q succeeded
+        [ &quot;${PIPESTATUS[1]}&quot; -eq 0 ] &amp;&amp; mark=${mark}1
+    done
+    # 如果mark值为空说明两个端口都不通。
+    # 如果mark等于1，说明有一个端口是通的。
+    # 如果mark等于11，说明两个端口都是通的。
+    echo $mark
+}
+
+ret1=$(check_ports)
+# 如果nginx端口不通，会尝试重启一次nginx
+if [ &quot;$ret1&quot; != 11 ];then
+    /sbin/service nginx stop
+    /sbin/service nginx start
+    sleep 1
+    ret2=$(check_ports)
+    # 如果还是有端口不通，表示nginx服务不正常，则停掉keepalived，使VIP发生切换
+    [ &quot;$ret2&quot; != 11 ] &amp;&amp; /etc/init.d/keepalived stop
+fi</code></pre>
 <p>给脚本设置可执行权限：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x /data/script/check_nginx.sh</span><br></pre></td></tr></table></figure>
-<p>补充一点：如果nginx恢复正常后，keepalived不能自动启动，需要编写一个脚本完成这项工作：判断nginx正常后，拉起 keepalived。脚本放到 cron 里每分钟执行。</p>
+<pre><code>chmod +x /data/script/check_nginx.sh</code></pre><p>补充一点：如果nginx恢复正常后，keepalived不能自动启动，需要编写一个脚本完成这项工作：判断nginx正常后，拉起 keepalived。脚本放到 cron 里每分钟执行。</p>
 <ol start="6">
 <li>开启keepalived的日志</li>
 </ol>
 <p>编辑 <code>/etc/sysconfig/keepalived</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KEEPALIVED_OPTIONS=&quot;-D -d -S 0&quot;</span><br></pre></td></tr></table></figure>
-
-<p>编辑/etc/rsyslog.conf：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 配置文件最后面加上下面一行</span><br><span class="line">local0.*                                        /var/log/keepalived.log</span><br></pre></td></tr></table></figure>
-
+<pre><code>KEEPALIVED_OPTIONS=&quot;-D -d -S 0&quot;</code></pre><p>编辑/etc/rsyslog.conf：</p>
+<pre><code class="conf"># 配置文件最后面加上下面一行
+local0.*                                        /var/log/keepalived.log</code></pre>
 <p>重启rsyslog：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service rsyslog restart</span><br></pre></td></tr></table></figure>
-
-<p>按上面配置后，keepalived 会把日志记录到 <code>/var/log/keepalived.log</code>。</p>
+<pre><code>service rsyslog restart</code></pre><p>按上面配置后，keepalived 会把日志记录到 <code>/var/log/keepalived.log</code>。</p>
 <ol start="7">
 <li>启动服务</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 先检查nginx配置文件正确性</span><br><span class="line">nginx -t</span><br><span class="line"># 启动nginx服务</span><br><span class="line">service nginx start</span><br><span class="line"># 同时启动keepalived服务</span><br><span class="line">service keepalived start</span><br><span class="line"># 过一会查看虚拟IP是否在nginx_master主机上</span><br><span class="line">ip a</span><br></pre></td></tr></table></figure>
-
-
-<p><strong>参考资料</strong>：</p>
+<pre><code># 先检查nginx配置文件正确性
+nginx -t
+# 启动nginx服务
+service nginx start
+# 同时启动keepalived服务
+service keepalived start
+# 过一会查看虚拟IP是否在nginx_master主机上
+ip a</code></pre><p><strong>参考资料</strong>：</p>
 <blockquote>
 <p><a href="https://zhuanlan.zhihu.com/p/101925682" target="_blank" rel="noopener">nginx可以集群吗</a><br><a href="https://blog.51cto.com/qicheng0211/1695674" target="_blank" rel="noopener">Nginx+Keepalived搭建高可用负载均衡集群</a>  </p>
 </blockquote>
-
-    </div>
-
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
-
-  </div>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/nginx/" rel="tag"># nginx</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/02/24/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Java%20Mybatis/" rel="prev" title="Java MyBatis">
-      <i class="fa fa-chevron-left"></i> Java MyBatis
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/04/01/Nginx%E9%AB%98%E5%B9%B6%E5%8F%91%E5%AE%9E%E7%8E%B0/" rel="next" title="Nginx 高并发高性能实现">
-      Nginx 高并发高性能实现 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#集群实现方案"><span class="nav-number">1.</span> <span class="nav-text">集群实现方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Keepalived介绍"><span class="nav-number">1.1.</span> <span class="nav-text">Keepalived介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VRRP协议"><span class="nav-number">1.1.1.</span> <span class="nav-text">VRRP协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#具体实现上"><span class="nav-number">1.2.</span> <span class="nav-text">具体实现上</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装"><span class="nav-number">1.2.1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">配置</span></a></li></ol></li></ol></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2020/04/01/Nginx%E9%AB%98%E5%B9%B6%E5%8F%91%E5%AE%9E%E7%8E%B0/" title="Nginx 高并发高性能实现"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: Nginx 高并发高性能实现</span></a><a class="button is-default" href="/2020/02/24/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Java%20Mybatis/" title="Java MyBatis"><span class="has-text-weight-semibold">下一页: Java MyBatis</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

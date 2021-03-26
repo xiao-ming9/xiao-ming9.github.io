@@ -1,277 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Docker Compose</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="Compose项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。Compose 定位是**定义和运行多个Docker容器的应用。我们知道使用一个Dockerfile模板文件，可以让用户很方便的定义一个单独的应用容器。然而，在日常工作中，经常会碰到需要多个容器相互配合来完成某项任务的情况。例如要实现一个Web项目，除了Web服务容器本身，往往还需要再加上后端的数据库服务容器">
-<meta name="keywords" content="Docker,Docker-compose,mysql">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Docker Compose">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;08&#x2F;20&#x2F;Docker%20Compose&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="Compose项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。Compose 定位是**定义和运行多个Docker容器的应用。我们知道使用一个Dockerfile模板文件，可以让用户很方便的定义一个单独的应用容器。然而，在日常工作中，经常会碰到需要多个容器相互配合来完成某项任务的情况。例如要实现一个Web项目，除了Web服务容器本身，往往还需要再加上后端的数据库服务容器">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-21T10:30:49.530Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2019/08/20/Docker%20Compose/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Docker Compose | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/20/Docker%20Compose/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Docker Compose
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-08-20 16:02:44" itemprop="dateCreated datePublished" datetime="2019-08-20T16:02:44+08:00">2019-08-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-08-21 18:30:49" itemprop="dateModified" datetime="2019-08-21T18:30:49+08:00">2019-08-21</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>2.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <p>Compose项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。<br>Compose 定位是**定义和运行多个Docker容器的应用。<br>我们知道使用一个Dockerfile模板文件，可以让用户很方便的定义一个单独的应用容器。然而，在日常工作中，经常会碰到需要多个容器相互配合来完成某项任务的情况。例如要实现一个Web项目，除了Web服务容器本身，往往还需要再加上后端的数据库服务容器，甚至还包括负载均衡容器等。<br>Compose恰好满足了这样的需求。它允许用户通过一个单独的<code>docker-compose.yml</code>模板文件（YAML格式）来定义一组相关联的应用容器为一个项目。</p>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Docker Compose</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#安装"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#卸载"><span class="toc-text">卸载</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用"><span class="toc-text">使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Compose模版文件"><span class="toc-text">Compose模版文件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#docker-compose配置mysql"><span class="toc-text">docker-compose配置mysql</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/Docker"><i class="tag post-item-tag">Docker</i></a><a href="/tags/Docker-compose"><i class="tag post-item-tag">Docker-compose</i></a><a href="/tags/mysql"><i class="tag post-item-tag">mysql</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Docker Compose</h1><time class="has-text-grey" datetime="2019-08-20T08:02:44.000Z">2019-08-20</time><article class="mt-2 post-content"><p>Compose项目是Docker官方的开源项目，负责实现对Docker容器集群的快速编排。<br>Compose 定位是**定义和运行多个Docker容器的应用。<br>我们知道使用一个Dockerfile模板文件，可以让用户很方便的定义一个单独的应用容器。然而，在日常工作中，经常会碰到需要多个容器相互配合来完成某项任务的情况。例如要实现一个Web项目，除了Web服务容器本身，往往还需要再加上后端的数据库服务容器，甚至还包括负载均衡容器等。<br>Compose恰好满足了这样的需求。它允许用户通过一个单独的<code>docker-compose.yml</code>模板文件（YAML格式）来定义一组相关联的应用容器为一个项目。</p>
 <p>Compose中两个重要的概念：</p>
 <ul>
 <li>(service)：一个应用的容器，实际上可以包括若干运行相同镜像的容器实例。</li>
@@ -279,12 +19,13 @@
 <h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1></li>
 </ul>
 <p>Mac和Window平台下载后自带docker-composer，可以通过以下命令查看：</p>
-<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-composer --version</span><br></pre></td></tr></table></figure>
+<pre><code class="docker">docker-composer --version</code></pre>
 <p>Linux安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo curl -L https://github.com/docker/compose/releases/download/1.17.1/docker-compose-`uname -s`-`uname -m` &gt; /usr/<span class="built_in">local</span>/bin/docker-compose</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo chmod +x /usr/<span class="built_in">local</span>/bin/docker-compose</span></span><br></pre></td></tr></table></figure>
-<h1 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h1><figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo rm /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">$ sudo curl -L https://github.com/docker/compose/releases/download/1.17.1/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose
+$ sudo chmod +x /usr/local/bin/docker-compose</code></pre>
+<h1 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h1><pre><code class="docker">sudo rm /usr/local/bin/docker-compose</code></pre>
 <h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>docker-compose 命令的基本的使用格式是：</p>
-<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose [-f=&lt;<span class="keyword">arg</span>&gt;...] [options] [COMMAND] [ARGS...]</span><br></pre></td></tr></table></figure>
+<pre><code class="docker">docker-compose [-f=&lt;arg&gt;...] [options] [COMMAND] [ARGS...]</code></pre>
 <p>命令选项:<br>-f, –file FILE指定使用的Compose模板文件，默认为<code>docker-compose.yml</code>，可以多次指定。<br>-p, –project-name NAME指定项目名称，默认将使用所在目录名称作为项目名。<br>–x-networking 使用Docker的可拔插网络后端特性<br>–x-network-driver DRIVER指定网络后端的驱动，默认为bridge<br>–verbose 输出更多调试信息。<br>-v, –version 打印版本并退出。</p>
 <p><a href="https://yeasy.gitbooks.io/docker_practice/content/compose/commands.html" target="_blank" rel="noopener">compose命令</a></p>
 <p>常用命令如下：<br><code>down</code><br>此命令将会停止 up 命令所启动的容器，并移除网络</p>
@@ -301,231 +42,30 @@
 <li><code>-t</code>, <code>--timeout</code> TIMEOUT停止容器时候的超时（默认为10秒）。</li>
 </ul>
 <h1 id="Compose模版文件"><a href="#Compose模版文件" class="headerlink" title="Compose模版文件"></a>Compose模版文件</h1><p>模板文件是使用Compose的核心，默认的模板文件名称为<code>docker-compose.yaml</code>格式为YAML格式。<br><a href="https://yeasy.gitbooks.io/docker_practice/content/compose/compose_file.html" target="_blank" rel="noopener">Compose模版文件指令说明</a></p>
-<h2 id="docker-compose配置mysql"><a href="#docker-compose配置mysql" class="headerlink" title="docker-compose配置mysql"></a>docker-compose配置mysql</h2><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">'3.1'</span> <span class="comment"># docker-compose版本</span></span><br><span class="line"><span class="attr">services:</span> <span class="comment"># 服务</span></span><br><span class="line">  <span class="attr">mysql:</span>  <span class="comment"># 服务名称（可以自定义）</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">mysql</span> <span class="comment"># 镜像</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span> <span class="comment"># 总是重启</span></span><br><span class="line">    <span class="attr">container_name:</span> <span class="string">mysql</span> <span class="comment"># 容器名称</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">3306</span><span class="string">:3306</span> <span class="comment"># 映射端口</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">      <span class="attr">TZ:</span> <span class="string">Asia/Shanghai</span> <span class="comment"># 时区</span></span><br><span class="line">      <span class="attr">MYSQL_ROOT_PASSWORD:</span> <span class="number">123456</span> <span class="comment"># Root账户密码</span></span><br><span class="line">    <span class="attr">command:</span></span><br><span class="line">      <span class="string">--default-authentication-plugin=mysql_native_password</span></span><br><span class="line">      <span class="string">--character-set-server=utf8mb4</span></span><br><span class="line">      <span class="string">--collation-server=utf8mb4_general_ci</span></span><br><span class="line">      <span class="string">--explicit_defaults_for_timestamp=true</span></span><br><span class="line">      <span class="string">--lower_case_table_names=1</span></span><br><span class="line">      <span class="string">--max_allowed_packet=128M</span></span><br><span class="line">    <span class="attr">volumes:</span> <span class="comment"># 数据卷映射</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">/Users/xiaoming/mysql-data:/mysql-data</span></span><br><span class="line">  <span class="attr">adminer:</span> <span class="comment"># mysql界面管理</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">adminer</span></span><br><span class="line">    <span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="number">8080</span><span class="string">:8080</span></span><br></pre></td></tr></table></figure>
+<h2 id="docker-compose配置mysql"><a href="#docker-compose配置mysql" class="headerlink" title="docker-compose配置mysql"></a>docker-compose配置mysql</h2><pre><code class="yaml">version: &#39;3.1&#39; # docker-compose版本
+services: # 服务
+  mysql:  # 服务名称（可以自定义）
+    image: mysql # 镜像
+    restart: always # 总是重启
+    container_name: mysql # 容器名称
+    ports:
+      - 3306:3306 # 映射端口
+    environment:
+      TZ: Asia/Shanghai # 时区
+      MYSQL_ROOT_PASSWORD: 123456 # Root账户密码
+    command:
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+      --max_allowed_packet=128M
+    volumes: # 数据卷映射
+      - /Users/xiaoming/mysql-data:/mysql-data
+  adminer: # mysql界面管理
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080</code></pre>
 <p>每个服务都必须通过<code>image</code>指令指定镜像或<code>build</code>指令（需要 Dockerfile）等来自动构建生成镜像。<br>如果使用<code>build</code>指令，在<code>Dockerfile</code>中设置的选项(例如：CMD, EXPOSE, VOLUME, ENV等) 将会自动被获取，无需在 docker-compose.yml 中再次设置。</p>
-
-    </div>
-
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
-
-  </div>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Docker/" rel="tag"># Docker</a>
-              <a href="/tags/Docker-compose/" rel="tag"># Docker-compose</a>
-              <a href="/tags/mysql/" rel="tag"># mysql</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/08/18/Docker%E9%83%A8%E7%BD%B2Mysql/" rel="prev" title="Docker部署MySQL">
-      <i class="fa fa-chevron-left"></i> Docker部署MySQL
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/08/21/Docker%E5%AE%89%E8%A3%85GitLab/" rel="next" title="通过Docker安装GitLab">
-      通过Docker安装GitLab <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#卸载"><span class="nav-number">2.</span> <span class="nav-text">卸载</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Compose模版文件"><span class="nav-number">4.</span> <span class="nav-text">Compose模版文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose配置mysql"><span class="nav-number">4.1.</span> <span class="nav-text">docker-compose配置mysql</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/08/21/Docker%E5%AE%89%E8%A3%85GitLab/" title="通过Docker安装GitLab"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 通过Docker安装GitLab</span></a><a class="button is-default" href="/2019/08/18/Docker%E9%83%A8%E7%BD%B2Mysql/" title="Docker部署MySQL"><span class="has-text-weight-semibold">下一页: Docker部署MySQL</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

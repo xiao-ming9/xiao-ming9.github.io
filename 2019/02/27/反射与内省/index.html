@@ -1,506 +1,403 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>java反射与内省</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="反射通过程序运行时信息来获取类或对象的类信息获取Class对象的三种方法 123Class class = dog.getCalss();Class class = Dog.class;Class class = Class.forName(&quot;com.vince.Dog&quot;);&#x2F;&#x2F;会有ClassNotFoundExeception">
-<meta name="keywords" content="java">
-<meta property="og:type" content="article">
-<meta property="og:title" content="java反射与内省">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;02&#x2F;27&#x2F;%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%86%85%E7%9C%81&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="反射通过程序运行时信息来获取类或对象的类信息获取Class对象的三种方法 123Class class = dog.getCalss();Class class = Dog.class;Class class = Class.forName(&quot;com.vince.Dog&quot;);&#x2F;&#x2F;会有ClassNotFoundExeception">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-12-01T10:33:56.474Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2019/02/27/%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%86%85%E7%9C%81/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>java反射与内省 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/27/%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%86%85%E7%9C%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          java反射与内省
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-02-27 21:55:58" itemprop="dateCreated datePublished" datetime="2019-02-27T21:55:58+08:00">2019-02-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:33:56" itemprop="dateModified" datetime="2020-12-01T18:33:56+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>10k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>9 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h1><p>通过程序运行时信息来获取类或对象的类信息<br><strong>获取Class对象的三种方法</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Class <span class="class"><span class="keyword">class</span> </span>= dog.getCalss();</span><br><span class="line">Class <span class="class"><span class="keyword">class</span> </span>= Dog<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">Class <span class="class"><span class="keyword">class</span> </span>= Class.forName(<span class="string">"com.vince.Dog"</span>);<span class="comment">//会有ClassNotFoundExeception</span></span><br></pre></td></tr></table></figure>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">java反射与内省</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#反射"><span class="toc-text">反射</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#内省"><span class="toc-text">内省</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AOP编程"><span class="toc-text">AOP编程</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/java"><i class="tag post-item-tag">java</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">java反射与内省</h1><time class="has-text-grey" datetime="2019-02-27T13:55:58.000Z">2019-02-27</time><article class="mt-2 post-content"><h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h1><p>通过程序运行时信息来获取类或对象的类信息<br><strong>获取Class对象的三种方法</strong></p>
+<pre><code class="java">Class class = dog.getCalss();
+Class class = Dog.class;
+Class class = Class.forName(&quot;com.vince.Dog&quot;);//会有ClassNotFoundExeception</code></pre>
 <a id="more"></a>
 <p><strong>通过反射实例化对象和获取对象信息</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> reflection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReflectionDemo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Dog dog = <span class="keyword">new</span> Dog(<span class="string">"dabao"</span>,<span class="number">5</span>,<span class="string">"白色"</span>,<span class="string">"藏獒"</span>);</span><br><span class="line">        Class dogClass = dog.getClass();</span><br><span class="line">        <span class="comment">//通过反射实例化对象</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//Dog inflectDog = (Dog)dogClass.newInstance("dwr");//jdk1.9之后不推荐使用</span></span><br><span class="line">            Dog inflectDog = (Dog)dogClass.getDeclaredConstructor(String.class, int.class, String.class, String.class).newInstance("xiaobai",3,"黑色","咖啡毛");</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InstantiationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取构造方法</span></span><br><span class="line">        Constructor[] constructors = dogClass.getConstructors();<span class="comment">//获取所有构造方法</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; constructors.length; i++) &#123;</span><br><span class="line">            System.out.println(constructors[i].getName());<span class="comment">//构造参数名</span></span><br><span class="line">            System.out.println(constructors[i].getParameterCount());<span class="comment">//参数数目</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Constructor constructor = dogClass.getConstructor(String<span class="class">.<span class="keyword">class</span>, <span class="title">int</span>.<span class="title">class</span>, <span class="title">String</span>.<span class="title">class</span>, <span class="title">String</span>.<span class="title">class</span>)</span>;<span class="comment">//根据变量类型获取指定的构造方法</span></span><br><span class="line">            <span class="comment">//之后就可以调用上面的newInstance方法实例化一个对象</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取类中的所有属性</span></span><br><span class="line">        Field[] fields = dogClass.getFields();<span class="comment">//获取所有非private的属性</span></span><br><span class="line">        System.out.println(fields.length);</span><br><span class="line">        Field[] declaredFields = dogClass.getDeclaredFields();<span class="comment">//获取所有属性</span></span><br><span class="line">        System.out.println(declaredFields.length);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; declaredFields.length; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> modifiers = declaredFields[i].getModifiers();</span><br><span class="line">            System.out.println(Modifier.toString(modifiers)+<span class="string">" "</span>+declaredFields[i].getType()+<span class="string">" "</span>+declaredFields[i].getName());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取包对象的包信息</span></span><br><span class="line">        Package aPackage = dogClass.getPackage();</span><br><span class="line">        System.out.println(aPackage.getName());</span><br><span class="line"></span><br><span class="line">        <span class="comment">//获取方法</span></span><br><span class="line">        <span class="comment">//获取所有非private方法，包括父类的方法</span></span><br><span class="line">        Method[] methods = dogClass.getMethods();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; methods.length; i++) &#123;</span><br><span class="line">            System.out.println(methods[i]);</span><br><span class="line">            <span class="keyword">if</span>(methods[i].getName().equals(<span class="string">"toString"</span>))&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    String s = (String)methods[i].invoke(dog);<span class="comment">//调用方法</span></span><br><span class="line">                    System.out.println(s);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"-------------"</span>);</span><br><span class="line">        <span class="comment">//获取当前类的所有方法（包括private），不包括父类</span></span><br><span class="line">        Method[] methods1 = dogClass.getDeclaredMethods();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; methods1.length; i++) &#123;</span><br><span class="line">            System.out.println(methods1[i]);</span><br><span class="line">            <span class="keyword">if</span>(methods1[i].getName().equals(<span class="string">"set"</span>))&#123;</span><br><span class="line">                <span class="comment">//设置私有方法可以被访问（去除访问修饰符的检查）</span></span><br><span class="line">                methods1[i].setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    methods1[i].invoke(dog);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">package reflection;
+
+import java.lang.reflect.*;
+
+public class ReflectionDemo {
+
+    public static void main(String[] args) {
+        Dog dog = new Dog(&quot;dabao&quot;,5,&quot;白色&quot;,&quot;藏獒&quot;);
+        Class dogClass = dog.getClass();
+        //通过反射实例化对象
+        try {
+            //Dog inflectDog = (Dog)dogClass.newInstance(&quot;dwr&quot;);//jdk1.9之后不推荐使用
+            Dog inflectDog = (Dog)dogClass.getDeclaredConstructor(String.class, int.class, String.class, String.class).newInstance(&quot;xiaobai&quot;,3,&quot;黑色&quot;,&quot;咖啡毛&quot;);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        //获取构造方法
+        Constructor[] constructors = dogClass.getConstructors();//获取所有构造方法
+        for (int i = 0; i &lt; constructors.length; i++) {
+            System.out.println(constructors[i].getName());//构造参数名
+            System.out.println(constructors[i].getParameterCount());//参数数目
+        }
+        try {
+            Constructor constructor = dogClass.getConstructor(String.class, int.class, String.class, String.class);//根据变量类型获取指定的构造方法
+            //之后就可以调用上面的newInstance方法实例化一个对象
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        //获取类中的所有属性
+        Field[] fields = dogClass.getFields();//获取所有非private的属性
+        System.out.println(fields.length);
+        Field[] declaredFields = dogClass.getDeclaredFields();//获取所有属性
+        System.out.println(declaredFields.length);
+        for (int i = 0; i &lt; declaredFields.length; i++) {
+            int modifiers = declaredFields[i].getModifiers();
+            System.out.println(Modifier.toString(modifiers)+&quot; &quot;+declaredFields[i].getType()+&quot; &quot;+declaredFields[i].getName());
+        }
+
+        //获取包对象的包信息
+        Package aPackage = dogClass.getPackage();
+        System.out.println(aPackage.getName());
+
+        //获取方法
+        //获取所有非private方法，包括父类的方法
+        Method[] methods = dogClass.getMethods();
+        for (int i = 0; i &lt; methods.length; i++) {
+            System.out.println(methods[i]);
+            if(methods[i].getName().equals(&quot;toString&quot;)){
+                try {
+                    String s = (String)methods[i].invoke(dog);//调用方法
+                    System.out.println(s);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println(&quot;-------------&quot;);
+        //获取当前类的所有方法（包括private），不包括父类
+        Method[] methods1 = dogClass.getDeclaredMethods();
+        for (int i = 0; i &lt; methods1.length; i++) {
+            System.out.println(methods1[i]);
+            if(methods1[i].getName().equals(&quot;set&quot;)){
+                //设置私有方法可以被访问（去除访问修饰符的检查）
+                methods1[i].setAccessible(true);
+                try {
+                    methods1[i].invoke(dog);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+</code></pre>
 <h1 id="内省"><a href="#内省" class="headerlink" title="内省"></a>内省</h1><p>Java中提供的一套用来访问某个属性的getter/setter方法的API</p>
 <p><strong>读取配置文件案例</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> instrospector;</span><br><span class="line"><span class="comment">//配置类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Config</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUsername</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.username = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPassword</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPassword</span><span class="params">(String password)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.password = password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUrl</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUrl</span><span class="params">(String url)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.url = url;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Config&#123;"</span> +</span><br><span class="line">                <span class="string">"username='"</span> + username + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", password='"</span> + password + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", url='"</span> + url + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置文件config.properties</span></span><br><span class="line">bean.name= instrospector.Config</span><br><span class="line">bean.username = hello</span><br><span class="line">bean.password = <span class="number">123</span></span><br><span class="line">bean.url = http:<span class="comment">//www.xiaoming.net.cn</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> instrospector;</span><br><span class="line"><span class="comment">//读取配置文件的工厂</span></span><br><span class="line"><span class="keyword">import</span> java.beans.BeanInfo;</span><br><span class="line"><span class="keyword">import</span> java.beans.IntrospectionException;</span><br><span class="line"><span class="keyword">import</span> java.beans.Introspector;</span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyDescriptor;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Properties prop = <span class="keyword">new</span> Properties();</span><br><span class="line">    <span class="comment">//使用静态代码块读取配置文件</span></span><br><span class="line">    <span class="keyword">static</span>&#123;</span><br><span class="line">        InputStream in = Thread.currentThread().getContextClassLoader()</span><br><span class="line">                .getResourceAsStream(<span class="string">"instrospector/config.properties"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            prop.load(in);<span class="comment">//加载文件</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取一个Bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">getBean</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        Object bean = <span class="keyword">null</span>;</span><br><span class="line">        String beanName = prop.getProperty(name);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class&lt;?&gt; aClass = Class.forName(beanName);</span><br><span class="line">            bean = aClass.getDeclaredConstructor().newInstance();</span><br><span class="line">            <span class="comment">//通过类信息获取javaBean的描述信息</span></span><br><span class="line">            BeanInfo beanInfo = Introspector.getBeanInfo(aClass);</span><br><span class="line">            <span class="comment">//通过javaBean的描述信息，获取该类的所有属性描述器</span></span><br><span class="line">            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; propertyDescriptors.length; i++) &#123;</span><br><span class="line">                <span class="comment">//获取属性名</span></span><br><span class="line">                String propertyName = propertyDescriptors[i].getName();</span><br><span class="line">                <span class="comment">//获取某个属性的写方法</span></span><br><span class="line">                Method writeMethod = propertyDescriptors[i].getWriteMethod();</span><br><span class="line">                <span class="keyword">if</span>(<span class="string">"username"</span>.equals(propertyName))&#123;</span><br><span class="line">                    writeMethod.invoke(bean,prop.getProperty(<span class="string">"bean.username"</span>));</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"password"</span>.equals(propertyName))&#123;</span><br><span class="line">                    writeMethod.invoke(bean,prop.getProperty(<span class="string">"bean.password"</span>));</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"url"</span>.equals(propertyName))&#123;</span><br><span class="line">                    writeMethod.invoke(bean,prop.getProperty(<span class="string">"bean.url"</span>));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IntrospectionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InstantiationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> instrospector;</span><br><span class="line"><span class="comment">//测试</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Config bean = (Config)BeanFactory.getBean(<span class="string">"bean.name"</span>);</span><br><span class="line">        System.out.println(bean);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">package instrospector;
+//配置类
+public class Config {
+    private String username;
+    private String password;
+    private String url;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String name) {
+        this.username = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Config{&quot; +
+                &quot;username=&#39;&quot; + username + &#39;\&#39;&#39; +
+                &quot;, password=&#39;&quot; + password + &#39;\&#39;&#39; +
+                &quot;, url=&#39;&quot; + url + &#39;\&#39;&#39; +
+                &#39;}&#39;;
+    }
+}
+
+//配置文件config.properties
+bean.name= instrospector.Config
+bean.username = hello
+bean.password = 123
+bean.url = http://www.xiaoming.net.cn
+
+package instrospector;
+//读取配置文件的工厂
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Properties;
+
+public class BeanFactory {
+    private static Properties prop = new Properties();
+    //使用静态代码块读取配置文件
+    static{
+        InputStream in = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream(&quot;instrospector/config.properties&quot;);
+        try {
+            prop.load(in);//加载文件
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取一个Bean
+     * @param name
+     * @return
+     */
+    public static Object getBean(String name){
+        Object bean = null;
+        String beanName = prop.getProperty(name);
+        try {
+            Class&lt;?&gt; aClass = Class.forName(beanName);
+            bean = aClass.getDeclaredConstructor().newInstance();
+            //通过类信息获取javaBean的描述信息
+            BeanInfo beanInfo = Introspector.getBeanInfo(aClass);
+            //通过javaBean的描述信息，获取该类的所有属性描述器
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            for (int i = 0; i &lt; propertyDescriptors.length; i++) {
+                //获取属性名
+                String propertyName = propertyDescriptors[i].getName();
+                //获取某个属性的写方法
+                Method writeMethod = propertyDescriptors[i].getWriteMethod();
+                if(&quot;username&quot;.equals(propertyName)){
+                    writeMethod.invoke(bean,prop.getProperty(&quot;bean.username&quot;));
+                }else if(&quot;password&quot;.equals(propertyName)){
+                    writeMethod.invoke(bean,prop.getProperty(&quot;bean.password&quot;));
+                }else if(&quot;url&quot;.equals(propertyName)){
+                    writeMethod.invoke(bean,prop.getProperty(&quot;bean.url&quot;));
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return bean;
+    }
+}
+
+package instrospector;
+//测试
+public class BeanTest {
+    public static void main(String[] args) {
+        Config bean = (Config)BeanFactory.getBean(&quot;bean.name&quot;);
+        System.out.println(bean);
+    }
+}</code></pre>
 <h1 id="AOP编程"><a href="#AOP编程" class="headerlink" title="AOP编程"></a>AOP编程</h1><p>面向切面编程，将一些与业务代码无关的代码放在另外的一个地方，让业务代码执行的时候跟着执行</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//业务接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IManager</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String item)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="comment">//业务内容</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">IManagerImpl</span> <span class="keyword">implements</span> <span class="title">IManager</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> ArrayList&lt;String&gt; list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String item)</span> </span>&#123;</span><br><span class="line">        list.add(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//通知（切面内容）</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Advice</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeAdvice</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterAdvice</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//切面内容实现类</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogAdvice</span> <span class="keyword">implements</span> <span class="title">Advice</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">beforeAdvice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"start time:"</span>+System.currentTimeMillis());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">afterAdvice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"end time:"</span>+System.currentTimeMillis());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//配置文件</span></span><br><span class="line">bean.target = aop.IManagerImpl</span><br><span class="line">bean.advice = aop.LogAdvice</span><br><span class="line">bean = aop.ProxyFactoryBean</span><br><span class="line"></span><br><span class="line"><span class="comment">//动态代理类</span></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationHandler;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Proxy;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ProxyFactoryBean</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Object target;<span class="comment">//业务对象</span></span><br><span class="line">    <span class="keyword">private</span> Advice advice;<span class="comment">//切面对象</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getTarget</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTarget</span><span class="params">(Object target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.target = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Advice <span class="title">getAdvice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> advice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAdvice</span><span class="params">(Advice advice)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.advice = advice;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取代理对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getProxy</span><span class="params">()</span></span>&#123;</span><br><span class="line">        Object proxy = Proxy.newProxyInstance(</span><br><span class="line">                target.getClass().getClassLoader(),</span><br><span class="line">                target.getClass().getInterfaces(),</span><br><span class="line">                <span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">return</span> proxy;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        advice.beforeAdvice();</span><br><span class="line">        Object object = method.invoke(target,args);</span><br><span class="line">        advice.afterAdvice();</span><br><span class="line">        <span class="keyword">return</span> object;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//代理类的处理加工工厂</span></span><br><span class="line"><span class="keyword">import</span> java.beans.BeanInfo;</span><br><span class="line"><span class="keyword">import</span> java.beans.IntrospectionException;</span><br><span class="line"><span class="keyword">import</span> java.beans.Introspector;</span><br><span class="line"><span class="keyword">import</span> java.beans.PropertyDescriptor;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BeanFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Properties prop = <span class="keyword">new</span> Properties();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读取配置文件</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BeanFactory</span><span class="params">(InputStream in)</span></span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            prop.load(in);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取一个bean实例</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> name</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getBean</span><span class="params">(String name)</span></span>&#123;</span><br><span class="line">        String className = prop.getProperty(name);</span><br><span class="line">        Object bean = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//获取ProxyFactoryBean的class对象</span></span><br><span class="line">            Class&lt;?&gt; aClass = Class.forName(className);<span class="comment">//创建一个代理类</span></span><br><span class="line">            bean = aClass.getDeclaredConstructor().newInstance();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//根据配置文件实例化target，advice对象</span></span><br><span class="line">            Object target = Class.forName(prop.getProperty(name+<span class="string">".target"</span>)).getDeclaredConstructor().newInstance();</span><br><span class="line">            Object advice = Class.forName(prop.getProperty(name+<span class="string">".advice"</span>)).getDeclaredConstructor().newInstance();</span><br><span class="line">            <span class="comment">//通过内省获取代理类属性信息</span></span><br><span class="line">            BeanInfo beanInfo = Introspector.getBeanInfo(aClass);</span><br><span class="line">            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();</span><br><span class="line">            <span class="keyword">for</span>(PropertyDescriptor pd:propertyDescriptors)&#123;</span><br><span class="line">                String propertyName = pd.getName();</span><br><span class="line">                Method writeMethod = pd.getWriteMethod();</span><br><span class="line">                <span class="keyword">if</span>(<span class="string">"target"</span>.equals(propertyName))&#123;</span><br><span class="line">                    writeMethod.invoke(bean,target);</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"advice"</span>.equals(propertyName))&#123;</span><br><span class="line">                    writeMethod.invoke(bean,advice);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InstantiationException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IntrospectionException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//测试</span></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AOPTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//读取配置文件</span></span><br><span class="line">        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(<span class="string">"aop/bean.properties"</span>);</span><br><span class="line">        <span class="comment">//创建Bean的工厂对象</span></span><br><span class="line">        BeanFactory beanFactory = <span class="keyword">new</span> BeanFactory(in);</span><br><span class="line">        <span class="comment">//获取代理对象</span></span><br><span class="line">        ProxyFactoryBean proxyFactoryBean = (ProxyFactoryBean)beanFactory.getBean(<span class="string">"bean"</span>);</span><br><span class="line">        IManager proxy = (IManager) proxyFactoryBean.getProxy();<span class="comment">//反射得到的代理实例</span></span><br><span class="line">        proxy.add(<span class="string">"我是一只猫"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-    </div>
+<pre><code class="java">//业务接口
+public interface IManager {
+    public void add(String item);
+}
 
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
+import java.util.ArrayList;
+//业务内容
+public class IManagerImpl implements IManager{
+    private ArrayList&lt;String&gt; list = new ArrayList&lt;&gt;();
+    @Override
+    public void add(String item) {
+        list.add(item);
+    }
+}
 
-  </div>
-</div>
+//通知（切面内容）
+public interface Advice {
+    public void beforeAdvice();
+    public void afterAdvice();
+}
 
+//切面内容实现类
+public class LogAdvice implements Advice{
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
-          </div>
+    @Override
+    public void beforeAdvice() {
+        System.out.println(&quot;start time:&quot;+System.currentTimeMillis());
+    }
 
-        
+    @Override
+    public void afterAdvice() {
+        System.out.println(&quot;end time:&quot;+System.currentTimeMillis());
+    }
+}
 
+//配置文件
+bean.target = aop.IManagerImpl
+bean.advice = aop.LogAdvice
+bean = aop.ProxyFactoryBean
 
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/02/25/java%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="prev" title="java网络编程">
-      <i class="fa fa-chevron-left"></i> java网络编程
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/03/02/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" rel="next" title="正则表达式">
-      正则表达式 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
+//动态代理类
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
-  </div>
+public class ProxyFactoryBean implements InvocationHandler {
+    private Object target;//业务对象
+    private Advice advice;//切面对象
 
+    public Object getTarget() {
+        return target;
+    }
 
-          </div>
-          
+    public void setTarget(Object target) {
+        this.target = target;
+    }
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
+    public Advice getAdvice() {
+        return advice;
+    }
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+    public void setAdvice(Advice advice) {
+        this.advice = advice;
+    }
 
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
+    /**
+     * 获取代理对象
+     */
+    public Object getProxy(){
+        Object proxy = Proxy.newProxyInstance(
+                target.getClass().getClassLoader(),
+                target.getClass().getInterfaces(),
+                this);
+        return proxy;
+    }
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#反射"><span class="nav-number">1.</span> <span class="nav-text">反射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#内省"><span class="nav-number">2.</span> <span class="nav-text">内省</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AOP编程"><span class="nav-number">3.</span> <span class="nav-text">AOP编程</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        advice.beforeAdvice();
+        Object object = method.invoke(target,args);
+        advice.afterAdvice();
+        return object;
+    }
+}
 
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
+//代理类的处理加工工厂
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Properties;
 
+public class BeanFactory {
+    private Properties prop = new Properties();
 
+    //读取配置文件
+    public BeanFactory(InputStream in){
+        try {
+            prop.load(in);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-      </div>
+    /**
+     * 获取一个bean实例
+     * @param name
+     * @return
+     */
+    public Object getBean(String name){
+        String className = prop.getProperty(name);
+        Object bean = null;
+        try {
+            //获取ProxyFactoryBean的class对象
+            Class&lt;?&gt; aClass = Class.forName(className);//创建一个代理类
+            bean = aClass.getDeclaredConstructor().newInstance();
 
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+            //根据配置文件实例化target，advice对象
+            Object target = Class.forName(prop.getProperty(name+&quot;.target&quot;)).getDeclaredConstructor().newInstance();
+            Object advice = Class.forName(prop.getProperty(name+&quot;.advice&quot;)).getDeclaredConstructor().newInstance();
+            //通过内省获取代理类属性信息
+            BeanInfo beanInfo = Introspector.getBeanInfo(aClass);
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            for(PropertyDescriptor pd:propertyDescriptors){
+                String propertyName = pd.getName();
+                Method writeMethod = pd.getWriteMethod();
+                if(&quot;target&quot;.equals(propertyName)){
+                    writeMethod.invoke(bean,target);
+                }else if(&quot;advice&quot;.equals(propertyName)){
+                    writeMethod.invoke(bean,advice);
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IntrospectionException e) {
+            e.printStackTrace();
+        }
 
+        return bean;
+    }
 
-      </div>
-    </main>
+}
 
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+//测试
+import java.io.InputStream;
+public class AOPTest {
+    public static void main(String[] args) {
+        //读取配置文件
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(&quot;aop/bean.properties&quot;);
+        //创建Bean的工厂对象
+        BeanFactory beanFactory = new BeanFactory(in);
+        //获取代理对象
+        ProxyFactoryBean proxyFactoryBean = (ProxyFactoryBean)beanFactory.getBean(&quot;bean&quot;);
+        IManager proxy = (IManager) proxyFactoryBean.getProxy();//反射得到的代理实例
+        proxy.add(&quot;我是一只猫&quot;);
+    }
+}</code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/03/02/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" title="正则表达式"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 正则表达式</span></a><a class="button is-default" href="/2019/02/25/java%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" title="java网络编程"><span class="has-text-weight-semibold">下一页: java网络编程</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

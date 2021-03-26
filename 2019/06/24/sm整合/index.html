@@ -1,526 +1,322 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Spring mybatis整合</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="方案一：传统的dao方式开发需要自己开发dao层，编写sql语句  创建项目，引入依赖需要注意的是需要导入mybatis和spring整合的包mybatis-spring">
-<meta name="keywords" content="java,mybatis,spring">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Spring mybatis整合">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;06&#x2F;24&#x2F;sm%E6%95%B4%E5%90%88&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="方案一：传统的dao方式开发需要自己开发dao层，编写sql语句  创建项目，引入依赖需要注意的是需要导入mybatis和spring整合的包mybatis-spring">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;sm%E6%95%B4%E5%90%88%E7%9B%AE%E5%BD%95.png?raw=true">
-<meta property="og:updated_time" content="2020-12-01T10:41:45.463Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;sm%E6%95%B4%E5%90%88%E7%9B%AE%E5%BD%95.png?raw=true">
-
-<link rel="canonical" href="http://yoursite.com/2019/06/24/sm%E6%95%B4%E5%90%88/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Spring mybatis整合 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/24/sm%E6%95%B4%E5%90%88/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Spring mybatis整合
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-06-24 21:44:52" itemprop="dateCreated datePublished" datetime="2019-06-24T21:44:52+08:00">2019-06-24</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:41:45" itemprop="dateModified" datetime="2020-12-01T18:41:45+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>9.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>9 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="方案一：传统的dao方式开发"><a href="#方案一：传统的dao方式开发" class="headerlink" title="方案一：传统的dao方式开发"></a>方案一：传统的dao方式开发</h1><p>需要自己开发dao层，编写sql语句</p>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Spring mybatis整合</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#方案一：传统的dao方式开发"><span class="toc-text">方案一：传统的dao方式开发</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/java"><i class="tag post-item-tag">java</i></a><a href="/tags/mybatis"><i class="tag post-item-tag">mybatis</i></a><a href="/tags/spring"><i class="tag post-item-tag">spring</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Spring mybatis整合</h1><time class="has-text-grey" datetime="2019-06-24T13:44:52.000Z">2019-06-24</time><article class="mt-2 post-content"><h1 id="方案一：传统的dao方式开发"><a href="#方案一：传统的dao方式开发" class="headerlink" title="方案一：传统的dao方式开发"></a>方案一：传统的dao方式开发</h1><p>需要自己开发dao层，编写sql语句</p>
 <ol>
-<li>创建项目，引入依赖<br>需要注意的是需要导入mybatis和spring整合的包<code>mybatis-spring</code><a id="more"></a>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">"http://maven.apache.org/POM/4.0.0"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">         <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>xm<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>sm<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- spring所需的包 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-context<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-aop<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-aspects<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-orm<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.1.7.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- mybatis所需的包 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.5.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- mybatis和spring整合的包 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.mybatis<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mybatis-spring<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.0.1<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- mysql驱动包 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.0.16<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">&lt;!-- 数据库连接池 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.mchange<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>c3p0<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9.5.4<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.junit.jupiter<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>junit-jupiter-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>5.5.0-RC2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>创建pojo<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.pojo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> Date birthday;</span><br><span class="line">    <span class="keyword">private</span> String address;</span><br><span class="line">	  <span class="comment">//get,set等方法省略</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>dao层接口及实现<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.dao;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xm.pojo.User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">selectUserById</span><span class="params">(<span class="keyword">int</span> id)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-接口实现要继承<code>SqlSessionDaoSupport</code>类，该类是mybatis和spring的整合<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.dao.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xm.dao.UserDao;</span><br><span class="line"><span class="keyword">import</span> com.xm.pojo.User;</span><br><span class="line"><span class="keyword">import</span> org.mybatis.spring.support.SqlSessionDaoSupport;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoImpl</span> <span class="keyword">extends</span> <span class="title">SqlSessionDaoSupport</span> <span class="keyword">implements</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">selectUserById</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        User user = <span class="keyword">this</span>.getSqlSession().selectOne(<span class="string">"com.xm.dao.UserDao.selectUserById"</span>, id);<span class="comment">//指定到后面需要写的mapper映射文件的命名空间下</span></span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>数据库配置文件db.propertiers<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jdbc.driver = com.mysql.jdbc.Driver</span><br><span class="line">jdbc.url = jdbc:mysql://localhost:3306/sm</span><br><span class="line">jdbc.username = root</span><br><span class="line">jdbc.password = 123</span><br></pre></td></tr></table></figure></li>
-<li>spring配置文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 加载配置文件 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:property-placeholder</span> <span class="attr">location</span>=<span class="string">"classpath:db.properties"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 连接池 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">class</span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driverClass"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.driver&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jdbcUrl"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- mybatis的工厂 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"sqlSessionFactoryBean"</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.SqlSessionFactoryBean"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 注入mybatis配置文件 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"configLocation"</span> <span class="attr">value</span>=<span class="string">"classpath:spring-mybatis.xml"</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 注入sqlSessionFactory --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userDao"</span> <span class="attr">class</span>=<span class="string">"com.xm.dao.impl.UserDaoImpl"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sqlSessionFactory"</span> <span class="attr">ref</span>=<span class="string">"sqlSessionFactoryBean"</span>&gt;</span><span class="tag">&lt;/<span class="name">property</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>mybatis配置文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE configuration</span></span><br><span class="line"><span class="meta">        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"</span></span><br><span class="line"><span class="meta">        "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 用于定义类型别名 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">typeAliases</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">package</span> <span class="attr">name</span>=<span class="string">"com.xm.pojo"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">typeAliases</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--定义映射文件--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span>=<span class="string">"UserMapper.xml"</span>&gt;</span><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">mappers</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>映射文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE mapper</span></span><br><span class="line"><span class="meta">        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"</span></span><br><span class="line"><span class="meta">        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"com.xm.dao.UserDao"</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 需要创建相应的接口,id的值为接口方法名 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectUserById"</span> <span class="attr">parameterType</span>=<span class="string">"int"</span> <span class="attr">resultType</span>=<span class="string">"User"</span>&gt;</span></span><br><span class="line">        select * from users where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>测试<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.xm.dao.UserDao;</span><br><span class="line"><span class="keyword">import</span> com.xm.pojo.User;</span><br><span class="line"><span class="keyword">import</span> org.junit.jupiter.api.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSelectUserById</span><span class="params">()</span></span>&#123;</span><br><span class="line">        ApplicationContext context = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"classpath:spring-applicationContext.xml"</span>);</span><br><span class="line">        <span class="comment">//获取userDao</span></span><br><span class="line">        UserDao userDao = context.getBean(UserDao<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        User user = userDao.selectUserById(<span class="number">1</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h3><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/sm%E6%95%B4%E5%90%88%E7%9B%AE%E5%BD%95.png?raw=true" alt=""></li>
-</ol>
-<h1 id="方案二：Mapper动态代理开发（不用自己写Dao实现类）"><a href="#方案二：Mapper动态代理开发（不用自己写Dao实现类）" class="headerlink" title="方案二：Mapper动态代理开发（不用自己写Dao实现类）"></a>方案二：Mapper动态代理开发（不用自己写Dao实现类）</h1><ol>
-<li>创建项目</li>
-<li>创建dao接口<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.dao;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xm.pojo.User;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">   <span class="function">User <span class="title">selectUserById</span><span class="params">(Integer id)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>配置spring核心配置文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:property-placeholder</span> <span class="attr">location</span>=<span class="string">"db.properties"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 连接池 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">class</span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driverClass"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.driver&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jdbcUrl"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- mybatis工厂 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"sqlSessionFactoryBean"</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.SqlSessionFactoryBean"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- mybatis核心配置文件的位置 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"configLocation"</span> <span class="attr">value</span>=<span class="string">"classpath:spring-mybatisConfig.xml"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Mapper动态代理开发 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"userDao"</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.mapper.MapperFactoryBean"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"sqlSessionFactory"</span> <span class="attr">ref</span>=<span class="string">"sqlSessionFactoryBean"</span>/&gt;</span></span><br><span class="line">		  <span class="comment">&lt;!-- 此处关联到dao层接口 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"mapperInterface"</span> <span class="attr">value</span>=<span class="string">"com.xm.dao.UserDao"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>UserMapper.xml<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE mapper</span></span><br><span class="line"><span class="meta">        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"</span></span><br><span class="line"><span class="meta">        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">mapper</span> <span class="attr">namespace</span>=<span class="string">"com.xm.dao.UserDao"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">select</span> <span class="attr">id</span>=<span class="string">"selectUserById"</span> <span class="attr">parameterType</span>=<span class="string">"Integer"</span> <span class="attr">resultType</span>=<span class="string">"User"</span>&gt;</span></span><br><span class="line">        select * from users where id = #&#123;id&#125;</span><br><span class="line">    <span class="tag">&lt;/<span class="name">select</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>mtybatis配置文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE configuration</span></span><br><span class="line"><span class="meta">        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"</span></span><br><span class="line"><span class="meta">        "http://mybatis.org/dtd/mybatis-3-config.dtd"&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 用于定义类型别名 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">typeAliases</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 指定扫描包，会把包内所有的类都设置别名，别名的名称就是类名，大小写不敏感 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">package</span> <span class="attr">name</span>=<span class="string">"com.xm.pojo"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">typeAliases</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">mappers</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">mapper</span> <span class="attr">resource</span>=<span class="string">"UserMapper.xml"</span>&gt;</span><span class="tag">&lt;/<span class="name">mapper</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">mappers</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></li>
-<li>测试类<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.xm.dao.UserDao;</span><br><span class="line"><span class="keyword">import</span> com.xm.pojo.User;</span><br><span class="line"><span class="keyword">import</span> org.junit.jupiter.api.Test;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.support.ClassPathXmlApplicationContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JunitTest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testMapper</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        ApplicationContext applicationContext = <span class="keyword">new</span> ClassPathXmlApplicationContext(<span class="string">"spring-applicationContext.xml"</span>);</span><br><span class="line">        UserDao userDao = applicationContext.getBean(UserDao<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        User user = userDao.selectUserById(<span class="number">1</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><p>创建项目，引入依赖<br>需要注意的是需要导入mybatis和spring整合的包<code>mybatis-spring</code></p>
+<a id="more"></a>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;project xmlns=&quot;http://maven.apache.org/POM/4.0.0&quot;
+      xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+      xsi:schemaLocation=&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;&gt;
+ &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
 
+ &lt;groupId&gt;xm&lt;/groupId&gt;
+ &lt;artifactId&gt;sm&lt;/artifactId&gt;
+ &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+
+ &lt;dependencies&gt;
+     &lt;!-- spring所需的包 --&gt;
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+         &lt;artifactId&gt;spring-context&lt;/artifactId&gt;
+         &lt;version&gt;5.1.7.RELEASE&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+         &lt;artifactId&gt;spring-aop&lt;/artifactId&gt;
+         &lt;version&gt;5.1.7.RELEASE&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+         &lt;artifactId&gt;spring-aspects&lt;/artifactId&gt;
+         &lt;version&gt;5.1.7.RELEASE&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+         &lt;artifactId&gt;spring-orm&lt;/artifactId&gt;
+         &lt;version&gt;5.1.7.RELEASE&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.springframework&lt;/groupId&gt;
+         &lt;artifactId&gt;spring-test&lt;/artifactId&gt;
+         &lt;version&gt;5.1.7.RELEASE&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;!-- mybatis所需的包 --&gt;
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+         &lt;artifactId&gt;mybatis&lt;/artifactId&gt;
+         &lt;version&gt;3.5.1&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;!-- mybatis和spring整合的包 --&gt;
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.mybatis&lt;/groupId&gt;
+         &lt;artifactId&gt;mybatis-spring&lt;/artifactId&gt;
+         &lt;version&gt;2.0.1&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;!-- mysql驱动包 --&gt;
+     &lt;dependency&gt;
+         &lt;groupId&gt;mysql&lt;/groupId&gt;
+         &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;
+         &lt;version&gt;8.0.16&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;!-- 数据库连接池 --&gt;
+     &lt;dependency&gt;
+         &lt;groupId&gt;com.mchange&lt;/groupId&gt;
+         &lt;artifactId&gt;c3p0&lt;/artifactId&gt;
+         &lt;version&gt;0.9.5.4&lt;/version&gt;
+     &lt;/dependency&gt;
+
+     &lt;dependency&gt;
+         &lt;groupId&gt;org.junit.jupiter&lt;/groupId&gt;
+         &lt;artifactId&gt;junit-jupiter-api&lt;/artifactId&gt;
+         &lt;version&gt;5.5.0-RC2&lt;/version&gt;
+         &lt;scope&gt;test&lt;/scope&gt;
+     &lt;/dependency&gt;
+ &lt;/dependencies&gt;
+</code></pre>
 </li>
 </ol>
-<h1 id="方案三：Mapper动态代理扫描包形式开发dao"><a href="#方案三：Mapper动态代理扫描包形式开发dao" class="headerlink" title="方案三：Mapper动态代理扫描包形式开发dao"></a>方案三：Mapper动态代理扫描包形式开发dao</h1><p>这种方法是对方案二的简化，只需要修改spring配置文件：将最后的mapper动态代理开发修改如下：这样会自动去寻找basePackage下的包中文件，不用为每一个dao层都配置一次动态代理</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--    &amp;lt;!&amp;ndash; Mapper动态代理开发 &amp;ndash;&amp;gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    &lt;bean id="userDao" class="org.mybatis.spring.mapper.MapperFactoryBean"&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        &lt;property name="sqlSessionFactory" ref="sqlSessionFactoryBean"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--        &lt;property name="mapperInterface" value="com.xm.dao.UserDao"/&gt;--&gt;</span></span><br><span class="line"><span class="comment">&lt;!--    &lt;/bean&gt;--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">class</span>=<span class="string">"org.mybatis.spring.mapper.MapperScannerConfigurer"</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 基本包 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"basePackage"</span> <span class="attr">value</span>=<span class="string">"com.xm.dao"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
-    </div>
+</project>
+```
+2. 创建pojo
+```java
+package com.xm.pojo;
 
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
+<p>import java.util.Date;</p>
+<p>public class User {<br>    private int id;<br>    private String username;<br>    private String sex;<br>    private Date birthday;<br>    private String address;<br>      //get,set等方法省略<br>}</p>
+<pre><code>3. dao层接口及实现
+```java
+package com.xm.dao;
 
-  </div>
-</div>
+import com.xm.pojo.User;
 
+public interface UserDao {
+    public User selectUserById(int id);
+}</code></pre><p>接口实现要继承<code>SqlSessionDaoSupport</code>类，该类是mybatis和spring的整合</p>
+<pre><code class="java">package com.xm.dao.impl;
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
-              <a href="/tags/mybatis/" rel="tag"># mybatis</a>
-              <a href="/tags/spring/" rel="tag"># spring</a>
-          </div>
+import com.xm.dao.UserDao;
+import com.xm.pojo.User;
+import org.mybatis.spring.support.SqlSessionDaoSupport;
 
-        
+public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
+    @Override
+    public User selectUserById(int id) {
+        User user = this.getSqlSession().selectOne(&quot;com.xm.dao.UserDao.selectUserById&quot;, id);//指定到后面需要写的mapper映射文件的命名空间下
+        return user;
+    }
+}</code></pre>
+<ol start="3">
+<li><p>数据库配置文件db.propertiers</p>
+<pre><code>jdbc.driver = com.mysql.jdbc.Driver
+jdbc.url = jdbc:mysql://localhost:3306/sm
+jdbc.username = root
+jdbc.password = 123</code></pre></li>
+<li><p>spring配置文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
 
+ &lt;!-- 加载配置文件 --&gt;
+ &lt;context:property-placeholder location=&quot;classpath:db.properties&quot;/&gt;
+ &lt;!-- 连接池 --&gt;
+ &lt;bean name=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+     &lt;property name=&quot;driverClass&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+     &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url}&quot;/&gt;
+     &lt;property name=&quot;user&quot; value=&quot;${jdbc.username}&quot;/&gt;
+     &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+ &lt;/bean&gt;
 
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/06/01/SpringMVC/" rel="prev" title="SpringMVC">
-      <i class="fa fa-chevron-left"></i> SpringMVC
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/07/04/SSM%E6%95%B4%E5%90%88/" rel="next" title="SSM框架整合">
-      SSM框架整合 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
+ &lt;!-- mybatis的工厂 --&gt;
+ &lt;bean id=&quot;sqlSessionFactoryBean&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;
+     &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;&gt;&lt;/property&gt;
+     &lt;!-- 注入mybatis配置文件 --&gt;
+     &lt;property name=&quot;configLocation&quot; value=&quot;classpath:spring-mybatis.xml&quot;&gt;&lt;/property&gt;
+ &lt;/bean&gt;
 
-  </div>
+ &lt;!-- 注入sqlSessionFactory --&gt;
+ &lt;bean id=&quot;userDao&quot; class=&quot;com.xm.dao.impl.UserDaoImpl&quot;&gt;
+     &lt;property name=&quot;sqlSessionFactory&quot; ref=&quot;sqlSessionFactoryBean&quot;&gt;&lt;/property&gt;
+ &lt;/bean&gt;
+&lt;/beans&gt;</code></pre>
+</li>
+<li><p>mybatis配置文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE configuration
+     PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;
+     &quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;
+&lt;configuration&gt;
 
+ &lt;!-- 用于定义类型别名 --&gt;
+ &lt;typeAliases&gt;
+     &lt;package name=&quot;com.xm.pojo&quot;/&gt;
+ &lt;/typeAliases&gt;
 
-          </div>
-          
+ &lt;!--定义映射文件--&gt;
+ &lt;mappers&gt;
+     &lt;mapper resource=&quot;UserMapper.xml&quot;&gt;&lt;/mapper&gt;
+ &lt;/mappers&gt;
+</code></pre>
+</li>
+</ol>
+</configuration>
+```
+6. 映射文件
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xm.dao.UserDao">
+    <!-- 需要创建相应的接口,id的值为接口方法名 -->
+    <select id="selectUserById" parameterType="int" resultType="User">
+        select * from users where id = #{id}
+    </select>
+</mapper>
+```
+7. 测试
+```java
+import com.xm.dao.UserDao;
+import com.xm.pojo.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
+<p>public class UserDaoTest {</p>
+<pre><code>@Test
+public void testSelectUserById(){
+    ApplicationContext context = new ClassPathXmlApplicationContext(&quot;classpath:spring-applicationContext.xml&quot;);
+    //获取userDao
+    UserDao userDao = context.getBean(UserDao.class);
+    User user = userDao.selectUserById(1);
+    System.out.println(user);
+}</code></pre><p>}</p>
+<pre><code>### 目录结构
+![](https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/sm%E6%95%B4%E5%90%88%E7%9B%AE%E5%BD%95.png?raw=true)
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+# 方案二：Mapper动态代理开发（不用自己写Dao实现类）
+1. 创建项目
+2. 创建dao接口
+```java
+package com.xm.dao;
 
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
+import com.xm.pojo.User;
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#方案一：传统的dao方式开发"><span class="nav-number">1.</span> <span class="nav-text">方案一：传统的dao方式开发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#目录结构"><span class="nav-number">1.0.1.</span> <span class="nav-text">目录结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案二：Mapper动态代理开发（不用自己写Dao实现类）"><span class="nav-number">2.</span> <span class="nav-text">方案二：Mapper动态代理开发（不用自己写Dao实现类）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方案三：Mapper动态代理扫描包形式开发dao"><span class="nav-number">3.</span> <span class="nav-text">方案三：Mapper动态代理扫描包形式开发dao</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
+public interface UserDao {
+   User selectUserById(Integer id);
+}</code></pre><ol start="3">
+<li><p>配置spring核心配置文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
 
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
+ &lt;context:property-placeholder location=&quot;db.properties&quot;/&gt;
 
+ &lt;!-- 连接池 --&gt;
+ &lt;bean name=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+     &lt;property name=&quot;driverClass&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+     &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url}&quot;/&gt;
+     &lt;property name=&quot;user&quot; value=&quot;${jdbc.username}&quot;/&gt;
+     &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+ &lt;/bean&gt;
 
+ &lt;!-- mybatis工厂 --&gt;
+ &lt;bean id=&quot;sqlSessionFactoryBean&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;
+     &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+     &lt;!-- mybatis核心配置文件的位置 --&gt;
+     &lt;property name=&quot;configLocation&quot; value=&quot;classpath:spring-mybatisConfig.xml&quot;/&gt;
+ &lt;/bean&gt;
 
-      </div>
+ &lt;!-- Mapper动态代理开发 --&gt;
+ &lt;bean id=&quot;userDao&quot; class=&quot;org.mybatis.spring.mapper.MapperFactoryBean&quot;&gt;
+     &lt;property name=&quot;sqlSessionFactory&quot; ref=&quot;sqlSessionFactoryBean&quot;/&gt;
+       &lt;!-- 此处关联到dao层接口 --&gt;
+     &lt;property name=&quot;mapperInterface&quot; value=&quot;com.xm.dao.UserDao&quot;/&gt;
+ &lt;/bean&gt;
+&lt;/beans&gt;</code></pre>
+</li>
+<li><p>UserMapper.xml</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;!DOCTYPE mapper
+     PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot;
+     &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot;&gt;
+</code></pre>
+</li>
+</ol>
+<mapper namespace="com.xm.dao.UserDao">
+    <select id="selectUserById" parameterType="Integer" resultType="User">
+        select * from users where id = #{id}
+    </select>
+</mapper>
+```
+5. mtybatis配置文件
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
 
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+<pre><code>&lt;!-- 用于定义类型别名 --&gt;
+&lt;typeAliases&gt;
+    &lt;!-- 指定扫描包，会把包内所有的类都设置别名，别名的名称就是类名，大小写不敏感 --&gt;
+    &lt;package name=&quot;com.xm.pojo&quot;/&gt;
+&lt;/typeAliases&gt;
 
+&lt;mappers&gt;
+    &lt;mapper resource=&quot;UserMapper.xml&quot;&gt;&lt;/mapper&gt;
+&lt;/mappers&gt;</code></pre></configuration>
+```
+6. 测试类
+```java
+import com.xm.dao.UserDao;
+import com.xm.pojo.User;
+import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-      </div>
-    </main>
+<p>public class JunitTest {</p>
+<pre><code>@Test
+public void testMapper() throws Exception{
+    ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;spring-applicationContext.xml&quot;);
+    UserDao userDao = applicationContext.getBean(UserDao.class);
+    User user = userDao.selectUserById(1);
+    System.out.println(user);
 
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+}</code></pre><p>}</p>
+<pre><code>
+# 方案三：Mapper动态代理扫描包形式开发dao
+这种方法是对方案二的简化，只需要修改spring配置文件：将最后的mapper动态代理开发修改如下：这样会自动去寻找basePackage下的包中文件，不用为每一个dao层都配置一次动态代理
+```xml
+&lt;!--    &amp;lt;!&amp;ndash; Mapper动态代理开发 &amp;ndash;&amp;gt;--&gt;
+&lt;!--    &lt;bean id=&quot;userDao&quot; class=&quot;org.mybatis.spring.mapper.MapperFactoryBean&quot;&gt;--&gt;
+&lt;!--        &lt;property name=&quot;sqlSessionFactory&quot; ref=&quot;sqlSessionFactoryBean&quot;/&gt;--&gt;
+&lt;!--        &lt;property name=&quot;mapperInterface&quot; value=&quot;com.xm.dao.UserDao&quot;/&gt;--&gt;
+&lt;!--    &lt;/bean&gt;--&gt;
+    &lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;
+        &lt;!-- 基本包 --&gt;
+        &lt;property name=&quot;basePackage&quot; value=&quot;com.xm.dao&quot;/&gt;
+    &lt;/bean&gt;</code></pre></article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/07/04/SSM%E6%95%B4%E5%90%88/" title="SSM框架整合"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: SSM框架整合</span></a><a class="button is-default" href="/2019/06/01/SpringMVC/" title="SpringMVC"><span class="has-text-weight-semibold">下一页: SpringMVC</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

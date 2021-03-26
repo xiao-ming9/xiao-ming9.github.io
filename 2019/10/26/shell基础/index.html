@@ -1,287 +1,23 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Shell基础</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Shell基础</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell基本结构和运行"><span class="toc-text">Shell基本结构和运行</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell变量"><span class="toc-text">Shell变量</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#常用的环境变量"><span class="toc-text">常用的环境变量:</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-Linux-已定义的环境变量："><span class="toc-text">使用 Linux 已定义的环境变量：</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用自己定义的变量："><span class="toc-text">使用自己定义的变量：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell字符串"><span class="toc-text">Shell字符串</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Shell-字符串常见操作"><span class="toc-text">Shell 字符串常见操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#拼接字符串："><span class="toc-text">拼接字符串：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取字符串长度："><span class="toc-text">获取字符串长度：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#截取子字符串"><span class="toc-text">截取子字符串:</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell数组"><span class="toc-text">Shell数组</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell基本运算符"><span class="toc-text">Shell基本运算符</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#算数运算符"><span class="toc-text">算数运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#关系运算符"><span class="toc-text">关系运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#逻辑运算符"><span class="toc-text">逻辑运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#布尔运算符"><span class="toc-text">布尔运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#字符串运算符"><span class="toc-text">字符串运算符</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文件相关运算符"><span class="toc-text">文件相关运算符</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Shell流程控制"><span class="toc-text">Shell流程控制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#if条件语句"><span class="toc-text">if条件语句</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#for循环语句"><span class="toc-text">for循环语句</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#输出当前列表中的数据："><span class="toc-text">输出当前列表中的数据：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#产生-10-个随机数："><span class="toc-text">产生 10 个随机数：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#输出1到5"><span class="toc-text">输出1到5</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#while-语句"><span class="toc-text">while 语句</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本的-while-循环语句："><span class="toc-text">基本的 while 循环语句：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#while循环可用于读取键盘信息："><span class="toc-text">while循环可用于读取键盘信息：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#无限循环："><span class="toc-text">无限循环：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#shell-函数"><span class="toc-text">shell 函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#不带参数没有返回值的函数"><span class="toc-text">不带参数没有返回值的函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#有返回值的函数"><span class="toc-text">有返回值的函数</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#输入两个数字之后相加并返回结果："><span class="toc-text">输入两个数字之后相加并返回结果：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#带参数的函数"><span class="toc-text">带参数的函数</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/shell"><i class="tag post-item-tag">shell</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Shell基础</h1><time class="has-text-grey" datetime="2019-10-26T07:45:23.000Z">2019-10-26</time><article class="mt-2 post-content"><h1 id="Shell基本结构和运行"><a href="#Shell基本结构和运行" class="headerlink" title="Shell基本结构和运行"></a>Shell基本结构和运行</h1><p>首先创建一个 shell 文件，并使脚本具有执行权限：</p>
+<pre><code>touch helloworld.sh
 
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="Shell基本结构和运行首先创建一个 shell 文件，并使脚本具有执行权限： 123touch helloworld.shchmod +x helloworld.sh 编写内容如下： 123#!&#x2F;bin&#x2F;bash#echo是linux中的输出命令echo &quot;hello world!&quot;">
-<meta name="keywords" content="shell">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Shell基础">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;10&#x2F;26&#x2F;shell%E5%9F%BA%E7%A1%80&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="Shell基本结构和运行首先创建一个 shell 文件，并使脚本具有执行权限： 123touch helloworld.shchmod +x helloworld.sh 编写内容如下： 123#!&#x2F;bin&#x2F;bash#echo是linux中的输出命令echo &quot;hello world!&quot;">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E7%AE%97%E6%95%B0%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E5%85%B3%E7%B3%BB%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;%E6%96%87%E4%BB%B6%E7%9B%B8%E5%85%B3%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-<meta property="og:updated_time" content="2019-11-08T08:58:40.120Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;shell%E7%AE%97%E6%95%B0%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true">
-
-<link rel="canonical" href="http://yoursite.com/2019/10/26/shell%E5%9F%BA%E7%A1%80/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Shell基础 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/26/shell%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Shell基础
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-10-26 15:45:23" itemprop="dateCreated datePublished" datetime="2019-10-26T15:45:23+08:00">2019-10-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-08 16:58:40" itemprop="dateModified" datetime="2019-11-08T16:58:40+08:00">2019-11-08</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>4.9k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>4 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="Shell基本结构和运行"><a href="#Shell基本结构和运行" class="headerlink" title="Shell基本结构和运行"></a>Shell基本结构和运行</h1><p>首先创建一个 shell 文件，并使脚本具有执行权限：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">touch helloworld.sh</span><br><span class="line"></span><br><span class="line">chmod +x helloworld.sh</span><br></pre></td></tr></table></figure>
-<p>编写内容如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="built_in">echo</span>是linux中的输出命令</span></span><br><span class="line">echo "hello world!"</span><br></pre></td></tr></table></figure>
+chmod +x helloworld.sh</code></pre><p>编写内容如下：</p>
+<pre><code class="shell">#!/bin/bash
+#echo是linux中的输出命令
+echo &quot;hello world!&quot;</code></pre>
 <a id="more"></a>
 <p>shell 中<code>#</code>符号表示注释，shell 的第一行比较特殊，一般都会以<code>#!</code>开始来指定使用的 shell 类型。在linux中，除了<code>bash shell</code>以外，还有很多版本的 shell， 例如<code>zsh</code>、<code>dash</code>等等…不过<code>bash shell</code>还是使用最多的。</p>
 <p>运行脚本：<code>./helloworld.sh</code>。</p>
@@ -306,7 +42,11 @@
 <li><code>PS1</code>:基本提示符，对于root用户是<code>#</code>，对于普通用户是<code>$</code></li>
 </ul>
 <h2 id="使用-Linux-已定义的环境变量："><a href="#使用-Linux-已定义的环境变量：" class="headerlink" title="使用 Linux 已定义的环境变量："></a>使用 Linux 已定义的环境变量：</h2><p>比如要看当前用户目录可以使用：<code>echo $HOME命令</code>；如果要看当前用户Shell类型 可以使用<code>echo $SHELL</code>命令。</p>
-<h2 id="使用自己定义的变量："><a href="#使用自己定义的变量：" class="headerlink" title="使用自己定义的变量："></a>使用自己定义的变量：</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash">自定义变量hello</span></span><br><span class="line">hello="hello world"</span><br><span class="line">echo $hello</span><br><span class="line">echo  "helloworld!"</span><br></pre></td></tr></table></figure>
+<h2 id="使用自己定义的变量："><a href="#使用自己定义的变量：" class="headerlink" title="使用自己定义的变量："></a>使用自己定义的变量：</h2><pre><code class="shell">#!/bin/bash
+#自定义变量hello
+hello=&quot;hello world&quot;
+echo $hello
+echo  &quot;helloworld!&quot;</code></pre>
 <p>Shell 编程中的变量名的命名的注意事项：</p>
 <ul>
 <li>命名只能使用英文字母，数字和下划线，首个字符不能以数字开头，但是可以使用下划线（_）开头。</li>
@@ -316,29 +56,73 @@
 </ul>
 <h1 id="Shell字符串"><a href="#Shell字符串" class="headerlink" title="Shell字符串"></a>Shell字符串</h1><p>字符串是shell编程中最常用最有用的数据类型（除了数字和字符串，也没啥其它类型好用了），字符串可以用单引号，也可以用双引号。这点和Java中有所不同。</p>
 <p>单引号字符串：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">name='Ming'</span><br><span class="line">hello='Hello, I  am '$name'!'</span><br><span class="line">echo $hello</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+name=&#39;Ming&#39;
+hello=&#39;Hello, I  am &#39;$name&#39;!&#39;
+echo $hello</code></pre>
 <p>输出内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello, I am SnailClimb!</span><br></pre></td></tr></table></figure>
-<p>双引号字符串：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">name='SnailClimb'</span><br><span class="line">hello="Hello, I  am "$name"!"</span><br><span class="line">echo $hello</span><br></pre></td></tr></table></figure>
+<pre><code>Hello, I am SnailClimb!</code></pre><p>双引号字符串：</p>
+<pre><code class="shell">#!/bin/bash
+name=&#39;SnailClimb&#39;
+hello=&quot;Hello, I  am &quot;$name&quot;!&quot;
+echo $hello</code></pre>
 <p>输出内容：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hello, I am SnailClimb!</span><br></pre></td></tr></table></figure>
-<h2 id="Shell-字符串常见操作"><a href="#Shell-字符串常见操作" class="headerlink" title="Shell 字符串常见操作"></a>Shell 字符串常见操作</h2><h3 id="拼接字符串："><a href="#拼接字符串：" class="headerlink" title="拼接字符串："></a>拼接字符串：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">name="Ming"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用双引号拼接</span></span><br><span class="line">greeting="hello, "$name" !"</span><br><span class="line">greeting_1="hello, $&#123;name&#125; !" # 双引号会输出name的内容</span><br><span class="line">echo $greeting  $greeting_1</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用单引号拼接</span></span><br><span class="line">greeting_2='hello, '$name' !'</span><br><span class="line">greeting_3='hello, $&#123;name&#125; !' # 单引号会直接输出字符串“$&#123;name&#125;”</span><br><span class="line">echo $greeting_2  $greeting_3</span><br></pre></td></tr></table></figure>
+<pre><code>Hello, I am SnailClimb!</code></pre><h2 id="Shell-字符串常见操作"><a href="#Shell-字符串常见操作" class="headerlink" title="Shell 字符串常见操作"></a>Shell 字符串常见操作</h2><h3 id="拼接字符串："><a href="#拼接字符串：" class="headerlink" title="拼接字符串："></a>拼接字符串：</h3><pre><code class="shell">#!/bin/bash
+name=&quot;Ming&quot;
+# 使用双引号拼接
+greeting=&quot;hello, &quot;$name&quot; !&quot;
+greeting_1=&quot;hello, ${name} !&quot; # 双引号会输出name的内容
+echo $greeting  $greeting_1
+# 使用单引号拼接
+greeting_2=&#39;hello, &#39;$name&#39; !&#39;
+greeting_3=&#39;hello, ${name} !&#39; # 单引号会直接输出字符串“${name}”
+echo $greeting_2  $greeting_3</code></pre>
 <p>输出结果：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hello,Ming ! hello,Ming !</span><br><span class="line">hello,Ming ! hello,$&#123;name&#125; !</span><br></pre></td></tr></table></figure>
-<h3 id="获取字符串长度："><a href="#获取字符串长度：" class="headerlink" title="获取字符串长度："></a>获取字符串长度：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash">获取字符串长度</span></span><br><span class="line">name="Ming"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第一种方式</span></span><br><span class="line">echo $&#123;#name&#125; #输出 4</span><br><span class="line"><span class="meta">#</span><span class="bash"> 第二种方式</span></span><br><span class="line">expr length "$name";</span><br></pre></td></tr></table></figure>
+<pre><code>hello,Ming ! hello,Ming !
+hello,Ming ! hello,${name} !</code></pre><h3 id="获取字符串长度："><a href="#获取字符串长度：" class="headerlink" title="获取字符串长度："></a>获取字符串长度：</h3><pre><code class="shell">#!/bin/bash
+#获取字符串长度
+name=&quot;Ming&quot;
+# 第一种方式
+echo ${#name} #输出 4
+# 第二种方式
+expr length &quot;$name&quot;;</code></pre>
 <p>输出结果:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">4</span><br><span class="line">4</span><br></pre></td></tr></table></figure>
-<p>使用<code>expr</code>命令时，表达式中的<strong>运算符左右必须包含空格</strong>，如果不包含空格，将会输出表达式本身:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">expr 5+6    // 直接输出 5+6</span><br><span class="line">expr 5 + 6       // 输出 11</span><br></pre></td></tr></table></figure>
-<p>对于某些运算符，还需要我们使用符号<code>\</code>进行转义，否则就会提示语法错误。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">expr 5 * 6       // 输出错误</span><br><span class="line">expr 5 \* 6      // 输出30</span><br></pre></td></tr></table></figure>
-<h3 id="截取子字符串"><a href="#截取子字符串" class="headerlink" title="截取子字符串:"></a>截取子字符串:</h3><p>简单的字符串截取：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">从字符串第 1 个字符开始往后截取 10 个字符</span></span><br><span class="line">str="Ming is a great man"</span><br><span class="line">echo $&#123;str:0:4&#125; #输出:Ming</span><br></pre></td></tr></table></figure>
+<pre><code>4
+4</code></pre><p>使用<code>expr</code>命令时，表达式中的<strong>运算符左右必须包含空格</strong>，如果不包含空格，将会输出表达式本身:</p>
+<pre><code>expr 5+6    // 直接输出 5+6
+expr 5 + 6       // 输出 11</code></pre><p>对于某些运算符，还需要我们使用符号<code>\</code>进行转义，否则就会提示语法错误。</p>
+<pre><code>expr 5 * 6       // 输出错误
+expr 5 \* 6      // 输出30</code></pre><h3 id="截取子字符串"><a href="#截取子字符串" class="headerlink" title="截取子字符串:"></a>截取子字符串:</h3><p>简单的字符串截取：</p>
+<pre><code class="shell">#从字符串第 1 个字符开始往后截取 10 个字符
+str=&quot;Ming is a great man&quot;
+echo ${str:0:4} #输出:Ming</code></pre>
 <p>根据表达式截取：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash">author:amau</span></span><br><span class="line"></span><br><span class="line">var="http://www.runoob.com/linux/linux-shell-variable.html"</span><br><span class="line"></span><br><span class="line">s1=$&#123;var%%t*&#125;#h</span><br><span class="line">s2=$&#123;var%t*&#125;#http://www.runoob.com/linux/linux-shell-variable.h</span><br><span class="line">s3=$&#123;var%%.*&#125;#http://www</span><br><span class="line">s4=$&#123;var#*/&#125;#/www.runoob.com/linux/linux-shell-variable.html</span><br><span class="line">s5=$&#123;var##*/&#125;#linux-shell-variable.html</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!bin/bash
+#author:amau
+
+var=&quot;http://www.runoob.com/linux/linux-shell-variable.html&quot;
+
+s1=${var%%t*}#h
+s2=${var%t*}#http://www.runoob.com/linux/linux-shell-variable.h
+s3=${var%%.*}#http://www
+s4=${var#*/}#/www.runoob.com/linux/linux-shell-variable.html
+s5=${var##*/}#linux-shell-variable.html</code></pre>
 <h1 id="Shell数组"><a href="#Shell数组" class="headerlink" title="Shell数组"></a>Shell数组</h1><p>bash支持一维数组（不支持多维数组），并且没有限定数组的大小。下面是一个关于数组操作的 Shell 代码示例，通过该示例可以知道如何创建数组、获取数组长度、获取/删除特定位置的数组元素、删除整个数组以及遍历数组。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">array=(1 2 3 4 5);</span><br><span class="line"><span class="meta">#</span><span class="bash"> 获取数组长度</span></span><br><span class="line">length=$&#123;#array[@]&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash"> 或者</span></span><br><span class="line">length2=$&#123;#array[*]&#125;</span><br><span class="line"><span class="meta">#</span><span class="bash">输出数组长度</span></span><br><span class="line">echo $length #输出：5</span><br><span class="line">echo $length2 #输出：5</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出数组第三个元素</span></span><br><span class="line">echo $&#123;array[2]&#125; #输出：3</span><br><span class="line">unset array[1]# 删除下标为1的元素也就是删除第二个元素</span><br><span class="line">for i in $&#123;array[@]&#125;;do echo $i ;done # 遍历数组，输出： 1 3 4 5 </span><br><span class="line">unset arr_number; # 删除数组中的所有元素</span><br><span class="line">for i in $&#123;array[@]&#125;;do echo $i ;done # 遍历数组，数组元素为空，没有任何输出内容</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+array=(1 2 3 4 5);
+# 获取数组长度
+length=${#array[@]}
+# 或者
+length2=${#array[*]}
+#输出数组长度
+echo $length #输出：5
+echo $length2 #输出：5
+# 输出数组第三个元素
+echo ${array[2]} #输出：3
+unset array[1]# 删除下标为1的元素也就是删除第二个元素
+for i in ${array[@]};do echo $i ;done # 遍历数组，输出： 1 3 4 5 
+unset arr_number; # 删除数组中的所有元素
+for i in ${array[@]};do echo $i ;done # 遍历数组，数组元素为空，没有任何输出内容</code></pre>
 <h1 id="Shell基本运算符"><a href="#Shell基本运算符" class="headerlink" title="Shell基本运算符"></a>Shell基本运算符</h1><p>Shell 编程支持下面的几种运算符：</p>
 <ul>
 <li>算数运算符</li>
@@ -348,255 +132,128 @@
 <li>文件测试运算符</li>
 </ul>
 <h2 id="算数运算符"><a href="#算数运算符" class="headerlink" title="算数运算符"></a>算数运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/shell%E7%AE%97%E6%95%B0%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell算数运算符"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">a=3;b=3;</span><br><span class="line">val=`expr $a + $b` # 注意是反引号</span><br><span class="line"><span class="meta">#</span><span class="bash">输出：Total value : 6</span></span><br><span class="line">echo "Total value : $val"</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+a=3;b=3;
+val=`expr $a + $b` # 注意是反引号
+#输出：Total value : 6
+echo &quot;Total value : $val&quot;</code></pre>
 <h2 id="关系运算符"><a href="#关系运算符" class="headerlink" title="关系运算符"></a>关系运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/shell%E5%85%B3%E7%B3%BB%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell关系运算符"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出B</span></span><br><span class="line">score=90;</span><br><span class="line">maxscore=100;</span><br><span class="line">if [ $score -eq $maxscore ]</span><br><span class="line">then</span><br><span class="line">   echo "A"</span><br><span class="line">else</span><br><span class="line">   echo "B"</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+# 输出B
+score=90;
+maxscore=100;
+if [ $score -eq $maxscore ]
+then
+   echo &quot;A&quot;
+else
+   echo &quot;B&quot;
+fi</code></pre>
 <h2 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/shell%E9%80%BB%E8%BE%91%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell逻辑运算符"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">a=$(( 1 &amp;&amp; 0))</span><br><span class="line"><span class="meta">#</span><span class="bash"> 输出：0；逻辑与运算只有相与的两边都是1，与的结果才是1；否则与的结果是0</span></span><br><span class="line">echo $a;</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+a=$(( 1 &amp;&amp; 0))
+# 输出：0；逻辑与运算只有相与的两边都是1，与的结果才是1；否则与的结果是0
+echo $a;</code></pre>
 <h2 id="布尔运算符"><a href="#布尔运算符" class="headerlink" title="布尔运算符"></a>布尔运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/shell%E5%B8%83%E5%B0%94%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell布尔运算符"></p>
 <h2 id="字符串运算符"><a href="#字符串运算符" class="headerlink" title="字符串运算符"></a>字符串运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell字符串运算符"></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">a="abc";</span><br><span class="line">b="efg";</span><br><span class="line">if [ $a = $b ]</span><br><span class="line">then</span><br><span class="line">   echo "a 等于 b"</span><br><span class="line">else</span><br><span class="line">   echo "a 不等于 b"</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+a=&quot;abc&quot;;
+b=&quot;efg&quot;;
+if [ $a = $b ]
+then
+   echo &quot;a 等于 b&quot;
+else
+   echo &quot;a 不等于 b&quot;
+fi</code></pre>
 <h2 id="文件相关运算符"><a href="#文件相关运算符" class="headerlink" title="文件相关运算符"></a>文件相关运算符</h2><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/%E6%96%87%E4%BB%B6%E7%9B%B8%E5%85%B3%E8%BF%90%E7%AE%97%E7%AC%A6.jpeg?raw=true" alt="shell文件相关运算符"></p>
-<h1 id="Shell流程控制"><a href="#Shell流程控制" class="headerlink" title="Shell流程控制"></a>Shell流程控制</h1><h2 id="if条件语句"><a href="#if条件语句" class="headerlink" title="if条件语句"></a>if条件语句</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">a=3;</span><br><span class="line">b=9;</span><br><span class="line">if [ $a -eq $b ]</span><br><span class="line">then</span><br><span class="line">   echo "a 等于 b"</span><br><span class="line">elif [ $a -gt $b ]</span><br><span class="line">then</span><br><span class="line">   echo "a 大于 b"</span><br><span class="line">else</span><br><span class="line">   echo "a 小于 b"</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+<h1 id="Shell流程控制"><a href="#Shell流程控制" class="headerlink" title="Shell流程控制"></a>Shell流程控制</h1><h2 id="if条件语句"><a href="#if条件语句" class="headerlink" title="if条件语句"></a>if条件语句</h2><pre><code class="shell">#!/bin/bash
+a=3;
+b=9;
+if [ $a -eq $b ]
+then
+   echo &quot;a 等于 b&quot;
+elif [ $a -gt $b ]
+then
+   echo &quot;a 大于 b&quot;
+else
+   echo &quot;a 小于 b&quot;
+fi</code></pre>
 <p>不同于常见的 Java 以及 PHP 中的 if 条件语句，shell if 条件语句中不能包含空语句也就是什么都不做的语句。</p>
-<h2 id="for循环语句"><a href="#for循环语句" class="headerlink" title="for循环语句"></a>for循环语句</h2><h3 id="输出当前列表中的数据："><a href="#输出当前列表中的数据：" class="headerlink" title="输出当前列表中的数据："></a>输出当前列表中的数据：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for loop in 1 2 3 4 5</span><br><span class="line">do</span><br><span class="line">    echo &quot;The value is: $loop&quot;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
-<h3 id="产生-10-个随机数："><a href="#产生-10-个随机数：" class="headerlink" title="产生 10 个随机数："></a>产生 10 个随机数：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">for i in &#123;0..9&#125;;</span><br><span class="line">do </span><br><span class="line">   echo $RANDOM;</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<h2 id="for循环语句"><a href="#for循环语句" class="headerlink" title="for循环语句"></a>for循环语句</h2><h3 id="输出当前列表中的数据："><a href="#输出当前列表中的数据：" class="headerlink" title="输出当前列表中的数据："></a>输出当前列表中的数据：</h3><pre><code>for loop in 1 2 3 4 5
+do
+    echo &quot;The value is: $loop&quot;
+done</code></pre><h3 id="产生-10-个随机数："><a href="#产生-10-个随机数：" class="headerlink" title="产生 10 个随机数："></a>产生 10 个随机数：</h3><pre><code class="shell">#!/bin/bash
+for i in {0..9};
+do 
+   echo $RANDOM;
+done</code></pre>
 <h3 id="输出1到5"><a href="#输出1到5" class="headerlink" title="输出1到5"></a>输出1到5</h3><p>通常情况下 shell 变量调用需要加 $,但是 for 的 (()) 中不需要：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">for((i=1;i&lt;=5;i++));do</span><br><span class="line">    echo $i;</span><br><span class="line">done;</span><br></pre></td></tr></table></figure>
-<h2 id="while-语句"><a href="#while-语句" class="headerlink" title="while 语句"></a>while 语句</h2><h3 id="基本的-while-循环语句："><a href="#基本的-while-循环语句：" class="headerlink" title="基本的 while 循环语句："></a>基本的 while 循环语句：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">int=1</span><br><span class="line">while(( $int&lt;=5 ))</span><br><span class="line">do</span><br><span class="line">    echo $int</span><br><span class="line">    let "int++"</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
-<h3 id="while循环可用于读取键盘信息："><a href="#while循环可用于读取键盘信息：" class="headerlink" title="while循环可用于读取键盘信息："></a>while循环可用于读取键盘信息：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">echo '按下 &lt;CTRL-D&gt; 退出'</span><br><span class="line">echo -n '输入你最喜欢的电影: '</span><br><span class="line">while read FILM</span><br><span class="line">do</span><br><span class="line">    echo "是的！$FILM 是一个好电影"</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+<pre><code class="shell">#!/bin/bash
+for((i=1;i&lt;=5;i++));do
+    echo $i;
+done;</code></pre>
+<h2 id="while-语句"><a href="#while-语句" class="headerlink" title="while 语句"></a>while 语句</h2><h3 id="基本的-while-循环语句："><a href="#基本的-while-循环语句：" class="headerlink" title="基本的 while 循环语句："></a>基本的 while 循环语句：</h3><pre><code class="shell">#!/bin/bash
+int=1
+while(( $int&lt;=5 ))
+do
+    echo $int
+    let &quot;int++&quot;
+done</code></pre>
+<h3 id="while循环可用于读取键盘信息："><a href="#while循环可用于读取键盘信息：" class="headerlink" title="while循环可用于读取键盘信息："></a>while循环可用于读取键盘信息：</h3><pre><code class="shell">echo &#39;按下 &lt;CTRL-D&gt; 退出&#39;
+echo -n &#39;输入你最喜欢的电影: &#39;
+while read FILM
+do
+    echo &quot;是的！$FILM 是一个好电影&quot;
+done</code></pre>
 <p>输出内容:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">按下 &lt;CTRL-D&gt; 退出</span><br><span class="line">输入你最喜欢的电影: 变形金刚</span><br><span class="line">是的！变形金刚 是一个好电影</span><br></pre></td></tr></table></figure>
-<h3 id="无限循环："><a href="#无限循环：" class="headerlink" title="无限循环："></a>无限循环：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">while true</span><br><span class="line">do</span><br><span class="line">    command</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
-<h1 id="shell-函数"><a href="#shell-函数" class="headerlink" title="shell 函数"></a>shell 函数</h1><h2 id="不带参数没有返回值的函数"><a href="#不带参数没有返回值的函数" class="headerlink" title="不带参数没有返回值的函数"></a>不带参数没有返回值的函数</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">hello()&#123;</span><br><span class="line">    echo "这是我的第一个 shell 函数!"</span><br><span class="line">&#125;</span><br><span class="line">echo "-----函数开始执行-----"</span><br><span class="line">hello</span><br><span class="line">echo "-----函数执行完毕-----"</span><br></pre></td></tr></table></figure>
+<pre><code>按下 &lt;CTRL-D&gt; 退出
+输入你最喜欢的电影: 变形金刚
+是的！变形金刚 是一个好电影</code></pre><h3 id="无限循环："><a href="#无限循环：" class="headerlink" title="无限循环："></a>无限循环：</h3><pre><code class="shell">while true
+do
+    command
+done</code></pre>
+<h1 id="shell-函数"><a href="#shell-函数" class="headerlink" title="shell 函数"></a>shell 函数</h1><h2 id="不带参数没有返回值的函数"><a href="#不带参数没有返回值的函数" class="headerlink" title="不带参数没有返回值的函数"></a>不带参数没有返回值的函数</h2><pre><code class="shell">#!/bin/bash
+hello(){
+    echo &quot;这是我的第一个 shell 函数!&quot;
+}
+echo &quot;-----函数开始执行-----&quot;
+hello
+echo &quot;-----函数执行完毕-----&quot;</code></pre>
 <p>输出结果：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-----函数开始执行-----</span><br><span class="line">这是我的第一个 shell 函数!</span><br><span class="line">-----函数执行完毕-----</span><br></pre></td></tr></table></figure>
-<h2 id="有返回值的函数"><a href="#有返回值的函数" class="headerlink" title="有返回值的函数"></a>有返回值的函数</h2><h3 id="输入两个数字之后相加并返回结果："><a href="#输入两个数字之后相加并返回结果：" class="headerlink" title="输入两个数字之后相加并返回结果："></a>输入两个数字之后相加并返回结果：</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">funWithReturn()&#123;</span><br><span class="line">    echo "输入第一个数字: "</span><br><span class="line">    read aNum</span><br><span class="line">    echo "输入第二个数字: "</span><br><span class="line">    read anotherNum</span><br><span class="line">    echo "两个数字分别为 $aNum 和 $anotherNum !"</span><br><span class="line">    return $(($aNum+$anotherNum))</span><br><span class="line">&#125;</span><br><span class="line">funWithReturn</span><br><span class="line">echo "输入的两个数字之和为 $?"</span><br></pre></td></tr></table></figure>
+<pre><code>-----函数开始执行-----
+这是我的第一个 shell 函数!
+-----函数执行完毕-----</code></pre><h2 id="有返回值的函数"><a href="#有返回值的函数" class="headerlink" title="有返回值的函数"></a>有返回值的函数</h2><h3 id="输入两个数字之后相加并返回结果："><a href="#输入两个数字之后相加并返回结果：" class="headerlink" title="输入两个数字之后相加并返回结果："></a>输入两个数字之后相加并返回结果：</h3><pre><code class="shell">#!/bin/bash
+funWithReturn(){
+    echo &quot;输入第一个数字: &quot;
+    read aNum
+    echo &quot;输入第二个数字: &quot;
+    read anotherNum
+    echo &quot;两个数字分别为 $aNum 和 $anotherNum !&quot;
+    return $(($aNum+$anotherNum))
+}
+funWithReturn
+echo &quot;输入的两个数字之和为 $?&quot;</code></pre>
 <p>输出结果：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">输入第一个数字: </span><br><span class="line">1</span><br><span class="line">输入第二个数字: </span><br><span class="line">2</span><br><span class="line">两个数字分别为 1 和 2 !</span><br><span class="line">输入的两个数字之和为 3</span><br></pre></td></tr></table></figure>
-<h2 id="带参数的函数"><a href="#带参数的函数" class="headerlink" title="带参数的函数"></a>带参数的函数</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">funWithParam()&#123;</span><br><span class="line">    echo "第一个参数为 $1 !"</span><br><span class="line">    echo "第二个参数为 $2 !"</span><br><span class="line">    echo "第十个参数为 $10 !"</span><br><span class="line">    echo "第十个参数为 $&#123;10&#125; !"# 使用这种方式才能读到值</span><br><span class="line">    echo "第十一个参数为 $&#123;11&#125; !"</span><br><span class="line">    echo "参数总数有 $# 个!"</span><br><span class="line">    echo "作为一个字符串输出所有参数 $* !"</span><br><span class="line">&#125;</span><br><span class="line">funWithParam 1 2 3 4 5 6 7 8 9 34 73</span><br></pre></td></tr></table></figure>
+<pre><code>输入第一个数字: 
+1
+输入第二个数字: 
+2
+两个数字分别为 1 和 2 !
+输入的两个数字之和为 3</code></pre><h2 id="带参数的函数"><a href="#带参数的函数" class="headerlink" title="带参数的函数"></a>带参数的函数</h2><pre><code class="shell">#!/bin/bash
+funWithParam(){
+    echo &quot;第一个参数为 $1 !&quot;
+    echo &quot;第二个参数为 $2 !&quot;
+    echo &quot;第十个参数为 $10 !&quot;
+    echo &quot;第十个参数为 ${10} !&quot;# 使用这种方式才能读到值
+    echo &quot;第十一个参数为 ${11} !&quot;
+    echo &quot;参数总数有 $# 个!&quot;
+    echo &quot;作为一个字符串输出所有参数 $* !&quot;
+}
+funWithParam 1 2 3 4 5 6 7 8 9 34 73</code></pre>
 <p>输出结果：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">第一个参数为 1 !</span><br><span class="line">第二个参数为 2 !</span><br><span class="line">第十个参数为 10 !</span><br><span class="line">第十个参数为 34 !</span><br><span class="line">第十一个参数为 73 !</span><br><span class="line">参数总数有 11 个!</span><br><span class="line">作为一个字符串输出所有参数 1 2 3 4 5 6 7 8 9 34 73 !</span><br></pre></td></tr></table></figure>
-    </div>
-
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
-
-  </div>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/shell/" rel="tag"># shell</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/10/11/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93Redis/" rel="prev" title="数据库Redis">
-      <i class="fa fa-chevron-left"></i> 数据库Redis
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/10/28/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="next" title="数据结构">
-      数据结构 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell基本结构和运行"><span class="nav-number">1.</span> <span class="nav-text">Shell基本结构和运行</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell变量"><span class="nav-number">2.</span> <span class="nav-text">Shell变量</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#常用的环境变量"><span class="nav-number">2.1.</span> <span class="nav-text">常用的环境变量:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Linux-已定义的环境变量："><span class="nav-number">2.2.</span> <span class="nav-text">使用 Linux 已定义的环境变量：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用自己定义的变量："><span class="nav-number">2.3.</span> <span class="nav-text">使用自己定义的变量：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell字符串"><span class="nav-number">3.</span> <span class="nav-text">Shell字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Shell-字符串常见操作"><span class="nav-number">3.1.</span> <span class="nav-text">Shell 字符串常见操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#拼接字符串："><span class="nav-number">3.1.1.</span> <span class="nav-text">拼接字符串：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取字符串长度："><span class="nav-number">3.1.2.</span> <span class="nav-text">获取字符串长度：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#截取子字符串"><span class="nav-number">3.1.3.</span> <span class="nav-text">截取子字符串:</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell数组"><span class="nav-number">4.</span> <span class="nav-text">Shell数组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell基本运算符"><span class="nav-number">5.</span> <span class="nav-text">Shell基本运算符</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#算数运算符"><span class="nav-number">5.1.</span> <span class="nav-text">算数运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系运算符"><span class="nav-number">5.2.</span> <span class="nav-text">关系运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#逻辑运算符"><span class="nav-number">5.3.</span> <span class="nav-text">逻辑运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#布尔运算符"><span class="nav-number">5.4.</span> <span class="nav-text">布尔运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串运算符"><span class="nav-number">5.5.</span> <span class="nav-text">字符串运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件相关运算符"><span class="nav-number">5.6.</span> <span class="nav-text">文件相关运算符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Shell流程控制"><span class="nav-number">6.</span> <span class="nav-text">Shell流程控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#if条件语句"><span class="nav-number">6.1.</span> <span class="nav-text">if条件语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for循环语句"><span class="nav-number">6.2.</span> <span class="nav-text">for循环语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输出当前列表中的数据："><span class="nav-number">6.2.1.</span> <span class="nav-text">输出当前列表中的数据：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#产生-10-个随机数："><span class="nav-number">6.2.2.</span> <span class="nav-text">产生 10 个随机数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输出1到5"><span class="nav-number">6.2.3.</span> <span class="nav-text">输出1到5</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#while-语句"><span class="nav-number">6.3.</span> <span class="nav-text">while 语句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基本的-while-循环语句："><span class="nav-number">6.3.1.</span> <span class="nav-text">基本的 while 循环语句：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#while循环可用于读取键盘信息："><span class="nav-number">6.3.2.</span> <span class="nav-text">while循环可用于读取键盘信息：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无限循环："><span class="nav-number">6.3.3.</span> <span class="nav-text">无限循环：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shell-函数"><span class="nav-number">7.</span> <span class="nav-text">shell 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#不带参数没有返回值的函数"><span class="nav-number">7.1.</span> <span class="nav-text">不带参数没有返回值的函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有返回值的函数"><span class="nav-number">7.2.</span> <span class="nav-text">有返回值的函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#输入两个数字之后相加并返回结果："><span class="nav-number">7.2.1.</span> <span class="nav-text">输入两个数字之后相加并返回结果：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#带参数的函数"><span class="nav-number">7.3.</span> <span class="nav-text">带参数的函数</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+<pre><code>第一个参数为 1 !
+第二个参数为 2 !
+第十个参数为 10 !
+第十个参数为 34 !
+第十一个参数为 73 !
+参数总数有 11 个!
+作为一个字符串输出所有参数 1 2 3 4 5 6 7 8 9 34 73 !</code></pre></article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/10/28/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" title="数据结构"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 数据结构</span></a><a class="button is-default" href="/2019/10/11/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93Redis/" title="数据库Redis"><span class="has-text-weight-semibold">下一页: 数据库Redis</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

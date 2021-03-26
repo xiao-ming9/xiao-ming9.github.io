@@ -1,277 +1,17 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Laravel—中间件</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="中间件中间件用于对用户的登陆等进行验证，只有满足条件的用户才能进入到页面，否则就跳转到指定页面Laravel自带的中间件，包括认证，CRSF等，在app&#x2F;Http&#x2F;Middleware目录下   中间件的使用分为三个步骤：创建、事例代码、注册、使用 定义中间件要创建一个新的中间件，在当前目录下使用：  php artisan make:middleware CheckToken    该命令会在a">
-<meta name="keywords" content="Laravel,php">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Laravel—中间件">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;26&#x2F;Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="中间件中间件用于对用户的登陆等进行验证，只有满足条件的用户才能进入到页面，否则就跳转到指定页面Laravel自带的中间件，包括认证，CRSF等，在app&#x2F;Http&#x2F;Middleware目录下   中间件的使用分为三个步骤：创建、事例代码、注册、使用 定义中间件要创建一个新的中间件，在当前目录下使用：  php artisan make:middleware CheckToken    该命令会在a">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-12-01T10:38:58.951Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2018/07/26/Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Laravel—中间件 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/26/Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Laravel—中间件
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2018-07-26 21:47:36" itemprop="dateCreated datePublished" datetime="2018-07-26T21:47:36+08:00">2018-07-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:38:58" itemprop="dateModified" datetime="2020-12-01T18:38:58+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>3k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>3 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h1><p>中间件用于对用户的登陆等进行验证，只有满足条件的用户才能进入到页面，否则就跳转到指定页面<br>Laravel自带的中间件，包括认证，CRSF等，在<code>app/Http/Middleware</code>目录下  </p>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Laravel—中间件</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#中间件"><span class="toc-text">中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#定义中间件"><span class="toc-text">定义中间件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#注册中间件"><span class="toc-text">注册中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#全局中间件"><span class="toc-text">全局中间件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#指定路由中间件"><span class="toc-text">指定路由中间件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#中间件组"><span class="toc-text">中间件组</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#中间件参数"><span class="toc-text">中间件参数</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/Laravel"><i class="tag post-item-tag">Laravel</i></a><a href="/tags/php"><i class="tag post-item-tag">php</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Laravel—中间件</h1><time class="has-text-grey" datetime="2018-07-26T13:47:36.000Z">2018-07-26</time><article class="mt-2 post-content"><h1 id="中间件"><a href="#中间件" class="headerlink" title="中间件"></a>中间件</h1><p>中间件用于对用户的登陆等进行验证，只有满足条件的用户才能进入到页面，否则就跳转到指定页面<br>Laravel自带的中间件，包括认证，CRSF等，在<code>app/Http/Middleware</code>目录下  </p>
 <p>中间件的使用分为三个步骤：<strong>创建、事例代码、注册、使用</strong></p>
 <h2 id="定义中间件"><a href="#定义中间件" class="headerlink" title="定义中间件"></a>定义中间件</h2><p>要创建一个新的中间件，在当前目录下使用：</p>
 <blockquote>
@@ -279,239 +19,104 @@
 </blockquote>
 <p>该命令会在app/Http/Middleware目录下创建一个新的中间件类<code>CheckToken</code></p>
 <a id="more"></a>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Http</span>\<span class="title">Middleware</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Closure</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CheckToken</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Handle an incoming request.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  \Illuminate\Http\Request  $request</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span>  \Closure  $next</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> mixed</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">handle</span><span class="params">($request, Closure $next)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> $next($request);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+
+class CheckToken
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+        return $next($request);
+    }
+}
+</code></pre>
 <h2 id="注册中间件"><a href="#注册中间件" class="headerlink" title="注册中间件"></a>注册中间件</h2><p>中间件分为三类：全局中间件、中间件组、指定路由中间件  </p>
 <h3 id="全局中间件"><a href="#全局中间件" class="headerlink" title="全局中间件"></a>全局中间件</h3><p>如果希望定义的中间件在每一个HTTP请求时都被执行，将相应的中间件类添加到<code>app/HTTP/Kernel.php</code>的数组属性<code>$middleware</code>中</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The application's global HTTP middleware stack.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * These middleware are run during every request to your application.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $middleware = [</span><br><span class="line">        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,</span><br><span class="line">        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,</span><br><span class="line">        \App\Http\Middleware\TrimStrings::class,</span><br><span class="line">        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,</span><br><span class="line">        \App\Http\Middleware\TrustProxies::class,</span><br><span class="line"></span><br><span class="line">        <span class="comment">//只需要在此处加入相应的类</span></span><br><span class="line">        \App\Http\Middleware\CheckToken::class,</span><br><span class="line">    ];</span><br></pre></td></tr></table></figure>
+<pre><code class="php">/**
+     * The application&#39;s global HTTP middleware stack.
+     *
+     * These middleware are run during every request to your application.
+     *
+     * @var array
+     */
+    protected $middleware = [
+        \Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\TrustProxies::class,
+
+        //只需要在此处加入相应的类
+        \App\Http\Middleware\CheckToken::class,
+    ];</code></pre>
 <h3 id="指定路由中间件"><a href="#指定路由中间件" class="headerlink" title="指定路由中间件"></a>指定路由中间件</h3><p>把中间件分配到指定的路由中，首先在<code>app/Http/Kernel.php</code>文件中为该中间件分配一个<code>key</code>（中间件名），在<code>$routeMiddleware</code>属性中添加</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The application's route middleware.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * These middleware may be assigned to groups or used individually.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $routeMiddleware = [</span><br><span class="line">        <span class="string">'auth'</span> =&gt; \Illuminate\Auth\Middleware\Authenticate::class,</span><br><span class="line">        <span class="string">'auth.basic'</span> =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,</span><br><span class="line">        <span class="string">'bindings'</span> =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class,</span><br><span class="line">        <span class="string">'cache.headers'</span> =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,</span><br><span class="line">        <span class="string">'can'</span> =&gt; \Illuminate\Auth\Middleware\Authorize::class,</span><br><span class="line">        <span class="string">'guest'</span> =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,</span><br><span class="line">        <span class="string">'signed'</span> =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class,</span><br><span class="line">        <span class="string">'throttle'</span> =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,</span><br><span class="line">        <span class="comment">//在该位置添加自己定义的中间件</span></span><br><span class="line">        <span class="string">'token'</span> =&gt; \App\Http\Middleware\CheckToken::class,</span><br><span class="line">    ];</span><br></pre></td></tr></table></figure>
+<pre><code class="php">/**
+     * The application&#39;s route middleware.
+     *
+     * These middleware may be assigned to groups or used individually.
+     *
+     * @var array
+     */
+    protected $routeMiddleware = [
+        &#39;auth&#39; =&gt; \Illuminate\Auth\Middleware\Authenticate::class,
+        &#39;auth.basic&#39; =&gt; \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
+        &#39;bindings&#39; =&gt; \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        &#39;cache.headers&#39; =&gt; \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        &#39;can&#39; =&gt; \Illuminate\Auth\Middleware\Authorize::class,
+        &#39;guest&#39; =&gt; \App\Http\Middleware\RedirectIfAuthenticated::class,
+        &#39;signed&#39; =&gt; \Illuminate\Routing\Middleware\ValidateSignature::class,
+        &#39;throttle&#39; =&gt; \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        //在该位置添加自己定义的中间件
+        &#39;token&#39; =&gt; \App\Http\Middleware\CheckToken::class,
+    ];</code></pre>
 <p>注册完，可以使用<code>middleware</code>方法将其分配到路由</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Route::get(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;)-&gt;middleware(<span class="string">'token'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//分配多个中间件到路由</span></span><br><span class="line">Route::get(<span class="string">'/'</span>,<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;)-&gt;middleware(<span class="string">'token'</span>,<span class="string">'auth'</span>);</span><br></pre></td></tr></table></figure>
+<pre><code class="php">Route::get(&#39;/&#39;,function(){
+    //
+})-&gt;middleware(&#39;token&#39;);
+
+//分配多个中间件到路由
+Route::get(&#39;/&#39;,function(){
+    //
+})-&gt;middleware(&#39;token&#39;,&#39;auth&#39;);</code></pre>
 <h3 id="中间件组"><a href="#中间件组" class="headerlink" title="中间件组"></a>中间件组</h3><p>通过一个键名的方式将相关的中间件分到一个组里，可以更方便的将其分配到路由，只需将相应的组加到<code>$MiddlewareGroups</code>属性中</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * The application's route middleware groups.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@var</span> array</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> $middlewareGroups = [</span><br><span class="line">        <span class="string">'web'</span> =&gt; [</span><br><span class="line">            \App\Http\Middleware\EncryptCookies::class,</span><br><span class="line">            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,</span><br><span class="line">            \Illuminate\Session\Middleware\StartSession::class,</span><br><span class="line">            <span class="comment">// \Illuminate\Session\Middleware\AuthenticateSession::class,</span></span><br><span class="line">            \Illuminate\View\Middleware\ShareErrorsFromSession::class,</span><br><span class="line">            \App\Http\Middleware\VerifyCsrfToken::class,</span><br><span class="line">            \Illuminate\Routing\Middleware\SubstituteBindings::class,</span><br><span class="line">        ],</span><br><span class="line"></span><br><span class="line">        <span class="string">'api'</span> =&gt; [</span><br><span class="line">            <span class="string">'throttle:60,1'</span>,</span><br><span class="line">            <span class="string">'bindings'</span>,</span><br><span class="line">        ],</span><br><span class="line"></span><br><span class="line">        <span class="comment">//在这里添加相应的中间件组</span></span><br><span class="line">        <span class="string">'blog'</span> =&gt; [</span><br><span class="line">            \App\Http\Middleware\CheckToken::class,</span><br><span class="line">        ],</span><br><span class="line">    ];</span><br></pre></td></tr></table></figure>
+<pre><code class="php">/**
+     * The application&#39;s route middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [
+        &#39;web&#39; =&gt; [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Session\Middleware\StartSession::class,
+            // \Illuminate\Session\Middleware\AuthenticateSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        &#39;api&#39; =&gt; [
+            &#39;throttle:60,1&#39;,
+            &#39;bindings&#39;,
+        ],
+
+        //在这里添加相应的中间件组
+        &#39;blog&#39; =&gt; [
+            \App\Http\Middleware\CheckToken::class,
+        ],
+    ];</code></pre>
 <h2 id="中间件参数"><a href="#中间件参数" class="headerlink" title="中间件参数"></a>中间件参数</h2><p>中间件默认只有<code>$request</code>,<code>$next</code>两个参数，可以自己定义需要的参数<br>中间件参数在定义路由时通过<code>：</code>分隔中间件名和参数名，<strong>多个参数用逗号隔开</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Route::put(<span class="string">'post/&#123;id&#125;'</span>,<span class="function"><span class="keyword">function</span><span class="params">($id)</span></span>&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">&#125;)-&gt;middleware(<span class="string">'role:editor'</span>);</span><br></pre></td></tr></table></figure>
-    </div>
-
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
-
-  </div>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
-              <a href="/tags/php/" rel="tag"># php</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2018/07/25/Laravel%E2%80%94%E8%B7%AF%E7%94%B1/" rel="prev" title="Laravel—路由">
-      <i class="fa fa-chevron-left"></i> Laravel—路由
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/" rel="next" title="Laravel—控制器">
-      Laravel—控制器 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#中间件"><span class="nav-number">1.</span> <span class="nav-text">中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义中间件"><span class="nav-number">1.1.</span> <span class="nav-text">定义中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注册中间件"><span class="nav-number">1.2.</span> <span class="nav-text">注册中间件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全局中间件"><span class="nav-number">1.2.1.</span> <span class="nav-text">全局中间件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定路由中间件"><span class="nav-number">1.2.2.</span> <span class="nav-text">指定路由中间件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#中间件组"><span class="nav-number">1.2.3.</span> <span class="nav-text">中间件组</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中间件参数"><span class="nav-number">1.3.</span> <span class="nav-text">中间件参数</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+<pre><code class="php">Route::put(&#39;post/{id}&#39;,function($id){
+    //
+})-&gt;middleware(&#39;role:editor&#39;);</code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/" title="Laravel—控制器"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: Laravel—控制器</span></a><a class="button is-default" href="/2018/07/25/Laravel%E2%80%94%E8%B7%AF%E7%94%B1/" title="Laravel—路由"><span class="has-text-weight-semibold">下一页: Laravel—路由</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

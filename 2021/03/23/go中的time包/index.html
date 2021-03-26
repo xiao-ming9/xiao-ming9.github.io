@@ -1,300 +1,100 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>go 中 time 包的使用</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="time 包中的类型time 包中定义了以下时间类型： time.Time{}时间类型，包含了秒和纳秒以及 Location： 12345type Time struct &amp;#123;	wall uint64 &#x2F;&#x2F; 秒	ext  int64  &#x2F;&#x2F; 纳秒	loc *Location&amp;#125;">
-<meta name="keywords" content="go">
-<meta property="og:type" content="article">
-<meta property="og:title" content="go 中 time 包的使用">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;03&#x2F;23&#x2F;go%E4%B8%AD%E7%9A%84time%E5%8C%85&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="time 包中的类型time 包中定义了以下时间类型： time.Time{}时间类型，包含了秒和纳秒以及 Location： 12345type Time struct &amp;#123;	wall uint64 &#x2F;&#x2F; 秒	ext  int64  &#x2F;&#x2F; 纳秒	loc *Location&amp;#125;">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2021-03-23T14:36:37.260Z">
-<meta name="twitter:card" content="summary">
-
-<link rel="canonical" href="http://yoursite.com/2021/03/23/go%E4%B8%AD%E7%9A%84time%E5%8C%85/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>go 中 time 包的使用 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/23/go%E4%B8%AD%E7%9A%84time%E5%8C%85/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          go 中 time 包的使用
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2021-03-23 10:39:09 / 修改时间：22:36:37" itemprop="dateCreated datePublished" datetime="2021-03-23T10:39:09+08:00">2021-03-23</time>
-            </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.2k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>7 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="time-包中的类型"><a href="#time-包中的类型" class="headerlink" title="time 包中的类型"></a>time 包中的类型</h1><p>time 包中定义了以下时间类型：</p>
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">go 中 time 包的使用</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#time-包中的类型"><span class="toc-text">time 包中的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Time"><span class="toc-text">time.Time{}</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Month"><span class="toc-text">time.Month()</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Weekday"><span class="toc-text">time.Weekday</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Duration"><span class="toc-text">time.Duration</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Location"><span class="toc-text">time.Location</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Timer-定时器"><span class="toc-text">time.Timer 定时器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#time-Ticker-断续器"><span class="toc-text">time.Ticker 断续器</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#time-包中的常用函数"><span class="toc-text">time 包中的常用函数</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Time-类型下的常用函数"><span class="toc-text">Time 类型下的常用函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其他常用函数"><span class="toc-text">其他常用函数</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#time-包的实际用例"><span class="toc-text">time 包的实际用例</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#创建时间"><span class="toc-text">创建时间</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#获取当前时间"><span class="toc-text">获取当前时间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#创建指定的时间"><span class="toc-text">创建指定的时间</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#纳秒-毫秒-秒转换"><span class="toc-text">纳秒/毫秒/秒转换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#时间格式化（time-与-string-相互转换）"><span class="toc-text">时间格式化（time 与 string 相互转换）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#对时间进行加减运算"><span class="toc-text">对时间进行加减运算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#加法"><span class="toc-text">加法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#减法"><span class="toc-text">减法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#时间戳与Time相互转换"><span class="toc-text">时间戳与Time相互转换</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#在本地和其他时区使用时间戳获取当前日期和时间"><span class="toc-text">在本地和其他时区使用时间戳获取当前日期和时间</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#获取-Weekday-和-Yearday"><span class="toc-text">获取 Weekday 和 Yearday</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#日期时间的前后关系判断"><span class="toc-text">日期时间的前后关系判断</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#定时器"><span class="toc-text">定时器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#断续器（每个固定的时间执行一次）"><span class="toc-text">断续器（每个固定的时间执行一次）</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/go"><i class="tag post-item-tag">go</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">go 中 time 包的使用</h1><time class="has-text-grey" datetime="2021-03-23T02:39:09.000Z">2021-03-23</time><article class="mt-2 post-content"><h1 id="time-包中的类型"><a href="#time-包中的类型" class="headerlink" title="time 包中的类型"></a>time 包中的类型</h1><p>time 包中定义了以下时间类型：</p>
 <h2 id="time-Time"><a href="#time-Time" class="headerlink" title="time.Time{}"></a>time.Time{}</h2><p>时间类型，包含了秒和纳秒以及 Location：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Time <span class="keyword">struct</span> &#123;</span><br><span class="line">	wall <span class="keyword">uint64</span> <span class="comment">// 秒</span></span><br><span class="line">	ext  <span class="keyword">int64</span>  <span class="comment">// 纳秒</span></span><br><span class="line">	loc *Location</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">type Time struct {
+    wall uint64 // 秒
+    ext  int64  // 纳秒
+    loc *Location
+}</code></pre>
 <a id="more"></a>
 
 <h2 id="time-Month"><a href="#time-Month" class="headerlink" title="time.Month()"></a>time.Month()</h2><p>月份，定义了十二个月份的常量：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Month <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	January Month = <span class="number">1</span> + <span class="literal">iota</span></span><br><span class="line">	February</span><br><span class="line">	March</span><br><span class="line">	April</span><br><span class="line">	May</span><br><span class="line">	June</span><br><span class="line">	July</span><br><span class="line">	August</span><br><span class="line">	September</span><br><span class="line">	October</span><br><span class="line">	November</span><br><span class="line">	December</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<pre><code class="go">type Month int
 
+const (
+    January Month = 1 + iota
+    February
+    March
+    April
+    May
+    June
+    July
+    August
+    September
+    October
+    November
+    December
+)</code></pre>
 <h2 id="time-Weekday"><a href="#time-Weekday" class="headerlink" title="time.Weekday"></a>time.Weekday</h2><p>月份，定义了十二个月的常量：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Weekday <span class="keyword">int</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	Sunday Weekday = <span class="literal">iota</span></span><br><span class="line">	Monday</span><br><span class="line">	Tuesday</span><br><span class="line">	Wednesday</span><br><span class="line">	Thursday</span><br><span class="line">	Friday</span><br><span class="line">	Saturday</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<pre><code class="go">type Weekday int
 
+const (
+    Sunday Weekday = iota
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+)</code></pre>
 <h2 id="time-Duration"><a href="#time-Duration" class="headerlink" title="time.Duration"></a>time.Duration</h2><p>持续时间，定义了以下持续时间类型，多用于时间的加减：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 持续时间表示两个瞬间之间经过的时间，以int64纳秒为单位。</span></span><br><span class="line"><span class="comment">// 该表示将最大可表示持续时间限制为大约290年。</span></span><br><span class="line"><span class="keyword">type</span> Duration <span class="keyword">int64</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	minDuration Duration = <span class="number">-1</span> &lt;&lt; <span class="number">63</span></span><br><span class="line">	maxDuration Duration = <span class="number">1</span>&lt;&lt;<span class="number">63</span> - <span class="number">1</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	Nanosecond  Duration = <span class="number">1</span></span><br><span class="line">	Microsecond          = <span class="number">1000</span> * Nanosecond</span><br><span class="line">	Millisecond          = <span class="number">1000</span> * Microsecond</span><br><span class="line">	Second               = <span class="number">1000</span> * Millisecond</span><br><span class="line">	Minute               = <span class="number">60</span> * Second</span><br><span class="line">	Hour                 = <span class="number">60</span> * Minute</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<pre><code class="go">// 持续时间表示两个瞬间之间经过的时间，以int64纳秒为单位。
+// 该表示将最大可表示持续时间限制为大约290年。
+type Duration int64
 
+const (
+    minDuration Duration = -1 &lt;&lt; 63
+    maxDuration Duration = 1&lt;&lt;63 - 1
+)
+
+const (
+    Nanosecond  Duration = 1
+    Microsecond          = 1000 * Nanosecond
+    Millisecond          = 1000 * Microsecond
+    Second               = 1000 * Millisecond
+    Minute               = 60 * Second
+    Hour                 = 60 * Minute
+)</code></pre>
 <h2 id="time-Location"><a href="#time-Location" class="headerlink" title="time.Location"></a>time.Location</h2><p>在 time 包里有两个时区变量：</p>
 <ul>
 <li>time.UTC：utc 时间</li>
 <li>time.Local：本地时间</li>
 </ul>
 <p>另外，还提供了一个 <code>FixedZone</code> 函数，用于设置时区名，以及与 UTC0 的时间偏差，返回 Location：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">FixedZone</span><span class="params">(name <span class="keyword">string</span>, offset <span class="keyword">int</span>)</span> *<span class="title">Location</span></span> &#123;</span><br><span class="line">	l := &amp;Location&#123;</span><br><span class="line">		name:       name,</span><br><span class="line">		zone:       []zone&#123;&#123;name, offset, <span class="literal">false</span>&#125;&#125;,</span><br><span class="line">		tx:         []zoneTrans&#123;&#123;alpha, <span class="number">0</span>, <span class="literal">false</span>, <span class="literal">false</span>&#125;&#125;,</span><br><span class="line">		cacheStart: alpha,</span><br><span class="line">		cacheEnd:   omega,</span><br><span class="line">	&#125;</span><br><span class="line">	l.cacheZone = &amp;l.zone[<span class="number">0</span>]</span><br><span class="line">	<span class="keyword">return</span> l</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">func FixedZone(name string, offset int) *Location {
+    l := &amp;Location{
+        name:       name,
+        zone:       []zone{{name, offset, false}},
+        tx:         []zoneTrans{{alpha, 0, false, false}},
+        cacheStart: alpha,
+        cacheEnd:   omega,
+    }
+    l.cacheZone = &amp;l.zone[0]
+    return l
+}</code></pre>
 <h2 id="time-Timer-定时器"><a href="#time-Timer-定时器" class="headerlink" title="time.Timer 定时器"></a>time.Timer 定时器</h2><p>传达一次到期事件：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Timer <span class="keyword">struct</span> &#123;</span><br><span class="line">	C &lt;-<span class="keyword">chan</span> Time</span><br><span class="line">	r runtimeTimer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">type Timer struct {
+    C &lt;-chan Time
+    r runtimeTimer
+}</code></pre>
 <h2 id="time-Ticker-断续器"><a href="#time-Ticker-断续器" class="headerlink" title="time.Ticker 断续器"></a>time.Ticker 断续器</h2><p>周期性的传达到期事件的装置。</p>
 <p><strong>与定时器的区别：定时器只会传达一次到期事件，断续器会持续工作直到停止</strong></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Ticker <span class="keyword">struct</span> &#123;</span><br><span class="line">	C &lt;-<span class="keyword">chan</span> Time <span class="comment">// The channel on which the ticks are delivered.</span></span><br><span class="line">	r runtimeTimer</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">type Ticker struct {
+    C &lt;-chan Time // The channel on which the ticks are delivered.
+    r runtimeTimer
+}</code></pre>
 <h1 id="time-包中的常用函数"><a href="#time-包中的常用函数" class="headerlink" title="time 包中的常用函数"></a>time 包中的常用函数</h1><h2 id="Time-类型下的常用函数"><a href="#Time-类型下的常用函数" class="headerlink" title="Time 类型下的常用函数"></a>Time 类型下的常用函数</h2><ul>
 <li><strong>After(u Time) bool</strong>：时间类型比较，是否在 Time 之后</li>
 <li><strong>Before(u Time) bool：</strong>时间类型比较，是否在 Time 之前</li>
@@ -345,294 +145,178 @@
 <li><strong>time.LoadLocation(name string) (*Location,error)</strong>：返回给定名称的位置</li>
 <li><strong>time.FixedZone(name string,offset int) *Location：</strong>返回给定名称和偏移量的位置</li>
 </ul>
-<h1 id="time-包的实际用例"><a href="#time-包的实际用例" class="headerlink" title="time 包的实际用例"></a>time 包的实际用例</h1><h2 id="创建时间"><a href="#创建时间" class="headerlink" title="创建时间"></a>创建时间</h2><h3 id="获取当前时间"><a href="#获取当前时间" class="headerlink" title="获取当前时间"></a>获取当前时间</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">now := time.Now()</span><br></pre></td></tr></table></figure>
-
-<h3 id="创建指定的时间"><a href="#创建指定的时间" class="headerlink" title="创建指定的时间"></a>创建指定的时间</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	date := time.Date(<span class="number">2008</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">21</span>,<span class="number">22</span>,<span class="number">23</span>,<span class="number">456234</span>,time.UTC)</span><br><span class="line">	fmt.Printf(<span class="string">"date is %s\n"</span>, date)</span><br><span class="line">	date = time.Now().UTC()</span><br><span class="line">	fmt.Printf(<span class="string">"current date is %s"</span>,date)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<h1 id="time-包的实际用例"><a href="#time-包的实际用例" class="headerlink" title="time 包的实际用例"></a>time 包的实际用例</h1><h2 id="创建时间"><a href="#创建时间" class="headerlink" title="创建时间"></a>创建时间</h2><h3 id="获取当前时间"><a href="#获取当前时间" class="headerlink" title="获取当前时间"></a>获取当前时间</h3><pre><code class="go">now := time.Now()</code></pre>
+<h3 id="创建指定的时间"><a href="#创建指定的时间" class="headerlink" title="创建指定的时间"></a>创建指定的时间</h3><pre><code class="go">func main() {
+    date := time.Date(2008,8,8,21,22,23,456234,time.UTC)
+    fmt.Printf(&quot;date is %s\n&quot;, date)
+    date = time.Now().UTC()
+    fmt.Printf(&quot;current date is %s&quot;,date)
+}</code></pre>
 <p>输出如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">date is 2008-08-08 21:22:23.000456234 +0000 UTC</span><br><span class="line">current date is 2021-03-23 06:58:28.054182 +0000 UTC</span><br></pre></td></tr></table></figure>
-
-<h2 id="纳秒-毫秒-秒转换"><a href="#纳秒-毫秒-秒转换" class="headerlink" title="纳秒/毫秒/秒转换"></a>纳秒/毫秒/秒转换</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(ns / <span class="number">1e6</span>) <span class="comment">// 纳秒转毫秒</span></span><br><span class="line">fmt.Println(ns / <span class="number">1e9</span>) <span class="comment">// 纳秒转秒</span></span><br></pre></td></tr></table></figure>
-
+<pre><code>date is 2008-08-08 21:22:23.000456234 +0000 UTC
+current date is 2021-03-23 06:58:28.054182 +0000 UTC</code></pre><h2 id="纳秒-毫秒-秒转换"><a href="#纳秒-毫秒-秒转换" class="headerlink" title="纳秒/毫秒/秒转换"></a>纳秒/毫秒/秒转换</h2><pre><code class="go">fmt.Println(ns / 1e6) // 纳秒转毫秒
+fmt.Println(ns / 1e9) // 纳秒转秒</code></pre>
 <h2 id="时间格式化（time-与-string-相互转换）"><a href="#时间格式化（time-与-string-相互转换）" class="headerlink" title="时间格式化（time 与 string 相互转换）"></a>时间格式化（time 与 string 相互转换）</h2><p>Go 不使用 <code>yyyy-mm-dd</code> 布局来格式化时间。而是通过传入一个 string 类型的 <code>layout</code> 布局参数，该参数定义的时间节点为：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 2006-01-02 15:04:05</span></span><br><span class="line">Mon Jan <span class="number">2</span> <span class="number">15</span>:<span class="number">04</span>:<span class="number">05</span> <span class="number">-0700</span> MST <span class="number">2006</span></span><br></pre></td></tr></table></figure>
+<pre><code class="go">// 2006-01-02 15:04:05
+Mon Jan 2 15:04:05 -0700 MST 2006
+</code></pre>
+<pre><code class="go">const (
+    // 定义的时间节点必须符合布局参数定义
+    layoutISO = &quot;2006-01-02 15:04:05&quot;
+    layoutUS = &quot;January 2, 2006&quot;
+)
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	<span class="comment">// 定义的时间节点必须符合布局参数定义</span></span><br><span class="line">	layoutISO = <span class="string">"2006-01-02 15:04:05"</span></span><br><span class="line">	layoutUS = <span class="string">"January 2, 2006"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// string 转 time</span></span><br><span class="line">	date := <span class="string">"2021-03-23"</span></span><br><span class="line">	t, _ := time.Parse(layoutISO, date)</span><br><span class="line">	fmt.Println(t)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// time 转 string</span></span><br><span class="line">	now := time.Now()</span><br><span class="line">	fmt.Println(now.Format(layoutUS))</span><br><span class="line">	fmt.Println(now.Format(layoutISO))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+func main() {
+    // string 转 time
+    date := &quot;2021-03-23&quot;
+    t, _ := time.Parse(layoutISO, date)
+    fmt.Println(t)
 
+    // time 转 string
+    now := time.Now()
+    fmt.Println(now.Format(layoutUS))
+    fmt.Println(now.Format(layoutISO))
+}</code></pre>
 <ul>
 <li><code>time.Parse</code> ：解析日期字符串</li>
 <li><code>Format</code>：格式化 <code>time.Time</code></li>
 </ul>
 <p>函数签名如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Parse</span><span class="params">(layout, value <span class="keyword">string</span>)</span> <span class="params">(Time, error)</span></span> </span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(t Time)</span> <span class="title">Format</span><span class="params">(layout <span class="keyword">string</span>)</span> <span class="title">string</span></span></span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">func Parse(layout, value string) (Time, error) 
+func (t Time) Format(layout string) string </code></pre>
 <p>另外，Go 在 time 包中为常用的格式提供了一些便捷的常量：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	ANSIC       = <span class="string">"Mon Jan _2 15:04:05 2006"</span></span><br><span class="line">	UnixDate    = <span class="string">"Mon Jan _2 15:04:05 MST 2006"</span></span><br><span class="line">	RubyDate    = <span class="string">"Mon Jan 02 15:04:05 -0700 2006"</span></span><br><span class="line">	RFC822      = <span class="string">"02 Jan 06 15:04 MST"</span></span><br><span class="line">	RFC822Z     = <span class="string">"02 Jan 06 15:04 -0700"</span> <span class="comment">// RFC822 with numeric zone</span></span><br><span class="line">	RFC850      = <span class="string">"Monday, 02-Jan-06 15:04:05 MST"</span></span><br><span class="line">	RFC1123     = <span class="string">"Mon, 02 Jan 2006 15:04:05 MST"</span></span><br><span class="line">	RFC1123Z    = <span class="string">"Mon, 02 Jan 2006 15:04:05 -0700"</span> <span class="comment">// RFC1123 with numeric zone</span></span><br><span class="line">	RFC3339     = <span class="string">"2006-01-02T15:04:05Z07:00"</span></span><br><span class="line">	RFC3339Nano = <span class="string">"2006-01-02T15:04:05.999999999Z07:00"</span></span><br><span class="line">	Kitchen     = <span class="string">"3:04PM"</span></span><br><span class="line">	<span class="comment">// Handy time stamps.</span></span><br><span class="line">	Stamp      = <span class="string">"Jan _2 15:04:05"</span></span><br><span class="line">	StampMilli = <span class="string">"Jan _2 15:04:05.000"</span></span><br><span class="line">	StampMicro = <span class="string">"Jan _2 15:04:05.000000"</span></span><br><span class="line">	StampNano  = <span class="string">"Jan _2 15:04:05.000000000"</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<pre><code class="go">const (
+    ANSIC       = &quot;Mon Jan _2 15:04:05 2006&quot;
+    UnixDate    = &quot;Mon Jan _2 15:04:05 MST 2006&quot;
+    RubyDate    = &quot;Mon Jan 02 15:04:05 -0700 2006&quot;
+    RFC822      = &quot;02 Jan 06 15:04 MST&quot;
+    RFC822Z     = &quot;02 Jan 06 15:04 -0700&quot; // RFC822 with numeric zone
+    RFC850      = &quot;Monday, 02-Jan-06 15:04:05 MST&quot;
+    RFC1123     = &quot;Mon, 02 Jan 2006 15:04:05 MST&quot;
+    RFC1123Z    = &quot;Mon, 02 Jan 2006 15:04:05 -0700&quot; // RFC1123 with numeric zone
+    RFC3339     = &quot;2006-01-02T15:04:05Z07:00&quot;
+    RFC3339Nano = &quot;2006-01-02T15:04:05.999999999Z07:00&quot;
+    Kitchen     = &quot;3:04PM&quot;
+    // Handy time stamps.
+    Stamp      = &quot;Jan _2 15:04:05&quot;
+    StampMilli = &quot;Jan _2 15:04:05.000&quot;
+    StampMicro = &quot;Jan _2 15:04:05.000000&quot;
+    StampNano  = &quot;Jan _2 15:04:05.000000000&quot;
+)</code></pre>
+<h2 id="对时间进行加减运算"><a href="#对时间进行加减运算" class="headerlink" title="对时间进行加减运算"></a>对时间进行加减运算</h2><h3 id="加法"><a href="#加法" class="headerlink" title="加法"></a>加法</h3><pre><code class="go">func main() {
+    date := time.Date(2008,8,8,21,22,23,456234,time.UTC)
+    nextDate := date.AddDate(0,0,1)
+    nextDateByHour := date.Add(+time.Hour * 24)
+    previousDate := date.Add(-time.Hour * 24)
 
-<h2 id="对时间进行加减运算"><a href="#对时间进行加减运算" class="headerlink" title="对时间进行加减运算"></a>对时间进行加减运算</h2><h3 id="加法"><a href="#加法" class="headerlink" title="加法"></a>加法</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	date := time.Date(<span class="number">2008</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">21</span>,<span class="number">22</span>,<span class="number">23</span>,<span class="number">456234</span>,time.UTC)</span><br><span class="line">	nextDate := date.AddDate(<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>)</span><br><span class="line">	nextDateByHour := date.Add(+time.Hour * <span class="number">24</span>)</span><br><span class="line">	previousDate := date.Add(-time.Hour * <span class="number">24</span>)</span><br><span class="line">	</span><br><span class="line">	fmt.Printf(<span class="string">"date is %s\n"</span>,date)</span><br><span class="line">	fmt.Printf(<span class="string">"next date is %s\n"</span>,nextDate)</span><br><span class="line">	fmt.Printf(<span class="string">"next date by add hour is %s\n"</span>,nextDateByHour)</span><br><span class="line">	fmt.Printf(<span class="string">"privious date by add hour is %s\n"</span>,previousDate)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+    fmt.Printf(&quot;date is %s\n&quot;,date)
+    fmt.Printf(&quot;next date is %s\n&quot;,nextDate)
+    fmt.Printf(&quot;next date by add hour is %s\n&quot;,nextDateByHour)
+    fmt.Printf(&quot;privious date by add hour is %s\n&quot;,previousDate)
+}</code></pre>
 <p>输出结果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">date is 2008-08-08 21:22:23.000456234 +0000 UTC</span><br><span class="line">next date is 2008-08-09 21:22:23.000456234 +0000 UTC</span><br><span class="line">next date by add hour is 2008-08-09 21:22:23.000456234 +0000 UTC</span><br><span class="line">privious date by add hour is 2008-08-07 21:22:23.000456234 +0000 UTC</span><br></pre></td></tr></table></figure>
+<pre><code>date is 2008-08-08 21:22:23.000456234 +0000 UTC
+next date is 2008-08-09 21:22:23.000456234 +0000 UTC
+next date by add hour is 2008-08-09 21:22:23.000456234 +0000 UTC
+privious date by add hour is 2008-08-07 21:22:23.000456234 +0000 UTC</code></pre><h3 id="减法"><a href="#减法" class="headerlink" title="减法"></a>减法</h3><pre><code class="go">func main() {
+    start := time.Now()
+    time.Sleep(1*time.Second)
+    stop := time.Now()
 
-<h3 id="减法"><a href="#减法" class="headerlink" title="减法"></a>减法</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	start := time.Now()</span><br><span class="line">	time.Sleep(<span class="number">1</span>*time.Second)</span><br><span class="line">	stop := time.Now()</span><br><span class="line"></span><br><span class="line">	cost := stop.Sub(start)</span><br><span class="line">	fmt.Printf(<span class="string">"The call took %v to run.\n"</span>,cost)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+    cost := stop.Sub(start)
+    fmt.Printf(&quot;The call took %v to run.\n&quot;,cost)
+}</code></pre>
 <p>输出结果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The call took 1.000541262s to run.</span><br></pre></td></tr></table></figure>
+<pre><code>The call took 1.000541262s to run.</code></pre><h2 id="时间戳与Time相互转换"><a href="#时间戳与Time相互转换" class="headerlink" title="时间戳与Time相互转换"></a>时间戳与Time相互转换</h2><p><code>Time</code> 类具有 <code>Unix()</code> 方法，可以将时间转换为 glang 中的 UNIX 时间戳：</p>
+<pre><code class="go">func main() {
+    now := time.Now().Unix() // 秒数
+    nowNano := time.Now().UnixNano() // 纳秒数
 
-<h2 id="时间戳与Time相互转换"><a href="#时间戳与Time相互转换" class="headerlink" title="时间戳与Time相互转换"></a>时间戳与Time相互转换</h2><p><code>Time</code> 类具有 <code>Unix()</code> 方法，可以将时间转换为 glang 中的 UNIX 时间戳：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	now := time.Now().Unix() <span class="comment">// 秒数</span></span><br><span class="line">	nowNano := time.Now().UnixNano() <span class="comment">// 纳秒数</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// now is 1616484297</span></span><br><span class="line">	fmt.Printf(<span class="string">"now is %v\n"</span>,now)</span><br><span class="line">    <span class="comment">// nowNano is 1616484297027772000</span></span><br><span class="line">	fmt.Printf(<span class="string">"nowNano is %v\n"</span>,nowNano)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+    // now is 1616484297
+    fmt.Printf(&quot;now is %v\n&quot;,now)
+    // nowNano is 1616484297027772000
+    fmt.Printf(&quot;nowNano is %v\n&quot;,nowNano)
+}</code></pre>
 <p>Unix 时间戳转 Time 格式：通过 <code>time.Unix</code> 函数</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	now := time.Unix(time.Now().Unix(), <span class="number">0</span>)</span><br><span class="line">	fmt.Printf(<span class="string">"now is %v\n"</span>,now)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<pre><code class="go">func main() {
+    now := time.Unix(time.Now().Unix(), 0)
+    fmt.Printf(&quot;now is %v\n&quot;,now)
+}</code></pre>
 <p>输出结果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">now is 2021-03-23 15:32:41 +0800 CST</span><br></pre></td></tr></table></figure>
+<pre><code>now is 2021-03-23 15:32:41 +0800 CST</code></pre><h2 id="在本地和其他时区使用时间戳获取当前日期和时间"><a href="#在本地和其他时区使用时间戳获取当前日期和时间" class="headerlink" title="在本地和其他时区使用时间戳获取当前日期和时间"></a>在本地和其他时区使用时间戳获取当前日期和时间</h2><p><code>LoadLocatio</code> 返回具有给定名称的 <code>Location</code>：</p>
+<pre><code class="go">func main() {
+    t := time.Now()
+    fmt.Println(&quot;Location: &quot;, t.Location(), &quot; Time: &quot;, t)
 
-<h2 id="在本地和其他时区使用时间戳获取当前日期和时间"><a href="#在本地和其他时区使用时间戳获取当前日期和时间" class="headerlink" title="在本地和其他时区使用时间戳获取当前日期和时间"></a>在本地和其他时区使用时间戳获取当前日期和时间</h2><p><code>LoadLocatio</code> 返回具有给定名称的 <code>Location</code>：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := time.Now()</span><br><span class="line">	fmt.Println(<span class="string">"Location: "</span>, t.Location(), <span class="string">" Time: "</span>, t)</span><br><span class="line"></span><br><span class="line">	location, _ := time.LoadLocation(<span class="string">"America/New_York"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 转换时区</span></span><br><span class="line">	tInAmerica := t.In(location)</span><br><span class="line">	fmt.Println(<span class="string">"Location: "</span>, location, <span class="string">" Time: "</span>, tInAmerica)</span><br><span class="line"></span><br><span class="line">	location, _ = time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line">	tInShanghai := t.In(location)</span><br><span class="line">	fmt.Println(<span class="string">"Location: "</span>, location, <span class="string">" Time: "</span>, tInShanghai)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    location, _ := time.LoadLocation(&quot;America/New_York&quot;)
 
+    // 转换时区
+    tInAmerica := t.In(location)
+    fmt.Println(&quot;Location: &quot;, location, &quot; Time: &quot;, tInAmerica)
+
+    location, _ = time.LoadLocation(&quot;Asia/Shanghai&quot;)
+    tInShanghai := t.In(location)
+    fmt.Println(&quot;Location: &quot;, location, &quot; Time: &quot;, tInShanghai)
+}</code></pre>
 <p>输出结果：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Location:  Local  Time:  2021-03-23 21:46:37.255412 +0800 CST m=+0.000090396</span><br><span class="line">Location:  America/New_York  Time:  2021-03-23 09:46:37.255412 -0400 EDT</span><br><span class="line">Location:  Asia/Shanghai  Time:  2021-03-23 21:46:37.255412 +0800 CST</span><br></pre></td></tr></table></figure>
+<pre><code>Location:  Local  Time:  2021-03-23 21:46:37.255412 +0800 CST m=+0.000090396
+Location:  America/New_York  Time:  2021-03-23 09:46:37.255412 -0400 EDT
+Location:  Asia/Shanghai  Time:  2021-03-23 21:46:37.255412 +0800 CST</code></pre><h2 id="获取-Weekday-和-Yearday"><a href="#获取-Weekday-和-Yearday" class="headerlink" title="获取 Weekday 和 Yearday"></a>获取 Weekday 和 Yearday</h2><p>Weekday 返回由 t 指定的星期几。Yearday 返回由 t 指定的一年中的第几天，非闰年范围为 <code>[1,365]</code>，闰年为 <code>[1,366]</code>。</p>
+<pre><code class="go">func main() {
+    t, _ := time.Parse(&quot;2006 01 02 15 04&quot;, &quot;2015 11 11 16 50&quot;)
+    fmt.Println(t.YearDay()) // 315
+    fmt.Println(t.Weekday()) // Wednesday
 
-<h2 id="获取-Weekday-和-Yearday"><a href="#获取-Weekday-和-Yearday" class="headerlink" title="获取 Weekday 和 Yearday"></a>获取 Weekday 和 Yearday</h2><p>Weekday 返回由 t 指定的星期几。Yearday 返回由 t 指定的一年中的第几天，非闰年范围为 <code>[1,365]</code>，闰年为 <code>[1,366]</code>。</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t, _ := time.Parse(<span class="string">"2006 01 02 15 04"</span>, <span class="string">"2015 11 11 16 50"</span>)</span><br><span class="line">	fmt.Println(t.YearDay()) <span class="comment">// 315</span></span><br><span class="line">	fmt.Println(t.Weekday()) <span class="comment">// Wednesday</span></span><br><span class="line"></span><br><span class="line">	t, _ = time.Parse(<span class="string">"2006 01 02 15 04"</span>, <span class="string">"2011 01 01 0 00"</span>)</span><br><span class="line">	fmt.Println(t.YearDay()) <span class="comment">// 1</span></span><br><span class="line">	fmt.Println(t.Weekday()) <span class="comment">// Saturday</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="日期时间的前后关系判断"><a href="#日期时间的前后关系判断" class="headerlink" title="日期时间的前后关系判断"></a>日期时间的前后关系判断</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	t2 := t1.Add(time.Minute)</span><br><span class="line">	t3 := t1.Add(-time.Minute)</span><br><span class="line">	<span class="keyword">if</span> t1.Before(t2) &#123;</span><br><span class="line">		fmt.Println(<span class="string">"t1 is before t2"</span>)</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"t1 is after t2"</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(time.Since(t3))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+    t, _ = time.Parse(&quot;2006 01 02 15 04&quot;, &quot;2011 01 01 0 00&quot;)
+    fmt.Println(t.YearDay()) // 1
+    fmt.Println(t.Weekday()) // Saturday
+}</code></pre>
+<h2 id="日期时间的前后关系判断"><a href="#日期时间的前后关系判断" class="headerlink" title="日期时间的前后关系判断"></a>日期时间的前后关系判断</h2><pre><code class="go">func main() {
+    t1 := time.Now()
+    t2 := t1.Add(time.Minute)
+    t3 := t1.Add(-time.Minute)
+    if t1.Before(t2) {
+        fmt.Println(&quot;t1 is before t2&quot;)
+    } else {
+        fmt.Println(&quot;t1 is after t2&quot;)
+    }
+    fmt.Println(time.Since(t3))
+}</code></pre>
 <p>输出结果如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">t1 is before t2</span><br><span class="line">1m0.000028295s</span><br></pre></td></tr></table></figure>
+<pre><code>t1 is before t2
+1m0.000028295s</code></pre><h2 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h2><pre><code class="go">func main() {
+    go func() {
+        timer := time.NewTimer(2 * time.Second)
+        for t := range timer.C:
+                fmt.Println(&quot;timer fired&quot;)
+            }
+        }
+    }()
 
-<h2 id="定时器"><a href="#定时器" class="headerlink" title="定时器"></a>定时器</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		timer := time.NewTimer(<span class="number">2</span> * time.Second)</span><br><span class="line">        <span class="keyword">for</span> t := <span class="keyword">range</span> timer.C:</span><br><span class="line">				fmt.Println(<span class="string">"timer fired"</span>)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    time.Sleep(3 * time.Second)
+}</code></pre>
+<h2 id="断续器（每个固定的时间执行一次）"><a href="#断续器（每个固定的时间执行一次）" class="headerlink" title="断续器（每个固定的时间执行一次）"></a>断续器（每个固定的时间执行一次）</h2><pre><code class="go">func main() {
+    ticker := time.NewTicker(1 * time.Second)
+    go func() {
+        for t := range ticker.C:
+                fmt.Println(&quot;ticker at: &quot;, t)
+            }
+        }
+    }()
 
-<h2 id="断续器（每个固定的时间执行一次）"><a href="#断续器（每个固定的时间执行一次）" class="headerlink" title="断续器（每个固定的时间执行一次）"></a>断续器（每个固定的时间执行一次）</h2><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	ticker := time.NewTicker(<span class="number">1</span> * time.Second)</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> t := <span class="keyword">range</span> ticker.C:</span><br><span class="line">				fmt.Println(<span class="string">"ticker at: "</span>, t)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	time.Sleep(<span class="number">10</span> * time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ticker at:  2021-03-23 22:19:49.743301 +0800 CST m=+1.003682073</span><br><span class="line">ticker at:  2021-03-23 22:19:50.741223 +0800 CST m=+2.001600968</span><br><span class="line">ticker at:  2021-03-23 22:19:51.744963 +0800 CST m=+3.005338145</span><br><span class="line">ticker at:  2021-03-23 22:19:52.742212 +0800 CST m=+4.002584520</span><br><span class="line">ticker at:  2021-03-23 22:19:53.741429 +0800 CST m=+5.001799684</span><br><span class="line">ticker at:  2021-03-23 22:19:54.742483 +0800 CST m=+6.002850379</span><br><span class="line">ticker at:  2021-03-23 22:19:55.741314 +0800 CST m=+7.001678696</span><br><span class="line">ticker at:  2021-03-23 22:19:56.743402 +0800 CST m=+8.003764744</span><br><span class="line">ticker at:  2021-03-23 22:19:57.740211 +0800 CST m=+9.000570923</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>参考资料</strong>：</p>
+    time.Sleep(10 * time.Second)
+}</code></pre>
+<pre><code>ticker at:  2021-03-23 22:19:49.743301 +0800 CST m=+1.003682073
+ticker at:  2021-03-23 22:19:50.741223 +0800 CST m=+2.001600968
+ticker at:  2021-03-23 22:19:51.744963 +0800 CST m=+3.005338145
+ticker at:  2021-03-23 22:19:52.742212 +0800 CST m=+4.002584520
+ticker at:  2021-03-23 22:19:53.741429 +0800 CST m=+5.001799684
+ticker at:  2021-03-23 22:19:54.742483 +0800 CST m=+6.002850379
+ticker at:  2021-03-23 22:19:55.741314 +0800 CST m=+7.001678696
+ticker at:  2021-03-23 22:19:56.743402 +0800 CST m=+8.003764744
+ticker at:  2021-03-23 22:19:57.740211 +0800 CST m=+9.000570923</code></pre><p><strong>参考资料</strong>：</p>
 <blockquote>
 <p><a href="https://www.jianshu.com/p/3b4b1e1f71f2" target="_blank" rel="noopener">go time包的使用</a></p>
 <p><a href="https://juejin.cn/post/6844903823933177863#heading-3" target="_blank" rel="noopener">Golang如何使用time包</a></p>
 </blockquote>
-
-    </div>
-
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
-
-  </div>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/go/" rel="tag"># go</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/" rel="prev" title="Go 中的单元测试和基准测试的使用">
-      <i class="fa fa-chevron-left"></i> Go 中的单元测试和基准测试的使用
-    </a></div>
-      <div class="post-nav-item"></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#time-包中的类型"><span class="nav-number">1.</span> <span class="nav-text">time 包中的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Time"><span class="nav-number">1.1.</span> <span class="nav-text">time.Time{}</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Month"><span class="nav-number">1.2.</span> <span class="nav-text">time.Month()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Weekday"><span class="nav-number">1.3.</span> <span class="nav-text">time.Weekday</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Duration"><span class="nav-number">1.4.</span> <span class="nav-text">time.Duration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Location"><span class="nav-number">1.5.</span> <span class="nav-text">time.Location</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Timer-定时器"><span class="nav-number">1.6.</span> <span class="nav-text">time.Timer 定时器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#time-Ticker-断续器"><span class="nav-number">1.7.</span> <span class="nav-text">time.Ticker 断续器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#time-包中的常用函数"><span class="nav-number">2.</span> <span class="nav-text">time 包中的常用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Time-类型下的常用函数"><span class="nav-number">2.1.</span> <span class="nav-text">Time 类型下的常用函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他常用函数"><span class="nav-number">2.2.</span> <span class="nav-text">其他常用函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#time-包的实际用例"><span class="nav-number">3.</span> <span class="nav-text">time 包的实际用例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建时间"><span class="nav-number">3.1.</span> <span class="nav-text">创建时间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取当前时间"><span class="nav-number">3.1.1.</span> <span class="nav-text">获取当前时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建指定的时间"><span class="nav-number">3.1.2.</span> <span class="nav-text">创建指定的时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#纳秒-毫秒-秒转换"><span class="nav-number">3.2.</span> <span class="nav-text">纳秒/毫秒/秒转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间格式化（time-与-string-相互转换）"><span class="nav-number">3.3.</span> <span class="nav-text">时间格式化（time 与 string 相互转换）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对时间进行加减运算"><span class="nav-number">3.4.</span> <span class="nav-text">对时间进行加减运算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#加法"><span class="nav-number">3.4.1.</span> <span class="nav-text">加法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#减法"><span class="nav-number">3.4.2.</span> <span class="nav-text">减法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#时间戳与Time相互转换"><span class="nav-number">3.5.</span> <span class="nav-text">时间戳与Time相互转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在本地和其他时区使用时间戳获取当前日期和时间"><span class="nav-number">3.6.</span> <span class="nav-text">在本地和其他时区使用时间戳获取当前日期和时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取-Weekday-和-Yearday"><span class="nav-number">3.7.</span> <span class="nav-text">获取 Weekday 和 Yearday</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日期时间的前后关系判断"><span class="nav-number">3.8.</span> <span class="nav-text">日期时间的前后关系判断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定时器"><span class="nav-number">3.9.</span> <span class="nav-text">定时器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#断续器（每个固定的时间执行一次）"><span class="nav-number">3.10.</span> <span class="nav-text">断续器（每个固定的时间执行一次）</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2021/03/25/Opentracing%E6%A0%87%E5%87%86%E5%92%8CJaeger%E5%AE%9E%E7%8E%B0/" title="分布式链路追踪（OpenTracing标准）和 Jaeger 实现"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: 分布式链路追踪（OpenTracing标准）和 Jaeger 实现</span></a><a class="button is-default" href="/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/" title="Go 中的单元测试和基准测试的使用"><span class="has-text-weight-semibold">下一页: Go 中的单元测试和基准测试的使用</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

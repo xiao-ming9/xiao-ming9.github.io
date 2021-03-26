@@ -1,533 +1,455 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>Spring数据访问</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">Spring数据访问</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#使用JdbcTemplate"><span class="toc-text">使用JdbcTemplate</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#直接连接c3p0"><span class="toc-text">直接连接c3p0</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#使用spring管理jdbcTemplate"><span class="toc-text">使用spring管理jdbcTemplate</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用xml配置"><span class="toc-text">使用xml配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用注解配置"><span class="toc-text">使用注解配置</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#事务管理"><span class="toc-text">事务管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Xml配置事务"><span class="toc-text">Xml配置事务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用注解配置事务"><span class="toc-text">使用注解配置事务</span></a></li></ol></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/java"><i class="tag post-item-tag">java</i></a><a href="/tags/spring"><i class="tag post-item-tag">spring</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">Spring数据访问</h1><time class="has-text-grey" datetime="2019-05-14T08:24:07.000Z">2019-05-14</time><article class="mt-2 post-content"><h1 id="使用JdbcTemplate"><a href="#使用JdbcTemplate" class="headerlink" title="使用JdbcTemplate"></a>使用JdbcTemplate</h1><p>需要导入的jar包：<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/SpringJdbc%E9%9C%80%E8%A6%81%E7%9A%84%E4%BE%9D%E8%B5%96.png?raw=true" alt="springJdbc需要的依赖"></p>
+<h2 id="直接连接c3p0"><a href="#直接连接c3p0" class="headerlink" title="直接连接c3p0"></a>直接连接c3p0</h2><pre><code class="java">public class TestJdbcTemplate {
 
+    @Test
+    public void testSave1() throws PropertyVetoException {
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+        dataSource.setDriverClass(&quot;com.mysql.jdbc.Driver&quot;);
+        dataSource.setJdbcUrl(&quot;jdbc:mysql://localhost:3306/spring&quot;);
+        dataSource.setUser(&quot;root&quot;);
+        dataSource.setPassword(&quot;123&quot;);
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
-
-
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
-
-  <meta name="description" content="使用JdbcTemplate需要导入的jar包： 直接连接c3p0123456789101112131415public class TestJdbcTemplate &amp;#123;    @Test    public void testSave1() throws PropertyVetoException &amp;#123;        ComboPooledDataSource dataSour">
-<meta name="keywords" content="java,spring">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Spring数据访问">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;05&#x2F;14&#x2F;spring%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="使用JdbcTemplate需要导入的jar包： 直接连接c3p0123456789101112131415public class TestJdbcTemplate &amp;#123;    @Test    public void testSave1() throws PropertyVetoException &amp;#123;        ComboPooledDataSource dataSour">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;SpringJdbc%E9%9C%80%E8%A6%81%E7%9A%84%E4%BE%9D%E8%B5%96.png?raw=true">
-<meta property="og:updated_time" content="2020-12-01T10:41:48.867Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;SpringJdbc%E9%9C%80%E8%A6%81%E7%9A%84%E4%BE%9D%E8%B5%96.png?raw=true">
-
-<link rel="canonical" href="http://yoursite.com/2019/05/14/spring%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
-
-  <title>Spring数据访问 | Silverming</title>
-  
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
-
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
-
-
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/14/spring%E6%95%B0%E6%8D%AE%E8%AE%BF%E9%97%AE/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Spring数据访问
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-05-14 16:24:07" itemprop="dateCreated datePublished" datetime="2019-05-14T16:24:07+08:00">2019-05-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:41:48" itemprop="dateModified" datetime="2020-12-01T18:41:48+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>11k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>10 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="使用JdbcTemplate"><a href="#使用JdbcTemplate" class="headerlink" title="使用JdbcTemplate"></a>使用JdbcTemplate</h1><p>需要导入的jar包：<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/SpringJdbc%E9%9C%80%E8%A6%81%E7%9A%84%E4%BE%9D%E8%B5%96.png?raw=true" alt="springJdbc需要的依赖"></p>
-<h2 id="直接连接c3p0"><a href="#直接连接c3p0" class="headerlink" title="直接连接c3p0"></a>直接连接c3p0</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestJdbcTemplate</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSave1</span><span class="params">()</span> <span class="keyword">throws</span> PropertyVetoException </span>&#123;</span><br><span class="line">        ComboPooledDataSource dataSource = <span class="keyword">new</span> ComboPooledDataSource();</span><br><span class="line">        dataSource.setDriverClass(<span class="string">"com.mysql.jdbc.Driver"</span>);</span><br><span class="line">        dataSource.setJdbcUrl(<span class="string">"jdbc:mysql://localhost:3306/spring"</span>);</span><br><span class="line">        dataSource.setUser(<span class="string">"root"</span>);</span><br><span class="line">        dataSource.setPassword(<span class="string">"123"</span>);</span><br><span class="line"></span><br><span class="line">        JdbcTemplate jt = <span class="keyword">new</span> JdbcTemplate(dataSource);</span><br><span class="line">        String sql = <span class="string">"INSERT INTO users(name,age) VALUES (?,?)"</span>;</span><br><span class="line">        jt.update(sql,<span class="string">"xiaoming"</span>,<span class="number">6</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        JdbcTemplate jt = new JdbcTemplate(dataSource);
+        String sql = &quot;INSERT INTO users(name,age) VALUES (?,?)&quot;;
+        jt.update(sql,&quot;xiaoming&quot;,6);
+    }
+}</code></pre>
 <a id="more"></a>
 
 <h1 id="使用spring管理jdbcTemplate"><a href="#使用spring管理jdbcTemplate" class="headerlink" title="使用spring管理jdbcTemplate"></a>使用spring管理jdbcTemplate</h1><h2 id="使用xml配置"><a href="#使用xml配置" class="headerlink" title="使用xml配置"></a>使用xml配置</h2><ol>
-<li>创建实体类<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name, <span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">        <span class="keyword">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAge</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.age = age;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"User&#123;"</span> +</span><br><span class="line">                <span class="string">"id="</span> + id +</span><br><span class="line">                <span class="string">", name='"</span> + name + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", age="</span> + age +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>dao层</li>
-</ol>
-<ul>
-<li>接口<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">save</span><span class="params">(User user)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">delete</span><span class="params">(Integer id)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(User user)</span></span>;</span><br><span class="line">    <span class="function">User <span class="title">getById</span><span class="params">(Integer id)</span></span>;</span><br><span class="line">    <span class="function">List&lt;User&gt; <span class="title">getAll</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">getTotalCount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-<li>接口实现类<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserDaoImpl</span> <span class="keyword">implements</span> <span class="title">UserDao</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> JdbcTemplate jt;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setJt</span><span class="params">(JdbcTemplate jt)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.jt = jt;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">save</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"INSERT INTO users(name,age) VALUES (?,?)"</span>;</span><br><span class="line">        jt.update(sql,user.getName(),user.getAge());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">delete</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"DELETE FROM users WHERE id = ?"</span>;</span><br><span class="line">        jt.update(sql,id);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(User user)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"UPDATE users set name = ?,age = ? WHERE id= ?"</span>;</span><br><span class="line">        jt.update(sql,user.getName(),user.getAge(),user.getId());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> User <span class="title">getById</span><span class="params">(Integer id)</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"SELECT * FROM users WHERE id = ?"</span>;</span><br><span class="line">        User user = jt.queryForObject(sql, <span class="keyword">new</span> RowMapper&lt;User&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> User <span class="title">mapRow</span><span class="params">(ResultSet rs, <span class="keyword">int</span> rowNum)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> RowMapperHandler(rs);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,id);</span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"SELECT * FROM users"</span>;</span><br><span class="line">        List&lt;User&gt; userList = jt.query(sql, <span class="keyword">new</span> RowMapper&lt;User&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> User <span class="title">mapRow</span><span class="params">(ResultSet rs, <span class="keyword">int</span> rowNum)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> RowMapperHandler(rs);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">return</span> userList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getTotalCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String sql = <span class="string">"SELECT count(1) from users"</span>;</span><br><span class="line">        Integer count = jt.queryForObject(sql,Integer<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        <span class="keyword">return</span> count;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将重复内容提取出来</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> rs</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> SQLException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> User <span class="title">RowMapperHandler</span><span class="params">(ResultSet rs)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setName(rs.getString(<span class="string">"name"</span>));</span><br><span class="line">        user.setAge(rs.getInt(<span class="string">"age"</span>));</span><br><span class="line">        <span class="keyword">return</span> user;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-<ol start="3">
-<li>配置xml文件<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">beans</span> <span class="attr">xmlns</span>=<span class="string">"http://www.springframework.org/schema/beans"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:xsi</span>=<span class="string">"http://www.w3.org/2001/XMLSchema-instance"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xmlns:context</span>=<span class="string">"http://www.springframework.org/schema/context"</span></span></span><br><span class="line"><span class="tag">       <span class="attr">xsi:schemaLocation</span>=<span class="string">"http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 加载配置文件 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:property-placeholder</span> <span class="attr">location</span>=<span class="string">"classpath:db.properties"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 连接池 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">class</span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driverClass"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.driver&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jdbcUrl"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- jdbcTemplate 只有自己写的类才能使用呢 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"jdbcTemplate"</span> <span class="attr">class</span>=<span class="string">"org.springframework.jdbc.core.JdbcTemplate"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- userDao --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"userDao"</span> <span class="attr">class</span>=<span class="string">"com.xm.dao.UserDaoImpl"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jt"</span> <span class="attr">ref</span>=<span class="string">"jdbcTemplate"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 配置文件 --&gt;</span></span><br><span class="line">jdbc.driver = com.mysql.jdbc.Driver</span><br><span class="line">jdbc.url = jdbc:mysql://localhost:3306/spring</span><br><span class="line">jdbc.username = root</span><br><span class="line">jdbc.password = 123</span><br></pre></td></tr></table></figure></li>
-<li>测试<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringJUnit4ClassRunner<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line">@ContextConfiguration("classpath:applicationContext.xml")</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestSpringJdbc</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span>(name = <span class="string">"userDao"</span>)</span><br><span class="line">    <span class="keyword">private</span> UserDao userDao;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSave</span><span class="params">()</span></span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User(<span class="string">"test3"</span>,<span class="number">45</span>);</span><br><span class="line">        userDao.save(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelete</span><span class="params">()</span></span>&#123;</span><br><span class="line">        userDao.delete(<span class="number">3</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testUpdate</span><span class="params">()</span></span>&#123;</span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setName(<span class="string">"test00"</span>);</span><br><span class="line">        user.setAge(<span class="number">12</span>);</span><br><span class="line">        user.setId(<span class="number">1</span>);</span><br><span class="line">        userDao.update(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGetById</span><span class="params">()</span></span>&#123;</span><br><span class="line">        User user = userDao.getById(<span class="number">2</span>);</span><br><span class="line">        System.out.println(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testGetAll</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;User&gt; users = userDao.getAll();</span><br><span class="line">        <span class="keyword">for</span> (User user : users) &#123;</span><br><span class="line">            System.out.println(user);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testCount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">int</span> totalCount = userDao.getTotalCount();</span><br><span class="line">        System.out.println(totalCount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><p>创建实体类</p>
+<pre><code class="java">public class User {
+ private int id;
+ private String name;
+ private int age;
 
+ public User() {
+ }
+
+ public User(String name, int age) {
+     this.name = name;
+     this.age = age;
+ }
+
+ public int getId() {
+     return id;
+ }
+
+ public void setId(int id) {
+     this.id = id;
+ }
+
+ public String getName() {
+     return name;
+ }
+
+ public void setName(String name) {
+     this.name = name;
+ }
+
+ public int getAge() {
+     return age;
+ }
+
+ public void setAge(int age) {
+     this.age = age;
+ }
+
+ @Override
+ public String toString() {
+     return &quot;User{&quot; +
+             &quot;id=&quot; + id +
+             &quot;, name=&#39;&quot; + name + &#39;\&#39;&#39; +
+             &quot;, age=&quot; + age +
+             &#39;}&#39;;
+ }
+}</code></pre>
+</li>
+<li><p>dao层</p>
 </li>
 </ol>
-<h2 id="使用注解配置"><a href="#使用注解配置" class="headerlink" title="使用注解配置"></a>使用注解配置</h2><p>除了使用xml，也可以使用注解进行依赖注入，但是要注意注解只能针对自己编写的类</p>
+<ul>
+<li><p>接口</p>
+<pre><code class="java">public interface UserDao {
+  void save(User user);
+  void delete(Integer id);
+  void update(User user);
+  User getById(Integer id);
+  List&lt;User&gt; getAll();
+  int getTotalCount();
+}</code></pre>
+</li>
+<li><p>接口实现类</p>
+<pre><code class="java">public class UserDaoImpl implements UserDao {
+
+  private JdbcTemplate jt;
+
+  public void setJt(JdbcTemplate jt) {
+      this.jt = jt;
+  }
+
+  @Override
+  public void save(User user) {
+      String sql = &quot;INSERT INTO users(name,age) VALUES (?,?)&quot;;
+      jt.update(sql,user.getName(),user.getAge());
+  }
+
+  @Override
+  public void delete(Integer id) {
+      String sql = &quot;DELETE FROM users WHERE id = ?&quot;;
+      jt.update(sql,id);
+  }
+
+  @Override
+  public void update(User user) {
+      String sql = &quot;UPDATE users set name = ?,age = ? WHERE id= ?&quot;;
+      jt.update(sql,user.getName(),user.getAge(),user.getId());
+  }
+
+  @Override
+  public User getById(Integer id) {
+      String sql = &quot;SELECT * FROM users WHERE id = ?&quot;;
+      User user = jt.queryForObject(sql, new RowMapper&lt;User&gt;() {
+          @Override
+          public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+              return RowMapperHandler(rs);
+          }
+      },id);
+      return user;
+  }
+
+  @Override
+  public List&lt;User&gt; getAll() {
+      String sql = &quot;SELECT * FROM users&quot;;
+      List&lt;User&gt; userList = jt.query(sql, new RowMapper&lt;User&gt;() {
+          @Override
+          public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+              return RowMapperHandler(rs);
+          }
+      });
+      return userList;
+  }
+
+  @Override
+  public int getTotalCount() {
+      String sql = &quot;SELECT count(1) from users&quot;;
+      Integer count = jt.queryForObject(sql,Integer.class);
+      return count;
+  }
+
+  /**
+   * 将重复内容提取出来
+   * @param rs
+   * @return
+   * @throws SQLException
+   */
+  private User RowMapperHandler(ResultSet rs) throws SQLException {
+      User user = new User();
+      user.setName(rs.getString(&quot;name&quot;));
+      user.setAge(rs.getInt(&quot;age&quot;));
+      return user;
+  }
+}</code></pre>
+</li>
+</ul>
+<ol start="3">
+<li><p>配置xml文件</p>
+<pre><code class="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;
+    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+    xmlns:context=&quot;http://www.springframework.org/schema/context&quot;
+    xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd&quot;&gt;
+
+ &lt;!-- 加载配置文件 --&gt;
+ &lt;context:property-placeholder location=&quot;classpath:db.properties&quot;/&gt;
+ &lt;!-- 连接池 --&gt;
+ &lt;bean name=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+     &lt;property name=&quot;driverClass&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+     &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url}&quot;/&gt;
+     &lt;property name=&quot;user&quot; value=&quot;${jdbc.username}&quot;/&gt;
+     &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+ &lt;/bean&gt;
+ &lt;!-- jdbcTemplate 只有自己写的类才能使用呢 --&gt;
+ &lt;bean name=&quot;jdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+     &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+ &lt;/bean&gt;
+ &lt;!-- userDao --&gt;
+ &lt;bean name=&quot;userDao&quot; class=&quot;com.xm.dao.UserDaoImpl&quot;&gt;
+     &lt;property name=&quot;jt&quot; ref=&quot;jdbcTemplate&quot;/&gt;
+ &lt;/bean&gt;
+&lt;/beans&gt;
+</code></pre>
+</li>
+</ol>
+<!-- 配置文件 -->
+<p>jdbc.driver = com.mysql.jdbc.Driver<br>jdbc.url = jdbc:mysql://localhost:3306/spring<br>jdbc.username = root<br>jdbc.password = 123</p>
+<pre><code>4. 测试
+```java
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(&quot;classpath:applicationContext.xml&quot;)
+public class TestSpringJdbc {
+
+    @Resource(name = &quot;userDao&quot;)
+    private UserDao userDao;
+
+    @Test
+    public void testSave(){
+        User user = new User(&quot;test3&quot;,45);
+        userDao.save(user);
+    }
+
+    @Test
+    public void testDelete(){
+        userDao.delete(3);
+    }
+
+    @Test
+    public void testUpdate(){
+        User user = new User();
+        user.setName(&quot;test00&quot;);
+        user.setAge(12);
+        user.setId(1);
+        userDao.update(user);
+    }
+
+    @Test
+    public void testGetById(){
+        User user = userDao.getById(2);
+        System.out.println(user);
+    }
+
+    @Test
+    public void testGetAll(){
+        List&lt;User&gt; users = userDao.getAll();
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    @Test
+    public void testCount(){
+        int totalCount = userDao.getTotalCount();
+        System.out.println(totalCount);
+    }
+}</code></pre><h2 id="使用注解配置"><a href="#使用注解配置" class="headerlink" title="使用注解配置"></a>使用注解配置</h2><p>除了使用xml，也可以使用注解进行依赖注入，但是要注意注解只能针对自己编写的类</p>
 <p>将最后的<code>userDao</code>Bean去掉，增加注解扫描<br>在<code>UserDaoImpl</code>添加注解<code>@Repository(&quot;userDao&quot;)</code>,对成员变量添加注解<code>@Resource(name = &quot;jdbcTemplate&quot;)</code>,在测试时对变量进行自动装配即可</p>
 <h1 id="事务管理"><a href="#事务管理" class="headerlink" title="事务管理"></a>事务管理</h1><p>Spring使用<code>TransactionManager</code>事务管理接口，其中<code>DataSourceTransantionManager</code>用于JDBC操作<br>事务的定义接口：<code>TransactionDefinition</code></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">TransactionDefinition</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 支持当前事务，，如果不存在，就新建一个</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_REQUIRED = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 支持当前事务，如果不存在，就不使用事务</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_SUPPORTS = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 支持当前事务，如果不存在就抛出异常</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_MANDATORY = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 如果有事务存在，挂起当前事务，创建一个新的事务</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_REQUIRES_NEW = <span class="number">3</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 以非事务方式运行，如果有事务存在，挂起当前事务</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_NOT_SUPPORTED = <span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 以非事务方式运行，如果有事务存在，就抛出异常</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_NEVER = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 如果有事务存在，则嵌套事务执行</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> PROPAGATION_NESTED = <span class="number">6</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 使用数据库默认级别</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> ISOLATION_DEFAULT = -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 未提交读</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> ISOLATION_READ_UNCOMMITTED = Connection.TRANSACTION_READ_UNCOMMITTED;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 提交读</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> ISOLATION_READ_COMMITTED = Connection.TRANSACTION_READ_COMMITTED;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 可重复读</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> ISOLATION_REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 串行化</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> ISOLATION_SERIALIZABLE = Connection.TRANSACTION_SERIALIZABLE;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 超时时间，-1为不超时，单位为秒</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">int</span> TIMEOUT_DEFAULT = -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 返回传播方式</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">getPropagationBehavior</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 返回隔离级别</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">getIsolationLevel</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 返回超时时间</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">int</span> <span class="title">getTimeout</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 设置是否是只读事务</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">boolean</span> <span class="title">isReadOnly</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * 返回该事务的名称</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@Nullable</span></span><br><span class="line">	<span class="function">String <span class="title">getName</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">public interface TransactionDefinition {
+
+    /**
+     * 支持当前事务，，如果不存在，就新建一个
+     */
+    int PROPAGATION_REQUIRED = 0;
+
+    /**
+     * 支持当前事务，如果不存在，就不使用事务
+     */
+    int PROPAGATION_SUPPORTS = 1;
+
+    /**
+     * 支持当前事务，如果不存在就抛出异常
+     */
+    int PROPAGATION_MANDATORY = 2;
+
+    /**
+     * 如果有事务存在，挂起当前事务，创建一个新的事务
+     */
+    int PROPAGATION_REQUIRES_NEW = 3;
+
+    /**
+     * 以非事务方式运行，如果有事务存在，挂起当前事务
+     */
+    int PROPAGATION_NOT_SUPPORTED = 4;
+
+    /**
+     * 以非事务方式运行，如果有事务存在，就抛出异常
+     */
+    int PROPAGATION_NEVER = 5;
+
+    /**
+     * 如果有事务存在，则嵌套事务执行
+     */
+    int PROPAGATION_NESTED = 6;
+
+
+    /**
+     * 使用数据库默认级别
+     */
+    int ISOLATION_DEFAULT = -1;
+
+    /**
+     * 未提交读
+     */
+    int ISOLATION_READ_UNCOMMITTED = Connection.TRANSACTION_READ_UNCOMMITTED;
+
+    /**
+     * 提交读
+     */
+    int ISOLATION_READ_COMMITTED = Connection.TRANSACTION_READ_COMMITTED;
+
+    /**
+     * 可重复读
+     */
+    int ISOLATION_REPEATABLE_READ = Connection.TRANSACTION_REPEATABLE_READ;
+
+    /**
+     * 串行化
+     */
+    int ISOLATION_SERIALIZABLE = Connection.TRANSACTION_SERIALIZABLE;
+
+
+    /**
+     * 超时时间，-1为不超时，单位为秒
+     */
+    int TIMEOUT_DEFAULT = -1;
+
+
+    /**
+     * 返回传播方式
+     */
+    int getPropagationBehavior();
+
+    /**
+     * 返回隔离级别
+     */
+    int getIsolationLevel();
+
+    /**
+     * 返回超时时间
+     */
+    int getTimeout();
+
+    /**
+     * 设置是否是只读事务
+     */
+    boolean isReadOnly();
+
+    /**
+     * 返回该事务的名称
+     */
+    @Nullable
+    String getName();
+
+}</code></pre>
 <h2 id="Xml配置事务"><a href="#Xml配置事务" class="headerlink" title="Xml配置事务"></a>Xml配置事务</h2><p>加入<code>tx</code>事务名称空间<br>配置事务管理器</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"transactionManager"</span> <span class="attr">class</span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;bean name=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+&lt;/bean&gt;</code></pre>
 <p>配置通知</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tx:advice</span> <span class="attr">id</span>=<span class="string">"txAdvice"</span> <span class="attr">transaction-manager</span>=<span class="string">"transactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tx:attributes</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 传播行为 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"transfer"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 可以对方法名使用通配符 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"save*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"add*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"insert*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"create*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"update*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"modify*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"edit*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"delete*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"remove*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"drop*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"get*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"select*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"find*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"query*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"search*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tx:attributes</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tx:advice</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;
+    &lt;tx:attributes&gt;
+        &lt;!-- 传播行为 --&gt;
+        &lt;tx:method name=&quot;transfer&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;!-- 可以对方法名使用通配符 --&gt;
+        &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;add*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;create*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;modify*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;edit*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;remove*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;drop*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;get*&quot; propagation=&quot;SUPPORTS&quot;/&gt;
+        &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot;/&gt;
+        &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot;/&gt;
+        &lt;tx:method name=&quot;query*&quot; propagation=&quot;SUPPORTS&quot;/&gt;
+        &lt;tx:method name=&quot;search*&quot; propagation=&quot;SUPPORTS&quot;/&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;</code></pre>
 <p>配置切面（将通知织入切入点），注意要引入<code>aspectjweaver</code>依赖</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tx:advice</span> <span class="attr">id</span>=<span class="string">"txAdvice"</span> <span class="attr">transaction-manager</span>=<span class="string">"transactionManager"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tx:attributes</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 传播行为 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"transfer"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 可以对方法名使用通配符 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"save*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"add*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"insert*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"create*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"update*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"modify*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"edit*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"delete*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"remove*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"drop*"</span> <span class="attr">propagation</span>=<span class="string">"REQUIRED"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"get*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span> <span class="attr">read-only</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"select*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span> <span class="attr">read-only</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"find*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span> <span class="attr">read-only</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"query*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span> <span class="attr">read-only</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">tx:method</span> <span class="attr">name</span>=<span class="string">"search*"</span> <span class="attr">propagation</span>=<span class="string">"SUPPORTS"</span> <span class="attr">read-only</span>=<span class="string">"true"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">tx:attributes</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">tx:advice</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 配置切面 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">aop:config</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:pointcut</span> <span class="attr">id</span>=<span class="string">"txPointcut"</span> <span class="attr">expression</span>=<span class="string">"execution(* com.xm.service..*.*(..))"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">aop:advisor</span> <span class="attr">advice-ref</span>=<span class="string">"txAdvice"</span> <span class="attr">pointcut-ref</span>=<span class="string">"txPointcut"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">aop:config</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;
+    &lt;tx:attributes&gt;
+        &lt;!-- 传播行为 --&gt;
+        &lt;tx:method name=&quot;transfer&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;!-- 可以对方法名使用通配符 --&gt;
+        &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;add*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;create*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;modify*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;edit*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;remove*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;drop*&quot; propagation=&quot;REQUIRED&quot;/&gt;
+        &lt;tx:method name=&quot;get*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;
+        &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;
+        &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;
+        &lt;tx:method name=&quot;query*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;
+        &lt;tx:method name=&quot;search*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;
+    &lt;/tx:attributes&gt;
+&lt;/tx:advice&gt;
 
+&lt;!-- 配置切面 --&gt;
+&lt;aop:config&gt;
+    &lt;aop:pointcut id=&quot;txPointcut&quot; expression=&quot;execution(* com.xm.service..*.*(..))&quot;/&gt;
+    &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut-ref=&quot;txPointcut&quot;/&gt;
+&lt;/aop:config&gt;</code></pre>
 <h2 id="使用注解配置事务"><a href="#使用注解配置事务" class="headerlink" title="使用注解配置事务"></a>使用注解配置事务</h2><p>首先开启注解事务管理</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">beans</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.xm.dao"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:component-scan</span> <span class="attr">base-package</span>=<span class="string">"com.xm.service"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">context:property-placeholder</span> <span class="attr">location</span>=<span class="string">"classpath:db.properties"</span>/&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 连接池 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">class</span>=<span class="string">"com.mchange.v2.c3p0.ComboPooledDataSource"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"driverClass"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.driver&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"jdbcUrl"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.url&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"user"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.username&#125;"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"password"</span> <span class="attr">value</span>=<span class="string">"$&#123;jdbc.password&#125;"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"jdbcTemplate"</span> <span class="attr">class</span>=<span class="string">"org.springframework.jdbc.core.JdbcTemplate"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">bean</span> <span class="attr">name</span>=<span class="string">"transactionManager"</span> <span class="attr">class</span>=<span class="string">"org.springframework.jdbc.datasource.DataSourceTransactionManager"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"dataSource"</span> <span class="attr">ref</span>=<span class="string">"dataSource"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- 开启注解事务管理 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">tx:annotation-driven</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">beans</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<pre><code class="xml">&lt;beans&gt;
+    &lt;context:component-scan base-package=&quot;com.xm.dao&quot;/&gt;
+    &lt;context:component-scan base-package=&quot;com.xm.service&quot;/&gt;
+    &lt;context:property-placeholder location=&quot;classpath:db.properties&quot;/&gt;
 
+    &lt;!-- 连接池 --&gt;
+    &lt;bean name=&quot;dataSource&quot; class=&quot;com.mchange.v2.c3p0.ComboPooledDataSource&quot;&gt;
+        &lt;property name=&quot;driverClass&quot; value=&quot;${jdbc.driver}&quot;/&gt;
+        &lt;property name=&quot;jdbcUrl&quot; value=&quot;${jdbc.url}&quot;/&gt;
+        &lt;property name=&quot;user&quot; value=&quot;${jdbc.username}&quot;/&gt;
+        &lt;property name=&quot;password&quot; value=&quot;${jdbc.password}&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean name=&quot;jdbcTemplate&quot; class=&quot;org.springframework.jdbc.core.JdbcTemplate&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;bean name=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;
+        &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;
+    &lt;/bean&gt;
+
+    &lt;!-- 开启注解事务管理 --&gt;
+    &lt;tx:annotation-driven/&gt;
+&lt;/beans&gt;</code></pre>
 <p>在Service层使用注解</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.xm.dao.AccountDao;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Propagation;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Transactional;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.annotation.Resource;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span>(<span class="string">"accountService"</span>)</span><br><span class="line"><span class="comment">//对所有方法启动事务注解</span></span><br><span class="line"><span class="meta">@Transactional</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AccountServiceImpl</span> <span class="keyword">implements</span> <span class="title">AccountService</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span>(name = <span class="string">"accountDao"</span>)</span><br><span class="line">    <span class="keyword">private</span> AccountDao accountDao;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="comment">//可以针对具体事务设置事务隔离级别</span></span><br><span class="line">    <span class="meta">@Transactional</span>(propagation = Propagation.REQUIRED)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">transfer</span><span class="params">(Integer from, Integer to, Double money)</span> </span>&#123;</span><br><span class="line">        accountDao.subMoney(from,money);</span><br><span class="line"><span class="comment">//        int a = 9/0;</span></span><br><span class="line">        accountDao.addMoney(to,money);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-    </div>
+<pre><code class="java">package com.xm.service;
 
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
+import com.xm.dao.AccountDao;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-  </div>
-</div>
+import javax.annotation.Resource;
 
+@Service(&quot;accountService&quot;)
+//对所有方法启动事务注解
+@Transactional
+public class AccountServiceImpl implements AccountService{
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
-              <a href="/tags/spring/" rel="tag"># spring</a>
-          </div>
+    @Resource(name = &quot;accountDao&quot;)
+    private AccountDao accountDao;
 
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/05/11/SpringAop/" rel="prev" title="Spring Aop">
-      <i class="fa fa-chevron-left"></i> Spring Aop
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/05/18/MyBatis/" rel="next" title="MyBatis">
-      MyBatis <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用JdbcTemplate"><span class="nav-number">1.</span> <span class="nav-text">使用JdbcTemplate</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#直接连接c3p0"><span class="nav-number">1.1.</span> <span class="nav-text">直接连接c3p0</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用spring管理jdbcTemplate"><span class="nav-number">2.</span> <span class="nav-text">使用spring管理jdbcTemplate</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用xml配置"><span class="nav-number">2.1.</span> <span class="nav-text">使用xml配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用注解配置"><span class="nav-number">2.2.</span> <span class="nav-text">使用注解配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事务管理"><span class="nav-number">3.</span> <span class="nav-text">事务管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Xml配置事务"><span class="nav-number">3.1.</span> <span class="nav-text">Xml配置事务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用注解配置事务"><span class="nav-number">3.2.</span> <span class="nav-text">使用注解配置事务</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+    @Override
+    //可以针对具体事务设置事务隔离级别
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void transfer(Integer from, Integer to, Double money) {
+        accountDao.subMoney(from,money);
+//        int a = 9/0;
+        accountDao.addMoney(to,money);
+    }
+}</code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/05/18/MyBatis/" title="MyBatis"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: MyBatis</span></a><a class="button is-default" href="/2019/05/11/SpringAop/" title="Spring Aop"><span class="has-text-weight-semibold">下一页: Spring Aop</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>

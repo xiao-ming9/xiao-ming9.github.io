@@ -1,284 +1,303 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+<!DOCTYPE html><html class="appearance-auto" lang="zh-CN"><head><meta charset="UTF-8"><title>SAX JSON解析</title><meta name="description" content="Wechat:934933088"><meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, initial-scale=1"><!-- Google Analytics --><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q || []).push(arguments)},i[r].l=1 * new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-<link rel="stylesheet" href="/css/main.css">
+ga('create', '', 'auto');
+ga('send', 'pageview');</script><!-- End Google Analytics -->
+<!-- Baidu Analytics --><script>var _hmt = _hmt || [];
+(function() {
+var hm = document.createElement("script");
+hm.src = "//hm.baidu.com/hm.js?" + '54ebb03ad7ad5b762ac8ff7958df6d3f';
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(hm, s);
+})();</script><!-- End Baidu Analytics --><link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E5%9B%BE%E6%A0%87.jpeg"><link rel="stylesheet" href="/style/common/bulma.css"><link rel="stylesheet" href="/style/base.css"><link rel="stylesheet" href="/style/common/helper.css"><script src="/js/common.js"></script><link rel="stylesheet" href="/style/post.css"><link rel="stylesheet" href="/style/themes/highlight-theme-light.css"><script src="/js/highlight.pack.js"></script></head><body class="is-flex is-flex-direction-column"><header class="header-widget is-flex-shrink-0 is-hidden-mobile"><div class="container is-fullhd is-flex is-justify-content-space-between is-align-items-center is-full-height"><section class="is-hidden-mobile is-flex-shrink-0"><h2><a href="/">silverming's blog</a></h2></section><h3 class="is-hidden-mobile is-family-serif is-full-height is-flex is-align-items-center is-flex-shrink-0"><div class="is-full-height" id="postTopic"><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">SAX JSON解析</p><p class="is-full-height is-flex-shrink-0 is-flex is-align-items-center is-justify-content-center">点击返回顶部</p></div></h3><aside class="is-flex-shrink-0"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></aside></div></header><header class="is-flex header-widget is-flex-shrink-0 is-align-items-center is-justify-content-center is-hidden-tablet"><h3 class="is-inline-block"><a href="/">首页</a></h3><h3 class="is-inline-block"><a href="/about">关于</a></h3><h3 class="is-inline-block"><a href="/archives">归档</a></h3></header><main><main class="container is-max-widescreen content section post-page pt-4 px-4"><div class="columns is-flex-desktop is-justify-content-center is-flex-direction-row-reverse"><div class="column is-3 is-hidden-mobile"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SAX解析XML"><span class="toc-text">SAX解析XML</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DOM解析XML"><span class="toc-text">DOM解析XML</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#通过对象生成和读取XML文件"><span class="toc-text">通过对象生成和读取XML文件</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JSON"><span class="toc-text">JSON</span></a></li></ol></div><div class="column is-9"><header class="my-4"><a href="/tags/java"><i class="tag post-item-tag">java</i></a></header><h1 class="mt-0 mb-1 is-family-serif" id="postTitle">SAX JSON解析</h1><time class="has-text-grey" datetime="2019-03-05T08:18:57.000Z">2019-03-05</time><article class="mt-2 post-content"><h1 id="SAX解析XML"><a href="#SAX解析XML" class="headerlink" title="SAX解析XML"></a>SAX解析XML</h1><a id="more"></a>
+<pre><code class="java">//xml内容
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;people&gt;
+    &lt;person personid=&quot;E01&quot;&gt;
+        &lt;name&gt;Tony Blair&lt;/name&gt;
+        &lt;address&gt;10 Downing Street,London,UK&lt;/address&gt;
+        &lt;tel&gt;(061) 98765&lt;/tel&gt;
+        &lt;fax&gt;(061) 98765&lt;/fax&gt;
+        &lt;email&gt;blair@everywhere.com&lt;/email&gt;
+    &lt;/person&gt;
+    &lt;person personid=&quot;E02&quot;&gt;
+        &lt;name&gt;Bill Clinton&lt;/name&gt;
+        &lt;address&gt;White House,USA&lt;/address&gt;
+        &lt;tel&gt;(010) 6400 98765&lt;/tel&gt;
+        &lt;fax&gt;(010) 6400 98765&lt;/fax&gt;
+        &lt;email&gt;bill@everywhere.com&lt;/email&gt;
+    &lt;/person&gt;
+&lt;/people&gt;
 
+//生成的类
+package saxDemo;
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+public class Person {
+    //XML解析的变量属性都是String
+    private String personid;
+    private String name;
+    private String address;
+    private String tel;
+    private String fax;
+    private String email;
 
+    public String getPersonid() {
+        return personid;
+    }
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+    public void setPersonid(String personid) {
+        this.personid = personid;
+    }
 
-  <meta name="description" content="SAX解析XML">
-<meta name="keywords" content="java">
-<meta property="og:type" content="article">
-<meta property="og:title" content="SAX JSON解析">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;03&#x2F;05&#x2F;java%20sax%E4%B8%8Ejson%E8%A7%A3%E6%9E%90%E6%96%B9%E6%B3%95&#x2F;index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="SAX解析XML">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-12-01T10:37:19.667Z">
-<meta name="twitter:card" content="summary">
+    public String getName() {
+        return name;
+    }
 
-<link rel="canonical" href="http://yoursite.com/2019/03/05/java%20sax%E4%B8%8Ejson%E8%A7%A3%E6%9E%90%E6%96%B9%E6%B3%95/">
+    public void setName(String name) {
+        this.name = name;
+    }
 
+    public String getAddress() {
+        return address;
+    }
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-  <title>SAX JSON解析 | Silverming</title>
-  
+    public String getTel() {
+        return tel;
+    }
 
+    public void setTel(String tel) {
+        this.tel = tel;
+    }
 
+    public String getFax() {
+        return fax;
+    }
 
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
 
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+    @Override
+    public String toString() {
+        return &quot;Person{&quot; +
+                &quot;personid=&#39;&quot; + personid + &#39;\&#39;&#39; +
+                &quot;, name=&#39;&quot; + name + &#39;\&#39;&#39; +
+                &quot;, address=&#39;&quot; + address + &#39;\&#39;&#39; +
+                &quot;, tel=&#39;&quot; + tel + &#39;\&#39;&#39; +
+                &quot;, fax=&#39;&quot; + fax + &#39;\&#39;&#39; +
+                &quot;, email=&#39;&quot; + email + &#39;\&#39;&#39; +
+                &#39;}&#39;;
+    }
+}
 
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
+//解析过程
+package saxDemo;
 
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
+import org.xml.sax.SAXException;
 
-</head>
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+public class XMLDemo {
+    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+        //解析步骤：
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
+        //1. 创建一个SAX解析器工厂对象
+        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+        //2. 通过工厂对象创建SAX解析器
+        SAXParser saxParser = saxParserFactory.newSAXParser();
+        //3. 创建一个数据处理器（由自己编写）
+        PersonHandler personHandler = new PersonHandler();
+        //4. 开始解析
+        InputStream is = Thread.currentThread().getContextClassLoader().
+                getResourceAsStream(&quot;saxDemo/person.xml&quot;);
+        saxParser.parse(is,personHandler);
+        List&lt;Person&gt; persons = personHandler.getPersons();
+        for(Person p:persons){
+            System.out.println(p);
+        }
 
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
-    </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
-  </div>
+    }
+}
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-</div>
+//数据处理器
+package saxDemo;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
-<nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
+import java.util.ArrayList;
+import java.util.List;
 
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+/**
+ * 读取XML配置文件内容
+ * SAX解析特点：
+ * 1. 基于事件驱动
+ * 2. 顺序读取，速度快
+ * 3. 灵活性较差，不能任意读取节点
+ * 4. SAX适用于在性能要求高的设备上使用
+ */
+public class PersonHandler extends DefaultHandler {
 
-  </li>
-        <li class="menu-item menu-item-about">
+    private List&lt;Person&gt; persons = null;
+    private Person p;//当前正在解析的person
+    private String tag;//用于记录当前正在解析的标签名
 
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+    public List&lt;Person&gt; getPersons(){
+        return persons;
+    }
 
-  </li>
-        <li class="menu-item menu-item-tags">
+    //开始解析XML文档时调用
+    @Override
+    public void startDocument() throws SAXException {
+        super.startDocument();
+        persons = new ArrayList&lt;&gt;();
+        System.out.println(&quot;开始解析文档&quot;);
+    }
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+    //解析文档XML结束时调用
+    @Override
+    public void endDocument() throws SAXException {
+        super.endDocument();
+        System.out.println(&quot;解析文档结束&quot;);
+    }
 
-  </li>
-        <li class="menu-item menu-item-archives">
+    /**
+     * 解析XML开始元素标签时调用
+     * @param uri           命名空间
+     * @param localName     不带前缀的标签名
+     * @param qName         带前缀的标签名
+     * @param attributes    当前标签的属性集合
+     * @throws SAXException
+     */
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        super.startElement(uri, localName, qName, attributes);
+        if(&quot;person&quot;.equals(qName)){
+            p = new Person();
+            String personid = attributes.getValue(&quot;personid&quot;);
+            p.setPersonid(personid);
+        }
+        tag = qName;
+        System.out.println(&quot;startElemtype--&quot;+qName);
+    }
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+    //解析XML结束元素标签时调用
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        super.endElement(uri, localName, qName);
+        if (&quot;person&quot;.equals(qName)) {
+            persons.add(p);
+        }
+        tag = null;//解析空格时直接跳过下面的多个判断，提高效率
+        System.out.println(&quot;endElemtype--&quot;+qName);
+    }
 
-  </li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-
-</nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
-           placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
-  </div>
-  <span class="popup-btn-close">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
-  </div>
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content">
-            
-
-  <div class="posts-expand">
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/05/java%20sax%E4%B8%8Ejson%E8%A7%A3%E6%9E%90%E6%96%B9%E6%B3%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          SAX JSON解析
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2019-03-05 16:18:57" itemprop="dateCreated datePublished" datetime="2019-03-05T16:18:57+08:00">2019-03-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-12-01 18:37:19" itemprop="dateModified" datetime="2020-12-01T18:37:19+08:00">2020-12-01</time>
-              </span>
-
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>9.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>9 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h1 id="SAX解析XML"><a href="#SAX解析XML" class="headerlink" title="SAX解析XML"></a>SAX解析XML</h1><a id="more"></a>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//xml内容</span></span><br><span class="line">&lt;?xml version=<span class="string">"1.0"</span> encoding=<span class="string">"UTF-8"</span>?&gt;</span><br><span class="line">&lt;people&gt;</span><br><span class="line">    &lt;person personid=<span class="string">"E01"</span>&gt;</span><br><span class="line">        &lt;name&gt;Tony Blair&lt;/name&gt;</span><br><span class="line">        &lt;address&gt;10 Downing Street,London,UK&lt;/address&gt;</span><br><span class="line">        &lt;tel&gt;(061) 98765&lt;/tel&gt;</span><br><span class="line">        &lt;fax&gt;(061) 98765&lt;/fax&gt;</span><br><span class="line">        &lt;email&gt;blair@everywhere.com&lt;/email&gt;</span><br><span class="line">    &lt;/person&gt;</span><br><span class="line">    &lt;person personid=<span class="string">"E02"</span>&gt;</span><br><span class="line">        &lt;name&gt;Bill Clinton&lt;/name&gt;</span><br><span class="line">        &lt;address&gt;White House,USA&lt;/address&gt;</span><br><span class="line">        &lt;tel&gt;(010) 6400 98765&lt;/tel&gt;</span><br><span class="line">        &lt;fax&gt;(010) 6400 98765&lt;/fax&gt;</span><br><span class="line">        &lt;email&gt;bill@everywhere.com&lt;/email&gt;</span><br><span class="line">    &lt;/person&gt;</span><br><span class="line">&lt;/people&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment">//生成的类</span></span><br><span class="line"><span class="keyword">package</span> saxDemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">    <span class="comment">//XML解析的变量属性都是String</span></span><br><span class="line">    <span class="keyword">private</span> String personid;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String address;</span><br><span class="line">    <span class="keyword">private</span> String tel;</span><br><span class="line">    <span class="keyword">private</span> String fax;</span><br><span class="line">    <span class="keyword">private</span> String email;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPersonid</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> personid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPersonid</span><span class="params">(String personid)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.personid = personid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getAddress</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> address;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAddress</span><span class="params">(String address)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.address = address;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getTel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tel;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTel</span><span class="params">(String tel)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.tel = tel;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getFax</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> fax;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFax</span><span class="params">(String fax)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.fax = fax;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getEmail</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> email;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEmail</span><span class="params">(String email)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.email = email;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Person&#123;"</span> +</span><br><span class="line">                <span class="string">"personid='"</span> + personid + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", name='"</span> + name + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", address='"</span> + address + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", tel='"</span> + tel + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", fax='"</span> + fax + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">", email='"</span> + email + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//解析过程</span></span><br><span class="line"><span class="keyword">package</span> saxDemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.xml.sax.SAXException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.xml.parsers.ParserConfigurationException;</span><br><span class="line"><span class="keyword">import</span> javax.xml.parsers.SAXParser;</span><br><span class="line"><span class="keyword">import</span> javax.xml.parsers.SAXParserFactory;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">XMLDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ParserConfigurationException, SAXException, IOException </span>&#123;</span><br><span class="line">        <span class="comment">//解析步骤：</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//1. 创建一个SAX解析器工厂对象</span></span><br><span class="line">        SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();</span><br><span class="line">        <span class="comment">//2. 通过工厂对象创建SAX解析器</span></span><br><span class="line">        SAXParser saxParser = saxParserFactory.newSAXParser();</span><br><span class="line">        <span class="comment">//3. 创建一个数据处理器（由自己编写）</span></span><br><span class="line">        PersonHandler personHandler = <span class="keyword">new</span> PersonHandler();</span><br><span class="line">        <span class="comment">//4. 开始解析</span></span><br><span class="line">        InputStream is = Thread.currentThread().getContextClassLoader().</span><br><span class="line">                getResourceAsStream(<span class="string">"saxDemo/person.xml"</span>);</span><br><span class="line">        saxParser.parse(is,personHandler);</span><br><span class="line">        List&lt;Person&gt; persons = personHandler.getPersons();</span><br><span class="line">        <span class="keyword">for</span>(Person p:persons)&#123;</span><br><span class="line">            System.out.println(p);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//数据处理器</span></span><br><span class="line"><span class="keyword">package</span> saxDemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.xml.sax.Attributes;</span><br><span class="line"><span class="keyword">import</span> org.xml.sax.SAXException;</span><br><span class="line"><span class="keyword">import</span> org.xml.sax.helpers.DefaultHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 读取XML配置文件内容</span></span><br><span class="line"><span class="comment"> * SAX解析特点：</span></span><br><span class="line"><span class="comment"> * 1. 基于事件驱动</span></span><br><span class="line"><span class="comment"> * 2. 顺序读取，速度快</span></span><br><span class="line"><span class="comment"> * 3. 灵活性较差，不能任意读取节点</span></span><br><span class="line"><span class="comment"> * 4. SAX适用于在性能要求高的设备上使用</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PersonHandler</span> <span class="keyword">extends</span> <span class="title">DefaultHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;Person&gt; persons = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Person p;<span class="comment">//当前正在解析的person</span></span><br><span class="line">    <span class="keyword">private</span> String tag;<span class="comment">//用于记录当前正在解析的标签名</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Person&gt; <span class="title">getPersons</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> persons;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//开始解析XML文档时调用</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startDocument</span><span class="params">()</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.startDocument();</span><br><span class="line">        persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        System.out.println(<span class="string">"开始解析文档"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//解析文档XML结束时调用</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">endDocument</span><span class="params">()</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.endDocument();</span><br><span class="line">        System.out.println(<span class="string">"解析文档结束"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 解析XML开始元素标签时调用</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> uri           命名空间</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> localName     不带前缀的标签名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> qName         带前缀的标签名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> attributes    当前标签的属性集合</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> SAXException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startElement</span><span class="params">(String uri, String localName, String qName, Attributes attributes)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.startElement(uri, localName, qName, attributes);</span><br><span class="line">        <span class="keyword">if</span>(<span class="string">"person"</span>.equals(qName))&#123;</span><br><span class="line">            p = <span class="keyword">new</span> Person();</span><br><span class="line">            String personid = attributes.getValue(<span class="string">"personid"</span>);</span><br><span class="line">            p.setPersonid(personid);</span><br><span class="line">        &#125;</span><br><span class="line">        tag = qName;</span><br><span class="line">        System.out.println(<span class="string">"startElemtype--"</span>+qName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//解析XML结束元素标签时调用</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">endElement</span><span class="params">(String uri, String localName, String qName)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.endElement(uri, localName, qName);</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"person"</span>.equals(qName)) &#123;</span><br><span class="line">            persons.add(p);</span><br><span class="line">        &#125;</span><br><span class="line">        tag = <span class="keyword">null</span>;<span class="comment">//解析空格时直接跳过下面的多个判断，提高效率</span></span><br><span class="line">        System.out.println(<span class="string">"endElemtype--"</span>+qName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//解析标签内文本内容时调用</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">characters</span><span class="params">(<span class="keyword">char</span>[] ch, <span class="keyword">int</span> start, <span class="keyword">int</span> length)</span> <span class="keyword">throws</span> SAXException </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.characters(ch, start, length);</span><br><span class="line">        <span class="keyword">if</span>(tag != <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(<span class="string">"name"</span>.equals(tag))&#123;</span><br><span class="line">                p.setName(<span class="keyword">new</span> String(ch,start,length));</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"address"</span>.equals(tag))&#123;</span><br><span class="line">                p.setAddress(<span class="keyword">new</span> String(ch,start,length));</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"tel"</span>.equals(tag))&#123;</span><br><span class="line">                p.setTel(<span class="keyword">new</span> String(ch,start,length));</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"fax"</span>.equals(tag))&#123;</span><br><span class="line">                p.setFax(<span class="keyword">new</span> String(ch,start,length));</span><br><span class="line">            &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"email"</span>.equals(tag))&#123;</span><br><span class="line">                p.setEmail(<span class="keyword">new</span> String(ch,start,length));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(ch);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+    //解析标签内文本内容时调用
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+        super.characters(ch, start, length);
+        if(tag != null){
+            if(&quot;name&quot;.equals(tag)){
+                p.setName(new String(ch,start,length));
+            }else if(&quot;address&quot;.equals(tag)){
+                p.setAddress(new String(ch,start,length));
+            }else if(&quot;tel&quot;.equals(tag)){
+                p.setTel(new String(ch,start,length));
+            }else if(&quot;fax&quot;.equals(tag)){
+                p.setFax(new String(ch,start,length));
+            }else if(&quot;email&quot;.equals(tag)){
+                p.setEmail(new String(ch,start,length));
+            }
+        }
+        System.out.println(ch);
+    }
+}</code></pre>
 <h1 id="DOM解析XML"><a href="#DOM解析XML" class="headerlink" title="DOM解析XML"></a>DOM解析XML</h1><p>基于树型结构，通过解析器一次性把文档加载到内存，所以比较占内存，但更加灵活</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//DOM解析</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">domParseXML</span><span class="params">()</span> <span class="keyword">throws</span> ParserConfigurationException, IOException, SAXException </span>&#123;</span><br><span class="line">        <span class="comment">//1. 创建一个DOM解析器工厂</span></span><br><span class="line">        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span><br><span class="line">        <span class="comment">//2. 通过工厂创建解析器对象</span></span><br><span class="line">        DocumentBuilder documentBuilder = factory.newDocumentBuilder();</span><br><span class="line">        <span class="comment">//解析文档</span></span><br><span class="line">        InputStream is = Thread.currentThread().</span><br><span class="line">                getContextClassLoader().getResourceAsStream(<span class="string">"saxDemo/person.xml"</span>);</span><br><span class="line">        Document doc = documentBuilder.parse(is);<span class="comment">//此代码完成后整个XML被以树状形式存储在内存中</span></span><br><span class="line">        <span class="comment">//从内存中读取数据</span></span><br><span class="line">        NodeList personNodeList = doc.getElementsByTagName(<span class="string">"person"</span>);<span class="comment">//获取节点名称为person的所有结点</span></span><br><span class="line">        ArrayList&lt;Person&gt; persons = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        Person p = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">//此循环迭代两次</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; personNodeList.getLength(); i++) &#123;</span><br><span class="line">            Node node = personNodeList.item(i);</span><br><span class="line">            p = <span class="keyword">new</span> Person();</span><br><span class="line">            <span class="comment">//获取结点的属性值</span></span><br><span class="line">            String personid = node.getAttributes().getNamedItem(<span class="string">"personid"</span>).getNodeValue();</span><br><span class="line">            p.setPersonid(personid);</span><br><span class="line">            <span class="comment">//获取当前结点的所有子节点</span></span><br><span class="line">            NodeList childNodes = node.getChildNodes();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; childNodes.getLength(); j++) &#123;</span><br><span class="line">                Node item = childNodes.item(j);</span><br><span class="line">                String nodeName = item.getNodeName();</span><br><span class="line">                <span class="keyword">if</span>(<span class="string">"name"</span>.equals(nodeName))&#123;</span><br><span class="line">                    <span class="comment">//文本也是结点</span></span><br><span class="line">                    p.setName(item.getFirstChild().getNodeValue());</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"address"</span>.equals(nodeName))&#123;</span><br><span class="line">                    p.setAddress(item.getFirstChild().getNodeValue());</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"tel"</span>.equals(nodeName))&#123;</span><br><span class="line">                    p.setTel(item.getFirstChild().getNodeValue());</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"fax"</span>.equals(nodeName))&#123;</span><br><span class="line">                    p.setFax(item.getFirstChild().getNodeValue());</span><br><span class="line">                &#125;<span class="keyword">else</span> <span class="keyword">if</span>(<span class="string">"email"</span>.equals(nodeName))&#123;</span><br><span class="line">                    p.setEmail(item.getFirstChild().getNodeValue());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            persons.add(p);</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"结果："</span>);</span><br><span class="line">        System.out.println(Arrays.toString(persons.toArray()));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">//DOM解析
+    public static void domParseXML() throws ParserConfigurationException, IOException, SAXException {
+        //1. 创建一个DOM解析器工厂
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        //2. 通过工厂创建解析器对象
+        DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+        //解析文档
+        InputStream is = Thread.currentThread().
+                getContextClassLoader().getResourceAsStream(&quot;saxDemo/person.xml&quot;);
+        Document doc = documentBuilder.parse(is);//此代码完成后整个XML被以树状形式存储在内存中
+        //从内存中读取数据
+        NodeList personNodeList = doc.getElementsByTagName(&quot;person&quot;);//获取节点名称为person的所有结点
+        ArrayList&lt;Person&gt; persons = new ArrayList&lt;&gt;();
+        Person p = null;
+        //此循环迭代两次
+        for (int i = 0; i &lt; personNodeList.getLength(); i++) {
+            Node node = personNodeList.item(i);
+            p = new Person();
+            //获取结点的属性值
+            String personid = node.getAttributes().getNamedItem(&quot;personid&quot;).getNodeValue();
+            p.setPersonid(personid);
+            //获取当前结点的所有子节点
+            NodeList childNodes = node.getChildNodes();
+            for (int j = 0; j &lt; childNodes.getLength(); j++) {
+                Node item = childNodes.item(j);
+                String nodeName = item.getNodeName();
+                if(&quot;name&quot;.equals(nodeName)){
+                    //文本也是结点
+                    p.setName(item.getFirstChild().getNodeValue());
+                }else if(&quot;address&quot;.equals(nodeName)){
+                    p.setAddress(item.getFirstChild().getNodeValue());
+                }else if(&quot;tel&quot;.equals(nodeName)){
+                    p.setTel(item.getFirstChild().getNodeValue());
+                }else if(&quot;fax&quot;.equals(nodeName)){
+                    p.setFax(item.getFirstChild().getNodeValue());
+                }else if(&quot;email&quot;.equals(nodeName)){
+                    p.setEmail(item.getFirstChild().getNodeValue());
+                }
+            }
+            persons.add(p);
+        }
+        System.out.println(&quot;结果：&quot;);
+        System.out.println(Arrays.toString(persons.toArray()));
+    }
+</code></pre>
+<h1 id="通过对象生成和读取XML文件"><a href="#通过对象生成和读取XML文件" class="headerlink" title="通过对象生成和读取XML文件"></a>通过对象生成和读取XML文件</h1><pre><code class="java">public void xmlEncoder() throws FileNotFoundException {
+    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(&quot;test.xml&quot;));
+    XMLEncoder xmlEncoder = new XMLEncoder(bos);
+    Person p = new Person();
+    p.setPersonid(&quot;1234&quot;);
+    p.setAddress(&quot;广州&quot;);
+    p.setEmail(&quot;qq.@com&quot;);
+    p.setFax(&quot;ming&quot;);
+    p.setTel(&quot;123456&quot;);
+    p.setName(&quot;1224333&quot;);
+    xmlEncoder.writeObject(p);
+    xmlEncoder.close();
+}
 
-<h1 id="通过对象生成和读取XML文件"><a href="#通过对象生成和读取XML文件" class="headerlink" title="通过对象生成和读取XML文件"></a>通过对象生成和读取XML文件</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">xmlEncoder</span><span class="params">()</span> <span class="keyword">throws</span> FileNotFoundException </span>&#123;</span><br><span class="line">    BufferedOutputStream bos = <span class="keyword">new</span> BufferedOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="string">"test.xml"</span>));</span><br><span class="line">    XMLEncoder xmlEncoder = <span class="keyword">new</span> XMLEncoder(bos);</span><br><span class="line">    Person p = <span class="keyword">new</span> Person();</span><br><span class="line">    p.setPersonid(<span class="string">"1234"</span>);</span><br><span class="line">    p.setAddress(<span class="string">"广州"</span>);</span><br><span class="line">    p.setEmail(<span class="string">"qq.@com"</span>);</span><br><span class="line">    p.setFax(<span class="string">"ming"</span>);</span><br><span class="line">    p.setTel(<span class="string">"123456"</span>);</span><br><span class="line">    p.setName(<span class="string">"1224333"</span>);</span><br><span class="line">    xmlEncoder.writeObject(p);</span><br><span class="line">    xmlEncoder.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">xmlDecoder</span><span class="params">()</span> <span class="keyword">throws</span> FileNotFoundException </span>&#123;</span><br><span class="line">    BufferedInputStream in = <span class="keyword">new</span> BufferedInputStream(<span class="keyword">new</span> FileInputStream(<span class="string">"test.xml"</span>));</span><br><span class="line">    XMLDecoder decoder = <span class="keyword">new</span> XMLDecoder(in);</span><br><span class="line">    Person p = (Person)decoder.readObject();</span><br><span class="line">    System.out.println(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+public static void xmlDecoder() throws FileNotFoundException {
+    BufferedInputStream in = new BufferedInputStream(new FileInputStream(&quot;test.xml&quot;));
+    XMLDecoder decoder = new XMLDecoder(in);
+    Person p = (Person)decoder.readObject();
+    System.out.println(p);
+}</code></pre>
 <h1 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h1><ul>
 <li><p>语法：<br><code>{}</code>：表示一个对象<br><code>[]</code>：表示一个数组</p>
 </li>
@@ -295,231 +314,75 @@
 <blockquote>
 <p>SerializerFeature.WriteMapNullValue  显示null<br>SerializerFeature.WriteNullStringAsEmpty  显示空字符串<br>SerializerFeature.PrettyFormat 格式化输出<br>SerializerFeature.DisableCircularReferenceDetect 禁用循环引用检测</p>
 </blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.serializer.SerializerFeature;</span><br><span class="line"><span class="keyword">import</span> com.xm.domain.Student;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JSONTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Student stu1 = <span class="keyword">new</span> Student(<span class="number">123</span>, <span class="keyword">null</span>, <span class="number">18</span>);</span><br><span class="line">        Student stu2 = <span class="keyword">new</span> Student(<span class="number">321</span>, <span class="string">"小张"</span>, <span class="number">16</span>);</span><br><span class="line">        Student stu3 = <span class="keyword">new</span> Student(<span class="number">666</span>, <span class="string">"小邢"</span>, <span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">/*用阿里FastJson*/</span></span><br><span class="line">        <span class="comment">//将java对象转换成字符串,第二个参数为是否美化</span></span><br><span class="line">        String jsonString = JSON.toJSONString(stu1,<span class="keyword">true</span>);</span><br><span class="line">        System.out.println(jsonString);</span><br><span class="line">        <span class="comment">//创建集合</span></span><br><span class="line">        ArrayList&lt;Student&gt; studentArrayList = <span class="keyword">new</span> ArrayList&lt;Student&gt;();</span><br><span class="line">        studentArrayList.add(stu1);</span><br><span class="line">        studentArrayList.add(stu2);</span><br><span class="line">        studentArrayList.add(stu3);</span><br><span class="line">        String jsonString1 = JSON.toJSONString(</span><br><span class="line">                studentArrayList,</span><br><span class="line">                SerializerFeature.WriteNullStringAsEmpty,</span><br><span class="line">                SerializerFeature.PrettyFormat</span><br><span class="line">        );</span><br><span class="line">        System.out.println(jsonString1);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//将json转换成java对象</span></span><br><span class="line">        String jsonString2 = <span class="string">"&#123;id:119,name:\"小飞\",age:19&#125;"</span>;</span><br><span class="line">        Student student = JSON.parseObject(jsonString2, Student<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        System.out.println(student.toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code class="java">package com.xm.test;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.xm.domain.Student;
+
+import java.util.ArrayList;
+
+public class JSONTest {
+    public static void main(String[] args) {
+        Student stu1 = new Student(123, null, 18);
+        Student stu2 = new Student(321, &quot;小张&quot;, 16);
+        Student stu3 = new Student(666, &quot;小邢&quot;, 8);
+
+        /*用阿里FastJson*/
+        //将java对象转换成字符串,第二个参数为是否美化
+        String jsonString = JSON.toJSONString(stu1,true);
+        System.out.println(jsonString);
+        //创建集合
+        ArrayList&lt;Student&gt; studentArrayList = new ArrayList&lt;Student&gt;();
+        studentArrayList.add(stu1);
+        studentArrayList.add(stu2);
+        studentArrayList.add(stu3);
+        String jsonString1 = JSON.toJSONString(
+                studentArrayList,
+                SerializerFeature.WriteNullStringAsEmpty,
+                SerializerFeature.PrettyFormat
+        );
+        System.out.println(jsonString1);
+
+        //将json转换成java对象
+        String jsonString2 = &quot;{id:119,name:\&quot;小飞\&quot;,age:19}&quot;;
+        Student student = JSON.parseObject(jsonString2, Student.class);
+        System.out.println(student.toString());
+    }
+}</code></pre>
 <ol start="2">
 <li><code>Jackson</code></li>
 </ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.xm.test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.core.JsonProcessingException;</span><br><span class="line"><span class="keyword">import</span> com.fasterxml.jackson.databind.ObjectMapper;</span><br><span class="line"><span class="keyword">import</span> com.xm.domain.Student;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JSONTest2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Student stu1 = <span class="keyword">new</span> Student(<span class="number">123</span>, <span class="keyword">null</span>, <span class="number">18</span>);</span><br><span class="line">        Student stu2 = <span class="keyword">new</span> Student(<span class="number">321</span>, <span class="string">"小张"</span>, <span class="number">16</span>);</span><br><span class="line">        Student stu3 = <span class="keyword">new</span> Student(<span class="number">666</span>, <span class="string">"小邢"</span>, <span class="number">8</span>);</span><br><span class="line">        <span class="comment">//把对象封装成json</span></span><br><span class="line">        ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span><br><span class="line">        String string;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            string = mapper.writeValueAsString(stu1);</span><br><span class="line">            System.out.println(string);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (JsonProcessingException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//把字符串转换成json</span></span><br><span class="line">        String jsonString2 = <span class="string">"&#123;\"id\":119,\"name\":\"小飞\",\"age\":19&#125;"</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            mapper.readValue(jsonString2,Student<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-    </div>
+<pre><code class="java">package com.xm.test;
 
-    
-    
-    
-        <div class="reward-container">
-  <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
-  </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
-      </div>
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
-      </div>
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xm.domain.Student;
 
-  </div>
-</div>
+import java.io.IOException;
 
+public class JSONTest2 {
+    public static void main(String[] args) {
+        Student stu1 = new Student(123, null, 18);
+        Student stu2 = new Student(321, &quot;小张&quot;, 16);
+        Student stu3 = new Student(666, &quot;小邢&quot;, 8);
+        //把对象封装成json
+        ObjectMapper mapper = new ObjectMapper();
+        String string;
+        try {
+            string = mapper.writeValueAsString(stu1);
+            System.out.println(string);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/java/" rel="tag"># java</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/03/03/java%E6%B3%A8%E8%A7%A3/" rel="prev" title="java注解">
-      <i class="fa fa-chevron-left"></i> java注解
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/03/13/JDBC/" rel="next" title="JDBC">
-      JDBC <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
-          </div>
-          
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SAX解析XML"><span class="nav-number">1.</span> <span class="nav-text">SAX解析XML</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DOM解析XML"><span class="nav-number">2.</span> <span class="nav-text">DOM解析XML</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通过对象生成和读取XML文件"><span class="nav-number">3.</span> <span class="nav-text">通过对象生成和读取XML文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON"><span class="nav-number">4.</span> <span class="nav-text">JSON</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">123</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">46</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2021</span>
-  <span class="with-love">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
-    </span>
-    <span title="站点总字数">1.9m</span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">28:49</span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
-<div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
-
-  
-
-</body>
-</html>
+        //把字符串转换成json
+        String jsonString2 = &quot;{\&quot;id\&quot;:119,\&quot;name\&quot;:\&quot;小飞\&quot;,\&quot;age\&quot;:19}&quot;;
+        try {
+            mapper.readValue(jsonString2,Student.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+</article><section class="jump-container is-flex is-justify-content-space-between my-6"><!-- em is empty placeholder--><a class="button is-default" href="/2019/03/13/JDBC/" title="JDBC"><i class="iconfont icon-prev mr-2 has-text-grey"></i><span class="has-text-weight-semibold">上一页: JDBC</span></a><a class="button is-default" href="/2019/03/03/java%E6%B3%A8%E8%A7%A3/" title="java注解"><span class="has-text-weight-semibold">下一页: java注解</span><i class="iconfont icon-next ml-2 has-text-grey"></i></a></section><article class="mt-6 comment-container"><script async repo="xiao-ming9/xiao-ming9.github.io" src="https://utteranc.es/client.js" issue-term="pathname" theme="preferred-color-scheme"></script></article></div></div></main></main><footer class="is-flex is-flex-direction-column is-align-items-center is-flex-shrink-0 is-family-serif"><section class="sns-container"><!-- Github--><!-- Ins--><!-- RSS--><!-- 知乎--><!-- 领英--><!-- 脸书--></section><p><span>Copyright ©</span><span> silverming 2021</span></p><div class="is-flex is-justify-content-center is-flex-wrap-wrap"><p>Powered by Hexo &verbar;&nbsp;</p><p class="is-flex is-justify-content-center"><a title="Hexo theme author" href="//github.com/haojen">Theme by Haojen&nbsp;</a></p><div style="margin-top: 2px"><a class="github-button" title="github-button" href="https://github.com/haojen/hexo-theme-Claudia" target="_blank" rel="noopener" data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"></a></div></div><div><span>footnotes</span></div></footer><script async defer src="https://buttons.github.io/buttons.js"></script><script src="/js/post.js"></script></body></html>
