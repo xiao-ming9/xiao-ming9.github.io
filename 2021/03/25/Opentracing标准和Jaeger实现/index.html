@@ -16,7 +16,8 @@
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="Wechat:934933088">
+  <meta name="description" content="OpenTracing 简介OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。
+OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并">
   <meta name="author" content="Silverming">
   <meta name="keywords" content="">
   
@@ -183,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      0 字
+      2k 字
     </span>
   
 
@@ -193,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      21
        分钟
     </span>
   
@@ -235,12 +236,69 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 天前
+                  本文最后更新于：2021年3月27日 晚上
                 
               </p>
             
             <div class="markdown-body">
-              
+              <h1 id="OpenTracing-简介"><a href="#OpenTracing-简介" class="headerlink" title="OpenTracing 简介"></a>OpenTracing 简介</h1><p>OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。</p>
+<h2 id="OpenTracing-诞生的背景"><a href="#OpenTracing-诞生的背景" class="headerlink" title="OpenTracing 诞生的背景"></a>OpenTracing 诞生的背景</h2><p>开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并发，或者解耦成大量微服务时，以前很容易实现的重点任务变得困难了。过程中需要面临一系列问题：用户体验优化、后台真是错误原因分析，分布式系统内各组件的调用情况等。随着服务数量的增多和内部调用链的复杂化，仅凭借日志和性能监控很难做到 “See the Whole Picture”，在进行问题排查或是性能分析的时候，无异于盲人摸象。</p>
+<a id="more"></a>
+
+<p>分布式追踪能够帮助开发者直观分析请求链路，快速定位性能瓶颈，逐渐优化服务间依赖，也有助于开发者从更宏观的角度更好地理解整个分布式系统。已有的分布式跟踪系统（例如，Zipkin, Dapper, HTrace, X-Trace等）旨在解决这些问题，但是他们使用不兼容的 API 来实现各自的应用需求。尽管这些分布式追踪系统有着相似的 API 语法，但各种语言的开发人员依然很难将他们各自的系统（使用不同的语言和技术）和特定的分布式追踪系统进行整合。</p>
+<p>在这种情况下，OpenTracing 通过提供平台无关、厂商无关的API，使得开发人员能够方便的添加（或更换）追踪系统的实现。OpenTracing 定义了一套通用的数据上报接口，要求各个分布式追踪系统都来实现这套接口。这样一来，应用程序只需要对接 OpenTracing，而无需关心后端采用的到底什么分布式追踪系统，因此开发者可以无缝切换分布式追踪系统，也使得在通用代码库增加对分布式追踪的支持成为可能。</p>
+<p>目前，主流的分布式追踪实现基本上都已经支持 OpenTracing，包括 Jaeger，Zipkin，Appdash 等。</p>
+<h2 id="分布式追踪的相关概念"><a href="#分布式追踪的相关概念" class="headerlink" title="分布式追踪的相关概念"></a>分布式追踪的相关概念</h2><h3 id="Tracing"><a href="#Tracing" class="headerlink" title="Tracing"></a>Tracing</h3><p>Wikipedia 中，对 Tracing 的定义是，在软件工程中，Tracing 指使用特定的日志记录程序的执行信息，与之相近的还有两个概念，它们分别是 Logging 和 Metrics。</p>
+<ul>
+<li>Logging：用于记录离散的事件，包含程序执行到某一点或某一阶段的详细信息。例如，应用程序的调试信息或错误信息。它是我们诊断问题的依据。</li>
+<li>Metrics：可聚合的数据，且通常是固定类型的时序数据。例如，队列的当前深度可被定义为一个度量值，在元素入队或出队时被更新；HTTP 请求个数可被定义为一个计数器，新请求到来时进行累加。</li>
+<li>Tracing：记录单个请求的处理流程，其中包括服务调用和处理时长等信息。</li>
+</ul>
+<p>这三者也有相交重叠的部门：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Logging%2CMetrics%2CTracing%20%E9%87%8D%E5%8F%A0%E7%9A%84%E9%83%A8%E5%88%86.png" srcset="/img/loading.gif" lazyload alt="Logging,Metrics,Tracing 重叠的部分"></p>
+<ul>
+<li>Logging &amp; Metrics：可聚合的事件。例如分析某对象存储的 Nginx 日志，统计某段时间内 GET、PUT、DELETE、OPTIONS 操作的总数。</li>
+<li>Metrics &amp; Tracing：单个请求中的可计量数据。例如 SQL 执行总时长、gRPC 调用总次数。</li>
+<li>Tracing &amp; Logging：请求阶段的标签数据。例如在 Tracing 的信息中标记详细的错误原因。</li>
+</ul>
+<p>针对每种分析需求，都有非常强大的集中式分析工具。</p>
+<ul>
+<li>Logging：ELK，近几年势头最猛的日志分析服务。</li>
+<li>Metrics：Prometheus，第二个加入 CNCF 的开源项目，非常好用。</li>
+<li>Tracing：OpenTracing 和 Jaeger，Jaeger 是 Uber 开源的一个兼容 OpenTracing 标准的分布式追踪服务。目前 Jaeger 也加入了 CNCF。</li>
+</ul>
+<h3 id="分布式追踪的核心步骤"><a href="#分布式追踪的核心步骤" class="headerlink" title="分布式追踪的核心步骤"></a>分布式追踪的核心步骤</h3><p>分布式追踪系统大体分为三个部分，数据采集、数据持久化、数据展示。</p>
+<p>数据采集是指在代码中埋点，设置请求中要上报的阶段，以及设置当前记录的阶段隶属于哪个上级阶段。数据持久化则是指将上报的数据落盘存储，例如 Jaeger 就支持多种存储后端，可选用 Cassandra 或者 Elasticsearch。数据展示则是前端根据 Trace ID 查询与之关联的请求阶段，并在界面上呈现。</p>
+<p>一个典型的 Trace 案例如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%85%B8%E5%9E%8BTrace%E6%A1%88%E4%BE%8B.png" srcset="/img/loading.gif" lazyload alt="典型Trace案例"></p>
+<p>请求从客户端发出，请求首先到达负载均衡，接着进行认证服务，计费服务，然后请求资源，最后返回结果。</p>
+<p>当数据被采集存储之后，分布式追踪系统会采用包含时间轴的的时序图来呈现这个 Trace：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%8C%85%E5%90%AB%E6%97%B6%E9%97%B4%E8%BD%B4%E7%9A%84%E6%97%B6%E5%BA%8F%E5%9B%BEtrace.png" srcset="/img/loading.gif" lazyload alt="包含时间轴的trace"></p>
+<h1 id="OpenTracing-数据模型"><a href="#OpenTracing-数据模型" class="headerlink" title="OpenTracing 数据模型"></a>OpenTracing 数据模型</h1><h2 id="Traces"><a href="#Traces" class="headerlink" title="Traces"></a>Traces</h2><p>一个 trace 代表一个潜在的，分布式的，存在并行数据或并行执行轨迹（潜在的分布式、并行）的系统。也可以理解成一个调用链，一个 trace 可以认为是多个 span 的有向无环图（DAG）。</p>
+<h2 id="Spans"><a href="#Spans" class="headerlink" title="Spans"></a>Spans</h2><p>一个 span 代表系统中具有开始时间和执行时长的逻辑运行单元，可以理解成某个处理阶段，一次方法调用，一个程序块的调用，或者一次 RPC/数据库访问。只要是一个具有完整时间周期的程序访问，都可以被认为是一个 span。span 之间通过嵌套或者顺序排列建立逻辑因果关系。</p>
+<p>每个 Span 包含以下的状态：</p>
+<ul>
+<li>操作名称（An operation name）</li>
+<li>起始时间（A start timestamp）</li>
+<li>结束时间（A finish timestamp）</li>
+<li>Span Tag：一组 KV 值，作为阶段的标签集合。键值对中，键必须为 string，值可以是字符串，布尔，或者数字类型。</li>
+<li>阶段日志（Span Logs）：一组 span 的日志集合。 每次 log 操作包含一个键值对，以及一个时间戳。 键值对中，键必须为 string，值可以是任意类型。 但是需要注意，不是所有的支持 OpenTracing 的 Tracer,都需要支持所有的值类型。</li>
+<li>阶段上下文（SpanContext），其中包含 TraceID 和 SpanID</li>
+<li>引用关系（Reference）：Span 和 Span 之间的关系被命名 Reference，Span 之间通过 SpanContext 建立这种关系。</li>
+</ul>
+<h3 id="Span-Reference"><a href="#Span-Reference" class="headerlink" title="Span Reference"></a>Span Reference</h3><p>一个 span 可以和一个或者多个 span 间存在因果关系。OpenTracing定义了两种关系：<code>ChildOf</code> 和 <code>FollowsFrom</code>。<strong>这两种引用类型代表了子节点和父节点间的直接因果关系</strong>。未来，OpenTracing将支持非因果关系的span引用关系。（例如：多个span被批量处理，span在同一个队列中，等等）</p>
+<p><strong><code>ChildOf</code> 引用:</strong> 一个span可能是一个父级span的孩子，即”ChildOf”关系。在”ChildOf”引用关系下，父级span某种程度上取决于子span。下面这些情况会构成”ChildOf”关系：</p>
+<ul>
+<li>一个RPC调用的服务端的span，和RPC服务客户端的span构成ChildOf关系</li>
+<li>一个sql insert操作的span，和ORM的save方法的span构成ChildOf关系</li>
+<li>很多span可以并行工作（或者分布式工作）都可能是一个父级的span的子项，他会合并所有子span的执行结果，并在指定期限内返回</li>
+</ul>
+<h3 id="SpanContext"><a href="#SpanContext" class="headerlink" title="SpanContext"></a>SpanContext</h3><p>每一个<strong>SpanContext</strong>包含以下状态：</p>
+<ul>
+<li>任何一个OpenTracing的实现，都需要将当前调用链的状态（例如：trace和span的id），依赖一个独特的Span去跨进程边界传输</li>
+<li><strong>Baggage Items</strong>，Trace的随行数据，是一个键值对集合，它存在于trace中，也需要跨进程边界传输</li>
+</ul>
+
             </div>
             <hr>
             <div>
