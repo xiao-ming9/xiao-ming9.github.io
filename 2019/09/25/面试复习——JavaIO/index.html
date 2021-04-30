@@ -58,7 +58,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -263,13 +263,13 @@
 <h1 id="3-BIO，NIO，AIO区别"><a href="#3-BIO，NIO，AIO区别" class="headerlink" title="3. BIO，NIO，AIO区别"></a>3. BIO，NIO，AIO区别</h1><p>Java中<code>BIO</code>,<code>NIO</code>和<code>AIO</code>理解为是 Java 语言对操作系统的各种 IO 模型的封装。程序员在使用这些 API 的时候，不需要关心操作系统层面的知识，也不需要根据不同操作系统编写不同的代码。只需要使用Java的API就可以了。</p>
 <h2 id="BIO（Blocking-I-O）"><a href="#BIO（Blocking-I-O）" class="headerlink" title="BIO（Blocking I/O）"></a>BIO（Blocking I/O）</h2><p>同步阻塞I/O模型，数据的读取写入必须阻塞在一个线程内等待其完成。</p>
 <h3 id="传统BIO"><a href="#传统BIO" class="headerlink" title="传统BIO"></a>传统BIO</h3><p>BIO通信（一请求一应答）模型图如下：</p>
-<p><img src="https://camo.githubusercontent.com/5ef6de9824ae82bb0c403522a647953d1193a362/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f322e706e67" srcset="/img/loading.gif" lazyload alt="传统BIO模型图"></p>
+<p><img src="https://camo.githubusercontent.com/5ef6de9824ae82bb0c403522a647953d1193a362/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f322e706e67" alt="传统BIO模型图"></p>
 <p>采用<strong>BIO通道模型</strong>的服务端，通常由一个独立的<code>Acceptor</code>线程负责监听客户端的连接。一般通过在<code>while(true)</code>循环中服务端会调用<code>accept()</code>方法等待接收客户端的连接的方式监听请求，请求一旦接收到一个连接请求，就可以建立通信套接字在这个通信套接字上进行读写操作，此时不能再接收其他客户端连接请求，只能等待同当前连接的客户端的操作执行完成，不过可以通过多线程来支持多个客户端的连接，如上图所示。</p>
 <p>在 Java 虚拟机中，线程是宝贵的资源，线程的创建和销毁成本很高，除此之外，线程的切换成本也是很高的。尤其在 Linux 这样的操作系统中，线程本质上就是一个进程，创建和销毁线程都是重量级的系统函数。如果并发访问量增加会导致线程数急剧膨胀可能会导致线程堆栈溢出、创建新线程失败等问题，最终导致进程宕机或者僵死，不能对外提供服务。</p>
 <p>如果要让BIO通信模型能够同时处理多个客户端请求，就必须使用多线程（主要原因是<code>socket.accept()</code>、<code>socket.read()</code>、<code>socket.write()</code>涉及的三个主要函数都是同步阻塞的），也就是说它在接收到客户端连接请求之后为每一个客户端创建一个新的线程进行链路处理，处理完成之后，通过输出流返回应答给客户端，线程销毁。这就是典型的<strong>一请求一应答通信模型</strong>。可以设想一下如果这个连接不做任何事情的话就会造成不必要的线程开销，不过可以通过<strong>线程池机制</strong>改善，线程池还可以让线程的创建和回收成本相对较低。使用<code>FixedThreadPool</code>可以有效的控制线程的最大数量，保证系统优先的资源的控制，实现<strong>N(客户端请求数量):M(处理客户端请求的线程数量)的伪异步I/O模型</strong>。（N可能远远大于M）。也就是伪异步IO。</p>
 <h3 id="伪异步IO"><a href="#伪异步IO" class="headerlink" title="伪异步IO"></a>伪异步IO</h3><p>为了解决同步阻塞I/O面临的一个链路需要一个线程处理的问题，有人对它的线程模型进行了优化一一后端通过一个线程池来处理多个客户端的请求接入，形成客户端个数M：线程池最大线程数N的比例关系，其中M可以远远大于N.通过线程池可以灵活地调配线程资源，设置线程的最大值，防止由于海量并发接入导致线程耗尽。</p>
 <p>伪异步IO模型图：</p>
-<p><img src="https://camo.githubusercontent.com/04b258a50ca7f9762f43d64e70f4489440bae4eb/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f332e706e67" srcset="/img/loading.gif" lazyload alt="伪异步IO模型图"></p>
+<p><img src="https://camo.githubusercontent.com/04b258a50ca7f9762f43d64e70f4489440bae4eb/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f332e706e67" alt="伪异步IO模型图"></p>
 <p>采用线程池和任务队列可以实现一种叫做伪异步的 I/O 通信框架，它的模型图如上图所示。当有新的客户端接入时，将客户端的<code>Socket</code>封装成一个<code>Task</code>（该任务实现<code>java.lang.Runnable</code>接口）投递到后端的线程池中进行处理，JDK 的线程池维护一个消息队列和 N 个活跃线程，对消息队列中的任务进行处理。由于线程池可以设置消息队列的大小和最大线程数，因此，它的资源占用是可控的，无论多少个客户端并发访问，都不会导致资源的耗尽和宕机。</p>
 <p>伪异步I/O通信框架采用了线程池实现，因此避免了为每个请求都创建一个独立线程造成的线程资源耗尽问题。不过因为它的底层仍然是同步阻塞的BIO模型，因此无法从根本上解决问题。</p>
 <h3 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h3><p>下面代码中演示了BIO通信（一请求一应答）模型。我们会在客户端创建多个线程依次连接服务端并向其发送”当前时间+:hello world”，服务端会为每个客户端线程创建一个线程来处理.</p>
@@ -311,7 +311,7 @@
 <h4 id="Selector-选择器"><a href="#Selector-选择器" class="headerlink" title="Selector(选择器)"></a>Selector(选择器)</h4><p><strong>NIO有选择器，而IO没有</strong></p>
 <p>这是一个可以用于监听多个通道的对象，如数据到达，连接打开等等。因此，单线程可以监视多个通道中的数据。</p>
 <p>选择器用于使用单个线程处理多个通道。因此，它需要较少的线程来处理这些通道。线程之间的切换对于操作系统来说是昂贵的。因此，为了提高系统效率选择器是有用的。</p>
-<p><img src="https://camo.githubusercontent.com/3a68153ce17be90275df07a47409afaea91aff83/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d322f536c6563746f722e706e67" srcset="/img/loading.gif" lazyload alt="选择器"></p>
+<p><img src="https://camo.githubusercontent.com/3a68153ce17be90275df07a47409afaea91aff83/68747470733a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f323031392d322f536c6563746f722e706e67" alt="选择器"></p>
 <p>要使用<code>Seclector</code>的话，必须把<code>Channel</code>注册到<code>Selector</code>上，然后就可以调用<code>Seclector</code>的<code>select()</code>方法。这个方法会进入阻塞，直到有一个<code>channel</code>的状态符合条件，当方法返回时，线程可以处理这些时间。</p>
 <h3 id="NIO读数据和写数据的方式"><a href="#NIO读数据和写数据的方式" class="headerlink" title="NIO读数据和写数据的方式"></a>NIO读数据和写数据的方式</h3><p>通常来说NIO中的所有IO都是从<code>Channel</code>（通道）开始的。</p>
 <ul>
@@ -851,9 +851,9 @@
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
                       <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                      <a class="hover-with-bg" href="/tags/java/">java</a>
                     
                   </div>
                 
@@ -893,7 +893,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -1031,7 +1031,7 @@
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -1067,10 +1067,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

@@ -55,7 +55,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -266,7 +266,7 @@
 <p>在操作系统层面，Thread 竞争的 CPU 资源是真实的物理 CPU，但对于 Go 程序来说，它是一个用户层程序，它本身整体是运行在一个或多个操作系统线程上的，因此 goroutine 们要竞争的所谓 “CPU” 资源就是操作系统线程。这样 Go scheduler 的要做的就是：<strong>将 goroutines 按照一定算法放到不同的操作系统线程中去执行</strong>。这种在语言层面自带调度器的，称之为原生支持并发。</p>
 <h1 id="goroutine-调度器的演进"><a href="#goroutine-调度器的演进" class="headerlink" title="goroutine 调度器的演进"></a>goroutine 调度器的演进</h1><p>调度器的任务是在用户态完成 goroutine 的调度，而调度器的实现好坏，对并发实际有很大的影响。</p>
 <h2 id="G-M模型"><a href="#G-M模型" class="headerlink" title="G-M模型"></a>G-M模型</h2><p>现在的 Go语言调度器是 2012 年重新设计的，在这之前的调度器称为老调度器，老调度器采用的是 <strong>G-M 模型</strong>，在这个调度器中，每个 goroutine 对应于 runtime 中的一个抽象结构：G，而 os thread 作为物理 CPU 的存在而被抽象为一个结构：M(machine)。M 想要执行 G、放回 G 都必须访问全局 G 队列，并且 M 有多个，即多线程访问同一资源需要加锁进行保证互斥/同步，所以全局 G 队列是有互斥锁进行保护的。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large" srcset="/img/loading.gif" lazyload alt="G-M模型"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large" alt="G-M模型"></p>
 <p>这个结构虽然简单，但是却存在着许多问题。它限制了 Go 并发程序的伸缩性，尤其是对那些有高吞吐或并行计算需求的服务程序。主要体现在如下几个方面：</p>
 <ul>
 <li>单一全局互斥锁(Sched.Lock)和集中状态存储的存在导致所有 goroutine 相关操作，比如：创建、重新调度等都要上锁，这会造成激烈的锁竞争</li>
@@ -281,7 +281,7 @@
 <li>work stealing：当 M 绑定的 P 没有可运行的 G 时，它可以从其他运行的 M 那里偷取G。</li>
 </ul>
 <p>G-P-M 模型的结构如下图：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/G-P-M%E6%A8%A1%E5%9E%8B.jpeg%21large" srcset="/img/loading.gif" lazyload alt="G-P-M模型"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/G-P-M%E6%A8%A1%E5%9E%8B.jpeg%21large" alt="G-P-M模型"></p>
 <p>从上往下是调度器的4个部分：</p>
 <ol>
 <li><strong>全局队列</strong>（Global Queue）：存放等待运行的 G。</li>
@@ -350,7 +350,7 @@
 </ol>
 <p>垃圾回收过程中需要暂停整个程序（Stop the world，STW），有时候可能需要几分钟的时间，这会导致整个程序无法工作。所以 STW 和栈扫描是一个可以抢占的安全点（Safe-points）， Go 语言在这里先加入抢占功能。基于信号的抢占式调度只解决了垃圾回收和栈扫描时存在的问题，它到目前为止没有解决全部问题。</p>
 <h1 id="go-func-调度流程"><a href="#go-func-调度流程" class="headerlink" title="go func() 调度流程"></a>go func() 调度流程</h1><p>基于上面的模型，当我们使用 <code>go func()</code> 创建一个新的 goroutine 的时候，其调度流程如下：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20func%28%29%20%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B.jpeg%21large" srcset="/img/loading.gif" lazyload alt="go func() 调度流程"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20func%28%29%20%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B.jpeg%21large" alt="go func() 调度流程"></p>
 <ol>
 <li><p>通过 go func () 来创建一个 goroutine；</p>
 </li>
@@ -365,7 +365,7 @@
 <li><p>当 M 系统调用结束时候，这个 G 会尝试获取一个空闲的 P 执行，并放入到这个 P 的本地队列。如果获取不到 P，那么这个线程 M 变成休眠状态， 加入到空闲线程中，然后这个 G 会被放入全局队列中。</p>
 </li>
 </ol>
-<h1 id="Goroutine-生命周期"><a href="#Goroutine-生命周期" class="headerlink" title="Goroutine 生命周期"></a>Goroutine 生命周期</h1><p><img src="https://qiniu.xiaoming.net.cn/goroutine%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png%21large" srcset="/img/loading.gif" lazyload alt="Goroutine 生命周期"></p>
+<h1 id="Goroutine-生命周期"><a href="#Goroutine-生命周期" class="headerlink" title="Goroutine 生命周期"></a>Goroutine 生命周期</h1><p><img src="https://qiniu.xiaoming.net.cn/goroutine%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png%21large" alt="Goroutine 生命周期"></p>
 <p>在这里有一个线程和一个 groutine 比较特殊，那就是 <strong>M0</strong> 和 <strong>G0</strong>：</p>
 <ul>
 <li><p><strong>M0</strong>：<code>M0</code> 是启动程序后的编号为 0 的主线程，这个 M 对应的实例会在全局变量 <code>runtime.m0</code> 中，不需要在 heap 上分配，M0 负责执行初始化操作和启动第一个 G， 在之后 M0 就和其他的 M 一样了。</p>
@@ -390,40 +390,40 @@
 </ol>
 <p>调度器的生命周期几乎占满了一个Go程序的一生，<code>runtime.main</code> 的 goroutine 执行之前都是为调度器做准备工作，<code>runtime.main</code> 的 goroutine 运行，才是调度器的真正开始，直到 <code>runtime.main</code> 结束而结束。</p>
 <h1 id="Goroutine-调度器场景分析"><a href="#Goroutine-调度器场景分析" class="headerlink" title="Goroutine 调度器场景分析"></a>Goroutine 调度器场景分析</h1><h2 id="场景一"><a href="#场景一" class="headerlink" title="场景一"></a>场景一</h2><p>p1 拥有 g1，m1 获取 p1 后开始运行g1，g1 使用 <code>go func()</code> 创建了 g2，为了局部性 g2 优先加入到 p1 的本地队列：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF1.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景1"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF1.png" alt="Goroutine 调度器场景1"></p>
 <h2 id="场景二"><a href="#场景二" class="headerlink" title="场景二"></a>场景二</h2><p><strong>g1运行完成后(函数：<code>goexit</code>)，m 上运行的 goroutine 切换为 g0，g0 负责调度时协程的切换（函数：<code>schedule</code>）</strong>。从 p1 的本地队列取 g2，从 g0 切换到 g2，并开始运行 g2 (函数：<code>execute</code>)。实现了<strong>线程 m1 的复用</strong>。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF2.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景2"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF2.png" alt="Goroutine 调度器场景2"></p>
 <h2 id="场景三"><a href="#场景三" class="headerlink" title="场景三"></a>场景三</h2><p>假设每个 p 的本地队列只能存 4 个 g。g2 要创建 6 个 g，前 4 个g（g3, g4, g5, g6）已经加入 p1 的本地队列，p1 本地队列满了。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景3"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3.png" alt="Goroutine 调度器场景3"></p>
 <p>g2 在创建 g7 的时候，发现 p1 的本地队列已满，需要执行<strong>负载均衡</strong>，把 p1 中本地队列中前一半的 g，还有新创建的 g <strong>转移</strong>到全局队列</p>
 <blockquote>
 <p>实现中并不一定是新的 g，如果 g 是 g2 之后就执行的，会被保存在本地队列，利用某个老的 g 替换新 g 加入全局队列），这些 g 被转移到全局队列时，会被打乱顺序。</p>
 </blockquote>
 <p>所以  g3,g4,g7 被转移到全局队列。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-2.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景3-2"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-2.png" alt="Goroutine 调度器场景3-2"></p>
 <blockquote>
 <p>蓝色长方形代表全局队列。</p>
 </blockquote>
 <p>如果此时 G2 创建 G8 时，P1 的本地队列未满，所以 G8 会被加入到 P1 的本地队列：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-3.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景3-3"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-3.png" alt="Goroutine 调度器场景3-3"></p>
 <h2 id="场景四"><a href="#场景四" class="headerlink" title="场景四"></a>场景四</h2><p><strong>在创建 g 时，运行的 g 会尝试唤醒其他空闲的 p 和 m 组合去执行</strong>。假定 g2 唤醒了 m2，m2 绑定了 p2，并运行 g0，但 p2 本地队列没有 g，m2 此时为自旋线程（没有 G 但为运行状态的线程，不断寻找 g）。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景4"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4.png" alt="Goroutine 调度器场景4"></p>
 <p>m2 接下来会尝试从全局队列 (GQ) 取一批 g 放到 p2 的本地队列（函数：<code>findrunnable</code>）。m2 从全局队列取的 g 数量符合下面的公式：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">n = min(<span class="hljs-built_in">len</span>(GQ)/GOMAXPROCS + <span class="hljs-number">1</span>, <span class="hljs-built_in">len</span>(GQ/<span class="hljs-number">2</span>))<br></code></pre></div></td></tr></table></figure>
 
 <p>公式的含义是，至少从全局队列取 1 个 g，但每次不要从全局队列移动太多的 g 到 p 本地队列，给其他 p 留点。这是<strong>从全局队列到 P 本地队列的负载均衡</strong>。</p>
 <p>假定场景中一共有 4 个 P（<code>GOMAXPROCS=4</code>），所以 m2 只从能从全局队列取 1 个 g（即 g3）移动 p2 本地队列，然后完成从 g0 到 g3 的切换，运行 g3：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4-2.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景4-2"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4-2.png" alt="Goroutine 调度器场景4-2"></p>
 <h2 id="场景五"><a href="#场景五" class="headerlink" title="场景五"></a>场景五</h2><p>假设 g2 一直在 m1上运行，经过 2 轮后，m2 已经把 g7、g4 也挪到了p2的本地队列并完成运行，全局队列和 p2 的本地队列都空了，如下图左边所示。</p>
 <p><strong>全局队列已经没有 g，那 m 就要执行 work stealing：从其他有 g 的 p 哪里偷取一半 g 过来，放到自己的 P 本地队列</strong>。p2 从 p1 的本地队列尾部取一半的 g，本例中一半则只有 1 个 g8，放到 p2 的本地队列，情况如下图右边：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF5-1.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景5-1"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF5-1.png" alt="Goroutine 调度器场景5-1"></p>
 <h2 id="场景六"><a href="#场景六" class="headerlink" title="场景六"></a>场景六</h2><p>p1 本地队列 g5、g6 已经被其他 m 偷走并运行完成，当前 m1 和 m2 分别在运行 g2 和 g8，m3 和 m4 没有goroutine 可以运行，m3 和 m4 处于<strong>自旋状态</strong>，它们不断寻找 goroutine。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF6.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景6"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF6.png" alt="Goroutine 调度器场景6"></p>
 <p>这里有一个问题，为什么要让 m3 和 m4 自旋？自旋本质是在运行，线程在运行却没有执行 g，就变成了浪费CPU，销毁线程可以节约CPU资源不是更好吗？实际上，创建和销毁CPU都是浪费时间的，我们<strong>希望当有新 goroutine 创建时，立刻能有 m 运行它</strong>，如果销毁再新建就增加了时延，降低了效率。当然也考虑了过多的自旋线程是浪费 CPU，所以系统中最多有 GOMAXPROCS 个自旋的线程，多余的没事做的线程会让他们休眠（函数：<code>notesleep()</code> 实现了这个思路）。</p>
 <h2 id="场景七"><a href="#场景七" class="headerlink" title="场景七"></a>场景七</h2><p>假定当前除了 m3 和 m4 为自旋线程，还有 m5 和 m6 为自旋线程，g8 创建了 g9，g9 会放入本地队列。加入此时g8 进行了<strong>阻塞的系统调用</strong>，m2 和 p2 立即解绑，p2 会执行以下判断：如果 p2 本地队列有 g、全局队列有 g 或有空闲的 m，p2 都会立马唤醒1个 m 和它绑定，否则 p2 则会加入到空闲 P 列表，等待 m 来获取可用的 p。本场景中，p2 本地队列有 g，可以和其他自旋线程 m5 绑定。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF7.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景7"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF7.png" alt="Goroutine 调度器场景7"></p>
 <h2 id="场景八"><a href="#场景八" class="headerlink" title="场景八"></a>场景八</h2><p>假设 g8 创建了 g9，假如 g8 进行了<strong>非阻塞系统调用</strong>（CGO会是这种方式，见<code>cgocall()</code>），m2 和 p2 会解绑，但 m2 会记住 p，然后 g8 和 m2 进入系统调用状态。当 g8 和 m2 退出系统调用时，会尝试获取 p2，如果无法获取，则获取空闲的 p，如果依然没有，g8 会被记为可运行状态，并加入到全局队列。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF8.png" srcset="/img/loading.gif" lazyload alt="Goroutine 调度器场景8"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF8.png" alt="Goroutine 调度器场景8"></p>
 <h2 id="场景九"><a href="#场景九" class="headerlink" title="场景九"></a>场景九</h2><p>前面说过，Go 调度在 go1.12 实现了抢占，应该更精确的称为<strong>基于协作的请求式抢占</strong>，那是因为 go 调度器的抢占和 OS 的线程抢占比起来很柔和，不暴力，不会说线程时间片到了，或者更高优先级的任务到了，执行抢占调度。<strong>go 的抢占调度柔和到只给 goroutine 发送 1 个抢占请求，至于 goroutine 何时停下来，那就管不到了</strong>。抢占请求需要满足2个条件中的1个：</p>
 <ul>
 <li>G 进行系统调用超过 20us</li>
@@ -526,21 +526,21 @@
 <figure class="highlight golang"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs golang">$ <span class="hljs-keyword">go</span> tool trace trace.out <br><span class="hljs-number">2020</span>/<span class="hljs-number">12</span>/<span class="hljs-number">07</span> <span class="hljs-number">23</span>:<span class="hljs-number">09</span>:<span class="hljs-number">33</span> Parsing trace...<br><span class="hljs-number">2020</span>/<span class="hljs-number">12</span>/<span class="hljs-number">07</span> <span class="hljs-number">23</span>:<span class="hljs-number">09</span>:<span class="hljs-number">33</span> Splitting trace...<br><span class="hljs-number">2020</span>/<span class="hljs-number">12</span>/<span class="hljs-number">07</span> <span class="hljs-number">23</span>:<span class="hljs-number">09</span>:<span class="hljs-number">33</span> Opening browser. Trace viewer is listening on http:<span class="hljs-comment">//127.0.0.1:56469</span><br></code></pre></div></td></tr></table></figure>
 
 <p>接下来通过浏览器打开 <code>http://127.0.0.1:33479</code> 网址，点击 <code>view trace</code> 能够看见可视化的调度流程：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace"></p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20%E4%BF%A1%E6%81%AF%E6%B3%A8%E8%A7%A3.png%21large" srcset="/img/loading.gif" lazyload alt="go tool trace 信息注解"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace.jpg" alt="go tool trace"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20%E4%BF%A1%E6%81%AF%E6%B3%A8%E8%A7%A3.png%21large" alt="go tool trace 信息注解"></p>
 <h3 id="g-信息"><a href="#g-信息" class="headerlink" title="g 信息"></a>g 信息</h3><p>点击 Goroutines 那一行的数据条，会看到一些详细的信息：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20g%E4%BF%A1%E6%81%AF.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace g信息"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20g%E4%BF%A1%E6%81%AF.jpg" alt="go tool trace g信息"></p>
 <p>上面表示一共有两个 G 在程序中，一个是特殊的 G0，是每个 M 必须有的一个初始化的 G。其中 G1 就是 main goroutine (执行 main 函数的协程)，在一段时间内处于可运行和运行的状态。</p>
 <h3 id="m-信息"><a href="#m-信息" class="headerlink" title="m 信息"></a>m 信息</h3><p>点击 Threads 那一行可视化的数据条，会看到一些详细的信息：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20m%E4%BF%A1%E6%81%AF.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace m信息"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20m%E4%BF%A1%E6%81%AF.jpg" alt="go tool trace m信息"></p>
 <p>这里一共有两个 M 在程序中，一个是特殊的 M0，用于初始化使用。</p>
-<h3 id="p-信息"><a href="#p-信息" class="headerlink" title="p 信息"></a>p 信息</h3><p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-1.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace p信息-1"></p>
+<h3 id="p-信息"><a href="#p-信息" class="headerlink" title="p 信息"></a>p 信息</h3><p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-1.jpg" alt="go tool trace p信息-1"></p>
 <p>G1 中调用了 <code>main.main</code>，创建了 <code>trace goroutine g6</code>。G1 运行在 P0 上，G6运行在 P1 上。</p>
 <p>这里有三个 P。</p>
 <p>在看看上面的 M 信息：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-2.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace p信息-2"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-2.jpg" alt="go tool trace p信息-2"></p>
 <p>可以看到确实 G6 在 P1 上被运行之前，确实在 Threads 行多了一个 M 的数据，点击查看如下：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-3.jpg" srcset="/img/loading.gif" lazyload alt="go tool trace p信息-3"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-3.jpg" alt="go tool trace p信息-3"></p>
 <p>多了一个 M2 应该就是 P1 为了执行 G6 而动态创建的 M2。</p>
 <h2 id="Debug-trace"><a href="#Debug-trace" class="headerlink" title="Debug trace"></a>Debug trace</h2><p>示例代码：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// main.main</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    <span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++ &#123;<br>        time.Sleep(time.Second)<br>        fmt.Println(<span class="hljs-string">"Hello scheduler"</span>)<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
@@ -636,7 +636,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -774,7 +774,7 @@
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -810,10 +810,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

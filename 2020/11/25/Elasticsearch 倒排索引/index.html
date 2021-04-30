@@ -56,7 +56,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -298,7 +298,7 @@
 <p>下回在搜索“生存”的时候，就会返回1，2两份文档。</p>
 <p>但是只是这样是远远不够的，世界上的语言种类特别多，没搜索一个单词，就都要全局遍历，效率特别低。这时候就需要用到了排序，以便采用二分查找等方式提高遍历效率，在这里 lucene 采用了跳表的数据结构，这就是<strong>Term Dictionary</strong>,另一方面，光使用排序还会导致磁盘IO速度过慢（因为数据都放在磁盘中），如果将数据放入内存，又会导致内存爆满。</p>
 <p>所以，Lucene 的倒排索引，在上面的表格的基础上，在左边增加了一层<strong>字典树 term index</strong>，它不存储所有的单词，只存储单词前缀，通过字典书找到单词所在的块，也就是单词的大概位置，再在块里二分查找，找到对应的单词，再找到单词对应的文档列表。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Lucene%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84.jpg" srcset="/img/loading.gif" lazyload alt="Lucene倒排索引内部结构"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Lucene%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84.jpg" alt="Lucene倒排索引内部结构"></p>
 <p>另外，为了进一步节省内存，Lucene 还用了 FST（Finite State Transducers）对 Term Index 做进一步压缩，term index 在内存中是以FST（finite state transducers）的形式保存的，其特点是非常节省内存。Term dictionary 在磁盘上是以分 block 的方式保存的，一个block 内部利用公共前缀压缩，比如都是 Ab 开头的单词就可以把 Ab 省去。这样 term dictionary 可以比 b-tree 更节约磁盘空间。</p>
 <h2 id="对-Posting-List-的改进"><a href="#对-Posting-List-的改进" class="headerlink" title="对 Posting List 的改进"></a>对 Posting List 的改进</h2><p>原生的 Posting List 有两个可以改进的地方：</p>
 <ul>
@@ -321,7 +321,7 @@
 <h4 id="按需分配空间"><a href="#按需分配空间" class="headerlink" title="按需分配空间"></a>按需分配空间</h4><p>对于第一个块，[73, 227, 2]，最大元素是227，需要 8 bits，所以就给每个元素都分配 8 bits的空间。</p>
 <p>但是对于第二个块，[30, 11, 29]，最大的元素才30，只需要 5 bits，所有给每个元素只分配 5 bits 的空间足矣。</p>
 <p>以上三个步骤，共同组成了一项编码技术，Frame Of Reference（FOR）：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/es%20FOR%E7%BC%96%E7%A0%81%E6%8A%80%E6%9C%AF.jpg" srcset="/img/loading.gif" lazyload alt="es FOR编码技术"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/es%20FOR%E7%BC%96%E7%A0%81%E6%8A%80%E6%9C%AF.jpg" alt="es FOR编码技术"></p>
 <h3 id="快速求交并集"><a href="#快速求交并集" class="headerlink" title="快速求交并集"></a>快速求交并集</h3><p>在 Lucene 中查询，通常不只有一个查询条件，比如想搜索：</p>
 <ul>
 <li>含有“生存”相关词语的文档</li>
@@ -363,7 +363,7 @@
 <p>8192 / 2 = 4096</p>
 <p>当文档数量少于 4096 时，用 Integer 数组，否则，用 bitmap。</p>
 <h4 id="对于-Integer，使用-Skip-List（跳表）做合并计算"><a href="#对于-Integer，使用-Skip-List（跳表）做合并计算" class="headerlink" title="对于 Integer，使用 Skip List（跳表）做合并计算"></a>对于 Integer，使用 Skip List（跳表）做合并计算</h4><p>对于需要查找的每一个 int 数组建立跳表，然后由最短的 posting list 开始遍历，遍历的过程中各自可以跳过不少元素，比如下面的例子：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/Lucene%E8%B7%B3%E8%A1%A8%E8%AE%A1%E7%AE%97%E4%BE%8B%E5%AD%90.jpg" srcset="/img/loading.gif" lazyload alt="Lucene 跳表例子"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/Lucene%E8%B7%B3%E8%A1%A8%E8%AE%A1%E7%AE%97%E4%BE%8B%E5%AD%90.jpg" alt="Lucene 跳表例子"></p>
 <p>以上是三个posting list。现在需要把它们用AND的关系合并，得出posting list的交集。首先选择最短的posting list，然后从小到大遍历。遍历的过程可以跳过一些元素，比如我们遍历到绿色的13的时候，就可以跳过蓝色的3了，因为3比13要小。</p>
 <p>整个过程如下：</p>
 <figure class="highlight livescript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs livescript">Next<span class="hljs-function"> -&gt;</span> <span class="hljs-number">2</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">2</span>)</span> -&gt;</span> <span class="hljs-number">13</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">13</span>)</span> -&gt;</span> <span class="hljs-number">13</span><br>Already <span class="hljs-literal">on</span> <span class="hljs-number">13</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">13</span>)</span> -&gt;</span> <span class="hljs-number">13</span> MATCH!!!<br>Next<span class="hljs-function"> -&gt;</span> <span class="hljs-number">17</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">17</span>)</span> -&gt;</span> <span class="hljs-number">22</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">22</span>)</span> -&gt;</span> <span class="hljs-number">98</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">98</span>)</span> -&gt;</span> <span class="hljs-number">98</span><br>Advance<span class="hljs-function"><span class="hljs-params">(<span class="hljs-number">98</span>)</span> -&gt;</span> <span class="hljs-number">98</span> MATCH!!!<br></code></pre></div></td></tr></table></figure>
@@ -428,7 +428,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -566,7 +566,7 @@
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -602,10 +602,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

@@ -60,7 +60,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -397,7 +397,7 @@
 <li>DFA字典树实现（当敏感词库较大时，占用较大内存空间，效率上没问题）</li>
 </ul>
 <h3 id="DFA-简介"><a href="#DFA-简介" class="headerlink" title="DFA 简介"></a>DFA 简介</h3><p>DFA 即 Deterministic Finite Automaton，也就是确定有穷自动机，它是是通过 event 和当前的 state 得到下一个 state，即 event+state=nextstate。下图展示了其状态的转换：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/DFA%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2.jpeg" srcset="/img/loading.gif" lazyload alt="DFA 状态转换"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/DFA%E8%87%AA%E5%8A%A8%E8%BD%AC%E6%8D%A2.jpeg" alt="DFA 状态转换"></p>
 <p>定义：一个确定有穷自动机（DFA）M 是一个五元组：<code>M=（K，Σ，f，S，Z）</code>其中</p>
 <ol>
 <li>K 是一个有穷集，它的每个元素称为一个状态；</li>
@@ -415,7 +415,7 @@
 <h3 id="HashMap-实现方式"><a href="#HashMap-实现方式" class="headerlink" title="HashMap 实现方式"></a>HashMap 实现方式</h3><p>我们可以认为，通过 S query U、V，通过 U query V、P，通过 V query U P。通过这样的转变我们可以将状态的转换转变为使用Java集合的查找。</p>
 <p>诚然，加入在我们的敏感词库中存在如下几个敏感词：日本人、日本鬼子、毛泽东。那么我需要构建成一个什么样的结构呢？</p>
 <p>首先：<code>query 日 ---&gt; {本}</code>、<code>query 本 ---&gt;{人、鬼子}</code>、<code>query 人 ---&gt;{null}</code>、<code>query 鬼 ---&gt; {子}</code>。形如下结构：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/HashMap%E5%AE%9E%E7%8E%B0%E7%9A%84DFA%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="HashMap实现的DFA结构"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/HashMap%E5%AE%9E%E7%8E%B0%E7%9A%84DFA%E7%BB%93%E6%9E%84.png" alt="HashMap实现的DFA结构"></p>
 <p>这样就将敏感词库构建成了一个类似于一颗一颗的树，这样判断一个词是否为敏感词时就大大减少了检索的匹配范围。比如要判断日本人，根据第一个字就可以确认需要检索的是那棵树，然后再在这棵树中进行检索。</p>
 <p>但是如何来判断一个敏感词已经结束了呢？利用标识位来判断。</p>
 <h4 id="构建-DFA"><a href="#构建-DFA" class="headerlink" title="构建 DFA"></a>构建 DFA</h4><p>所以对于这个关键是如何来构建一棵棵这样的敏感词树。下面以 Java 中的 HashMap 为例来实现 DFA 算法。具体过程如下：</p>
@@ -438,9 +438,9 @@
 
 <h3 id="两种实现方式对比"><a href="#两种实现方式对比" class="headerlink" title="两种实现方式对比"></a>两种实现方式对比</h3><p>两种方法本质上是一样的，都是通过构造 HashMap，在 Map 中包含了另外一个子 Map，所以空间复杂度相等，O（n*m）（n的敏感词，每个m长），时间复杂度方面，如果敏感词的长度为 m，则每个敏感词的查找时间复杂度是 O(m)，字符串的长度为 n，我们需要遍历 n 遍，所以敏感词查找这个过程的时间复杂度是 O(n * m)。如果有 t 个敏感词的话，构建 trie 树的时间复杂度是 O(t * m)。基于 Tire 树实现的方式，相对结构比较直观，实现方法上比较容易理解。</p>
 <h1 id="7-项目架构"><a href="#7-项目架构" class="headerlink" title="7. 项目架构"></a>7. 项目架构</h1><p>教师资格证培训平台：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/%E6%95%99%E5%B8%88%E8%B5%84%E6%A0%BC%E8%AF%81%E5%9F%B9%E8%AE%AD%E6%9E%B6%E6%9E%84%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="教师资格证培训平台"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E6%95%99%E5%B8%88%E8%B5%84%E6%A0%BC%E8%AF%81%E5%9F%B9%E8%AE%AD%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="教师资格证培训平台"></p>
 <p>熠熠星光小程序：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/%E7%86%A0%E7%86%A0%E6%98%9F%E5%85%89%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%9E%B6%E6%9E%84%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="熠熠星光小程序"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E7%86%A0%E7%86%A0%E6%98%9F%E5%85%89%E5%B0%8F%E7%A8%8B%E5%BA%8F%E6%9E%B6%E6%9E%84%E5%9B%BE.png" alt="熠熠星光小程序"></p>
 <h1 id="8-Docker-部署项目流程"><a href="#8-Docker-部署项目流程" class="headerlink" title="8. Docker 部署项目流程"></a>8. Docker 部署项目流程</h1><ol>
 <li>首先需要将项目打包</li>
 <li>下载相关需要配置的镜像（Nginx，MySQL，AabbitMQ等等）</li>
@@ -680,7 +680,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -818,7 +818,7 @@
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -854,10 +854,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

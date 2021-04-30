@@ -59,7 +59,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -269,7 +269,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 <a id="more"></a>
 
 <h1 id="2-MyBatis-整体架构"><a href="#2-MyBatis-整体架构" class="headerlink" title="2. MyBatis 整体架构"></a>2. MyBatis 整体架构</h1><p>MyBatis <strong>最上面是接口层</strong>，接口层就是开发人员在 Mapper 或者是 Dao 接口中的接口定义，是查询、新增、更新还是删除操作；<strong>中间层是数据处理层</strong>，主要是配置 Mapper -&gt; XML 层级之间的参数映射，SQL 解析，SQL 执行，结果映射的过程。<strong>上述两种流程都由基础支持层来提供功能支撑</strong>，基础支持层包括连接管理，事务管理，配置加载，缓存处理等。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E6%9E%B6%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="MyBatis架构"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E6%9E%B6%E6%9E%84.png" alt="MyBatis架构"></p>
 <h2 id="接口层"><a href="#接口层" class="headerlink" title="接口层"></a>接口层</h2><p>在不与Spring 集成的情况下，使用 MyBatis 执行数据库的操作主要如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">InputStream is = Resources.getResourceAsStream(<span class="hljs-string">"myBatis-config.xml"</span>);<br>SqlSessionFactoryBuilder builder = <span class="hljs-keyword">new</span> SqlSessionFactoryBuilder();<br>SqlSessionFactory factory = builder.build(is);<br>sqlSession = factory.openSession();<br></code></pre></div></td></tr></table></figure>
 <p>其中的 <code>SqlSessionFactory</code>,<code>SqlSession</code> 是 MyBatis 接口的核心类，尤其是 <code>SqlSession</code>，这个接口是MyBatis 中最重要的接口，这个接口能够执行命令，获取映射，管理事务。</p>
@@ -277,7 +277,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 <h3 id="SQL-解析与-scripting-模块"><a href="#SQL-解析与-scripting-模块" class="headerlink" title="SQL 解析与 scripting 模块"></a>SQL 解析与 scripting 模块</h3><p>Mybatis 实现的动态 SQL 语句，几乎可以编写出所有满足需要的 SQL。</p>
 <p>Mybatis 中 scripting 模块会根据用户传入的参数，解析映射文件中定义的动态 SQL 节点，形成数据库能执行的 SQL 语句。</p>
 <h3 id="SQL-执行"><a href="#SQL-执行" class="headerlink" title="SQL 执行"></a>SQL 执行</h3><p>SQL 语句的执行涉及多个组件，包括 MyBatis 的四大核心，它们是: <code>Executor</code>、<code>StatementHandler</code>、<code>ParameterHandler</code>、<code>ResultSetHandler</code>。SQL 的执行过程可以用下面这幅图来表示：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/mybatis%E4%B8%ADsql%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="MyBatis中sql执行过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/mybatis%E4%B8%ADsql%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" alt="MyBatis中sql执行过程"></p>
 <p>MyBatis 层级结构各个组件的介绍(这里只是简单介绍，具体介绍在后面)：</p>
 <ul>
 <li><code>SqlSession</code>：它是 MyBatis 核心 API，主要用来执行命令，获取映射，管理事务。接收开发人员提供 Statement Id 和参数。并返回操作结果。</li>
@@ -308,7 +308,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 <li>MyBatis 框架初始化操作</li>
 <li>为开发人员提供SqlSession 对象</li>
 </ul>
-<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E4%B8%ADsqlsessionFactory.jpg" srcset="/img/loading.gif" lazyload alt="MyBatis中sqlSessionFactory类"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E4%B8%ADsqlsessionFactory.jpg" alt="MyBatis中sqlSessionFactory类"></p>
 <p><code>SqlSessionFactory</code> 有两个实现类，一个是 <code>SqlSessionManager</code> 类，一个是 <code>DefaultSqlSessionFactory</code> 类</p>
 <ul>
 <li><code>DefaultSqlSessionFactory</code> : SqlSessionFactory 的默认实现类，是真正生产会话的工厂类，这个类的实例的生命周期是全局的，它只会在首次调用时生成一个实例（单例模式），就一直存在直到服务器关闭。</li>
@@ -319,32 +319,32 @@ MyBatis 比较简单和轻量：本身就很小且">
 
 <p>从这行代码入手，首先创建了一个 <code>SqlSessionFactoryBuilder</code> 工厂，这是一个建造者模式的设计思想，由 <code>builder</code> 建造者来创建 <code>SqlSessionFactory</code> 工厂</p>
 <p>然后调用 <code>SqlSessionFactoryBuilder</code> 中的 <code>build</code> 方法传递一个 <code>InputStream</code> 输入流，Inputstream 输入流中就是你传过来的配置文件 <code>mybatis-config.xml</code>，<code>SqlSessionFactoryBuilder</code> 根据传入的 <code>InputStream</code> 输入流和 <code>environment</code>、<code>properties</code> 属性创建一个 <code>XMLConfigBuilder</code> 对象。<code>SqlSessionFactoryBuilder</code> 对象调用 <code>XMLConfigBuilder</code> 的 <code>parse()</code> 方法，流程如下。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/SqlSessionFactory%20%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="SqlSessionFactory 的执行流程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/SqlSessionFactory%20%E7%9A%84%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.jpg" alt="SqlSessionFactory 的执行流程"></p>
 <p>XMLConfigBuilder 会解析 <code>/configuration</code> 标签，<code>configuration</code> 是 MyBatis 中最重要的一个标签。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/parseConfiguration%E6%96%B9%E6%B3%95.jpg" srcset="/img/loading.gif" lazyload alt="parseConfiguration方法"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/parseConfiguration%E6%96%B9%E6%B3%95.jpg" alt="parseConfiguration方法"></p>
 <p>每一个属性都对应着一个解析方法，都是使用 XPath 把标签进行解析，解析完成后返回一个 <code>DefaultSqlSessionFactory</code> 对象，它是 <code>SqlSessionFactory</code> 的默认实现类。这就是 <code>SqlSessionFactoryBuilder</code> 的初始化流程，通过流程我们可以看到，初始化流程就是对一个个 <code>/configuration</code> 标签下子标签的解析过程。</p>
 <h2 id="SqlSession"><a href="#SqlSession" class="headerlink" title="SqlSession"></a>SqlSession</h2><p>在 MyBatis 初始化流程结束，也就是 SqlSessionFactoryBuilder -&gt; SqlSessionFactory 的获取流程后，我们就可以通过 SqlSessionFactory 对象得到 SqlSession 然后执行 SQL 语句了。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/sqlSessionFactory%E8%8E%B7%E5%8F%96sqlsession%E6%B5%81%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="sqlSessionFactory获取sqlSession流程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/sqlSessionFactory%E8%8E%B7%E5%8F%96sqlsession%E6%B5%81%E7%A8%8B.jpg" alt="sqlSessionFactory获取sqlSession流程"></p>
 <p>在 <code>SqlSessionFactory.openSession</code> 过程中我们可以看到，会调用到 <code>DefaultSqlSessionFactory</code> 中的 <code>openSessionFromDataSource</code> 方法，这个方法主要创建了两个与分析执行流程重要的对象，一个是 <code>Executor</code> 执行器对象，一个是 <code>SqlSession</code> 对象。</p>
 <p><code>SqlSession</code> 对象是 MyBatis 中最重要的一个对象，这个接口能够执行命令，获取映射，管理事务。<code>SqlSession</code> 中定义了一系列模版方法，让你能够执行简单的 CRUD 操作，也可以通过 getMapper 获取 Mapper 层，执行自定义 SQL 语句，因为 SqlSession 在执行 SQL 语句之前是需要先开启一个会话，涉及到事务操作，所以还会有 commit、 rollback、close 等方法。这也是模版设计模式的一种应用。</p>
 <h2 id="MapperProxy"><a href="#MapperProxy" class="headerlink" title="MapperProxy"></a>MapperProxy</h2><p><code>MapperProxy</code> 是 Mapper 映射 SQL 语句的关键对象，我们写的 Dao 层或者 Mapper 层都是通过 MapperProxy 来和对应的 SQL 语句进行绑定的。绑定过程如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/MapperProxy%E7%BB%91%E5%AE%9A%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="MapperProxy绑定过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/MapperProxy%E7%BB%91%E5%AE%9A%E8%BF%87%E7%A8%8B.jpg" alt="MapperProxy绑定过程"></p>
 <p>这就是 MyBatis 的核心绑定流程，可以看到 <code>SqlSession</code> 首先调用 <code>getMapper</code> 方法， SqlSession 是大哥级别的人物，只定义标准。</p>
 <p>SqlSession 把事情交给 <code>Configuration</code> 去做，然后 <code>Configuration</code> 有调用 <code>MapperRegistry</code>。<code>MapperRegistry</code> 相当于项目经理，项目经理只从大面上把握项目进度，不需要知道手下的小弟是如何工作的，把任务完成了就好。最终真正干活的还是 <code>MapperProxyFactory</code>。通过这段代码 <code>Proxy.newProxyInstance</code> ，可以看出使用了动态代理。</p>
 <p>也就是说，MyBatis 中 Mapper 和 SQL 语句的绑定正是通过动态代理来完成的。</p>
 <p>通过动态代理，就可以方便的在 Dao 层或者 Mapper 层定义接口，实现自定义的增删改查操作了。</p>
 <p>接下来再看看 sql 语句执行过程</p>
-<p><img src="http://qiniu.xiaoming.net.cn/MapperProxy%E4%B8%ADsql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="MapperProxy中sql语句执行过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/MapperProxy%E4%B8%ADsql%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" alt="MapperProxy中sql语句执行过程"></p>
 <p><code>MapperProxyFactory</code> 会生成代理对象，这个对象就是 <code>MapperProxy</code>，最终会调用到 <code>mapperMethod.execute</code> 方法，execute 方法比较长，其实逻辑比较简单，就是判断是插入、更新、删除还是查询语句，其中如果是查询的话，还会判断返回值的类型:</p>
-<p><img src="http://qiniu.xiaoming.net.cn/mapperMethod.execute%E6%96%B9%E6%B3%95.jpg" srcset="/img/loading.gif" lazyload alt="mapperMethod.execute方法"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/mapperMethod.execute%E6%96%B9%E6%B3%95.jpg" alt="mapperMethod.execute方法"></p>
 <p>以 selectList 为例，来看一下下面的执行过程。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/mapperMethod%E4%B8%ADselectList%E6%BA%90%E7%A0%81.jpg" srcset="/img/loading.gif" lazyload alt="DefaultSqlSession中selectList源码"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/mapperMethod%E4%B8%ADselectList%E6%BA%90%E7%A0%81.jpg" alt="DefaultSqlSession中selectList源码"></p>
 <p>这是 <code>DefaultSqlSession</code> 中 <code>selectList</code> 的代码，可以看到出现了 <code>executor</code>。</p>
 <h2 id="Executor"><a href="#Executor" class="headerlink" title="Executor"></a>Executor</h2><p>Executor 的创建如下：由 Configuration 对象创建了一个 Executor 对象</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%87%BA%E7%8E%B0%E7%9A%84%E4%BD%8D%E7%BD%AE.jpg" srcset="/img/loading.gif" lazyload alt="Executor创建"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%AC%AC%E4%B8%80%E6%AC%A1%E5%87%BA%E7%8E%B0%E7%9A%84%E4%BD%8D%E7%BD%AE.jpg" alt="Executor创建"></p>
 <h3 id="Executor-的继承结构"><a href="#Executor-的继承结构" class="headerlink" title="Executor 的继承结构"></a>Executor 的继承结构</h3><p>每一个 SqlSession 都会拥有一个 Executor 对象，这个对象负责增删改查的具体操作，可以简单的将它理解为 JDBC 中 Statement 的封装版。也可以理解为 SQL 的执行引擎，要干活总得有一个发起人吧，可以把 Executor 理解为发起人的角色。</p>
 <p>Executor 的继承体系如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%9A%84%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84.jpg" srcset="/img/loading.gif" lazyload alt="Executor继承结构"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%9A%84%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84.jpg" alt="Executor继承结构"></p>
 <p>如上图所示，位于继承体系最顶层的是 Executor 执行器，它有两个实现类，分别是 <code>BaseExecutor</code> 和 <code>CachingExecutor</code>。</p>
 <p><code>BaseExecutor</code> 是一个抽象类，这种通过抽象的实现接口的方式是适配器设计模式之接口适配的体现，是Executor 的默认实现，实现了大部分 Executor 接口定义的功能，降低了接口实现的难度。<code>BaseExecutor</code> 的子类有三个，分别是 <code>SimpleExecutor</code>、<code>ReuseExecutor</code> 和 <code>BatchExecutor</code>。</p>
 <ul>
@@ -354,7 +354,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 <li><code>CachingExecutor</code> : 缓存执行器，先从缓存中查询结果，如果存在就返回之前的结果；如果不存在，再委托给 Executor delegate 去数据库中取，delegate 可以是上面任何一个执行器。</li>
 </ul>
 <h3 id="Executor的创建和选择"><a href="#Executor的创建和选择" class="headerlink" title="Executor的创建和选择"></a>Executor的创建和选择</h3><p>Executor 是由 Configuration 创建的，Configuration 会根据执行器的类型创建，如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E9%80%89%E6%8B%A9.jpg" srcset="/img/loading.gif" lazyload alt="Executor的创建和选择"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E9%80%89%E6%8B%A9.jpg" alt="Executor的创建和选择"></p>
 <p>这一步就是执行器的创建过程，根据传入的 <code>ExecutorType</code> 类型来判断是哪种执行器，如果不指定 <code>ExecutorType</code> ，默认创建的是简单执行器。它的赋值可以通过两个地方进行赋值：</p>
 <p>可以通过<settings>标签来设置当前工程中所有的 SqlSession 对象使用默认的 Executor:</p>
 <figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">settings</span>&gt;</span><br> <span class="hljs-comment">&lt;!--取值范围 SIMPLE, REUSE, BATCH --&gt;</span><br>	<span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"defaultExecutorType"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"SIMPLE"</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">settings</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
@@ -362,20 +362,20 @@ MyBatis 比较简单和轻量：本身就很小且">
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">session = factory.openSession(ExecutorType.BATCH);<br></code></pre></div></td></tr></table></figure>
 
 <h3 id="Executor-的具体执行过程"><a href="#Executor-的具体执行过程" class="headerlink" title="Executor 的具体执行过程"></a>Executor 的具体执行过程</h3><p>Executor 中的大部分方法的调用链其实是差不多的，执行流程图如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%20%E7%9A%84%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="Executor的具体执行过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%20%E7%9A%84%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.jpg" alt="Executor的具体执行过程"></p>
 <p>紧跟着上面的 selectList 继续分析，它会调用到 <code>executor.query</code> 方法。</p>
 <p>当有一个查询请求访问的时候，首先会经过 Executor 的实现类 <code>CachingExecutor</code> ，先从缓存中查询 SQL 是否是第一次执行，如果是第一次执行的话，那么就直接执行 SQL 语句，并创建缓存，如果第二次访问相同的 SQL 语句的话，那么就会直接从缓存中提取。</p>
 <p>下面这段代码是从 <code>selectList -&gt; 从缓存中 query</code> 的具体过程。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B2.jpg" srcset="/img/loading.gif" lazyload alt="Executor具体执行过程2-从缓存获取"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B2.jpg" alt="Executor具体执行过程2-从缓存获取"></p>
 <p>下面代码会判断缓存中是否有这条 SQL 语句的执行结果，如果没有的话，就再重新创建 Executor 执行器执行 SQL 语句，注意， <code>list = doQuery</code> 是真正执行 SQL 语句的过程，这个过程中会创建我们上面提到的三种执行器，这里我们使用的是简单执行器。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Executor%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B2-%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8Csql%E8%AF%AD%E5%8F%A5.jpg" srcset="/img/loading.gif" lazyload alt="Executor具体执行过程2-直接执行sql语句"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Executor%E5%85%B7%E4%BD%93%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B2-%E7%9B%B4%E6%8E%A5%E6%89%A7%E8%A1%8Csql%E8%AF%AD%E5%8F%A5.jpg" alt="Executor具体执行过程2-直接执行sql语句"></p>
 <p>到这里，执行器所做的工作就完事了，Executor 会把后续的工作交给 StatementHandler 继续执行。</p>
 <h2 id="StatementHandler"><a href="#StatementHandler" class="headerlink" title="StatementHandler"></a>StatementHandler</h2><p><code>StatementHandler</code> 是四大组件中最重要的一个对象，负责操作 Statement 对象与数据库进行交互，在工作时还会使用 <code>ParameterHandler</code> 和 <code>ResultSetHandler</code> 对参数进行映射，对结果进行实体类的绑定，这两个组件我们后面说。</p>
 <p>在搭建原生 JDBC 的时候，会有这样一行代码:</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">Statement stmt = conn.createStatement(); <span class="hljs-comment">//也可以使用PreparedStatement来做</span><br></code></pre></div></td></tr></table></figure>
 
 <p>这行代码创建的 <code>Statement</code> 对象或者是 <code>PreparedStatement</code> 对象就是由 <code>StatementHandler</code> 进行管理的。</p>
-<h3 id="StatementHandler-的继承结构"><a href="#StatementHandler-的继承结构" class="headerlink" title="StatementHandler 的继承结构"></a>StatementHandler 的继承结构</h3><p><img src="http://qiniu.xiaoming.net.cn/StatementHandler%E7%9A%84%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84.jpg" srcset="/img/loading.gif" lazyload alt="StatementHandler 的继承结构"></p>
+<h3 id="StatementHandler-的继承结构"><a href="#StatementHandler-的继承结构" class="headerlink" title="StatementHandler 的继承结构"></a>StatementHandler 的继承结构</h3><p><img src="http://qiniu.xiaoming.net.cn/StatementHandler%E7%9A%84%E7%BB%A7%E6%89%BF%E7%BB%93%E6%9E%84.jpg" alt="StatementHandler 的继承结构"></p>
 <p>有没有感觉和  Executor 的继承体系很相似呢？最顶级接口是四大组件对象，分别有两个实现类 <code>BaseStatementHandler</code>  和  <code>RoutingStatementHandler</code>，<code>BaseStatementHandler</code> 有三个实现类, 他们分别是 <code>SimpleStatementHandler</code>、<code>PreparedStatementHandler</code> 和 <code>CallableStatementHandler</code>。</p>
 <p><code>RoutingStatementHandler</code> : RoutingStatementHandler 并没有对 Statement 对象进行使用，只是根据 <code>StatementType</code> 来创建一个代理，代理的就是对应 Handler 的三种实现类。在MyBatis 工作时,使用的 <code>StatementHandler</code> 接口对象实际上就是 <code>RoutingStatementHandler</code> 对象。</p>
 <p><code>BaseStatementHandler</code> : 是 <code>StatementHandler</code> 接口的另一个实现类，它本身是一个抽象类，用于简化 <code>StatementHandler</code> 接口实现的难度，属于适配器设计模式体现，它主要有三个实现类</p>
@@ -388,31 +388,31 @@ MyBatis 比较简单和轻量：本身就很小且">
 <p>这里注意一下，<code>SimpleStatementHandler</code> 和 <code>PreparedStatementHandler</code> 的区别是 SQL 语句是否包含变量，是否通过外部进行参数传入。<code>SimpleStatementHandler</code> 用于执行没有任何参数传入的 SQL,<code>PreparedStatementHandler</code> 需要对外部传入的变量和参数进行提前参数绑定和赋值。</p>
 </blockquote>
 <h3 id="StatementHandler-的创建和源码分析"><a href="#StatementHandler-的创建和源码分析" class="headerlink" title="StatementHandler 的创建和源码分析"></a>StatementHandler 的创建和源码分析</h3><p>继续来分析上面 query 的调用链路，StatementHandler 的创建过程如下:</p>
-<p><img src="http://qiniu.xiaoming.net.cn/StatementHandler%20%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.jpg" srcset="/img/loading.gif" lazyload alt="StatementHandler 的创建和源码分析"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/StatementHandler%20%E7%9A%84%E5%88%9B%E5%BB%BA%E5%92%8C%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90.jpg" alt="StatementHandler 的创建和源码分析"></p>
 <p>MyBatis 会根据 SQL 语句的类型进行对应 StatementHandler 的创建。以预处理 StatementHandler 为例，创建过程如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/PreparedStatementHandler%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="PrepareStatementHandler创建过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/PreparedStatementHandler%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B.jpg" alt="PrepareStatementHandler创建过程"></p>
 <p>执行器不仅掌管着 StatementHandler 的创建，还掌管着创建 Statement 对象，设置参数等，在创建完 PreparedStatement 之后，就需要对参数进行处理了。</p>
 <p>综上，sql语句的执行流程如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/%E4%BB%8Eexecutor%E5%88%B0handler%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="从executor到handler执行流程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E4%BB%8Eexecutor%E5%88%B0handler%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B.jpg" alt="从executor到handler执行流程"></p>
 <h2 id="ParameterHandler"><a href="#ParameterHandler" class="headerlink" title="ParameterHandler"></a>ParameterHandler</h2><h3 id="ParameterHandler-介绍"><a href="#ParameterHandler-介绍" class="headerlink" title="ParameterHandler 介绍"></a>ParameterHandler 介绍</h3><p><code>ParameterHandler</code> 相比于其他的组件就简单很多了，<code>ParameterHandler</code> 译为参数处理器，负责为 <code>PreparedStatement</code> 的 sql 语句参数动态赋值，这个接口很简单只有两个方法:</p>
-<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%E6%8E%A5%E5%8F%A3.jpg" srcset="/img/loading.gif" lazyload alt="ParameterHandler接口"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%E6%8E%A5%E5%8F%A3.jpg" alt="ParameterHandler接口"></p>
 <p><code>ParameterHandler</code> 只有一个实现类 <code>DefaultParameterHandler</code> ， 它实现了这两个方法。</p>
 <ul>
 <li><code>getParameterObject</code>：用于读取参数</li>
 <li><code>setParameters</code>: 用于对 <code>PreparedStatement</code> 的参数赋值</li>
 </ul>
 <h3 id="ParameterHandler-的解析过程"><a href="#ParameterHandler-的解析过程" class="headerlink" title="ParameterHandler 的解析过程"></a>ParameterHandler 的解析过程</h3><p>上面我们讨论过了 ParameterHandler 的创建过程，下面继续上面 <code>parameterSize</code> 流程：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%20%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B.jpg" srcset="/img/loading.gif" lazyload alt="ParameterHandler 的解析过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%20%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B.jpg" alt="ParameterHandler 的解析过程"></p>
 <p>这就是具体参数的解析过程了，注释如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setParameters</span><span class="hljs-params">(PreparedStatement ps)</span> </span>&#123;<br>  ErrorContext.instance().activity(<span class="hljs-string">"setting parameters"</span>).object(mappedStatement.getParameterMap().getId());<br>  <span class="hljs-comment">// parameterMappings 就是对 #&#123;&#125; 或者 $&#123;&#125; 里面参数的封装</span><br>  List&lt;ParameterMapping&gt; parameterMappings = boundSql.getParameterMappings();<br>  <span class="hljs-keyword">if</span> (parameterMappings != <span class="hljs-keyword">null</span>) &#123;<br>    <span class="hljs-comment">// 如果是参数化的SQL，便需要循环取出并设置参数的值</span><br>    <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; parameterMappings.size(); i++) &#123;<br>      ParameterMapping parameterMapping = parameterMappings.get(i);<br>      <span class="hljs-comment">// 如果参数类型不是 OUT ，这个类型与 CallableStatementHandler 有关</span><br>      <span class="hljs-comment">// 因为存储过程不存在输出参数，所以参数不是输出参数的时候，就需要设置。</span><br>      <span class="hljs-keyword">if</span> (parameterMapping.getMode() != ParameterMode.OUT) &#123;<br>        Object value;<br>        <span class="hljs-comment">// 得到 #&#123;&#125;  中的属性名</span><br>        String propertyName = parameterMapping.getProperty();<br>        <span class="hljs-comment">// 如果 propertyName 是 Map 中的key</span><br>        <span class="hljs-keyword">if</span> (boundSql.hasAdditionalParameter(propertyName)) &#123; <span class="hljs-comment">// issue #448 ask first for additional params</span><br>          <span class="hljs-comment">// 通过key 来得到 additionalParameter 中的value值</span><br>          value = boundSql.getAdditionalParameter(propertyName);<br>        &#125;<br>        <span class="hljs-comment">// 如果不是 additionalParameters 中的key，而且传入参数是 null， 则value 就是null</span><br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (parameterObject == <span class="hljs-keyword">null</span>) &#123;<br>          value = <span class="hljs-keyword">null</span>;<br>        &#125;<br>        <span class="hljs-comment">// 如果 typeHandlerRegistry 中已经注册了这个参数的 Class 对象，即它是 Primitive 或者是String 的话</span><br>        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) &#123;<br>          value = parameterObject;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>          <span class="hljs-comment">// 否则就是 Map</span><br>          MetaObject metaObject = configuration.newMetaObject(parameterObject);<br>          value = metaObject.getValue(propertyName);<br>        &#125;<br>        <span class="hljs-comment">// 在通过 SqlSource 的parse 方法得到parameterMappings 的具体实现中，我们会得到parameterMappings 的 typeHandler</span><br>        TypeHandler typeHandler = parameterMapping.getTypeHandler();<br>        <span class="hljs-comment">// 获取 typeHandler 的jdbc type</span><br>        JdbcType jdbcType = parameterMapping.getJdbcType();<br>        <span class="hljs-keyword">if</span> (value == <span class="hljs-keyword">null</span> &amp;&amp; jdbcType == <span class="hljs-keyword">null</span>) &#123;<br>          jdbcType = configuration.getJdbcTypeForNull();<br>        &#125;<br>        <span class="hljs-keyword">try</span> &#123;<br>          typeHandler.setParameter(ps, i + <span class="hljs-number">1</span>, value, jdbcType);<br>        &#125; <span class="hljs-keyword">catch</span> (TypeException e) &#123;<br>          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> TypeException(<span class="hljs-string">"Could not set parameters for mapping: "</span> + parameterMapping + <span class="hljs-string">". Cause: "</span> + e, e);<br>        &#125; <span class="hljs-keyword">catch</span> (SQLException e) &#123;<br>          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> TypeException(<span class="hljs-string">"Could not set parameters for mapping: "</span> + parameterMapping + <span class="hljs-string">". Cause: "</span> + e, e);<br>        &#125;<br>      &#125;<br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>下面用一个流程图表示一下 ParameterHandler 的解析过程，以简单执行器为例：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%20%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg" srcset="/img/loading.gif" lazyload alt="ParameterHandler 的解析过程流程图"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ParameterHandler%20%E7%9A%84%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B%E6%B5%81%E7%A8%8B%E5%9B%BE.jpg" alt="ParameterHandler 的解析过程流程图"></p>
 <p>在完成 <code>ParameterHandler</code> 对 SQL 参数的预处理后，回到 <code>SimpleExecutor</code> 中的 <code>doQuery</code> 方法：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/SimpleExecutor%E4%B8%AD%E7%9A%84%20doQuery%E6%96%B9%E6%B3%95.jpg" srcset="/img/loading.gif" lazyload alt="SimpleExecutor中的 doQuery方法"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/SimpleExecutor%E4%B8%AD%E7%9A%84%20doQuery%E6%96%B9%E6%B3%95.jpg" alt="SimpleExecutor中的 doQuery方法"></p>
 <p>上面又引出来了一个重要的组件那就是 <code>ResultSetHandler</code>。</p>
 <h2 id="ResultSetHandler"><a href="#ResultSetHandler" class="headerlink" title="ResultSetHandler"></a>ResultSetHandler</h2><h3 id="ResultSetHandler-简介"><a href="#ResultSetHandler-简介" class="headerlink" title="ResultSetHandler 简介"></a>ResultSetHandler 简介</h3><p><code>ResultSetHandler</code> 也是一个非常简单的接口:</p>
-<p><img src="http://qiniu.xiaoming.net.cn/ResultHandler%E6%8E%A5%E5%8F%A3.jpg" srcset="/img/loading.gif" lazyload alt="ResultHandler接口"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ResultHandler%E6%8E%A5%E5%8F%A3.jpg" alt="ResultHandler接口"></p>
 <p><code>ResultSetHandler</code> 是一个接口，它只有一个默认的实现类，像是 <code>ParameterHandler</code> 一样，它的默认实现类是 <code>DefaultResultSetHandler</code></p>
 <h3 id="ResultSetHandler-解析过程"><a href="#ResultSetHandler-解析过程" class="headerlink" title="ResultSetHandler 解析过程"></a>ResultSetHandler 解析过程</h3><p>MyBatis 只有一个默认的实现类就是 <code>DefaultResultSetHandler</code>，<code>DefaultResultSetHandler</code> 主要负责处理两件事:</p>
 <ul>
@@ -456,7 +456,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 
 <h2 id="settings"><a href="#settings" class="headerlink" title="settings"></a>settings</h2><p>MyBatis 中极其重要的配置，它们会改变 MyBatis 的运行时行为。</p>
 <p>settings 中配置有很多。这里介绍几个平常使用过程中比较重要的配置：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/myBatis%20setting%E8%8A%82%E7%82%B9%E5%86%85%E5%AE%B9.jpg" srcset="/img/loading.gif" lazyload alt="MyBatis中Setting节点内容"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/myBatis%20setting%E8%8A%82%E7%82%B9%E5%86%85%E5%AE%B9.jpg" alt="MyBatis中Setting节点内容"></p>
 <figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">settings</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"cacheEnabled"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"true"</span>/&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"lazyLoadingEnabled"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"true"</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">settings</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
 
 <h2 id="typeAliases"><a href="#typeAliases" class="headerlink" title="typeAliases"></a>typeAliases</h2><p>类型别名，类型别名是为 Java 类型设置的一个名字。它只和 XML 配置有关。</p>
@@ -465,7 +465,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 <p>当这样配置时，Blog 可以用在任何使用 <code>domain.blog.Blog</code> 的地方。</p>
 <h2 id="typeHandlers"><a href="#typeHandlers" class="headerlink" title="typeHandlers"></a>typeHandlers</h2><p>类型处理器，无论是 MyBatis 在预处理语句（PreparedStatement）中设置一个参数时，还是从结果集中取出一个值时， 都会用类型处理器将获取的值以合适的方式转换成 Java 类型。</p>
 <p>在 <code>org.apache.ibatis.type</code> 包下有很多已经实现好的 TypeHandler，可以参考如下:</p>
-<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E5%AE%9E%E7%8E%B0%E5%A5%BD%E7%9A%84%20TypeHandler.jpg" srcset="/img/loading.gif" lazyload alt="MyBatis 实现好的 TypeHandler"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/MyBatis%E5%AE%9E%E7%8E%B0%E5%A5%BD%E7%9A%84%20TypeHandler.jpg" alt="MyBatis 实现好的 TypeHandler"></p>
 <p>可以重写类型处理器或创建自己的类型处理器来处理不支持的或非标准的类型。</p>
 <p>具体做法为：实现 <code>org.apache.ibatis.type.TypeHandler</code> 接口， 或继承一个很方便的类 <code>org.apache.ibatis.type.BaseTypeHandler</code>， 然后可以选择性地将它映射到一个 JDBC 类型。</p>
 <h2 id="objectFactory"><a href="#objectFactory" class="headerlink" title="objectFactory"></a>objectFactory</h2><p>对象工厂，MyBatis 每次创建结果对象的新实例时，它都会使用一个对象工厂（ObjectFactory）实例来完成。默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化。如果想覆盖对象工厂的默认行为，则可以通过创建自己的对象工厂来实现。</p>
@@ -698,9 +698,9 @@ MyBatis 比较简单和轻量：本身就很小且">
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
                       <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                      <a class="hover-with-bg" href="/tags/java/">java</a>
                     
                       <a class="hover-with-bg" href="/tags/mybatis/">mybatis</a>
                     
@@ -742,7 +742,7 @@ MyBatis 比较简单和轻量：本身就很小且">
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -880,7 +880,7 @@ MyBatis 比较简单和轻量：本身就很小且">
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -916,10 +916,6 @@ MyBatis 比较简单和轻量：本身就很小且">
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

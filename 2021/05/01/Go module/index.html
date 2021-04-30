@@ -1,0 +1,705 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Go module 是 Go1.11 版本之后推出的模块管理工具，从1.13开始为默认的依赖管理工具。在没有 Go module 之前，对于导入依赖的管理都是通过 GOPATH 来指定在工程中使用哪些源文件和模块。项目的代码只能放到 GOPATH/src 目录下，依赖的各种源文件也都只能加入到 src 目录下才可以运行使用。">
+  <meta name="author" content="Silverming">
+  <meta name="keywords" content="">
+  
+  <title>Go module - Silverming</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <!-- <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i -->
+              <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+           <!-- <a class="nav-link" href="javascript:" target="_blank" rel="noopener">&nbsp;<i -->
+             <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Go module">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-05-01 14:22" pubdate>
+        2021年5月1日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      35
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Go module</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2021年5月1日 凌晨
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>Go module 是 Go1.11 版本之后推出的模块管理工具，从1.13开始为默认的依赖管理工具。在没有 Go module 之前，对于导入依赖的管理都是通过 GOPATH 来指定在工程中使用哪些源文件和模块。项目的代码只能放到 <code>GOPATH/src</code> 目录下，依赖的各种源文件也都只能加入到 <code>src</code> 目录下才可以运行使用。</p>
+<a id="more"></a>
+
+<h1 id="Go-module-相关属性"><a href="#Go-module-相关属性" class="headerlink" title="Go module 相关属性"></a>Go module 相关属性</h1><h2 id="GO111MODULE"><a href="#GO111MODULE" class="headerlink" title="GO111MODULE"></a>GO111MODULE</h2><p>要想使用 go module，首先需要设置环境变量 <code>GO111MODULE</code>，通过它可以开启或关闭模块支持。它有三个可选的值：<code>off</code>,<code>on</code>,<code>auto</code>。最新版本（1.16）中默认值是 <code>on</code>。</p>
+<ul>
+<li><code>GO111MODULE=off</code>：禁用模块支持，项目编译时会从 <code>GOPATH</code> 和 <code>vendor</code> 文件夹中查找包。</li>
+<li><code>GO111MODULE=on</code>：开启模块支持，项目编译时会忽略 <code>GOPATH</code> 和 <code>vendor</code> 文件夹，只根据 <code>go.mod</code> 下载所需要的依赖，同时该依赖会被下载到 <code>$GOPATH/pkg/mod</code> 目录下。</li>
+<li><code>GO111MODULE=auto</code>：当项目在 <code>$GOPATH/src</code> 外且项目的根目录中有 <code>go.mod</code> 文件时，使用模块支持模式，<code>src</code> 目录下禁用模块支持。</li>
+</ul>
+<p>使用 go module 管理依赖后会在项目根目录下生成两个文件 <code>go.mod</code> 和 <code>go.sum</code>。</p>
+<h2 id="go-mod"><a href="#go-mod" class="headerlink" title="go.mod"></a>go.mod</h2><p><code>go.mod</code> 描述了当前项目（也就是当前模块）的元信息，文件的内容如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">module example.com/foobar<br><br><span class="hljs-keyword">go</span> <span class="hljs-number">1.13</span><br><br>require (<br>    example.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span><br>    example.com/banana v1<span class="hljs-number">.2</span><span class="hljs-number">.3</span><br>    example.com/banana/v2 v2<span class="hljs-number">.3</span><span class="hljs-number">.4</span><br>    example.com/pineapple v0<span class="hljs-number">.0</span><span class="hljs-number">.0</span><span class="hljs-number">-20190924185754</span><span class="hljs-number">-1</span>b0db40df49a<br>)<br><br>exclude example.com/banana v1<span class="hljs-number">.2</span><span class="hljs-number">.4</span><br>replace example.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span> =&gt; example.com/rda v0<span class="hljs-number">.1</span><span class="hljs-number">.0</span> <br>replace example.com/banana =&gt; example.com/hugebanana<br></code></pre></div></td></tr></table></figure>
+
+<p>文件中有以下几个关键词：</p>
+<ul>
+<li>module：用于定义当前项目的模块路径</li>
+<li>go：用于设置预期的 Go 版本</li>
+<li>require：用于添加依赖，设置一个特定的模块版本</li>
+<li>exclude：用于从使用中排除一个特定的模块版本</li>
+<li>replace：用于将一个模块版本替换成另外一个模块版本</li>
+</ul>
+<h2 id="go-sum"><a href="#go-sum" class="headerlink" title="go.sum"></a>go.sum</h2><p><code>go.sum</code> 详细罗列了当前项目直接或者间接依赖的所有模块版本，并写明了这些模块版本的SHA-256 哈希值，用于在今后的操作中保证项目所依赖的那些模块版本不会被篡改。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">zexample.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span> h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ= <br>example.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span>/<span class="hljs-keyword">go</span>.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU= example.com/banana v1<span class="hljs-number">.2</span><span class="hljs-number">.3</span> h1:qHgHjyoNFV7jgucU8QZUuU4gcdhfs8QW1kw68OD2Lag= <br>example.com/banana v1<span class="hljs-number">.2</span><span class="hljs-number">.3</span>/<span class="hljs-keyword">go</span>.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU= example.com/banana/v2 v2<span class="hljs-number">.3</span><span class="hljs-number">.4</span> h1:zl/OfRA6nftbBK9qTohYBJ5xvw6C/oNKizR7cZGl3cI= example.com/banana/v2 v2<span class="hljs-number">.3</span><span class="hljs-number">.4</span>/<span class="hljs-keyword">go</span>.mod h1:eZbhyaAYD41SGSSsnmcpxVoRiQ/MPUTjUdIIOT9Um7Q= <br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>从上面的例子中可以看到，一个模块路径下可能有两种哈希值：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">example.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span> h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ= <br>example.com/apple v0<span class="hljs-number">.1</span><span class="hljs-number">.2</span>/<span class="hljs-keyword">go</span>.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=<br></code></pre></div></td></tr></table></figure>
+
+<p>第一种为 Go modules 打包整个模块包文件zip后再进行hash，后者为针对 go.mod 的 hash 值。两者要么同时存在，要么就只存在 <code>go.mod hash</code>，此时 Go 认为肯定用不到某个模块版本，会自动忽略它的 zip hash。</p>
+<h2 id="GOPROXY"><a href="#GOPROXY" class="headerlink" title="GOPROXY"></a>GOPROXY</h2><p><code>GOPROXY</code> 环境变量用于设置 Go 模块代理，它是以一个英文逗号<code>,</code>分割的 Go module proxy 列表。其作用是使 Go 在后续拉取版本模块时能够脱离传统的 VCS（版本控制系统）方式，从镜像站点快速拉取，默认值为 <code>https://proxy.golang.org,direct</code>，但是该站点在中国无法访问，可以使用 <code>goproxy.cn</code> 替代：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">go</span> env -w GOPROXY=https:<span class="hljs-comment">//goproxy.cn,direct</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>direct</code> 是一个特殊指示符，用于指示 Go 回源到模块版本的源地址去抓取实现代码（如GitHUb），当值列表中上一个 Go module proxy 返回 404 或者 410 错误的时候，Go 自动尝试列表中的下一个，遇到 <code>direct</code> 时回源，遇到 <code>EOF</code> 时终止并抛出类似 “invalid version: unknown revision…” 的错误。</p>
+<p>当 <code>GOPROXY</code> 的值为 <code>off</code> 时，禁止 Go 在后续操作中使用任何 <code>go module proxy</code>。</p>
+<h2 id="GOSUMDB"><a href="#GOSUMDB" class="headerlink" title="GOSUMDB"></a>GOSUMDB</h2><p><code>GOSUMDB</code> 的值是一个 <strong>Go checksum database</strong>，用于使 Go 在拉取模块版本时（无论是从源站拉取还是通过 Go module proxy 拉取)保证拉取到的模块版本数据未经篡改，也可以是 <code>off</code> 即禁止 Go 在后续操作中校验模块版本。</p>
+<ul>
+<li>格式 1：<code>&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt;</code>。</li>
+<li>格式 2：<code>&lt;SUMDB_NAME&gt;+&lt;PUBLIC_KEY&gt; &lt;SUMDB_URL&gt;</code>。</li>
+<li>拥有默认值：<code>sum.golang.org</code> (之所以没有按照上面的格式是因为 Go 对默认值做了特殊处理)。</li>
+<li>可被 Go module proxy 代理。</li>
+<li><code>sum.golang.org</code> 在中国无法访问，可以将 GOPROXY 设置为 <code>goproxy.cn</code>，因为 <code>goproxy.cn</code> 支持代理 <code>sum.golang.org</code>。</li>
+</ul>
+<h3 id="Go-Checksum-Database"><a href="#Go-Checksum-Database" class="headerlink" title="Go Checksum Database"></a>Go Checksum Database</h3><p>Go checksum database 主要用于保护 Go 不会从任何源头（包括 Go module proxy）拉到被篡改过的非法 Go 模块版本，其工作机制如图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Go%20Checksum%20Database%20%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6.jpg" alt="Go Checksum Database 工作机制"></p>
+<h2 id="GONOPROXY-GONOSUMDB-GOPRIVATE"><a href="#GONOPROXY-GONOSUMDB-GOPRIVATE" class="headerlink" title="GONOPROXY/GONOSUMDB/GOPRIVATE"></a>GONOPROXY/GONOSUMDB/GOPRIVATE</h2><p><code>GONOPROXY</code>, <code>GONOSUMDB</code>, <code>GOPRIVATE</code> 这三个环境变量都是用在当前项目依赖了私有模块的场景，也就是依赖了由 <code>GOPROXY</code> 指定的 <code>Go module proxy</code> 或由 <code>GOSUMDB</code> 指定 <code>Go checksum database</code> 无法访问到的模块时的场景。</p>
+<ul>
+<li>它们三个的值都是一个以英文逗号 <code>,</code> 分割的模块路径前缀，匹配规则同 <code>path.Match</code>。</li>
+<li>其中 <code>GOPRIVATE</code> 较为特殊，它的值将作为 <code>GONOPROXY</code> 和 <code>GONOSUMDB</code> 的默认值，所以最佳实践是只是用 <code>GOPRIVATE</code>。</li>
+</ul>
+<p>在使用上来讲，比如 <code>GOPRIVATE=*.corp.example.com</code> 表示所有模块路径以 <code>corp.example.com</code> 的下一级域名 (如 <code>team1.corp.example.com</code>) 为前缀的模块版本都将不经过 <code>Go module proxy</code> 和 <code>Go checksum database</code>，需要注意的是不包括 <code>corp.example.com</code> 本身。</p>
+<h3 id="Global-Caching"><a href="#Global-Caching" class="headerlink" title="Global Caching"></a>Global Caching</h3><p>这个主要是针对 Go modules 的全局缓存数据说明，如下：</p>
+<ul>
+<li>同一个模块版本的数据只缓存一份，所有其他模块共享使用。</li>
+<li>目前所有模块版本数据均缓存在 <code>$GOPATH/pkg/mod</code>和 <code>$GOPATH/pkg/sum</code> 下，未来或将移至 <code>$GOCACHE/mod</code>和<code>$GOCACHE/sum</code> 下( 可能会在当 <code>$GOPATH</code> 被淘汰后)。</li>
+<li>可以使用 <code>go clean -modcache</code> 清理所有已缓存的模块版本数据。</li>
+</ul>
+<p>另外在 Go1.11 之后 GOCACHE 已经不允许设置为 off 了，可能这也是为了模块数据缓存移动位置做准备。</p>
+<h1 id="Go-module-相关命令"><a href="#Go-module-相关命令" class="headerlink" title="Go module 相关命令"></a>Go module 相关命令</h1><h2 id="go-mod-1"><a href="#go-mod-1" class="headerlink" title="go mod"></a>go mod</h2><p>常用的 <code>go mod</code> 命令如下：</p>
+<p><strong>go mod init</strong>：初始化当前文件夹，创建 <code>go.mod</code> 文件。</p>
+<p><strong>go mod tidy</strong>：整理现有的依赖，它会增加缺少的 module，删除无用的 module，<code>-v</code> 参数可以显示执行的信息</p>
+<p><strong>go mod vendor</strong>：将依赖复制到 vendor 下</p>
+<p><strong>go mod download</strong>：下载依赖的 module 到本地</p>
+<p><strong>go mod verify</strong>：校验模块是否被篡改过</p>
+<p><strong>go mod edit</strong>：编辑 <code>go.mod</code> 文件，<code>-fmt</code> 参数用于格式化当前文件；<code>-require=package path</code> 参数用于添加依赖项</p>
+<p><strong>go mod why</strong>：解释为什么需要依赖</p>
+<p><strong>go mod graph</strong>：打印模块依赖图</p>
+<h2 id="go-get"><a href="#go-get" class="headerlink" title="go get"></a>go get</h2><p><code>go get</code> 命令用于拉取依赖，常用示例如下：</p>
+<p><strong>go get package path@latest</strong>：拉取最新的版本(优先择取 tag)</p>
+<p><strong>go get package path@master</strong>：拉取 <code>master</code> 分支的最新 commit</p>
+<p><strong>go get package <a href="mailto:path@v0.3.2" target="_blank" rel="noopener">path@v0.3.2</a></strong>：拉取 tag 为 v0.3.2 的 commit</p>
+<p><strong>go get package path@342b2e</strong>：拉取 hash 为 342b231 的 commit，最终会被转换为 v0.3.2，这是因为虽然设置了拉取 @342b2e commit，但是因为 Go modules 会与 tag 进行对比，若发现对应的 commit 与 tag 有关联，则进行转换</p>
+<p><strong>go get -u</strong>：更新现有的主要模块依赖（忽略单元测试），该指令会将模块升级到最新的次要版本或者修订版本（<strong>x.y.z</strong>，z是修订版本号，y是次要版本号）</p>
+<p><strong>go get -u=patch</strong>：升级到最新的修订版本</p>
+<p><strong>go get -u ./..</strong>：递归更新所有子目录的所有模块，忽略单元测试</p>
+<p><strong>go get -u -t</strong>：同样只会更新主要模块，但是考虑了单元测试</p>
+<p><strong>go get -u -t ./..</strong>：同样是递归更新所有子目录的所有模块，但是考虑了单元测试</p>
+<p><strong>go get -u all</strong>：更新所有模块，推荐使用</p>
+<h1 id="将项目迁移至-Go-Modules"><a href="#将项目迁移至-Go-Modules" class="headerlink" title="将项目迁移至 Go Modules"></a>将项目迁移至 Go Modules</h1><ol>
+<li><p>修改 GOBIN 路径（可选）：<code>go env -w GOBIN=$HOME/bin</code>。</p>
+</li>
+<li><p>打开 Go modules：<code>go env -w GO111MODULE=on</code>。</p>
+</li>
+<li><p>设置 GOPROXY：<code>go env -w GOPROXY=https://goproxy.cn,direct</code> （可选，对于无法访问外网的同学来说是必须的，因为它的默认值被墙了）。</p>
+</li>
+<li><p>在项目的根目录下执行 <code>go mod init &lt;OPTIONAL_MODULE_PATH&gt;</code> 以生成 go.mod 文件。</p>
+</li>
+<li><p>执行 <code>go get</code></p>
+</li>
+</ol>
+<h1 id="Go-module-常见问题"><a href="#Go-module-常见问题" class="headerlink" title="Go module 常见问题"></a>Go module 常见问题</h1><h2 id="管理-Go-的环境变量"><a href="#管理-Go-的环境变量" class="headerlink" title="管理 Go 的环境变量"></a>管理 Go 的环境变量</h2><p>在 Go 1.13 中管理环境变量会变得有些混乱，因此 Go 1.13建议将所有与 Go 相关的环境变量都交由新推出的 <code>go env -w</code> 来管理，比如：<code>go env -w GO111MODULE=on</code> 就会在 <code>$HOME/.config/go/env</code> 文件中追加一行“GO111MODULE=on”。</p>
+<p>但是 <code>go env -w</code> 不会覆盖系统环境变量，所以建议在Go 1.13之后<strong>删除系统中所有跟 Go 相关的环境变量，改有 <code>go env -w</code> 进行管理</strong></p>
+<h2 id="拉取私有模块"><a href="#拉取私有模块" class="headerlink" title="拉取私有模块"></a>拉取私有模块</h2><p>常见的公共 Go module proxy，例如 <code>proxy.golang.org</code> 和 <code>goproxy.cn</code> 都是无权访问任何人的私有模块的，即使使用 <code>direct</code> 也无法抓去私有模块，解决办法是<strong>修改VCS的拉取行为</strong>，例如使用 Git 时就在 <code>$HOME/.gitconfig</code> 文件中追加：</p>
+<figure class="highlight cs"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cs">[<span class="hljs-meta">url <span class="hljs-meta-string">"ssh://git@github.com/"</span></span>]<br>	insteadOf = <span class="hljs-string">"https://github.com"</span><br></code></pre></div></td></tr></table></figure>
+
+<p>另外需要在 <code>GOPROXY</code> 加上 <code>direct</code>，这样才能在 Go module proxy 拉取不到时回源到模块所在地拉取。</p>
+<p>这里主要想涉及两块知识点，如下：</p>
+<ul>
+<li><code>GOPROXY</code> 是无权访问到任何人的私有模块的，所以你放心，安全性没问题。</li>
+<li><code>GOPROXY</code> 除了设置模块代理的地址以外，还需要增加 “direct” 特殊标识才可以成功拉取私有库。</li>
+</ul>
+<h2 id="主版本号"><a href="#主版本号" class="headerlink" title="主版本号"></a>主版本号</h2><p>除了 v0 和 v1外，主版本号必须显示地出现在模块路径的尾部。</p>
+<p>Go 会将 <code>example.com/foo/bar</code> 和 <code>example.com/foo/bar/v2</code> 视为完全不同的两个模块来对待。</p>
+<p>一个项目中可能同时存在多个拥有不同主版本号的相同模块，但是互不影响。</p>
+<p><code>go get -u</code> 不会更新主版本号，如果需要更新，需要手动修改代码中对应的导入路径。</p>
+<p>另外，<strong>使用 Go modules 时，不可以同时依赖同一个模块的不同的两个或者多个小版本（修订版本号不同）</strong>。Go modules 只可以同时依赖一个模块的不同的两个或者多个大版本（主版本号不同）。比如可以同时依赖 <code>example.com/foobar@v1.2.3</code> 和 <code>example.com/foobar/v2@v2.3.4</code>，因为他们的模块路径（module path）不同，Go modules 规定主版本号不是 v0 或者 v1 时，那么主版本号必须显式地出现在模块路径的尾部。但是，同时依赖两个或者多个小版本是不支持的。</p>
+<p>比如如果模块 A 同时直接依赖了模块 B 和模块 C，且模块 A 直接依赖的是模块 C 的 v1.0.0 版本，然后模块 B 直接依赖的是模块 C 的 v1.0.1 版本，那么<strong>最终 Go modules 会为模块 A 选用模块 C 的 v1.0.1 版本而不是模块 A 的 go.mod 文件中指明的 v1.0.0 版本</strong>。这是因为 Go modules 认为只要主版本号不变，那么剩下的都可以直接升级采用最新的。但是如果采用了最新的结果导致项目 Break 掉了，那么 Go modules 就会 Fallback 到上一个老的版本，比如在该例子中就会 Fallback 到 v1.0.0 版本。</p>
+<p><strong>参考文章</strong>：</p>
+<blockquote>
+<p><a href="https://juejin.cn/post/6844903954879348750#heading-21" target="_blank" rel="noopener">干货满满的 Go Modules 和 goproxy.cn</a></p>
+<p><a href="https://segmentfault.com/a/1190000022868683" target="_blank" rel="noopener">go module 使用</a></p>
+<p><a href="https://learnku.com/articles/27401" target="_blank" rel="noopener">Go Modules 详解使用</a></p>
+<p><a href="https://blog.csdn.net/benben_2015/article/details/82227338?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522161977038716780274127846%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&request_id=161977038716780274127846&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_v2~hot_rank-1-82227338.first_rank_v2_pc_rank_v29&utm_term=go+module" target="_blank" rel="noopener">Go module的介绍及使用</a></p>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/go/">go</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/04/30/%E6%97%A5%E5%BF%97%E5%AE%9E%E8%B7%B5%E4%B8%80%E4%B8%A4%E4%BA%8B/">
+                        <span class="hidden-mobile">日志实践一两事</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.lazyComments('comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        粤ICP备18114217号
+      </a>
+    </span>
+    
+      
+        <span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
+            rel="nofollow noopener"
+            class="beian-police"
+            target="_blank"
+          >
+            
+              <span style="visibility: hidden; width: 0">|</span>
+              <img src="/img/police_beian.png" alt="police-icon"/>
+            
+            <span>粤ICP备18114217号-1</span>
+          </a>
+        </span>
+      
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      $('#local-search-input').on('click', function() {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      });
+      $('#modalSearch').on('shown.bs.modal', function() {
+        $('#local-search-input').focus();
+      });
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-M2RT7SDT3L', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M2RT7SDT3L');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

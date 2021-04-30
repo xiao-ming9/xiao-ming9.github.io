@@ -54,7 +54,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -292,7 +292,7 @@
 <li>启动项目:可以通过idea配置两个启动项启动，也可以打包后启动，命令如下:</li>
 </ol>
 <figure class="highlight routeros"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs routeros"><span class="hljs-comment"># 打包</span><br>mvn clean package  -Dmaven.test.<span class="hljs-attribute">skip</span>=<span class="hljs-literal">true</span><br><br><span class="hljs-comment"># 分别以peer1和peer2配置信息启动Eureka</span><br>java -jar target/spring-cloud-eureka-server-0.0.1-SNAPSHOT.jar  --spring.profiles.<span class="hljs-attribute">active</span>=peer1<br>java -jar target/spring-cloud-eureka-server-0.0.1-SNAPSHOT.jar  --spring.profiles.<span class="hljs-attribute">active</span>=peer2<br></code></pre></div></td></tr></table></figure>
-<p>启动后显示如下:<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/eureka%E5%8F%8C%E8%8A%82%E7%82%B9%E5%90%AF%E5%8A%A8.png?raw=true" srcset="/img/loading.gif" lazyload alt="eureka双节点"></p>
+<p>启动后显示如下:<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/eureka%E5%8F%8C%E8%8A%82%E7%82%B9%E5%90%AF%E5%8A%A8.png?raw=true" alt="eureka双节点"></p>
 <p>根据图可以看出peer1的注册中心DS Replicas已经有了peer2的相关配置信息，并且出现在 <code>available-replicas</code>中。手动停止peer2来观察，发现peer2就会移动到<code>unavailable-replicas</code>一栏中，表示peer2不可用。<br><strong>注意事项</strong>:</p>
 <ul>
 <li>在搭建Eureka Server双节点或集群的时候，要把<code>eureka.client.register-with-eureka</code>和<code>eureka.client.fetch-registry</code>均改为true（默认）。否则会出现实例列表为空，且peer2不在<code>available-replicas</code>而在<code>unavailable-replicas</code>的情况（这时其实只是启动了两个单点实例）。</li>
@@ -424,7 +424,7 @@
 <li>配置文件<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">spring:</span><br>	<span class="hljs-attr">application:</span><br>		<span class="hljs-attr">name:</span> <span class="hljs-string">hystrix-dashboard</span><br><span class="hljs-attr">server:</span><br>	<span class="hljs-attr">port:</span> <span class="hljs-number">11000</span><br></code></pre></div></td></tr></table></figure>
 之后访问<code>http://localhost:11000/hystrix</code>，看到如下界面:</li>
 </ol>
-<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%20Dashboard%E7%95%8C%E9%9D%A2.png?raw=true" srcset="/img/loading.gif" lazyload alt="Hystrix Dashboard界面"></p>
+<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%20Dashboard%E7%95%8C%E9%9D%A2.png?raw=true" alt="Hystrix Dashboard界面"></p>
 <p>通过Hystrix Dashboard主页面的文字介绍，可以知道，Hystrix Dashboard 共支持三种不同的监控方式:</p>
 <ul>
 <li>默认的集群监控:通过 URL:<a href="http://turbine-hostname:port/turbine.stream" target="_blank" rel="noopener">http://turbine-hostname:port/turbine.stream</a> 开启，实现对默认集群的监控。</li>
@@ -446,11 +446,11 @@
 <li><p>测试<br>在 Hystrix-Dashboard 的主界面上输入 <code>eureka-consumer-feign-hystrix</code> 对应的地址 <code>http://localhost:9004/actuator/hystrix.stream</code> 然后点击 Monitor Stream 按钮，进入页面。<br>如果没有请求会一直显示 “Loading…” ，这时访问<code>http://localhost:9004/actuator/hystrix.stream</code>也是不断的显示”ping”。<br>这时候访问一下<code>http://localhost:9002/hello/?name=xm</code>，可以看到 Hystrix Dashboard 中出现了类似下面的效果:</p>
 </li>
 </ol>
-<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/hystrix%E5%8D%95%E4%BD%93%E5%BA%94%E7%94%A8%E7%9B%91%E6%8E%A7.png?raw=true" srcset="/img/loading.gif" lazyload alt="hystrix单体应用监控"></p>
-<h3 id="界面解读"><a href="#界面解读" class="headerlink" title="界面解读"></a>界面解读</h3><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%E7%9B%91%E6%8E%A7%E7%95%8C%E9%9D%A2%E8%A7%A3%E8%AF%BB1.jpg?raw=true" srcset="/img/loading.gif" lazyload alt="Hystrix监控界面解读1"><br>以上图来说明其中各元素的具体含义:</p>
+<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/hystrix%E5%8D%95%E4%BD%93%E5%BA%94%E7%94%A8%E7%9B%91%E6%8E%A7.png?raw=true" alt="hystrix单体应用监控"></p>
+<h3 id="界面解读"><a href="#界面解读" class="headerlink" title="界面解读"></a>界面解读</h3><p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%E7%9B%91%E6%8E%A7%E7%95%8C%E9%9D%A2%E8%A7%A3%E8%AF%BB1.jpg?raw=true" alt="Hystrix监控界面解读1"><br>以上图来说明其中各元素的具体含义:</p>
 <ul>
 <li>实心圆:它有颜色和大小之分，分别代表实例的监控程度和流量大小。如上图所示，它的健康度从绿色、黄色、橙色、红色递减。通过该实心圆的展示，我们就可以在大量的实例中快速的发现故障实例和高压力实例。</li>
-<li>曲线:用来记录 2 分钟内流量的相对变化，我们可以通过它来观察到流量的上升和下降趋势。<br>其他一些数量指标如下图所示:<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%E7%9B%91%E6%8E%A7%E7%95%8C%E9%9D%A2%E8%A7%A3%E8%AF%BB2.jpg?raw=true" srcset="/img/loading.gif" lazyload alt="Hystrix监控界面解读2"></li>
+<li>曲线:用来记录 2 分钟内流量的相对变化，我们可以通过它来观察到流量的上升和下降趋势。<br>其他一些数量指标如下图所示:<br><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/Hystrix%E7%9B%91%E6%8E%A7%E7%95%8C%E9%9D%A2%E8%A7%A3%E8%AF%BB2.jpg?raw=true" alt="Hystrix监控界面解读2"></li>
 </ul>
 <h1 id="Spring-Cloud-Config-服务配置中心"><a href="#Spring-Cloud-Config-服务配置中心" class="headerlink" title="Spring Cloud Config 服务配置中心"></a>Spring Cloud Config 服务配置中心</h1><p>Spring Cloud Config 是 Spring Cloud 团队创建的一个全新项目，用来为分布式系统中的基础设施和微服务应用提供集中化的外部配置支持，它分为<strong>服务端</strong>与<strong>客户端</strong>两个部分。其中服务端也称为分布式配置中心，它是一个独立的微服务应用，用来连接配置仓库并为客户端提供获取配置信息、加密/解密信息等访问接口；而客户端则是微服务架构中的各个微服务应用或基础设施，它们通过指定的配置中心来管理应用资源与业务相关的配置内容，并在启动的时候从配置中心获取和加载配置信息。Spring Cloud Config 实现了对服务端和客户端中环境变量和属性配置的抽象映射，所以它除了适用于 Spring 构建的应用程序之外，也可以在任何其他语言运行的应用程序中使用。由于 Spring Cloud Config 实现的配置中心默认采用 Git 来存储配置信息，所以使用 Spring Cloud Config 构建的配置服务器，天然就支持对微服务应用配置信息的版本管理，并且可以通过 Git 客户端工具来方便的管理和访问配置内容。当然它也提供了对其他存储方式的支持，比如:SVN 仓库、本地化文件系统。</p>
 <h2 id="创建Git仓库"><a href="#创建Git仓库" class="headerlink" title="创建Git仓库"></a>创建Git仓库</h2><p>准备一个 Git 仓库，在 Github 上面创建了一个文件夹<code>config-repo</code>用来存放配置文件，为了模拟生产环境，我们创建以下三个配置文件:</p>
@@ -809,7 +809,7 @@ bootstrap.yml<figure class="highlight yaml"><table><tr><td class="gutter hljs"><
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -947,7 +947,7 @@ bootstrap.yml<figure class="highlight yaml"><table><tr><td class="gutter hljs"><
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -983,10 +983,6 @@ bootstrap.yml<figure class="highlight yaml"><table><tr><td class="gutter hljs"><
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

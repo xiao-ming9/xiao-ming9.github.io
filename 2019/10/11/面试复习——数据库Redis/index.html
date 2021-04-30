@@ -56,7 +56,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -418,9 +418,9 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li>事件处理器（连接应答处理器，命令请求处理器、命令回复处理器）</li>
 </ul>
 <p>多个socket可能会并发产生不同的操作，每个操作对应不同的文件事件，但是IO多路服用程序会监听多个socket，会将socket产生的事件放入队列中排队，事件分派器每次从队列中取出一个事件，把该事件交给对应的事件处理器进行处理。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/redis%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%99%A8.png" srcset="/img/loading.gif" lazyload alt="Redis事件处理器"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/redis%E4%BA%8B%E4%BB%B6%E5%A4%84%E7%90%86%E5%99%A8.png" alt="Redis事件处理器"></p>
 <p>客户端与redis的一次通信过程如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Redis%E4%B8%80%E6%AC%A1%E9%80%9A%E8%A1%8C%E8%BF%87%E7%A8%8B.webp" srcset="/img/loading.gif" lazyload alt="redis的一次通信过程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Redis%E4%B8%80%E6%AC%A1%E9%80%9A%E8%A1%8C%E8%BF%87%E7%A8%8B.webp" alt="redis的一次通信过程"></p>
 <p>客户端<code>socket01</code>向redis的<code>server socket</code>请求建立连接，此时<code>server socket</code>会产生一个<code>AE_READBLE</code>事件，IO多路复用程序监听到<code>server socket</code>产生的事件后，将该事件压入队列中。文件事件分派器从队列中获取该事件，交给连接应答处理器。连接应答处理器会创建一个能与客户端通信的<code>socket01</code>,并将该<code>socket01</code>的<code>AE_READBLE</code>事件与命令请求处理器相关联。</p>
 <p>假设此时客户端发送了一个<code>set key value</code>请求，此时redis的<code>socket01</code>会产生<code>AE_READABLE</code>事件，IO多路复用程序将事件压入队列，此时事件分派器将事件交给命令请求处理器来处理。命令请求处理器读取<code>socket01</code>中的<code>key value</code>并在自己内存中完成<code>key value</code>的设置。操作完成后，它会将<code>socket01</code>的<code>AE_WRITABLE</code>事件与命令回复处理器相关联。</p>
 <p>如果此时客户端准备好接收返回结果了，那么redis中的<code>socket01</code>会产生一个<code>AE_WRITABLE</code>事件，同样压入队列中，事件分派器找到相关联的的命令回复处理器，由命令回复处理器对<code>socket01</code>输入本次操作的一个结果，比如<code>ok</code>，之后解除<code>socket01</code>的<code>AE_WRITABLE</code>事件与命令回复处理器的关联。</p>
@@ -479,7 +479,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">io-threads <span class="hljs-number">4</span> #官网建议<span class="hljs-number">4</span>核的机器建议设置为<span class="hljs-number">2</span>或<span class="hljs-number">3</span>个线程，<span class="hljs-number">8</span>核的建议设置为<span class="hljs-number">6</span>个线程<br></code></pre></div></td></tr></table></figure>
 
 <p>关于线程数的设置，官方有一个建议：4核的机器建议设置为2或3个线程，8核的建议设置为6个线程，线程数一定要小于机器核数。还需要注意的是，线程数并不是越大越好，官方认为超过了8个基本就没什么意义了。</p>
-<h2 id="Redis-多线程实现机制"><a href="#Redis-多线程实现机制" class="headerlink" title="Redis 多线程实现机制"></a>Redis 多线程实现机制</h2><p><img src="http://qiniu.xiaoming.net.cn/Redis%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6.webp" srcset="/img/loading.gif" lazyload alt="Redis多线程实现机制"></p>
+<h2 id="Redis-多线程实现机制"><a href="#Redis-多线程实现机制" class="headerlink" title="Redis 多线程实现机制"></a>Redis 多线程实现机制</h2><p><img src="http://qiniu.xiaoming.net.cn/Redis%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%9C%BA%E5%88%B6.webp" alt="Redis多线程实现机制"></p>
 <p><strong>流程简述如下：</strong></p>
 <ol>
 <li><p>主线程负责接收建立连接请求，获取 socket 放入全局等待读处理队列</p>
@@ -495,7 +495,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li><p>解除绑定，清空等待队列</p>
 </li>
 </ol>
-<p><img src="http://qiniu.xiaoming.net.cn/Redis%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%B5%81%E7%A8%8B.webp" srcset="/img/loading.gif" lazyload alt="Redis多线程实现流程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Redis%E5%A4%9A%E7%BA%BF%E7%A8%8B%E5%AE%9E%E7%8E%B0%E6%B5%81%E7%A8%8B.webp" alt="Redis多线程实现流程"></p>
 <p><strong>该设计有如下特点：</strong></p>
 <ol>
 <li><p>IO 线程要么同时在读 socket，要么同时在写，不会同时读或写</p>
@@ -528,7 +528,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <p>很多时候，我们的业务场景就是需要某个数据只在某一时间段内存在，比如我们的短信验证码可能只在1分钟内有效，用户登录的 token 可能只在 1 天内有效。</p>
 <p>如果使用传统的数据库来处理的话，一般都是自己判断过期，这样更麻烦并且性能要差很多。</p>
 <h1 id="9-Redis-判断数据过期的原理"><a href="#9-Redis-判断数据过期的原理" class="headerlink" title="9. Redis 判断数据过期的原理"></a>9. Redis 判断数据过期的原理</h1><p>Redis 通过一个叫做过期字典（可以看作是hash表）来保存数据过期的时间。过期字典的键指向Redis数据库中的某个key(键)，过期字典的值是一个long long类型的整数，这个整数保存了key所指向的数据库键的过期时间（毫秒精度的UNIX时间戳）。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/redis%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86.png" srcset="/img/loading.gif" lazyload alt="Redis过期时间实现原理"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/redis%E8%BF%87%E6%9C%9F%E6%97%B6%E9%97%B4%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86.png" alt="Redis过期时间实现原理"></p>
 <p>过期字典是存储在redisDb这个结构里的：</p>
 <figure class="highlight c"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisDb</span> &#123;</span><br>    ...<br>    <br>    dict *dict;     <span class="hljs-comment">//数据库键空间,保存着数据库中所有键值对</span><br>    dict *expires   <span class="hljs-comment">// 过期字典,保存着键的过期时间</span><br>    ...<br>&#125; redisDb;<br></code></pre></div></td></tr></table></figure>
 
@@ -639,7 +639,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li>事中：<strong>本地ehcache缓存+hystrix限流&amp;降级</strong>，避免MySQL崩掉</li>
 <li>事后：利用redis持久化机制保存的数据尽快恢复缓存</li>
 </ul>
-<p><img src="http://qiniu.xiaoming.net.cn/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.jpeg" srcset="/img/loading.gif" lazyload alt="缓存雪崩解决方案"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.jpeg" alt="缓存雪崩解决方案"></p>
 <p><strong>针对 Redis 服务不可用的情况：</strong></p>
 <ol>
 <li>采用 Redis 集群，避免单机出现问题整个缓存服务都没办法使用。</li>
@@ -656,7 +656,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <h3 id="布隆过滤器"><a href="#布隆过滤器" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h3><p>将所有可能存在的数据哈希到一个足够大的bitmap中，一个一定不存在的数据会被这个bitmap拦截掉，从而避免了对底层存储系统的查询压力。</p>
 <p>具体是这样做的：把所有可能存在的请求的值都存放在布隆过滤器中，当用户请求过来，先判断用户发来的请求的值是否存在于布隆过滤器中。不存在的话，直接返回请求参数错误信息给客户端，存在的话才会走下面的流程。</p>
 <p>流程如下：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/%E5%8A%A0%E5%85%A5%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E5%90%8E%E7%9A%84%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="加入布隆过滤器后的缓存处理流程"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E5%8A%A0%E5%85%A5%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E5%90%8E%E7%9A%84%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="加入布隆过滤器后的缓存处理流程"></p>
 <p>但是，需要注意的是布隆过滤器可能会存在误判的情况。总结来说就是： <strong>布隆过滤器说某个元素存在，小概率会误判。布隆过滤器说某个元素不在，那么这个元素一定不在。</strong>(具体原因看<strong>面试复习——数据结构</strong>第13题)</p>
 <h3 id="缓存空结果"><a href="#缓存空结果" class="headerlink" title="缓存空结果"></a>缓存空结果</h3><p>另外也有一个更为简单粗暴的方法，如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。</p>
 <h1 id="16-如何解决Redis的并发竞争key问题"><a href="#16-如何解决Redis的并发竞争key问题" class="headerlink" title="16. 如何解决Redis的并发竞争key问题"></a>16. 如何解决Redis的并发竞争key问题</h1><p>所谓Redis的并发竞争Key的问题也就是多个系统同时对一个Key进行操作，但是最后执行的顺序和期望的顺序不同，这样也就导致了结果的不同。</p>
@@ -716,11 +716,11 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <h3 id="RedLock算法不可靠的场景"><a href="#RedLock算法不可靠的场景" class="headerlink" title="RedLock算法不可靠的场景"></a>RedLock算法不可靠的场景</h3><p>在分布式环境下，锁比<code>mutex</code>这类复杂，因为涉及到不同节点、网络通信并且他们随时可能无征兆的fail。假设现在有一个场景：一个client要修改一个文件，它先申请得到锁，然后修改文件写回，放锁。另一个client再申请锁。代码流程如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-function">function <span class="hljs-title">writeData</span><span class="hljs-params">(filename,data)</span></span>&#123;<br>    <span class="hljs-keyword">var</span> lock = lockService.acquireLock(filename);<br>    <span class="hljs-keyword">if</span>(!lock) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-string">'Failed to acquire lock!'</span>;<br>    &#125;<br>    <br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">var</span> file = storage.readFile(filename);<br>        <span class="hljs-keyword">var</span> updated = updateContents(file,data);<br>        sotrage.writeFile(filename,updated);<br>    &#125;<span class="hljs-keyword">finally</span> &#123;<br>        lock.release();<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 <p>上述代码在以下流程中还是有可能出现bug：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/RedLock%E9%94%81%E6%B5%81%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="RedLock锁流程"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/RedLock%E9%94%81%E6%B5%81%E7%A8%8B.png" alt="RedLock锁流程"></p>
 <p>在上述图中，得到锁的client1在持有锁的期间pause（暂停）了一段时间，例如GC停顿。锁有过期时间（一般叫租约，为了防止某个 client 崩溃之后一直占有锁），但是如果 GC 停顿太长超过了锁租约时间，此时锁已经被另一个 client2 所得到，原先的 client1 还没有感知到锁过期，这时候client再进行写时就会发生错误。即使在client1写回之前检查一下锁是否过期也无法解决这个问题，因为GC可能在任何时候发生，即使在最后的检查和写操作期间。</p>
 <p>除了GC停顿，还有很多原因可能导致进程pause。例如进程可能读取尚未进入内存的数据，所以它得到一个 page fault （错误页面）并且等待 page 被加载进缓存；还有可能你依赖于网络服务；或者其他进程占用 CPU；或者其他意外发生 SIGSTOP 等。</p>
 <h3 id="解决方式"><a href="#解决方式" class="headerlink" title="解决方式"></a>解决方式</h3><h4 id="使用Fencing（栏栅）使锁变安全"><a href="#使用Fencing（栏栅）使锁变安全" class="headerlink" title="使用Fencing（栏栅）使锁变安全"></a>使用Fencing（栏栅）使锁变安全</h4><p>在每次写操作时加入一个<code>fencing token</code>,这个场景下，<code>fencing token</code>可以是一个递增的数字（lock service可以做到），每次有client申请锁就递增一次：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/%E4%BD%BF%E7%94%A8Fencing%E8%A7%A3%E5%86%B3%E9%94%81%E4%B8%8D%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98.png" srcset="/img/loading.gif" lazyload alt="使用Fencing解决锁不安全问题"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E4%BD%BF%E7%94%A8Fencing%E8%A7%A3%E5%86%B3%E9%94%81%E4%B8%8D%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98.png" alt="使用Fencing解决锁不安全问题"></p>
 <p>client1 申请锁同时拿到<code>token33</code>，然后它进入长时间的停顿锁也过期了。client2 得到锁和<code>token34</code>写入数据，紧接着 client1 活过来之后尝试写入数据，自身<code>token33</code>比<code>34</code>小因此写入操作被拒绝。注意这需要存储层来检查<code>token</code>，但这并不难实现。如果使用<code>Zookeeper</code>作为<code>lock service</code>的话那么可以使用<code>zxid</code>作为递增数字。 但是<strong>对于 Redlock ，没什么生成<code>fencing token</code>的方式，并且怎么修改 Redlock 算法使其能产生<code>fencing toke</code>并不那么显而易见。因为产生<code>token</code>需要单调递增，除非在单节点<code>Redis</code>上完成但是这又没有高可靠性</strong>，需要引进一致性协议来让 Redlock 产生可靠的<code>fencing token</code>。</p>
 <h4 id="使用时间来解决一致性"><a href="#使用时间来解决一致性" class="headerlink" title="使用时间来解决一致性"></a>使用时间来解决一致性</h4><p>学术界有个说法，算法对时间不做假设：因为进程可能pause一段时间、数据包可能因为网络延迟延后到达、时钟可能根本就是错的。而可靠的算法依旧要在上述假设下做正确的事情。</p>
 <p>同样Redlock算法也是假设所有 Redis 节点都能对同一个 Key 在其过期前持有差不多的时间、跟过期时间相比网络延迟很小、跟过期时间相比进程 pause 很短。</p>
@@ -872,11 +872,11 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li><code>skiplist</code>(跳表)：当ziplist条件不满足时，有序集合会使用skiplist作为内部实现，因为此时ziplist的读写效率会下降</li>
 </ul>
 <h2 id="ZipList"><a href="#ZipList" class="headerlink" title="ZipList"></a>ZipList</h2><p>ziplist 编码的 Zset 使用紧挨在一起的压缩列表节点来保存，第一个节点保存 member，第二个保存 score。ziplist 内的集合元素按 score 从小到大排序，其实质是一个双向链表。虽然元素是按 score 有序排序的， 但对 ziplist 的节点指针只能线性地移动，所以在 <code>REDIS_ENCODING_ZIPLIST</code> 编码的 Zset 中， 查找某个给定元素的复杂度为 O(N)。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/ziplist%E7%BB%93%E6%9E%84%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="ziplist结构图"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ziplist%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="ziplist结构图"></p>
 <h2 id="Skiplist"><a href="#Skiplist" class="headerlink" title="Skiplist"></a>Skiplist</h2><p>skiplist 编码的 Zset 底层为一个被称为 zset 的结构体，这个结构体中<strong>包含一个字典和一个跳跃表</strong>。跳跃表按 score 从小到大保存所有集合元素，查找时间复杂度为平均 O(logN)，最坏 O(N) 。字典则保存着从 member 到 score 的映射，这样就可以用 O(1) 的复杂度来查找 member 对应的 score 值。虽然同时使用两种结构，但它们会通过指针来共享相同元素的 member 和 score，因此不会浪费额外的内存。</p>
 <figure class="highlight c"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c"><span class="hljs-comment">/* zset结构体 */</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">zset</span> &#123;</span><br>    <span class="hljs-comment">// 字典，维护元素值和分值的映射关系</span><br>    dict *dict;<br>    <span class="hljs-comment">// 按分值对元素值排序序，支持O(logN)数量级的查找操作</span><br>    zskiplist *zsl;<br>&#125; zset;<br></code></pre></div></td></tr></table></figure>
 
-<p><img src="http://qiniu.xiaoming.net.cn/ZSet%E4%B8%ADskiplist%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="ZSet中skiplist结构"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/ZSet%E4%B8%ADskiplist%E7%BB%93%E6%9E%84.png" alt="ZSet中skiplist结构"></p>
 <h3 id="跳表数据结构"><a href="#跳表数据结构" class="headerlink" title="跳表数据结构"></a>跳表数据结构</h3><p>跳表查找时间复杂度为平均 O(logN)，最差 O(N)，在大部分情况下效率可与平衡树相媲美，但实现比平衡树简单的多，跳表是一种典型的以空间换时间的数据结构。</p>
 <p>跳表具有以下几个特点：</p>
 <ul>
@@ -887,8 +887,8 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li>每个节点包含两个指针，一个指向同一链表中的下一个元素，一个指向下面一层的元素。</li>
 </ul>
 <p>跳表的查找会从顶层链表的头部元素开始，然后遍历该链表，直到找到元素大于或等于目标元素的节点，如果当前元素正好等于目标，那么就直接返回它。如果当前元素小于目标元素，那么就垂直下降到下一层继续搜索，如果当前元素大于目标或到达链表尾部，则移动到前一个节点的位置，然后垂直下降到下一层。正因为 Skiplist 的搜索过程会不断地从一层跳跃到下一层的，所以被称为跳跃表。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/%E8%B7%B3%E8%B7%83%E8%A1%A8%E7%BB%93%E6%9E%84.jpeg" srcset="/img/loading.gif" lazyload alt="跳跃表结构"></p>
-<p><img src="http://qiniu.xiaoming.net.cn/%E8%B7%B3%E8%A1%A8%E7%BB%93%E6%9E%842.png" srcset="/img/loading.gif" lazyload alt="跳表结构2"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E8%B7%B3%E8%B7%83%E8%A1%A8%E7%BB%93%E6%9E%84.jpeg" alt="跳跃表结构"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E8%B7%B3%E8%A1%A8%E7%BB%93%E6%9E%842.png" alt="跳表结构2"></p>
 <p>跳表是一个“概率型”的数据结构，指的就是跳表在插入操作时，元素的插入层数完全是随机指定的。实际上该决定插入层数的随机函数对跳表的查找性能有着很大影响，这并不是一个普通的服从均匀分布的随机数，它的计算过程如下：</p>
 <ol>
 <li>指定一个节点最大的层数 MaxLevel，指定一个概率 p， 层数 lvl 默认为 1 。</li>
@@ -928,7 +928,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <li>其他方面的优化：定期删除+惰性删除等</li>
 </ul>
 <h1 id="24-Redis-集群原理"><a href="#24-Redis-集群原理" class="headerlink" title="24. Redis 集群原理"></a>24. Redis 集群原理</h1><h2 id="集群数据分区"><a href="#集群数据分区" class="headerlink" title="集群数据分区"></a>集群数据分区</h2><p>Redis Cluster 采用虚拟槽分区，所有的键根据哈希函数映射到 <code>0~16383</code> 整数槽内，计算公式：<code>slot=CRC16（key）&amp; 16383</code>。每一个节点负责维护一部分槽以及槽所映射的键值数据。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/redis%E6%95%B0%E6%8D%AE%E5%88%86%E5%8C%BA.png" srcset="/img/loading.gif" lazyload alt="Redis数据分区"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/redis%E6%95%B0%E6%8D%AE%E5%88%86%E5%8C%BA.png" alt="Redis数据分区"></p>
 <p>Redis虚拟槽分区的特点：</p>
 <ul>
 <li>解耦数据和节点之间的关系，简化了节点扩容和收缩难度。</li>
@@ -970,7 +970,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 </ul>
 <p>Gossip 协议规定，节点会定期随机选择周围节点发送消息，而收到消息的节点也会重复该步骤，因此就不可避免的存在消息重复发送给同一节点的情况，造成了消息的冗余，同时也增加了收到消息的节点的处理压力。而且，由于是定期发送而且不反馈，因此，即使节点收到了消息，还是会反复收到重复消息，加重了消息的冗余。</p>
 <h2 id="节点选择"><a href="#节点选择" class="headerlink" title="节点选择"></a>节点选择</h2><p>Redis集群内节点通信采用固定频率（定时任务每秒执行10次）。</p>
-<p><img src="https://qiniu.xiaoming.net.cn/redis%E9%9B%86%E7%BE%A4%E5%86%85%E8%8A%82%E7%82%B9%E9%80%9A%E4%BF%A1.png" srcset="/img/loading.gif" lazyload alt="Redis 集群节点选择"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/redis%E9%9B%86%E7%BE%A4%E5%86%85%E8%8A%82%E7%82%B9%E9%80%9A%E4%BF%A1.png" alt="Redis 集群节点选择"></p>
 <p>由上图可以看出：消息交换的成本主要体现在单位时间选择发送消息的节点数量和每个消息携带的数据量</p>
 <h3 id="选择发送消息的节点数量"><a href="#选择发送消息的节点数量" class="headerlink" title="选择发送消息的节点数量"></a>选择发送消息的节点数量</h3><p>集群内每个节点维护定时任务默认每秒执行10次，每秒会随机选取5个节点找出最久没有通信的节点发送ping消息，用于保证 Gossip 信息交换的随机性。每 100 毫秒都会扫描本地节点列表，如果发现节点最近一次接受 pong 消息的时间大于 <code>cluster_node_timeout/2</code>，则立刻发送 ping 消息，防止该节点信息太长时间未更新。根据以上规则得出每个节点每秒需要发送 ping 消息的数量 = <code>1+10*num（node.pong_received&gt;cluster_node_timeout/2)</code>。</p>
 <h3 id="消息数据量"><a href="#消息数据量" class="headerlink" title="消息数据量"></a>消息数据量</h3><p>每个 ping 消息的数据量体现在消息头和消息体中，其中消息头主要占用空间的字段是 <code>myslots[CLUSTER_SLOTS/8]</code>，占用 2KB，这块空间占用相对固定。消息体会携带一定数量的其他节点信息用于信息交换。</p>
@@ -1028,7 +1028,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 <figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">clusterState</span> &#123;</span> <br>	... <br>	<span class="hljs-keyword">mstime_t</span> failover_auth_time; <span class="hljs-comment">/* 记录之前或者下次将要执行故障选举时间 */</span> <br>	<span class="hljs-keyword">int</span> failover_auth_rank; <span class="hljs-comment">/* 记录当前从节点排名 */</span> <br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>采用延迟触发机制，主要是通过对多个从节点使用不同的延迟选举时间来支持优先级问题。复制偏移量越大说明从节点延迟越低，那么它应该具有更高的优先级来替换故障主节点。</p>
-<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/redis%E9%80%89%E4%B8%BE%E5%BB%B6%E8%BF%9F%E5%87%BA%E5%8F%91%E6%9C%BA%E5%88%B6.png?raw=true" srcset="/img/loading.gif" lazyload alt="准备选举时间"></p>
+<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/redis%E9%80%89%E4%B8%BE%E5%BB%B6%E8%BF%9F%E5%87%BA%E5%8F%91%E6%9C%BA%E5%88%B6.png?raw=true" alt="准备选举时间"></p>
 <h3 id="发起选举"><a href="#发起选举" class="headerlink" title="发起选举"></a>发起选举</h3><p>当从节点定时任务检测到达故障选举时间（failover_auth_time）到达后，发起选举流程如下：</p>
 <h3 id="更新配置纪元："><a href="#更新配置纪元：" class="headerlink" title="更新配置纪元："></a>更新配置纪元：</h3><p>配置纪元是一个只增不减的整数，每个主节点自身维护一个配置纪元（clusterNode.configEpoch）标示当前主节点的版本，所有主节点的配置纪元都不相等，从节点会复制主节点的配置纪元。整个集群又维护一个全局的配置纪元（clusterState.current Epoch），用于记录集群内所有主节点配置纪元的最大版本。执行 cluster info 命令可以查看配置纪元信息。配置纪元会跟随 ping/pong 消息在集群内传播，当发送方与接收方都是主节点且配置纪元相等时代表出现了冲突，nodeId 更大的一方会递增全局配置纪元并赋值给当前节点来区分冲突。</p>
 <p>配置纪元的主要作用：</p>
@@ -1062,7 +1062,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 </ol>
 <p>即首先启动一个集群模式下的 Redis 节点，然后通过与任意一个集群中的节点握手使得新的节点加入集群，最后再向新的节点分配它负责的 slot 以及向其迁移 slot 对应的数据。由于 Redis 采用 Gossip 协议，所以可以让新节点与任意一个现有集群节点握手，一段时间后整个集群都会知道新节点的加入。</p>
 <p>例如我们向该集群中新加入一个节点 6385。由于我们要追求负载均衡，所以加入后四个节点每个节点负责 4096 个slots，但是集群中原来的每个节点都负责 5462 个slots，所以 6379、6380、6381 节点都需要向新的节点 6385 迁移 1366 个slots。需要说明的是，Redis 集群并没有一个自动实现负载均衡的工具，把多少 slots 从哪个节点迁移到哪个节点完全是由用户自己来指定的。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Redis%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB.jpg" srcset="/img/loading.gif" lazyload alt="Redis集群数据迁移"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Redis%E9%9B%86%E7%BE%A4%E6%95%B0%E6%8D%AE%E8%BF%81%E7%A7%BB.jpg" alt="Redis集群数据迁移"></p>
 <h3 id="设置节点迁入迁出状态——解决路由困境"><a href="#设置节点迁入迁出状态——解决路由困境" class="headerlink" title="设置节点迁入迁出状态——解决路由困境"></a>设置节点迁入迁出状态——解决路由困境</h3><p>每个 Redis 集群节点的 clusterState 都会存储整个集群中 slot 和 Redis 节点的对应关系用于路由。当 6379 迁移 slot1 时，会首先标级该槽属于正在迁移的状态 IMGRATING，而同样 6385 也需要标记 slot1 属于正在导入的状态 IMPORTING。从实现上看，就是分别设置 <code>migrating_slots_to</code> 和 <code>importing_slots_from</code> 两个数组的对应 <code>index</code> 的值。迁入迁出的状态设置主要是为了方便数据路由的实现。在未完成迁移之前，集群中的所有节点都会将 slot1 的请求重定向到6379节点。</p>
 <p>而当 6379 把 <code>slot1</code> 标记为MIGRATING时，该节点会接收所有关于 <code>slot1</code> 的请求，但只有当请求中的 <code>key</code> 存在于 6379 中时该节点才会处理该请求。否则 6379 会把该请求通过 ASK 重定向到 slot1 的迁移目标节点，即 6385 节点。</p>
 <p>而当 6385 把 slot1 标记为 <code>IMPORTING</code> 时，该节点也可以接受关于 slot1 的请求，但前提是该请求中必须包含 <code>ASKING</code> 命令。如果关于 slot1 的请求中没有 <code>ASKING</code> 命令，那么 6385 节点会把该请求通过 <code>MOVED</code> 重定向到 6379 节点。</p>
@@ -1074,7 +1074,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 </ol>
 <p>当迁移 slot1 结束后，slot1 就不再由 6379 负责而是交给 6385 节点负责。但是从其他节点的视角看，slot1 仍然由 6379 节点负责，他们接收到关于 slot1 的键的请求还是会路由到 6379 节点。所以迁移结束之后我们要向集群广播 slot1 由 6385 节点负责的消息，这样每个节点都会更新内部的路由数据，之后就可以正确的把 slot1 的键的请求路由到 6385 节点。需要说明的是，我们可以把上述的更新信息只告诉一个节点，那么随着各个节点信息的交换，一段时间后整个集群的所有节点都会更新路由。但是这样显然更新的延迟会很高，那些还没来得及更新的节点仍然会错误的把 slot1 的请求路由给 6379 节点。所以我们需要向每个节点进行广播消息。</p>
 <h2 id="集群收缩"><a href="#集群收缩" class="headerlink" title="集群收缩"></a>集群收缩</h2><p>集群收缩即让其中一些节点安全下线。所谓的安全下线指的是让一个节点下线之前我们需要把其负责的所有 slots 迁移到别的节点，否则该节点下线后其负责的 slots 就没法继续被服务了。节点下线的流程如下图所示：</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Redis%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%AE%89%E5%85%A8%E4%B8%8B%E7%BA%BF.jpg" srcset="/img/loading.gif" lazyload alt="Redis集群节点安全下线"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Redis%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E5%AE%89%E5%85%A8%E4%B8%8B%E7%BA%BF.jpg" alt="Redis集群节点安全下线"></p>
 <p>在上面的扩容完成后，集群中共有四个节点：6379、6380、6381、6385，我们以下线 6381 为例介绍下线的流程。下线 6381 节点首先需要把其上负责 slots 的数据分别迁移到三个节点上，然后通知所有集群中的节点忘记 6381 节点，最后 6381 节点关闭下线。</p>
 <p>Redis 的元数据在每个节点中都有一份，即每个 Redis 节点维护者从它的视角看过去集群中所有其他节点的状态。那么当集群中的所有其他节点接收到 <code>CLUSTER FORGET &lt;NODE ID&gt;</code> 命令时会删除自己保存的 <code>NODE_ID</code> 对应的节点的状态，同时把 <code>NODE_ID</code> 对应的节点加入到黑名单中 60s。把一个节点放入黑名单意味着其他节点不会再去更新自己维护的该节点的信息，也就意味着当我们向集群中的所有节点发送<code>CLUSTER FORGET 6381</code> 后，6381节点 60s 内不能再次加入集群中。至此就完成了集群的缩容。</p>
 <h1 id="27-Redis应用场景"><a href="#27-Redis应用场景" class="headerlink" title="27. Redis应用场景"></a>27. Redis应用场景</h1><h2 id="热点数据"><a href="#热点数据" class="headerlink" title="热点数据"></a>热点数据</h2><p>存取数据优先从 Redis 操作，如果不存在再从文件（例如 MySQL）中操作，从文件操作完后将数据存储到 Redis 中并返回。同时有个定时任务后台定时扫描 Redis 的 key，根据业务规则进行淘汰，防止某些只访问一两次的数据一直存在 Redis 中。</p>
@@ -1231,7 +1231,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -1369,7 +1369,7 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -1405,10 +1405,6 @@ string 数据结构是简单的 key-value 类型。虽然 Redis 是用 C 语言�
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

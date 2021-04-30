@@ -55,7 +55,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -252,7 +252,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <p>根据ZAB协议，所有的写操作都必须是通过<code>Leader</code>完成，<code>Leader</code>写入本地日志后再复制到所有的<code>Follower</code>节点。</p>
 <p>一旦<code>Leader</code>节点无法工作，ZAB协议能够自动从<code>Follower</code>节点中重新选出一个合适的替代者，即新的<code>Leader</code>，该过程即为领导选举。该领导选举过程，是ZAB协议中最为重要和复杂的过程。</p>
 <h1 id="2-Zookeeper读写流程"><a href="#2-Zookeeper读写流程" class="headerlink" title="2. Zookeeper读写流程"></a>2. Zookeeper读写流程</h1><h2 id="写Leader"><a href="#写Leader" class="headerlink" title="写Leader"></a>写Leader</h2><p>通过<code>Leader</code>进行写数据的流程如下：</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041615117.jpg" srcset="/img/loading.gif" lazyload alt="写Leader"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041615117.jpg" alt="写Leader"></p>
 <p>由上图可见，通过<code>Leader</code>进行写操作，主要分为五步：</p>
 <ol>
 <li>客户端向<code>Leader</code>发起写请求</li>
@@ -268,10 +268,10 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <li><code>Observer</code>虽然无投票权，但仍须同步<code>Leader</code>的数据从而在处理读请求时可以返回尽可能新的数据。</li>
 </ul>
 <h2 id="写Follower-Obsever"><a href="#写Follower-Obsever" class="headerlink" title="写Follower/Obsever"></a>写Follower/Obsever</h2><p>通过<code>Follower/Obsever</code>进行写操作的流程如下：</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041632405.jpg" srcset="/img/loading.gif" lazyload alt="写Follower/Observer"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041632405.jpg" alt="写Follower/Observer"></p>
 <p>从上图可见，<code>Follower/Observer</code>均可以接受写请求，但不能直接处理，而需要将写请求转发给<code>Leader</code>处理。</p>
 <h2 id="读操作"><a href="#读操作" class="headerlink" title="读操作"></a>读操作</h2><p><code>Leader/Follower/Observer</code>都可直接处理读请求，从本地内存中读取数据并返回给客户端即可。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041645454.jpg" srcset="/img/loading.gif" lazyload alt="读操作"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041645454.jpg" alt="读操作"></p>
 <p>由于处理读请求不需要服务器之间的交互，<code>Follower/Observer</code>越多，整体可处理的读请求量越大，也即读性能越好。</p>
 <h1 id="3-领导选举算法"><a href="#3-领导选举算法" class="headerlink" title="3. 领导选举算法"></a>3. 领导选举算法</h1><p>Zookeeper使用<strong>基于TCP的FastLeaderElection</strong>算法进行领导选举。原理：</p>
 <h2 id="1-myid"><a href="#1-myid" class="headerlink" title="1.  myid"></a>1.  myid</h2><p>每个ZooKeeper服务器，都需要在数据文件夹下创建一个名为<code>myid</code>的文件，该文件包含整个ZooKeeper集群唯一的ID（整数）。例如，某ZooKeeper集群包含三台服务器，<code>hostname</code>分别为zoo1、zoo2和zoo3，其<code>myid</code>分别为1、2和3，则在配置文件中其ID与<code>hostname</code>必须一一对应，如下所示。在该配置文件中，<code>server.</code>后面的数据即为<code>myid</code></p>
@@ -311,52 +311,52 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <h3 id="统计选票"><a href="#统计选票" class="headerlink" title="统计选票"></a>统计选票</h3><p>如果已经确定有过半服务器认可了自己的投票（可能是更新后的投票），则终止投票。否则继续接收其他服务器的投票。</p>
 <h3 id="更新服务器状态"><a href="#更新服务器状态" class="headerlink" title="更新服务器状态"></a>更新服务器状态</h3><p>投票终止后，服务器开始更新自身状态。若过半的票投给了自己，则将自己的服务器状态更新为<code>LEADING</code>，否则将自己的状态更新为<code>FOLLOWING</code>。</p>
 <h1 id="4-集群启动领导选举"><a href="#4-集群启动领导选举" class="headerlink" title="4. 集群启动领导选举"></a>4. 集群启动领导选举</h1><h2 id="1-初始投票给自己"><a href="#1-初始投票给自己" class="headerlink" title="1. 初始投票给自己"></a>1. 初始投票给自己</h2><p>集群刚启动时，所有服务器的<code>logicClock</code>都为1，<code>zxid</code>都为0。各服务器初始化后，都投票给自己，并将自己的一票存入自己的票箱，如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041723580.jpg" srcset="/img/loading.gif" lazyload alt="集群启动第一步"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041723580.jpg" alt="集群启动第一步"></p>
 <p>在上图中，<code>(1, 1, 0)</code>第一位数代表投出该选票的服务器的<code>logicClock</code>，第二位数代表被推荐的服务器的<code>myid</code>，第三位代表被推荐的服务器的最大的<code>zxid</code>。由于该步骤中所有选票都投给自己，所以第二位的<code>myid</code>即是自己的<code>myid</code>，第三位的<code>zxid</code>即是自己的<code>zxid</code>。</p>
 <p>此时各自的票箱中只有投给自己的一票</p>
 <h2 id="2-更新投票"><a href="#2-更新投票" class="headerlink" title="2. 更新投票"></a>2. 更新投票</h2><p>服务器收到外部投票后，进行选票PK，相应更新自己的选票并广播出去，并将合适的选票存入自己的票箱，如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041738662.jpg" srcset="/img/loading.gif" lazyload alt="集群启动第二步"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041738662.jpg" alt="集群启动第二步"></p>
 <p>服务器1收到服务器2的选票<code>（1, 2, 0）</code>和服务器3的选票<code>（1, 3, 0）</code>后，由于所有的<code>logicClock</code>都相等，所有的<code>zxid</code>都相等，因此根据<code>myid</code>判断应该将自己的选票按照服务器3的选票更新为<code>（1, 3, 0）</code>，并将自己的票箱全部清空，再将服务器3的选票与自己的选票存入自己的票箱，接着将自己更新后的选票广播出去。此时服务器1票箱内的选票为<code>(1, 3)</code>，<code>(3, 3)</code>。</p>
 <p>同理，服务器2收到服务器3的选票后也将自己的选票更新为<code>（1, 3, 0）</code>并存入票箱然后广播。此时服务器2票箱内的选票为<code>(2, 3)</code>，<code>(3, ,3)</code>。</p>
 <p>服务器3根据上述规则，无须更新选票，自身的票箱内选票仍为<code>（3, 3）</code>。</p>
 <p>服务器1与服务器2更新后的选票广播出去后，由于三个服务器最新选票都相同，最后三者的票箱内都包含三张投给服务器3的选票。</p>
 <h2 id="3-根据选票确定角色"><a href="#3-根据选票确定角色" class="headerlink" title="3. 根据选票确定角色"></a>3. 根据选票确定角色</h2><p>根据上述选票，三个服务器一致认为此时服务器3应该是<code>Leader</code>。因此服务器1和2都进入<code>FOLLOWING</code>状态，而服务器3进入<code>LEADING</code>状态。之后<code>Leader</code>发起并维护与<code>Follower</code>间的心跳。</p>
-<p> <img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041757212.jpg" srcset="/img/loading.gif" lazyload alt="集群启动第三步"></p>
+<p> <img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041757212.jpg" alt="集群启动第三步"></p>
 <h1 id="5-Follower-Leader重启选举"><a href="#5-Follower-Leader重启选举" class="headerlink" title="5. Follower/Leader重启选举"></a>5. Follower/Leader重启选举</h1><h2 id="Follower重启选举"><a href="#Follower重启选举" class="headerlink" title="Follower重启选举"></a>Follower重启选举</h2><h3 id="1-Follower重启投票给自己"><a href="#1-Follower重启投票给自己" class="headerlink" title="1. Follower重启投票给自己"></a>1. Follower重启投票给自己</h3><p><code>Follower</code>重启，或者发生网络分区后找不到<code>Leader</code>，会进入<code>LOOKING</code>状态并发起新的一轮投票。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041817539.jpg" srcset="/img/loading.gif" lazyload alt="Follower重启1"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041817539.jpg" alt="Follower重启1"></p>
 <h3 id="2-发现已有Leader后成为Follower"><a href="#2-发现已有Leader后成为Follower" class="headerlink" title="2. 发现已有Leader后成为Follower"></a>2. 发现已有Leader后成为Follower</h3><p>服务器3收到服务器1的投票后，将自己的状态<code>LEADING</code>以及选票返回给服务器1。服务器2收到服务器1的投票后，将自己的状态<code>FOLLOWING</code>及选票返回给服务器1。此时服务器1知道服务器3是<code>Leader</code>，并且通过服务器2与服务器3的选票可以确定服务器3确实得到了超过半数的选票。因此服务器1进入<code>FOLLOWING</code>状态。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041833444.jpg" srcset="/img/loading.gif" lazyload alt="Follower重启2"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041833444.jpg" alt="Follower重启2"></p>
 <h2 id="Leader重启选举"><a href="#Leader重启选举" class="headerlink" title="Leader重启选举"></a>Leader重启选举</h2><h3 id="1-Follower发起新投票"><a href="#1-Follower发起新投票" class="headerlink" title="1. Follower发起新投票"></a>1. Follower发起新投票</h3><p><code>Leader</code>（服务器3）宕机后，<code>Follower</code>（服务器1和2）发现<code>Leader</code>不工作了，因此进入<code>LOOKING</code>状态并发起新的一轮投票，并且都将票投给自己。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041907813.jpg" srcset="/img/loading.gif" lazyload alt="Leader重启1"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041907813.jpg" alt="Leader重启1"></p>
 <h3 id="2-广播更新投票"><a href="#2-广播更新投票" class="headerlink" title="2. 广播更新投票"></a>2. 广播更新投票</h3><p>服务器1和2根据外部投票确定是否要更新自身的选票。这里有两种情况：</p>
 <ul>
 <li>服务器1和2的<code>zxid</code>相同。例如在服务器3宕机前服务器1与2完全与之同步。此时选票的更新主要取决于<code>myid</code>的大小</li>
 <li>服务器1和2的<code>zxid</code>不同。在旧<code>Leader</code>宕机之前，其所主导的写操作，只需过半服务器确认即可，而不需所有服务器确认。换句话说，服务器1和2可能一个与旧<code>Leader</code>同步（即<code>zxid</code>与之相同）另一个不同步（即<code>zxid</code>比之小）。此时选票的更新主要取决于谁的<code>zxid</code>较大。</li>
 </ul>
 <p>在上图中，服务器1的<code>zxid</code>为11，而服务器2的<code>zxid</code>为10，因此服务器2将自身选票更新为<code>（3, 1, 11）</code>，如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041923754.jpg" srcset="/img/loading.gif" lazyload alt="Leader重启2"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041923754.jpg" alt="Leader重启2"></p>
 <h3 id="3-选出新的Leader"><a href="#3-选出新的Leader" class="headerlink" title="3. 选出新的Leader"></a>3. 选出新的Leader</h3><p>经过上一步选票更新后，服务器1与服务器2均将选票投给服务器1，因此服务器2成为<code>Follower</code>，而服务器1成为新的<code>Leader</code>并维护与服务器2的心跳。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041937775.jpg" srcset="/img/loading.gif" lazyload alt="Leader重启3"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041937775.jpg" alt="Leader重启3"></p>
 <h3 id="4-旧Leader恢复后发起选举"><a href="#4-旧Leader恢复后发起选举" class="headerlink" title="4. 旧Leader恢复后发起选举"></a>4. 旧Leader恢复后发起选举</h3><p>旧的<code>Leader</code>恢复后，进入<code>LOOKING</code>状态并发起新一轮领导选举，并将选票投给自己。此时服务器1会将自己的<code>LEADING</code>状态及选票<code>（3, 1, 11）</code>返回给服务器3，而服务器2将自己的<code>FOLLOWING</code>状态及选票<code>（3, 1, 11）</code>返回给服务器3。如下图所示:</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041955650.jpg" srcset="/img/loading.gif" lazyload alt="Leader重启4"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105041955650.jpg" alt="Leader重启4"></p>
 <h3 id="5-旧Leader成为Follower"><a href="#5-旧Leader成为Follower" class="headerlink" title="5. 旧Leader成为Follower"></a>5. 旧Leader成为Follower</h3><p>服务器3了解到<code>Leader</code>为服务器1，且根据选票了解到服务器1确实得到过半服务器的选票，因此自己进入<code>FOLLOWING</code>状态。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042009165.jpg" srcset="/img/loading.gif" lazyload alt="Leader重启5"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042009165.jpg" alt="Leader重启5"></p>
 <h1 id="6-Zookeeper如何保证commit过的数据不丢失"><a href="#6-Zookeeper如何保证commit过的数据不丢失" class="headerlink" title="6. Zookeeper如何保证commit过的数据不丢失"></a>6. Zookeeper如何保证commit过的数据不丢失</h1><h2 id="1-Failover前状态"><a href="#1-Failover前状态" class="headerlink" title="1. Failover前状态"></a>1. Failover前状态</h2><p>如下图共有5个节点：A作为<code>Leader</code>，共收到P1、P2、P3三条消息，并且<code>Commit</code>了1和2，且总体顺序为P1、P2、C1、P3、C2。根据顺序性原则，其它<code>Follower</code>收到的消息的顺序肯定与之相同。其中B与A完全同步，C收到P1、P2、C1，D收到P1、P2，E收到P1，如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042029601.jpg" srcset="/img/loading.gif" lazyload alt="Failover前状态"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042029601.jpg" alt="Failover前状态"></p>
 <p>这里要注意：</p>
 <ul>
 <li>由于A没有C3，意味着收到P3的服务器的总个数不会超过一半，也即包含A在内最多只有两台服务器收到P3。在这里A和B收到P3，其它服务器均未收到P3</li>
 <li>由于A已写入C1、C2，说明它已经Commit了P1、P2，因此整个集群有超过一半的服务器，即最少三个服务器收到P1、P2。在这里所有服务器都收到了P1，除E外其它服务器也都收到了P2</li>
 </ul>
 <h2 id="2-选出Leader"><a href="#2-选出Leader" class="headerlink" title="2. 选出Leader"></a>2. 选出Leader</h2><p>旧<code>Leader</code>也即A宕机后，其它服务器根据上述<code>FastLeaderElection</code>算法选出B作为新的<code>Leader</code>。C、D和E成为<code>Follower</code>且以B为<code>Leader</code>后，会主动将自己最大的<code>zxid</code>发送给B，B会将<code>Follower</code>的<code>zxid</code>与自身<code>zxid</code>间的所有被<code>Commit</code>过的消息同步给<code>Follower</code>，如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042045130.jpg" srcset="/img/loading.gif" lazyload alt="选出Leader"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042045130.jpg" alt="选出Leader"></p>
 <p>在上图中：</p>
 <ul>
 <li>P1和P2都被A Commit，因此B会通过同步保证P1、P2、C1与C2都存在于C、D和E中</li>
 <li>P3由于未被A Commit，同时幸存的所有服务器中P3未存在于大多数据服务器中，因此它不会被同步到其它<code>Follower</code></li>
 </ul>
 <h2 id="3-通知Follower可对外服务"><a href="#3-通知Follower可对外服务" class="headerlink" title="3. 通知Follower可对外服务"></a>3. 通知Follower可对外服务</h2><p>同步完数据后，B会向D、C和E发送NEWLEADER命令并等待大多数服务器的ACK（下图中D和E已返回ACK，加上B自身，已经占集群的大多数），然后向所有服务器广播<code>UPTODATE</code>命令。收到该命令后的服务器即可对外提供服务。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042058968.jpg" srcset="/img/loading.gif" lazyload alt="通知Follower可对外服务"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042058968.jpg" alt="通知Follower可对外服务"></p>
 <h2 id="未Commit过的消息对客户端不可见"><a href="#未Commit过的消息对客户端不可见" class="headerlink" title="未Commit过的消息对客户端不可见"></a>未Commit过的消息对客户端不可见</h2><p>在上例中，P3未被A Commit过，同时因为没有过半的服务器收到P3，因此B也未Commit P3（如果有过半服务器收到P3，即使A未Commit P3，B会主动Commit P3，即C3），所以它不会将P3广播出去。</p>
 <p>具体做法是，B在成为<code>Leader</code>后，先判断自身未Commit的消息（本例中即P3）是否存在于大多数服务器中从而决定是否要将其Commit。然后B可得出自身所包含的被Commit过的消息中的最小<code>zxid</code>（记为<code>min_zxid</code>）与最大<code>zxid</code>（记为<code>max_zxid</code>）。C、D和E向B发送自身Commit过的最大消息<code>zxid</code>（记为<code>max_zxid</code>）以及未被Commit过的所有消息（记为<code>zxid_set</code>）。B根据这些信息作出如下操作：</p>
 <ul>
@@ -365,7 +365,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 </ul>
 <p>上述操作保证了未被Commit过的消息不会被Commit从而对外不可见。</p>
 <p>上述例子中Follower上并不存在未被Commit的消息。但可考虑这种情况，如果将上述例子中的服务器数量从五增加到七，服务器F包含P1、P2、C1、P3，服务器G包含P1、P2。此时服务器F、A和B都包含P3，但是因为票数未过半，因此B作为<code>Leader</code>不会Commit P3，而会通过<code>TRUNC</code>命令通知F删除P3。如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042119217.jpg" srcset="/img/loading.gif" lazyload alt="未Commit过的消息对客户端不可见"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042119217.jpg" alt="未Commit过的消息对客户端不可见"></p>
 <h1 id="7-Zookeeper节点类型"><a href="#7-Zookeeper节点类型" class="headerlink" title="7. Zookeeper节点类型"></a>7. Zookeeper节点类型</h1><p>Zookeeper提供了类似于Linux文件系统的树形结构，该树形结构中每个节点都被称为<code>znode</code>，可被分为以下两类：</p>
 <ol>
 <li><strong>Persist</strong>和<strong>Ephemeral</strong></li>
@@ -399,7 +399,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <li>Zookeeper监听到有数据或者路径变化，就会将这个消息发送给<code>listener</code>线程</li>
 <li><code>listener</code>线程内部调用了<code>process()</code>方法</li>
 </ul>
-<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/zookeeper%E7%9B%91%E5%90%AC%E5%99%A8%E5%8E%9F%E7%90%86.png?raw=true" srcset="/img/loading.gif" lazyload alt="监听器机制"></p>
+<p><img src="https://github.com/xiao-ming9/xiao-ming9.github.io/blob/master/images/zookeeper%E7%9B%91%E5%90%AC%E5%99%A8%E5%8E%9F%E7%90%86.png?raw=true" alt="监听器机制"></p>
 <p><code>Watch</code>有如下特点：</p>
 <ul>
 <li>主动推送：<code>Watch</code>被触发时，由 ZooKeeper 服务器主动将更新推送给客户端，而不需要客户端轮询。</li>
@@ -422,14 +422,14 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 </li>
 </ol>
 <h2 id="非公平领导选举实现分布式锁"><a href="#非公平领导选举实现分布式锁" class="headerlink" title="非公平领导选举实现分布式锁"></a>非公平领导选举实现分布式锁</h2><h3 id="1-选主过程："><a href="#1-选主过程：" class="headerlink" title="1. 选主过程："></a>1. 选主过程：</h3><p>假设有三个ZooKeeper的客户端，如下图所示，同时竞争<code>Leader</code>。这三个客户端同时向ZooKeeper集群注册<code>Ephemeral</code>且<code>Non-sequence</code>类型的节点，路径都为<code>/zkroot/leader</code>（工程实践中，路径名可自定义）。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042158212.jpg" srcset="/img/loading.gif" lazyload alt="非公平领导选举"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042158212.jpg" alt="非公平领导选举"></p>
 <p>如上图所示，由于是<code>Non-sequence</code>节点，这三个客户端只会有一个创建成功，其它节点均创建失败。此时，创建成功的客户端（即上图中的Client 1）即成功竞选为<code>Leader</code>。其它客户端（即上图中的Client 2和Client 3）此时匀为<code>Follower</code>。</p>
 <h3 id="2-放弃领导权"><a href="#2-放弃领导权" class="headerlink" title="2. 放弃领导权"></a>2. 放弃领导权</h3><p>如果<code>Leader</code>打算主动放弃领导权，直接删除<code>/zkroot/leader</code>节点即可。</p>
 <p>如果<code>Leader</code>进程意外宕机，其与 ZooKeeper 间的<code>Session</code>也结束，该节点由于是<code>Ephemeral</code>类型的节点，因此也会自动被删除。</p>
 <p>此时<code>/zkroot/leader</code>节点不复存在，对于其它参与竞选的客户端而言，之前的<code>Leader</code>已经放弃了领导权。</p>
 <h3 id="3-感知领导权的放弃"><a href="#3-感知领导权的放弃" class="headerlink" title="3. 感知领导权的放弃"></a>3. 感知领导权的放弃</h3><p>由上图可见，创建节点失败的节点，除了成为<code>Follower</code>以外，还会向<code>/zkroot/leader</code>注册一个<code>Watch</code>，一旦<code>Leader</code>放弃领导权，也即该节点被删除，所有的<code>Follower</code>会收到通知。</p>
 <h3 id="4-重新选举"><a href="#4-重新选举" class="headerlink" title="4. 重新选举"></a>4. 重新选举</h3><p>感知到旧<code>Leader</code>放弃领导权后，所有的<code>Follower</code>可以再次发起新一轮的领导选举，如下图所示：</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042227598.jpg" srcset="/img/loading.gif" lazyload alt="重新选举"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042227598.jpg" alt="重新选举"></p>
 <p>从上图中可见：</p>
 <ul>
 <li>新一轮的领导选举方法与最初的领导选举方法完全一样，都是发起节点创建请求，创建成功即为<code>Leader</code>，否则为<code>Follower</code> ，且<code>Follower</code>会<code>Watch</code>该节点</li>
@@ -442,7 +442,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 </ol>
 <p><strong>缺点</strong>：<br>给 ZooKeeper 集群造成的负载大，因此扩展性差。如果有上万个客户端都参与竞选，意味着同时会有上万个写请求发送给 Zookeper。ZooKeeper 存在单点写的问题，写性能不高。同时一旦<code>Leader</code>放弃领导权，ZooKeeper 需要同时通知上万个<code>Follower</code>，负载较大。</p>
 <h2 id="公平领导选举实现分布式锁"><a href="#公平领导选举实现分布式锁" class="headerlink" title="公平领导选举实现分布式锁"></a>公平领导选举实现分布式锁</h2><h3 id="1-选主过程"><a href="#1-选主过程" class="headerlink" title="1. 选主过程"></a>1. 选主过程</h3><p>如下图所示，公平领导选举中，各客户端均创建<code>/zkroot/leader</code> 节点，且其类型为<code>Ephemeral</code>与<code>Sequence</code>。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042242375.jpg" srcset="/img/loading.gif" lazyload alt="公平领导选举"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042242375.jpg" alt="公平领导选举"></p>
 <p>由于是<code>Sequence</code>类型节点，故上图中三个客户端均创建成功，只是序号不一样。此时，每个客户端都会判断自己创建成功的节点的序号是不是当前最小的。如果是，则该客户端为<code>Leader</code>，否则即为<code>Follower</code>。</p>
 <p>在上图中，Client 1创建的节点序号为 1 ，Client 2创建的节点序号为 2，Client 3创建的节点序号为3。由于最小序号为 1 ，且该节点由Client 1创建，故Client 1为<code>Leader</code></p>
 <h3 id="2-放弃领导权-1"><a href="#2-放弃领导权-1" class="headerlink" title="2. 放弃领导权"></a>2. 放弃领导权</h3><p><code>Leader</code>如果主动放弃领导权，直接删除其创建的节点即可。</p>
@@ -451,9 +451,9 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <p>在上图中，总共有 1、2、3 共三个节点，因此Client 2 Watch <code>/zkroot/leader1</code>，Client 3 Watch <code>/zkroot/leader2</code>。（注：序号应该是10位数字，而非一位数字，这里为了方便，以一位数字代替）</p>
 <p>一旦<code>Leader</code>宕机，<code>/zkroot/leader1</code>被删除，Client 2可得到通知。此时Client 3由于<code>Watch</code>的是<code>/zkroot/leader2</code>，故不会得到通知。</p>
 <h3 id="4-重新选举-1"><a href="#4-重新选举-1" class="headerlink" title="4. 重新选举"></a>4. 重新选举</h3><p>重新选举Client 2得到<code>/zkroot/leader1</code>被删除的通知后，不会立即成为新的<code>Leader</code>。而是先判断自己的序号 2 是不是当前最小的序号。在该场景下，其序号确为最小。因此Client 2成为新的<code>Leader</code>。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042304441.jpg" srcset="/img/loading.gif" lazyload alt="重新选举"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042304441.jpg" alt="重新选举"></p>
 <p>这里要注意，如果在Client 1放弃领导权之前，Client 2就宕机了，Client 3会收到通知。此时Client 3不会立即成为<code>Leader</code>，而是要先判断自己的序号 3 是否为当前最小序号。很显然，由于Client 1创建的<code>/zkroot/leader1</code>还在，因此Client 3不会成为新的<code>Leader</code>，并向Client 2序号 2 前面的序号，也即 1 创建<code>Watch</code>。该过程如下图所示。</p>
-<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042317577.jpg" srcset="/img/loading.gif" lazyload alt="重新选举2"></p>
+<p><img src="http://dbaplus.cn/uploadfile/2018/0105/20180105042317577.jpg" alt="重新选举2"></p>
 <h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><p><strong>优点</strong>：</p>
 <ul>
 <li>扩展性好，每个客户端都只<code>Watch</code>一个节点且每次节点被删除只须通知一个客户端；</li>
@@ -539,7 +539,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -677,7 +677,7 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -713,10 +713,6 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 

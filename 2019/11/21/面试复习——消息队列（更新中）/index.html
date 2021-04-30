@@ -58,7 +58,7 @@
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -250,14 +250,14 @@
 <li>通过异步处理提高系统性能（削峰、减少响应所需的时间）</li>
 <li>降低系统的耦合性</li>
 </ol>
-<h2 id="通过异步处理提高系统性能（削峰、减少响应所需时间）"><a href="#通过异步处理提高系统性能（削峰、减少响应所需时间）" class="headerlink" title="通过异步处理提高系统性能（削峰、减少响应所需时间）"></a>通过异步处理提高系统性能（削峰、减少响应所需时间）</h2><p><img src="https://camo.githubusercontent.com/bc24d4adc2b279738dd8b08d5205d4d517b0a3e0/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031382f342f32312f313632653633613865333462613533343f773d39313026683d33353026663d6a70656726733d3239313233" srcset="/img/loading.gif" lazyload alt="使用消息队列服务器"></p>
+<h2 id="通过异步处理提高系统性能（削峰、减少响应所需时间）"><a href="#通过异步处理提高系统性能（削峰、减少响应所需时间）" class="headerlink" title="通过异步处理提高系统性能（削峰、减少响应所需时间）"></a>通过异步处理提高系统性能（削峰、减少响应所需时间）</h2><p><img src="https://camo.githubusercontent.com/bc24d4adc2b279738dd8b08d5205d4d517b0a3e0/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031382f342f32312f313632653633613865333462613533343f773d39313026683d33353026663d6a70656726733d3239313233" alt="使用消息队列服务器"></p>
 <a id="more"></a>
 
 <p>如上图，在不使用消息队列服务器的时候，用户的请求数据直接写入数据库，在高并发的情况下数据库压力剧增，使得响应速度变慢。但是在使用消息队列之后，用户的请求数据发送给消息队列之后立即返回，再由消息队列的消费者进程从消息队列中获取数据，异步写入数据库。由于消息队列服务器处理速度快于数据库（消息队列也比数据库有更好的伸缩性），因此响应速度得到大幅改善。</p>
 <p>通过以上分析可以得出消息队列具有很好的削峰作用的功能——即通过异步处理，将短时间高并发产生的事务消息存储在消息队列中，从而削平高峰期的并发事务。 </p>
 <p>举例：在电子商务一些秒杀、促销活动中，合理使用消息队列可以有效抵御促销活动刚开始大量订单涌入对系统的冲击。</p>
 <p>因为用户请求数据写入消息队列之后就立即返回给用户了，但是请求数据在后续的业务校验、写数据库等操作中可能失败。因此使用消息队列进行异步处理之后，需要适当修改业务流程进行配合，比如用户在提交订单之后，订单数据写入消息队列，不能立即返回用户订单提交成功，需要在消息队列的订单消费者进程真正处理完该订单之后，甚至出库后，再通过电子邮件或短信通知用户订单成功，以免交易纠纷。这就类似我们平时手机订火车票和电影票。</p>
-<h2 id="降低系统耦合性"><a href="#降低系统耦合性" class="headerlink" title="降低系统耦合性"></a>降低系统耦合性</h2><p><img src="https://camo.githubusercontent.com/786eb0835f335e5b67fefa8fa8e626b543b40c19/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031382f342f32312f313632653636363566613339346233623f773d37393026683d32393026663d6a70656726733d3134393436" srcset="/img/loading.gif" lazyload alt="降低系统耦合性"></p>
+<h2 id="降低系统耦合性"><a href="#降低系统耦合性" class="headerlink" title="降低系统耦合性"></a>降低系统耦合性</h2><p><img src="https://camo.githubusercontent.com/786eb0835f335e5b67fefa8fa8e626b543b40c19/68747470733a2f2f757365722d676f6c642d63646e2e786974752e696f2f323031382f342f32312f313632653636363566613339346233623f773d37393026683d32393026663d6a70656726733d3134393436" alt="降低系统耦合性"></p>
 <p>消息队列使利用发布-订阅模式工作，消息发送者（生产者）发布消息，一个或多个消息接受者（消费者）订阅消息。从上图可以看到消息发送者（生产者）和消息接受者（消费者）之间没有直接耦合，消息发送者将消息发送至分布式消息队列即结束对消息的处理，消息接受者从分布式消息队列获取该消息后进行后续处理，并不需要知道该消息从何而来。对新增业务，只要对该类消息感兴趣，即可订阅该消息，对原有系统和业务没有任何影响，从而实现网站业务的可扩展性设计。</p>
 <p>　　消息接受者对消息进行过滤、处理、包装后，构造成一个新的消息类型，将消息继续发送出去，等待其他消息接受者订阅该消息。因此基于事件（消息对象）驱动的业务架构可以是一系列流程。</p>
 <p>　　另外为了避免消息队列服务器宕机造成消息丢失，会将成功发送到消息队列的消息存储在消息生产者服务器上，等消息真正被消费者服务器处理后才删除消息。在消息队列服务器宕机后，生产者服务器会选择分布式消息队列服务器集群中的其他服务器发布消息。</p>
@@ -289,7 +289,7 @@
 <h1 id="3-RabbitMQ交换机exchange的类型有哪些？"><a href="#3-RabbitMQ交换机exchange的类型有哪些？" class="headerlink" title="3. RabbitMQ交换机exchange的类型有哪些？"></a>3. RabbitMQ交换机exchange的类型有哪些？</h1><p>RabbitMQ常用的Exchange类型有<code>fanout</code>,<code>direct</code>,<code>topic</code>,<code>headers</code>。</p>
 <h2 id="fanout"><a href="#fanout" class="headerlink" title="fanout"></a>fanout</h2><p><code>fanout</code>类型的Exchange路由规则非常简单，它会把所有发送到该Exchange的消息路由到所有与它绑定的Queue中，不需要做任何判断操作，所以<code>fanout</code>类型是所有的交换机类型里面速度最快的。<code>fanout</code>类型常用来广播消息。</p>
 <h2 id="direct"><a href="#direct" class="headerlink" title="direct"></a>direct</h2><p><code>direct</code>类型的Exchange路由规则也很简单，它会把消息路由到那些<code>Bindingkey</code>与<code>RoutingKey</code>完全匹配的<code>Queue</code>中。</p>
-<p><img src="https://camo.githubusercontent.com/7177328efe9e95372a9b7fb8b51022312d2e601b/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d31322d31362f33373030383032312e6a7067" srcset="/img/loading.gif" lazyload alt="direct Exchange"></p>
+<p><img src="https://camo.githubusercontent.com/7177328efe9e95372a9b7fb8b51022312d2e601b/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d31322d31362f33373030383032312e6a7067" alt="direct Exchange"></p>
 <p>以上图为例，如果发送消息的时候设置路由键为<code>warning</code>,那么消息会路由到 Queue1 和 Queue2。如果在发送消息的时候设置路由键为<code>Info</code>或者<code>debug</code>，消息只会路由到Queue2。如果以其他的路由键发送消息，则消息不会路由到这两个队列中。</p>
 <p><code>direct</code>类型常用在处理有优先级的任务，根据任务的优先级把消息发送到对应的队列，这样可以指派更多的资源去处理高优先级的队列。</p>
 <h2 id="topic"><a href="#topic" class="headerlink" title="topic"></a>topic</h2><p><code>direct</code>类型的交换器路由规则是完全匹配<code>BindingKey</code>和<code>RoutingKey</code>，但是这种严格的匹配方式在很多情况下不能满足实际业务的需求。<code>topic</code>类型的交换器在匹配规则上进行了扩展，它与<code>direct</code>类型的交换器相似，也是将消息路由到<code>BindingKey</code>和<code>RoutingKey</code>相匹配的队列中，但这里的匹配规则有些不同，它约定：</p>
@@ -298,7 +298,7 @@
 <li><code>BindingKey</code>和<code>RoutingKey</code>一样也是点号<code>.</code>分隔的字符串；</li>
 <li><code>BindingKey</code>中可以存在两种特殊字符串<code>*</code>和<code>#</code>，用于做模糊匹配，其中<code>*</code>用于匹配一个单词，<code>#</code>用于匹配多个单词(可以是零个)。</li>
 </ul>
-<p><img src="https://camo.githubusercontent.com/ad72829eb75cde62383a48361e3a77708a80f955/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d31322d31362f37333834332e6a7067" srcset="/img/loading.gif" lazyload alt="topicExchange"></p>
+<p><img src="https://camo.githubusercontent.com/ad72829eb75cde62383a48361e3a77708a80f955/687474703a2f2f6d792d626c6f672d746f2d7573652e6f73732d636e2d6265696a696e672e616c6979756e63732e636f6d2f31382d31322d31362f37333834332e6a7067" alt="topicExchange"></p>
 <h2 id="headers"><a href="#headers" class="headerlink" title="headers"></a>headers</h2><p><code>headers</code>类型的交换器不依赖于路由键的匹配规则来路由消息，而是根据发送的消息内容中的 <code>headers</code> 属性进行匹配。在绑定队列和交换器时制定一组键值对，当发送消息到交换器时，RabbitMQ会获取到该消息的 <code>headers</code>（也是一个键值对的形式)对比其中的键值对是否完全匹配队列和交换器绑定时指定的键值对，如果完全匹配则消息会路由到该队列，否则不会路由到该队列。<code>headers</code> 类型的交换器性能会很差，而且也不实用，基本上不会看到它的存在。</p>
 <h1 id="4-如何保证消息可靠性传输？-RabbitMQ-消息确认机制（事务-Confirm）"><a href="#4-如何保证消息可靠性传输？-RabbitMQ-消息确认机制（事务-Confirm）" class="headerlink" title="4. 如何保证消息可靠性传输？/RabbitMQ 消息确认机制（事务+Confirm）"></a>4. 如何保证消息可靠性传输？/RabbitMQ 消息确认机制（事务+Confirm）</h1><p>在 Rabbitmq 中可以通过持久化来解决因为服务器异常而导致的数据丢失问题。但是还存在另外一个问题：生产者将消息发送出去之后，消息是否真正到达Rabbitmq服务器是无法确定的（即Rabbitmq不会反馈任何消息给生产者），默认情况下是不知道消息有没有正确到达的。</p>
 <p>导致的问题：消息到达服务器之前丢失，那么持久化也不能解决此问题，因为消息根本没有到达Rabbitmq服务器。</p>
@@ -327,9 +327,9 @@
 <p>这种方式确实很麻烦，也不怎么好，没做到所谓的分布式，就是个普通集群。因为这导致你要么消费者每次随机连接一个实例然后拉取数据，要么固定连接那个 queue 所在实例消费数据，前者有数据拉取的开销，后者导致单实例性能瓶颈。</p>
 <p>而且如果那个放 queue 的实例宕机了，会导致接下来其他实例就无法从那个实例拉取，如果你开启了消息持久化，让 rabbitmq 落地存储消息的话，消息不一定会丢，得等这个实例恢复了，然后才可以继续从这个 queue 拉取数据。</p>
 <p>这方案主要是提高吞吐量的，并没有什么高可用可言，就是说让集群中多个节点来服务某个 queue 的读写操作。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E6%99%AE%E9%80%9A%E9%9B%86%E7%BE%A4.png" srcset="/img/loading.gif" lazyload alt="RabbitMQ普通集群"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E6%99%AE%E9%80%9A%E9%9B%86%E7%BE%A4.png" alt="RabbitMQ普通集群"></p>
 <h2 id="镜像集群模式"><a href="#镜像集群模式" class="headerlink" title="镜像集群模式"></a>镜像集群模式</h2><p>这种模式，才是所谓的 RabbitMQ 的高可用模式。跟普通集群模式不一样的是，在镜像集群模式下，创建的 queue，无论元数据还是 queue 里的消息都会存在于多个实例上，就是说，每个 RabbitMQ 节点都有这个 queue 的一个完整镜像，包含 queue 的全部数据的意思。然后每次写消息到 queue 的时候，都会自动把消息同步到多个实例的 queue 上。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E9%95%9C%E5%83%8F%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F.png" srcset="/img/loading.gif" lazyload alt="RabbitMQ镜像集群模式"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E9%95%9C%E5%83%8F%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F.png" alt="RabbitMQ镜像集群模式"></p>
 <p>如何开启这个镜像集群模式呢？其实很简单，RabbitMQ 有很好的管理控制台，就是在后台新增一个策略，这个策略是镜像集群模式的策略，指定的时候是可以要求数据同步到所有节点的，也可以要求同步到指定数量的节点，再次创建 queue 的时候，应用这个策略，就会自动将数据同步到其他的节点上去了。</p>
 <p>这样的话，好处在于，任何一个机器宕机了，其它机器（节点）还包含了这个 queue 的完整数据，别的 consumer 都可以到其它节点上去消费数据。坏处在于，第一，这个性能开销太大，消息需要同步到所有机器上，导致网络带宽压力和消耗很重！第二，不是分布式的，就没有扩展性可言了，如果某个 queue 负载很重，增加机器，新增的机器也包含了这个 queue 的所有数据，并没有办法线性扩展 queue。</p>
 <h1 id="7-如何保证消息不会被重复消费（保证消息幂等性）？"><a href="#7-如何保证消息不会被重复消费（保证消息幂等性）？" class="headerlink" title="7. 如何保证消息不会被重复消费（保证消息幂等性）？"></a>7. 如何保证消息不会被重复消费（保证消息幂等性）？</h1><p>首先，比如 RabbitMQ、RocketMQ、Kafka，都有可能会出现消息重复消费的问题，正常。因为这问题通常不是 MQ 自己保证的，是由开发来保证的。挑一个 Kafka 来举个例子，说说怎么重复消费。</p>
@@ -337,7 +337,7 @@
 <p>但是凡事总有意外，比如有时候重启系统，看你怎么重启了，如果碰到点着急的，直接 kill 进程了，再重启。这会导致 consumer 有些消息处理了，但是没来得及提交 offset，尴尬了。重启之后，少数消息会再次消费一次。</p>
 <p>举个例子：</p>
 <p>有这么个场景。数据 1，2，3 依次进入 kafka，kafka 会给这三条数据每条分配一个 offset，代表这条数据的序号，我们就假设分配的 offset 依次是 152，153，154。消费者从 kafka 去消费的时候，也是按照这个顺序去消费。假如当消费者消费了 offset=153 的这条数据，刚准备去提交 offset 到 zookeeper，此时消费者进程被重启了。那么此时消费过的数据 1，2 的 offset 并没有提交，kafka 也就不知道你已经消费了 offset=153 这条数据。那么重启之后，消费者会找 kafka ，接着把上次消费到的那个地方后面的数据继续给传递过来。由于之前的 offset 没有提交成功，那么数据 1，2 会再次传过来，如果此时消费者没有去重的话，那么就会导致重复消费。</p>
-<p><img src="http://qiniu.xiaoming.net.cn/Kafka%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9.png" srcset="/img/loading.gif" lazyload alt="kakfka重复消费"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/Kafka%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9.png" alt="kakfka重复消费"></p>
 <p>如果消费者干的事儿是拿一条数据就往数据库里写一条，会导致说，可能就把数据 1,2 在数据库里插入了 2 次，那么数据就错啦。</p>
 <p>举个例子。假设有个系统，消费一条消息就往数据库里插入一条数据，要是你一个消息重复两次，不就插入了两条，这数据不就错了？但是你要是消费到第二次的时候，自己判断一下是否已经消费过了，若是就直接扔了，这样不就保留了一条数据，从而保证了数据的正确性。</p>
 <p>一条数据重复出现两次，数据库里就只有一条数据，这就保证了系统的幂等性。</p>
@@ -356,7 +356,7 @@
 <p>先看看顺序会错乱的俩场景：</p>
 <p>RabbitMQ：一个 queue，多个 consumer。比如，生产者向 RabbitMQ 里发送了三条数据，顺序依次是 data1、data2、data3，压入的是 RabbitMQ 的一个内存队列。有三个消费者分别从 MQ 中消费这三条数据中的一条，结果消费者 2 先执行完操作，把 data2 存入数据库，然后是 data1、data3。这不明显乱了。</p>
 <p>解决方案是拆分多个 queue，每个 queue 一个 consumer，就是多一些 queue 而已，确实是麻烦点；或者就一个 queue 但是对应一个 consumer，然后这个 consumer 内部用内存队列做排队，然后分发给底层不同的 worker 来处理。 </p>
-<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%80%A7.png" srcset="/img/loading.gif" lazyload alt="RabbitMQ保证消息顺序性"></p>
+<p><img src="http://qiniu.xiaoming.net.cn/RabbitMQ%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E9%A1%BA%E5%BA%8F%E6%80%A7.png" alt="RabbitMQ保证消息顺序性"></p>
 <p><strong>参考内容</strong></p>
 <blockquote>
 <p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a><br><a href="https://github.com/shishan100/Java-Interview-Advanced" target="_blank" rel="noopener">中华石杉–互联网Java进阶面试训练营</a><br><a href="https://juejin.im/post/5cbd679af265da039b086d4f" target="_blank" rel="noopener">RabbitMq底层原理分析</a>  </p>
@@ -415,7 +415,7 @@
 
             
               <!-- Comments -->
-              <article class="comments" id="comments" lazyload>
+              <article class="comments" id="comments">
                 
                   
                 
@@ -553,7 +553,7 @@
           >
             
               <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" srcset="/img/loading.gif" lazyload alt="police-icon"/>
+              <img src="/img/police_beian.png" alt="police-icon"/>
             
             <span>粤ICP备18114217号-1</span>
           </a>
@@ -589,10 +589,6 @@
 
 <!-- Plugins -->
 
-
-  
-    <script  src="/js/img-lazyload.js" ></script>
-  
 
 
 
