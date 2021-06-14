@@ -1,0 +1,1337 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="因为最近快入职了，正好在公众号看到推广，就在拉勾教育上购买了一套 MySQL 实战教程：《姜承尧的MySQL实战宝典》，重新温习一下 MySQL，这篇文章主要记录通过这个课程学习到的一些 MySQL 使用技巧。
+这里附上课程链接：拉勾教育——MySQL实战宝典">
+  <meta name="author" content="Silverming">
+  <meta name="keywords" content="">
+  
+  <title>MySQL 实战总结 - Silverming</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="MySQL 实战总结">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-05-04 23:03" pubdate>
+        2021年5月4日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      22k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      263
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">MySQL 实战总结</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2021年6月13日 下午
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>因为最近快入职了，正好在公众号看到推广，就在拉勾教育上购买了一套 MySQL 实战教程：《姜承尧的MySQL实战宝典》，重新温习一下 MySQL，这篇文章主要记录通过这个课程学习到的一些 MySQL 使用技巧。</p>
+<p>这里附上课程链接：<a href="https://t10.lagounews.com/dR66R+RLcp301" target="_blank" rel="noopener">拉勾教育——MySQL实战宝典</a></p>
+<a id="more"></a>
+
+<h1 id="表结构设计"><a href="#表结构设计" class="headerlink" title="表结构设计"></a>表结构设计</h1><h2 id="数字类型"><a href="#数字类型" class="headerlink" title="数字类型"></a>数字类型</h2><p>对于表的主键，采用 <code>BIGINT</code> 类型。在 MySQL 中，当自增达到 INT/BIGINT 上限后，再次进行自增插入时，会报重复错误，MySQL 数据库并不会自动将其重置为 1。</p>
+<p>另外，MySQL 8.0 版本前，<strong>自增不持久化，自增值可能会存在回溯问题</strong>。例如，在正常情况下，在删除自增值为 3 的记录后，下一个自增值依然为 4（AUTO_INCREMENT=4），这并没有错误，自增并不会进行回溯。但<strong>若这时数据库发生重启，那数据库启动后，表的自增起始值将再次变为 3，即自增值发生回溯</strong>。MySQL 版本到 8.0 后，每张表的自增值会持久化，此时就不存在回溯问题。</p>
+<p>另外，在海量互联网架构设计过程中，为了之后更好的分布式架构扩展性，<strong>不建议使用整型类型做主键，更为推荐的是字符串类型</strong></p>
+<p>而对于资金字段的设计，不推荐使用 <code>DECIMAL</code> 类型，因为类型 <code>DECIMAL</code> 是个变长字段，若要定义金额字段，则定义诸如 <code>DECIMAL(8,2)</code> 是远远不够的。这样只能表示存储最大值为 999999.99，百万级的资金存储。用户的金额至少要存储百亿的字段，而统计局的 GDP 金额字段则可能达到数十万亿级别。用类型 <code>DECIMAL</code> 定义，不好统一。另外重要的是，类型 <code>DECIMAL</code> 是通过二进制实现的一种编码方式，计算效率远不如整型来的高效。</p>
+<blockquote>
+<p>DOUBLE,FLOAT 后续版本不再支持</p>
+</blockquote>
+<p>一般使用整数类型来作为转换，也就是说，资金类型更推荐使用用分单位存储，而不是用元单位存储。如 1 元在数据库中用整型类型 100 存储。这样的好处是，所有金额相关字段都是定长字段，占用 8 个字节，存储高效。另一点，直接通过整型计算，效率更高。推荐使用 BIG INT 来存储金额相关的字段</p>
+<blockquote>
+<p>这一点当时在实习的时候，因为部门跟京东，拼多多等有业务合作，发现不管是部门内部的字段，还是京东，拼多多的金额字段，都是使用分为单位，字段类型都是 BIG INT。</p>
+</blockquote>
+<p>在数据库设计中，非常强调定长存储，因为定长存储的性能更好。</p>
+<p>数据库中记录的存储方式，大致如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F.png" alt="数据库中数据的存储方式"></p>
+<p>若发生更新，记录 1 原先的空间无法容纳更新后记录 1 的存储空间，因此，这时数据库会将记录 1 标记为删除，寻找新的空间给记录1使用，如：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%B8%AD%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E6%96%B9%E5%BC%8F2.png" alt="数据库中数据的存储方式"></p>
+<p>上图中 <code>*记录 1</code> 表示的就是原先记录 1 占用的空间，而这个空间后续将变成碎片空间，无法继续使用，除非人为地进行表空间的碎片整理。</p>
+<p><strong>课后题</strong>：账户余额字段可以用整型替代高精度型，还有哪些字段设计时可以考虑使用整型，从而有更好的性能？</p>
+<p>IP可以用整形存储，IP本身是个变长字段，但是通过 INT 存储，固定占用4个字节，提升了存储性能和效率。但是在使用 INT 存储 IP 字段的时候，要使用 <code>INT UNSIGNED</code> ，官方文档有提示：</p>
+<blockquote>
+<p>To store values ganerated by INET_ATON(), use an INT UNSIGNED column rather than INT, which is signed.</p>
+</blockquote>
+<p>日期类型不建议使用整型，因为效率不高，性能也不好，还不支持存储毫秒值。</p>
+<h2 id="字符串类型"><a href="#字符串类型" class="headerlink" title="字符串类型"></a>字符串类型</h2><p>在 MySQL 数据库下，绝大部分字符串场景使用类型 VARCHAR 就足够了，推荐把 MySQL 的默认字符集设置为 UTF8MB4 以支持 emoji 表情包的存储。在 MySQL8.0 之后，默认的字符集已经设置为 UTF8MB4，对于 8.0 之前的版本，需要手动进行更改：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">[mysqld] character-<span class="hljs-keyword">set</span>-<span class="hljs-keyword">server</span> = utf8mb4<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>不同的字符集，<code>CHAR(N)</code>、<code>VARCHAR(N)</code> 对应最长的字节也不相同（这里 N 指定的是字符）。比如 GBK 字符集，1 个字符最大存储 2 个字节，UTF8MB4 字符集 1 个字符最大存储 4 个字节。所以从底层存储内核看，<strong>在多字节字符集下，CHAR 和 VARCHAR 底层的实现完全相同，都是变长存储</strong>。所以针对多字符集，在表结构设计时，可以把 CHAR 全部用 VARCHAR 替换，底层存储的本质实现一模一样。</p>
+<p>另外，每一种字符集都有默认的排序规则，可以用命令 <code>SHOW CHARSET</code> 来查看：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta">mysql&gt;</span><span class="bash"> SHOW COLLATION LIKE <span class="hljs-string">'utf8mb4%'</span>;</span><br>+----------------------------+---------+-----+---------+----------+---------+---------------+<br>| Collation                  | Charset | Id  | Default | Compiled | Sortlen | Pad_attribute |<br>+----------------------------+---------+-----+---------+----------+---------+---------------+<br>| utf8mb4_0900_ai_ci         | utf8mb4 | 255 | Yes     | Yes      |       0 | NO PAD        |<br>| utf8mb4_0900_as_ci         | utf8mb4 | 305 |         | Yes      |       0 | NO PAD        |<br>| utf8mb4_0900_as_cs         | utf8mb4 | 278 |         | Yes      |       0 | NO PAD        |<br>| utf8mb4_0900_bin           | utf8mb4 | 309 |         | Yes      |       1 | NO PAD        |<br>| utf8mb4_bin                | utf8mb4 |  46 |         | Yes      |       1 | PAD SPACE     |<br>......<br></code></pre></div></td></tr></table></figure>
+
+<p>排序规则以 <code>_ci</code> 结尾，表示不区分大小写（Case Insentive），<code>_cs</code> 表示大小写敏感，<code>_bin</code> 表示通过存储字符的二进制进行比较。需要注意的是，比较 MySQL 字符串，<strong>默认采用不区分大小的排序规则</strong>。</p>
+<p>对于后期需要修改字段字符集的场景，如果只是执行例如下面这种语句，实际上插入新的数据列仍然使用的是原来的字符集。</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> emoji_test <span class="hljs-keyword">CHARSET</span> utf8mb4;<br></code></pre></div></td></tr></table></figure>
+
+<p>其实，上述修改只是将表的字符集修改为 UTF8MB4，下次新增列时，若不显式地指定字符集，新列的字符集会变更为 UTF8MB4，<strong>但对于已经存在的列，其默认字符集并不做修改</strong>。</p>
+<p>因此，正确修改列字符集的命令应该使用 <code>ALTER TABLE ... CONVERT TO...</code> 这样才能将之前的列 a 字符集从 UTF8 修改为 UTF8MB4：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; ALTER TABLE emoji_test CONVERT TO CHARSET utf8mb4;<br>Query OK, 0 rows affected (0.94 sec)<br>Records: 0  Duplicates: 0  Warnings: 0<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="性别，状态字段"><a href="#性别，状态字段" class="headerlink" title="性别，状态字段"></a>性别，状态字段</h3><p>对于数据库中的性别，状态等字段，不建议使用 TINYINT,INT 这种类型进行存储，原因如下：</p>
+<ul>
+<li><strong>表达不清</strong>：在具体存储时，0 表示女，还是 1 表示女呢？每个业务可能有不同的潜规则；</li>
+<li><strong>脏数据</strong>：因为是 tinyint，因此除了 0 和 1，用户完全可以插入 2、3、4 这样的数值，最终表中存在无效数据的可能，后期再进行清理，代价就非常大了。</li>
+</ul>
+<p>对于这种场景，在 MySQL 8.0 版本之前，可以使用 ENUM 字符串枚举类型，只允许有限的定义值插入。如果将参数 <code>SQL_MODE</code> 设置为严格模式，插入非定义数据就会报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta">mysql&gt;</span><span class="bash"> SHOW CREATE TABLE User\G</span><br>*************************** 1. row ***************************<br>       Table: User<br>Create Table: CREATE TABLE `User` (<br>  `id` bigint NOT NULL AUTO_INCREMENT,<br>  `sex` enum('M','F') COLLATE utf8mb4_general_ci DEFAULT NULL,<br>  PRIMARY KEY (`id`)<br>) ENGINE=InnoDB<br>1 row in set (0.00 sec)<br><span class="hljs-meta"><br>mysql&gt;</span><span class="bash"> SET sql_mode = <span class="hljs-string">'STRICT_TRANS_TABLES'</span>;</span><br>Query OK, 0 rows affected, 1 warning (0.00 sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>由于类型 ENUM 并非 SQL 标准的数据类型，而是 MySQL 所独有的一种字符串类型。抛出的错误提示也并不直观，主要是因为 MySQL 8.0 之前的版本并没有提供约束功能。自 MySQL 8.0.16 版本开始，数据库原生提供 CHECK 约束功能，可以方便地进行有限状态列类型的设计：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta">mysql&gt;</span><span class="bash"> SHOW CREATE TABLE User\G</span><br>*************************** 1. row ***************************<br>       Table: User<br>Create Table: CREATE TABLE `User` (<br>  `id` bigint NOT NULL AUTO_INCREMENT,<br>  `sex` char(1) COLLATE utf8mb4_general_ci DEFAULT NULL,<br>  PRIMARY KEY (`id`),<br>  CONSTRAINT `user_chk_1` CHECK (((`sex` = _utf8mb4'M') or (`sex` = _utf8mb4'F')))<br>) ENGINE=InnoDB<br><br>1 row in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="账户密码存储设计"><a href="#账户密码存储设计" class="headerlink" title="账户密码存储设计"></a>账户密码存储设计</h3><p>数据库密码不能明码存储，另外，通过函数 MD5 加密存储隐私数据也不是很推荐。因为 MD5 算法虽然不可逆，但是 MD5 加密后的值是固定的，如密码 12345678，它对应的 MD5 固定值即为 25d55ad283aa400af464c76d713c07ad。</p>
+<p>因此，可以对 MD5 进行暴力破解，计算出所有可能的字符串对应的 MD5 值。若无法枚举所有的字符串组合，那可以计算一些常见的密码，如111111、12345678 等。</p>
+<p>所以，在设计密码存储使用，还需要加盐（salt），每个公司的盐值都是不同的，因此计算出的值也是不同的。若盐值为 psalt，则密码 12345678 在数据库中的值为：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">password</span> = MD5（‘psalt12345678’）<br></code></pre></div></td></tr></table></figure>
+
+<p>这样的密码存储设计是一种固定盐值的加密算法，其中存在三个主要问题：</p>
+<ul>
+<li>若 salt 值被（离职）员工泄漏，则外部黑客依然存在暴利破解的可能性；</li>
+<li>对于相同密码，其密码存储值相同，一旦一个用户密码泄漏，其他相同密码的用户的密码也将被泄漏；</li>
+<li>固定使用 MD5 加密算法，一旦 MD5 算法被破解，则影响很大。</li>
+</ul>
+<p>所以一个真正好的密码存储设计，应该是：<strong>动态盐 + 非固定加密算法</strong>。</p>
+<p>在这里，作者比较推荐这么设计密码，列 password 存储的格式如下：</p>
+<figure class="highlight arcade"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs arcade"><span class="hljs-symbol">$salt</span><span class="hljs-symbol">$cryptio</span>n_algorithm<span class="hljs-symbol">$value</span><br></code></pre></div></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><code>$salt</code>：表示动态盐，每次用户注册时业务产生不同的盐值，并存储在数据库中。若做得再精细一点，可以动态盐值 + 用户注册日期合并为一个更为动态的盐值。</li>
+<li><code>$cryption_algorithm</code>：表示加密的算法，如 v1 表示 MD5 加密算法，v2 表示 AES256 加密算法，v3 表示 AES512 加密算法等。</li>
+<li><code>$value</code>：表示加密后的字符串。</li>
+</ul>
+<p>假设表 User 的设计如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">User</span> (<br>    <span class="hljs-keyword">id</span> <span class="hljs-built_in">BIGINT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT,<br>    <span class="hljs-keyword">name</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    sex <span class="hljs-built_in">CHAR</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-keyword">password</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">1024</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    regDate DATETIME <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-keyword">CHECK</span> (sex = <span class="hljs-string">'M'</span> <span class="hljs-keyword">OR</span> sex = <span class="hljs-string">'F'</span>),<br>    PRIMARY <span class="hljs-keyword">KEY</span>(<span class="hljs-keyword">id</span>)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>其存储的数据如下：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs markdown">SELECT * FROM User\G<br><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">** 1. row **</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><br><span class="hljs-code">      id: 1</span><br><span class="hljs-code">    name: David</span><br><span class="hljs-code">     sex: M</span><br>password: $fgfaef$v1$2198687f6db06c9d1b31a030ba1ef074<br> regDate: 2020-09-07 15:30:00<br><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">** 2. row **</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><span class="hljs-strong">*****</span><br><span class="hljs-code">      id: 2</span><br><span class="hljs-code">    name: Amy</span><br><span class="hljs-code">     sex: F</span><br>password: $zpelf$v2$0x860E4E3B2AA4005D8EE9B7653409C4B133AF77AEF53B815D31426EC6EF78D882<br> regDate: 2020-09-07 17:28:00<br></code></pre></div></td></tr></table></figure>
+
+<p>在上面的例子中，用户 David 和 Amy 密码都是 12345678，然而由于使用了动态盐和动态加密算法，两者存储的内容完全不同。</p>
+<p>即便别有用心的用户拿到当前密码加密算法，则通过加密算法 $cryption_algorithm 版本，可以对用户存储的密码进行升级，进一步做好对于恶意数据攻击的防范。</p>
+<p><strong>课后题</strong>：</p>
+<ol>
+<li><p>假设表中有个字段 status，表示订单的状态，可能值为：start，done，timeout，unknown，请问你会如何设计？请给出你的SQL。</p>
+<p> 状态列的最优设计是用<strong>字符串+CHECK 约束</strong>，这样可以避免脏数据的插入：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> ...(<br>	...<br>    <span class="hljs-keyword">status</span> <span class="hljs-built_in">CHAR</span>(<span class="hljs-number">1</span>)<br>    ...<br>    <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`check_status`</span><br>    <span class="hljs-keyword">CHECK</span> (<span class="hljs-keyword">status</span> <span class="hljs-keyword">in</span> (<span class="hljs-string">'S'</span>,<span class="hljs-string">'D'</span>,<span class="hljs-string">'T'</span>,<span class="hljs-string">'U'</span>))<br>    ...<br>)<br></code></pre></div></td></tr></table></figure>
+</li>
+<li><p>若现在要求字段 img 存储用户的头像，你会如何设计这个列？请写入你的SQL</p>
+<p> 对于图片的存储，一般将其存储在对象存储上，数据库只存储图片对应的链接地址。</p>
+</li>
+</ol>
+<h2 id="日期类型"><a href="#日期类型" class="headerlink" title="日期类型"></a>日期类型</h2><h3 id="DATETIME"><a href="#DATETIME" class="headerlink" title="DATETIME"></a>DATETIME</h3><p>类型 DATETIME 最终展现的形式为：YYYY-MM-DD HH：MM：SS，固定占用 8 个字节。</p>
+<p>从 MySQL 5.6 版本开始，DATETIME 类型支持毫秒，DATETIME(N) 中的 N 表示毫秒的精度。例如，DATETIME(6) 表示可以存储 6 位的毫秒值。同时，一些日期函数也支持精确到毫秒，例如常见的函数 NOW、SYSDATE：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; SELECT NOW(6);<br>+----------------------------+<br>| NOW(6)                     |<br>+----------------------------+<br>| 2020-09-14 17:50:28.707971 |<br>+----------------------------+<br>1 row in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>在数据库设计中一般会有一个创建时间和一个更新时间字段，一般默认值都是当前时间，对于更新时间还会设置当更新时自动更新：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">User</span> (<br>    <span class="hljs-keyword">id</span> <span class="hljs-built_in">BIGINT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT,<br>    <span class="hljs-keyword">name</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    sex <span class="hljs-built_in">CHAR</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-keyword">password</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">1024</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    money <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-number">0</span>,<br>    register_date DATETIME(<span class="hljs-number">6</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span>(<span class="hljs-number">6</span>),<br>    last_modify_date DATETIME(<span class="hljs-number">6</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> <span class="hljs-keyword">DEFAULT</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span>(<span class="hljs-number">6</span>) <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">CURRENT_TIMESTAMP</span>(<span class="hljs-number">6</span>),<br>    <span class="hljs-keyword">CHECK</span> (sex = <span class="hljs-string">'M'</span> <span class="hljs-keyword">OR</span> sex = <span class="hljs-string">'F'</span>),<br>    PRIMARY <span class="hljs-keyword">KEY</span>(<span class="hljs-keyword">id</span>)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>在上面的表 User 中，列 <code>register_date</code> 表示注册时间，<code>DEFAULT CURRENT_TIMESTAMP</code> 表示记录插入时，若没有指定时间，默认就是当前时间。</p>
+<p>列 <code>last_modify_date</code> 表示当前记录最后的修改时间，<code>DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6)</code> 表示每次修改都会修改为当前时间。</p>
+<p>这样的设计保证当用户的金钱（money 字段）发生了变更，则 <code>last_modify_date</code> 能记录最后一次用户金钱发生变更时的时间。</p>
+<h3 id="TIMESTAMP"><a href="#TIMESTAMP" class="headerlink" title="TIMESTAMP"></a>TIMESTAMP</h3><p>TIMESTAMP 实际存储的内容为 ‘1970-01-01 00:00:00’ 到现在的毫秒数。在 MySQL 中，由于类型 TIMESTAMP 占用 4 个字节，因此其存储的时间上限只能到 ‘2038-01-19 03:14:07’。</p>
+<p>从 MySQL 5.6 版本开始，类型 TIMESTAMP 也能支持毫秒。与 DATETIME 不同的是，<strong>若带有毫秒时，类型 TIMESTAMP 占用 7 个字节，而 DATETIME 无论是否存储毫秒信息，都占用 8 个字节</strong>。</p>
+<p>类型 TIMESTAMP 最大的优点是可以带有时区属性，因为它本质上是从毫秒转化而来。如果业务需要对应不同的国家时区，那么类型 TIMESTAMP 是一种不错的选择。比如新闻类的业务，通常用户想知道这篇新闻发布时对应的自己国家时间，那么 TIMESTAMP 是一种选择。</p>
+<p>TIMESTAMP 可以通过参数 <code>time_zone</code> 指定了当前使用的时区，默认为 SYSTEM 使用操作系统时区，用户可以通过该参数指定所需要的时区。指定时区有两种方式：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> <span class="hljs-keyword">time_zone</span> = <span class="hljs-string">'-08:00'</span>;<br><span class="hljs-keyword">SET</span> <span class="hljs-keyword">time_zone</span> = <span class="hljs-string">'Asia/Shanghai'</span>;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="DATETIME-or-TIMESTAMP"><a href="#DATETIME-or-TIMESTAMP" class="headerlink" title="DATETIME or TIMESTAMP ?"></a>DATETIME or TIMESTAMP ?</h3><p>在做表结构设计时，对日期字段的存储，开发人员通常会有 3 种选择：DATETIME、TIMESTAMP、INT。</p>
+<p>INT 类型就是直接存储 ‘1970-01-01 00:00:00’ 到现在的毫秒数，本质和 TIMESTAMP 一样，因此用 INT 不如直接使用 TIMESTAMP。</p>
+<p>当然，有些同学会认为 INT 比 TIMESTAMP 性能更好。但是，由于当前每个 CPU 每秒可执行上亿次的计算，所以无须为这种转换的性能担心。更重要的是，在后期运维和数据分析时，使用 INT 存储日期，是会让 DBA 和数据分析人员发疯的，INT的可运维性太差。</p>
+<p>也有的同学会热衷用类型 TIMESTEMP 存储日期，因为类型 TIMESTAMP 占用 4 个字节，比 DATETIME 小一半的存储空间。</p>
+<p>但<strong>若要将时间精确到毫秒，TIMESTAMP 要 7 个字节，和 DATETIME 8 字节差不太多</strong>。另一方面，现在距离 TIMESTAMP 的最大值‘2038-01-19 03:14:07’已经很近，这是需要开发同学好好思考的问题。</p>
+<p><strong>总的来说，作者建议使用类型 DATETIME。</strong> 对于时区问题，可以由前端或者服务这里做一次转化，不一定非要在数据库中解决。</p>
+<p>另外，TIMESTAMP 还存在潜在的性能问题：虽然从毫秒数转换到类型 TIMESTAMP 本身需要的 CPU 指令并不多，这并不会带来直接的性能问题。但是<strong>如果使用默认的操作系统时区，则每次通过时区计算时间时，要调用操作系统底层系统函数 <code>__tz_convert()</code>，而这个函数需要额外的加锁操作，以确保这时操作系统时区没有修改</strong>。所以，当大规模并发访问时，由于热点资源竞争，会产生两个问题。</p>
+<ul>
+<li><strong>性能不如 DATETIME：</strong> DATETIME 不存在时区转化问题。</li>
+<li><strong>性能抖动：</strong> 海量并发时，存在性能抖动问题。</li>
+</ul>
+<p>为了优化 TIMESTAMP 的使用，<strong>强烈建议使用显式的时区，而不是操作系统时区。</strong>比如在配置文件中显示地设置时区，而不要使用系统时区：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-section">[mysqld]</span><br><span class="hljs-attr">time_zone</span> = <span class="hljs-string">"+08:00"</span><br></code></pre></div></td></tr></table></figure>
+
+<p>最后，通过命令 mysqlslap 来测试 TIMESTAMP、DATETIME 的性能，命令如下：</p>
+<p>复制代码</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 比较time_zone为System和Asia/Shanghai的性能对比</span><br>mysqlslap -uroot --number-of-queries=1000000 --concurrency=100 --query='SELECT NOW()'<br></code></pre></div></td></tr></table></figure>
+
+<p>最后的性能对比如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/TIMESTAMP%E6%97%B6%E5%8C%BA%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94.png" alt="TIMESTAMP时区性能对比"></p>
+<p>从表中可以发现，显式指定时区的性能要远远好于直接使用操作系统时区。所以，日期字段推荐使用 DATETIME，没有时区转化。即便使用 TIMESTAMP，也需要在数据库中显式地配置时区，而不是用系统时区。</p>
+<p><strong>课后题</strong>：若设置字段为 DATETIME(6)，时间精确到小数点后 6 位，在这么高精度的存储下，请问存储的值是否是唯一的？我们又如何验证呢？</p>
+<p>多线程并发执行的情况有可能会重复，可以通过 MySQL 自带的测试工具 muysqlslap 进行多线程测试。</p>
+<h2 id="JSON-类型"><a href="#JSON-类型" class="headerlink" title="JSON 类型"></a>JSON 类型</h2><p>JSON 类型是从 MySQL 5.7 版本开始支持的功能，8.0 版本解决了更新 JSON 的日志性能瓶颈。所以建议在 MySQL8.0 当中使用 JSON 数据类型。</p>
+<p>MySQL 中 JSON 类型有自己的存储格式，还能在每个对应的字段上创建索引，做特定的优化。同时，其无须预定义字段，字段可以无限拓展，避免关系型数据库中拓展列而使用 <code>ALTER TABLE ... ADD COLUM ...</code> 这样比较重的操作。</p>
+<p>在数据库中，JSON 类型比较适合存储一些修改较少、相对静态的数据，比如用户登录信息，用户画像的存储。</p>
+<h3 id="用户登录信息"><a href="#用户登录信息" class="headerlink" title="用户登录信息"></a>用户登录信息</h3><figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> UserLogin (<br>    userId <span class="hljs-built_in">BIGINT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    loginInfo <span class="hljs-keyword">JSON</span>,<br>    PRIMARY <span class="hljs-keyword">KEY</span>(userId)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>由于现如今登录方式越来越多样化，如同一账户支持手机、微信、QQ 账号登录，所以这里可以用 JSON 类型存储登录的信息。</p>
+<p>插入数据如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SET</span> @a = <span class="hljs-string">'<br>&#123;<br>	"cellphone" : "13918888888",<br>	"wxchat" : "破产码农",<br>    "QQ" : "82946772"<br>&#125;<br>'</span>;<br><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> UserLogin <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">1</span>,@a);<br><br><span class="hljs-keyword">SET</span> @b = <span class="hljs-string">'<br>&#123;<br>	"cellphone" : "15026888888"<br>&#125;<br>'</span>;<br><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> UserLogin <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">2</span>,@b);<br></code></pre></div></td></tr></table></figure>
+
+<p>而如果不采用 JSON 数据类型，就需要针对每一种方式都建立一个列，这种方式存在两个问题：</p>
+<ol>
+<li>有些列可能比较稀疏，一些列可能大部分都是空值。</li>
+<li>如果出现一种新的登录方式，需要创建新的列，而 JSON 可以避免这么重的操作。</li>
+</ol>
+<p>MySQL 中提供了丰富的 JSON 字段处理函数，其中最常见的就是函数 <code>JSON_EXTRACT</code>，它用来从 JSON 数据中提取所需要的字段内容，如下面的这条 SQL 语句就查询用户的手机和微信信息：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>    userId,<br>    JSON_UNQUOTE(JSON_EXTRACT(loginInfo,<span class="hljs-string">"$.cellphone"</span>)) cellphone,<br>    JSON_UNQUOTE(JSON_EXTRACT(loginInfo,<span class="hljs-string">"$.wxchat"</span>)) wxchat<br><span class="hljs-keyword">FROM</span> UserLogin;<br>+<span class="hljs-comment">--------+-------------+--------------+</span><br>| userId | cellphone   | wxchat       |<br>+<span class="hljs-comment">--------+-------------+--------------+</span><br>|      1 | 13918888888 | 破产码农     |<br>|      2 | 15026888888 | NULL         |<br>+<span class="hljs-comment">--------+-------------+--------------+</span><br>2 rows in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.01</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>如果觉得每次写 <code>JSON_EXTRACT</code>、<code>JSON_UNQUOTE</code> 非常麻烦，MySQL 还提供了 <code>-&gt;&gt;</code> 表达式，和上述 SQL 效果完全一样：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    userId,<br>    loginInfo-&gt;&gt;<span class="hljs-string">"$.cellphone"</span> cellphone,<br>    loginInfo-&gt;&gt;<span class="hljs-string">"$.wxchat"</span> wxchat<br><span class="hljs-keyword">FROM</span> UserLogin;<br></code></pre></div></td></tr></table></figure>
+
+<p>当 JSON 数据量非常大，如果希望对 JSON 数据进行有效检索时，可以利用 MySQL 的<strong>函数索引</strong>功能对 JSON 中的某个字段进行索引。</p>
+<p>比如在上面的用户登录示例中，假设用户必须绑定唯一手机号，且希望未来能用手机号码进行用户检索时，可以创建下面的索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> UserLogin <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">COLUMN</span> cellphone <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">AS</span> (loginInfo-&gt;&gt;<span class="hljs-string">"$.cellphone"</span>);<br><br><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> UserLogin <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">INDEX</span> idx_cellphone(cellphone);<br></code></pre></div></td></tr></table></figure>
+
+<p>上述 SQL 首先创建了一个虚拟列 cellphone，这个列是由函数 <code>loginInfo-&gt;&gt;&quot;$.cellphone&quot;</code> 计算得到的。然后在这个虚拟列上创建一个唯一索引 <code>idx_cellphone</code>。这时再通过虚拟列 <code>cellphone</code> 进行查询，就可以看到优化器会使用到新创建的 <code>idx_cellphone</code> 索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span>  *  <span class="hljs-keyword">FROM</span> UserLogin <br><span class="hljs-keyword">WHERE</span> cellphone = <span class="hljs-string">'13918888888'</span>\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: UserLogin<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: const<br>possible_keys: idx_cellphone<br>          <span class="hljs-keyword">key</span>: idx_cellphone<br>      key_len: <span class="hljs-number">1023</span><br>          <span class="hljs-keyword">ref</span>: const<br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">1</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-literal">NULL</span><br><span class="hljs-number">1</span> <span class="hljs-keyword">row</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">set</span>, <span class="hljs-number">1</span> <span class="hljs-keyword">warning</span> (<span class="hljs-number">0.00</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>可以在一开始创建表的时候，就完成虚拟列及函数索引的创建。如下表创建的列 <code>cellphone</code> 对应的就是 JSON 中的内容，是个虚拟列；<code>uk_idx_cellphone</code> 就是在虚拟列 <code>cellphone</code> 上所创建的索引。</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> UserLogin (<br>    userId <span class="hljs-built_in">BIGINT</span>,<br>    loginInfo <span class="hljs-keyword">JSON</span>,<br>    cellphone <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">AS</span> (loginInfo-&gt;&gt;<span class="hljs-string">"$.cellphone"</span>),<br>    PRIMARY <span class="hljs-keyword">KEY</span>(userId),<br>    <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">KEY</span> uk_idx_cellphone(cellphone)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="用户画像设计"><a href="#用户画像设计" class="headerlink" title="用户画像设计"></a>用户画像设计</h3><p>某些业务需要做用户画像（也就是对用户打标签），然后根据用户的标签，通过数据挖掘技术，进行相应的产品推荐。比如：</p>
+<ul>
+<li>在电商行业中，根据用户的穿搭喜好，推荐相应的商品；</li>
+<li>在音乐行业中，根据用户喜欢的音乐风格和常听的歌手，推荐相应的歌曲；</li>
+<li>在金融行业，根据用户的风险喜好和投资经验，推荐相应的理财产品。</li>
+</ul>
+<p>在这种场景下，作者强烈推荐使用 JSON 类型在数据库中存储用户画像信息，并结合 JSON 数组类型和多值索引的特点进行高效查询。</p>
+<p>假设有张画像定义表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> Tags (<br>    tagId <span class="hljs-built_in">bigint</span> auto_increment,<br>    tagName <span class="hljs-built_in">varchar</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    primary <span class="hljs-keyword">key</span>(tagId)<br>);<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> Tags;<br>+<span class="hljs-comment">-------+--------------+</span><br>| tagId | tagName      |<br>+<span class="hljs-comment">-------+--------------+</span><br>|     1 | 70后         |<br>|     2 | 80后         |<br>|     3 | 90后         |<br>|     4 | 00后         |<br>|     5 | 爱运动       |<br>|     6 | 高学历       |<br>|     7 | 小资         |<br>|     8 | 有房         |<br>|     9 | 有车         |<br>|    10 | 常看电影     |<br>|    11 | 爱网购       |<br>|    12 | 爱外卖       |<br>+<span class="hljs-comment">-------+--------------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，表 Tags 是一张画像定义表，用于描述当前定义有多少个标签，接着给每个用户打标签，比如用户 David，他的标签是 80 后、高学历、小资、有房、常看电影；用户 Tom，90 后、常看电影、爱外卖。</p>
+<p>若不用 JSON 数据类型进行标签存储，通常会将用户标签通过字符串，加上分割符的方式，在一个字段中存取用户所有的标签：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-code">+-------+</span>---------------------------------------+<br><span class="hljs-section">|用户    |标签                                   |<br>+-------+---------------------------------------+</span><br>|David  |80后 ； 高学历 ； 小资 ； 有房 ；常看电影   |<br><span class="hljs-section">|Tom    |90后 ；常看电影 ； 爱外卖                 |<br>+-------+---------------------------------------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p><strong>这样做的缺点是：</strong> 不好搜索特定画像的用户，另外分隔符也是一种自我约定，在数据库中其实可以任意存储其他数据，最终产生脏数据。</p>
+<p>而采用 JSON 数据类型就可以很好的解决这个问题：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> UserTag (<br>    userId <span class="hljs-built_in">bigint</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    userTags <span class="hljs-keyword">JSON</span>,<br>    PRIMARY <span class="hljs-keyword">KEY</span> (userId)<br>);<br><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> UserTag <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">1</span>,<span class="hljs-string">'[2,6,8,10]'</span>);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> UserTag <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">2</span>,<span class="hljs-string">'[3,10,12]'</span>);<br></code></pre></div></td></tr></table></figure>
+
+<p><code>userTags</code> 存储的标签就是表 Tags 已定义的那些标签值，只是使用 JSON 数组类型进行存储。</p>
+<p>MySQL 8.0.17 版本开始支持 Multi-Valued Indexes，用于在 JSON 数组上创建索引，并通过函数 <code>member of</code>、<code>json_contains</code>、<code>json_overlaps</code> 来快速检索索引数据。所以可以在表 UserTag 上创建 Multi-Valued Indexes：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> UserTag<br><span class="hljs-keyword">ADD</span> <span class="hljs-keyword">INDEX</span> idx_user_tags ((<span class="hljs-keyword">cast</span>((userTags-&gt;<span class="hljs-string">"$"</span>) <span class="hljs-keyword">as</span> <span class="hljs-keyword">unsigned</span> <span class="hljs-built_in">array</span>)));<br></code></pre></div></td></tr></table></figure>
+
+<p>如果想要查询用户画像为常看电影的用户，可以使用函数 <code>MEMBER OF</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> <span class="hljs-number">10</span> <span class="hljs-keyword">MEMBER</span> <span class="hljs-keyword">OF</span>(userTags-&gt;<span class="hljs-string">"$"</span>)\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: UserTag<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ref</span><br>possible_keys: idx_user_tags<br>          <span class="hljs-keyword">key</span>: idx_user_tags<br>      key_len: <span class="hljs-number">9</span><br>          <span class="hljs-keyword">ref</span>: const<br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">1</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br><span class="hljs-number">1</span> <span class="hljs-keyword">row</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">set</span>, <span class="hljs-number">1</span> <span class="hljs-keyword">warning</span> (<span class="hljs-number">0.00</span> sec)<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> <span class="hljs-number">10</span> <span class="hljs-keyword">MEMBER</span> <span class="hljs-keyword">OF</span>(userTags-&gt;<span class="hljs-string">"$"</span>);<br>+<span class="hljs-comment">--------+---------------+</span><br>| userId | userTags      |<br>+<span class="hljs-comment">--------+---------------+</span><br>|      1 | [2, 6, 8, 10] |<br>|      2 | [3, 10, 12]   |<br>+<span class="hljs-comment">--------+---------------+</span><br>2 rows in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>如果想要查询画像为 80 后，且常看电影的用户，可以使用函数 <code>JSON_CONTAINS</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> JSON_CONTAINS(userTags-&gt;<span class="hljs-string">"$"</span>, <span class="hljs-string">'[2,10]'</span>)\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: UserTag<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">range</span><br>possible_keys: idx_user_tags<br>          <span class="hljs-keyword">key</span>: idx_user_tags<br>      key_len: <span class="hljs-number">9</span><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">3</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br><span class="hljs-number">1</span> <span class="hljs-keyword">row</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">set</span>, <span class="hljs-number">1</span> <span class="hljs-keyword">warning</span> (<span class="hljs-number">0.00</span> sec)<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> JSON_CONTAINS(userTags-&gt;<span class="hljs-string">"$"</span>, <span class="hljs-string">'[2,10]'</span>);<br>+<span class="hljs-comment">--------+---------------+</span><br>| userId | userTags      |<br>+<span class="hljs-comment">--------+---------------+</span><br>|      1 | [2, 6, 8, 10] |<br>+<span class="hljs-comment">--------+---------------+</span><br>1 row in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>如果想要查询画像为 80 后、90 后，且常看电影的用户，则可以使用函数 <code>JSON_OVERLAP</code>：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> JSON_OVERLAPS(userTags-&gt;<span class="hljs-string">"$"</span>, <span class="hljs-string">'[2,3,10]'</span>)\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: UserTag<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">range</span><br>possible_keys: idx_user_tags<br>          <span class="hljs-keyword">key</span>: idx_user_tags<br>      key_len: <span class="hljs-number">9</span><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">4</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br><span class="hljs-number">1</span> <span class="hljs-keyword">row</span> <span class="hljs-keyword">in</span> <span class="hljs-keyword">set</span>, <span class="hljs-number">1</span> <span class="hljs-keyword">warning</span> (<span class="hljs-number">0.00</span> sec)<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag <br><span class="hljs-keyword">WHERE</span> JSON_OVERLAPS(userTags-&gt;<span class="hljs-string">"$"</span>, <span class="hljs-string">'[2,3,10]'</span>);<br>+<span class="hljs-comment">--------+---------------+</span><br>| userId | userTags      |<br>+<span class="hljs-comment">--------+---------------+</span><br>|      1 | [2, 6, 8, 10] |<br>|      2 | [3, 10, 12]   |<br>+<span class="hljs-comment">--------+---------------+</span><br>2 rows in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.01</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>思考题</strong>：我们说了很多 JSON 类型的好处，但思考一下，JSON 类型的缺点是什么？</p>
+<p>JSON 的优点是灵活，列无须定义，但是缺点是过于灵活，对业务没有任何约束，可能导致最终管理非常麻烦。所以，JSON 是张鬼牌，在一定特点场景下用好，则威力巨大，否则会遭到反噬。</p>
+<h2 id="表结构设计-1"><a href="#表结构设计-1" class="headerlink" title="表结构设计"></a>表结构设计</h2><h3 id="自增主键设计"><a href="#自增主键设计" class="headerlink" title="自增主键设计"></a>自增主键设计</h3><p>使用 BIGINT 的自增类型作为主键的设计<strong>仅仅适合非核心业务表</strong>，比如告警表、日志表等。真正的核心业务表，不要用自增键做主键，主要有 6 个原因：</p>
+<ol>
+<li><p>自增存在回溯问题（8.0之后会进行持久化解决该问题）；</p>
+</li>
+<li><p>自增值在服务器端产生，存在并发性能问题；</p>
+</li>
+<li><p>自增值做主键，只能在当前实例中保证唯一，不能保证全局唯一；</p>
+</li>
+<li><p>公开数据值，容易引发安全问题，例如知道地址<a href="http://www.example.com/User/10/，很容猜出" target="_blank" rel="noopener">http://www.example.com/User/10/，很容猜出</a> User 有 11、12 依次类推的值，容易引发数据泄露；</p>
+</li>
+<li><p>MGR（MySQL Group Replication） 可能引起的性能问题；</p>
+</li>
+<li><p>分布式架构设计问题。</p>
+</li>
+</ol>
+<p>另外，自增值是在 MySQL 服务端产生的值，需要有一把自增的 AI 锁保护，若这时有大量的插入请求，就可能存在自增引起的性能瓶颈。比如在 MySQL 数据库中，参数 <code>innodb_autoinc_lock_mode</code> 用于控制自增锁持有的时间。假设有一 SQL 语句，同时插入 3 条带有自增值的记录：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> ... <span class="hljs-keyword">VALUES</span> (<span class="hljs-literal">NULL</span>,...),(<span class="hljs-literal">NULL</span>,...),(<span class="hljs-literal">NULL</span>,...);<br></code></pre></div></td></tr></table></figure>
+
+<p>参数 <code>innodb_autoinc_lock_mode</code> 对性能的影响如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/innodb_autoinc_lock_mode%20%E5%8F%82%E6%95%B0%E7%9A%84%E5%BD%B1%E5%93%8D.png" alt="innodb_autoinc_lock_mode 参数的影响"></p>
+<p>从表格中可以看到，一条 SQL 语句插入 3 条记录，参数 <code>innodb_autoinc_lock_mode</code> 设置为 1，自增锁在这一条 SQL 执行完成后才释放。</p>
+<p>如果参数 <code>innodb_autoinc_lock_mode</code> 设置为2，自增锁需要持有 3 次，每插入一条记录获取一次自增锁。</p>
+<p>这样设计好处是： 当前插入不影响其他自增主键的插入，可以获得最大的自增并发插入性能。</p>
+<p>缺点是： 一条 SQL 插入的多条记录并不是连续的，如结果可能是 1、3、5 这样单调递增但非连续的情况。</p>
+<p>所以，如果想获得自增值的最大并发性能，把参数 <code>innodb_autoinc_lock_mode</code> 设置为2。</p>
+<p>虽然可以通过调整参数 <code>innodb_autoinc_lock_mode</code>获得自增的最大性能，但是由于其还存在上述 5 个问题。因此，在互联网海量并发架构实战中，更推荐 UUID 做主键或业务自定义生成主键。</p>
+<h3 id="UUID-主键设计"><a href="#UUID-主键设计" class="headerlink" title="UUID 主键设计"></a>UUID 主键设计</h3><p>UUID（Universally Unique Identifier）代表全局唯一标识 ID。显然，由于全局唯一性，可以把它用来作为数据库的主键。</p>
+<p>MySQL 数据库遵循 DRFC 4122 命名空间版本定义的 Version 1规范，可以通过函数 UUID自动生成36字节字符：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; SELECT UUID();<br>+--------------------------------------+<br>| UUID()                               |<br>+--------------------------------------+<br>| e0ea12d4-6473-11eb-943c-00155dbaa39d |<br>+--------------------------------------+<br></code></pre></div></td></tr></table></figure>
+
+<p>根据 Version 规范，MySQL 中的 UUID 由以下几个部分组成：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">UUID = 时间低（<span class="hljs-number">4</span>字节）- 时间中高+版本（<span class="hljs-number">4</span>字节）- 时钟序列 - MAC地址<br></code></pre></div></td></tr></table></figure>
+
+<p>前 8 个字节中，60 位用于存储时间，4 位用于 UUID 的版本号，其中时间是从 1582-10-15 00：00：00.00 到现在的100ns 的计数。</p>
+<p>60 位的时间存储中，其存储分为：</p>
+<ul>
+<li><p>时间低位（time-low），占用 12 位；</p>
+</li>
+<li><p>时间中位（time-mid），占用 2 字节，16 位；</p>
+</li>
+<li><p>时间高位（time-high），占用 4 字节，32 位；</p>
+</li>
+</ul>
+<p>需要特别注意的是，在存储时间时，UUID 是根据时间位逆序存储， 也就是低时间低位存放在最前面，高时间位在最后，即 UUID 的前 4 个字节会随着时间的变化而不断“随机”变化，并非单调递增。而<strong>非随机值在插入时会产生离散 IO，从而产生性能瓶颈</strong>。这也是 UUID 对比自增值最大的弊端。</p>
+<p>为了解决这个问题，MySQL 8.0 推出了函数 <code>UUID_TO_BIN</code>，它可以把 UUID 字符串进行如下转换：</p>
+<ul>
+<li><p>通过参数将时间高位放在最前，解决了 UUID 插入时乱序问题；</p>
+</li>
+<li><p>去掉了无用的字符串”-“，精简存储空间；</p>
+</li>
+<li><p>将字符串其转换为二进制值存储，空间最终从之前的 36 个字节缩短为了 16 字节。</p>
+</li>
+</ul>
+<p>将之前的 UUID 字符串 e0ea12d4-6473-11eb-943c-00155dbaa39d 通过函数 <code>UUID_TO_BIN</code> 进行转换，得到二进制值如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> UUID_TO_BIN(<span class="hljs-string">'e0ea12d4-6473-11eb-943c-00155dbaa39d'</span>,<span class="hljs-literal">TRUE</span>) <span class="hljs-keyword">as</span> UUID_BIN;<br>+<span class="hljs-comment">------------------------------------+</span><br>| UUID_BIN                           |<br>+<span class="hljs-comment">------------------------------------+</span><br>| 0x11EB6473E0EA12D4943C00155DBAA39D |<br>+<span class="hljs-comment">------------------------------------+</span><br>1 row in <span class="hljs-keyword">set</span> (<span class="hljs-number">0.00</span> sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>除此之外，MySQL 8.0 也提供了函数 <code>BIN_TO_UUID</code>，支持将二进制值反转为 UUID 字符串。在下表中，将主键设置为 BINARY(16)，用于存储排序后的 16 字节的 UUID 值，表的结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">User</span> (<br>    <span class="hljs-keyword">id</span>  <span class="hljs-built_in">BINARY</span>(<span class="hljs-number">16</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-keyword">uuid</span> <span class="hljs-built_in">CHAR</span>(<span class="hljs-number">36</span>) <span class="hljs-keyword">AS</span> (BIN_TO_UUID(<span class="hljs-keyword">id</span>)),<br>    PRIMARY <span class="hljs-keyword">KEY</span>(<span class="hljs-keyword">id</span>)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>因此，对于表的主键列，可以设计为 <code>BINARY(16)</code> ，用于存储排序后的 16 字节的 UUID 值，在插入时执行如下操作：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> <span class="hljs-keyword">User</span> <span class="hljs-keyword">VALUES</span> (UUID_TO_BIN(<span class="hljs-keyword">UUID</span>(),<span class="hljs-literal">TRUE</span>),......);<br></code></pre></div></td></tr></table></figure>
+
+<p>关于 UUID 的性能和存储占用的空间问题，作者也做了相关的插入性能测试，结果如下表所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/UUID%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95.png" alt="UUID 性能测试"></p>
+<p>可以看到，MySQL 8.0 提供的排序 UUID 性能最好，甚至比自增ID还要好。此外，由于 <code>UUID_TO_BIN</code> 转换为的结果是16 字节，仅比自增 ID 增加 8 个字节，最后存储占用的空间也仅比自增大了 3G。</p>
+<p>而且由于 UUID 能保证全局唯一，因此使用 UUID 的收益远远大于自增ID。可能已经习惯了用自增做主键，但在海量并发的互联网业务场景下，更推荐 UUID 这样的全局唯一值做主键。</p>
+<p>比如，特别推荐游戏行业的用户表结构设计，使用 UUID 作为主键，而不是用自增 ID。因为当发生合服操作时，由于 UUID 全局唯一，用户相关数据可直接进行数据的合并，而自增 ID 却需要额外程序整合两个服务器 ID 相同的数据，这个工作是相当巨大且容易出错的。</p>
+<h3 id="自定义业务生成主键"><a href="#自定义业务生成主键" class="headerlink" title="自定义业务生成主键"></a>自定义业务生成主键</h3><p>当然了，UUID 虽好，但是在分布式数据库场景下，主键还需要加入一些额外的信息，这样才能保证后续二级索引的查询效率。分布式数据库架构，仅用 UUID 做主键依然是不够的。 所以，对于分布式架构的核心业务表，推荐类似如下的设计，比如：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs routeros">PK = 时间字段 + 随机码（可选） + 业务信息1 + 业务信息2 <span class="hljs-built_in">..</span><span class="hljs-built_in">..</span><span class="hljs-built_in">..</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="反范式设计"><a href="#反范式设计" class="headerlink" title="反范式设计"></a>反范式设计</h3><p>通常会在 OLAP 数据分析场景中使用反范式设计，但随着 JSON 数据类型的普及，MySQL 在线业务也可以进行反范式的设计。</p>
+<p>对于上面的表 UserTag，就是通过 JSON 数据类型进行了反范式的设计，如果通过范式设计，则表 UserTag 应该设计为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> UserTag (<br>	userId <span class="hljs-built_in">BIGINT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    userTag <span class="hljs-built_in">INT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>    PRIMARY <span class="hljs-keyword">KEY</span>(userId,userTag)<br>);<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> UserTag;<br>+<span class="hljs-comment">--------+---------+</span><br>| userId | userTag |<br>+<span class="hljs-comment">--------+---------+</span><br>|      1 |   2     |<br>|      1 |   6     |<br>|      1 |   8     |<br>|      1 |  10     |<br>|      2 |   3     |<br>|      2 |  10     |<br>|      2 |  12     |<br>+<span class="hljs-comment">--------+---------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p>对比后可以发现，范式设计并没有使用 JSON 数据类型来得更为有效，使用 JSON 数据类型，userID 只需保存一次，从一定程度上减少了数据的冗余：</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs asciidoc"><span class="hljs-code">+--------+</span>---------------+<br><span class="hljs-section">| userId | userTags      |<br>+--------+---------------+</span><br>|      1 | [2, 6, 8, 10] |<br>|      2 | [3, 10, 12]   |<br><span class="hljs-code">+--------+</span>---------------<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>思考题</strong>：</p>
+<ol>
+<li><p>除了上面所讲的 UUID 全局唯一实现，业界还有哪些全局唯一的设计实现？</p>
+<p> 雪花算法比较常用，但是存在时间回溯问题，雪花算法后来也有很多的实现。另外，还可以设计全局 ID 生成器服务，每次要主键时通过服务获取，但是这种方式完全依赖于全局 ID 生成服务，依赖性大，服务一旦宕机，会影响所有相关依赖服务。</p>
+</li>
+<li><p>UUID 能够实现全局唯一，但它有缺点吗？你认为的缺点是什么？</p>
+<p> 比如在后期的运维中，看到的是一长串的字符串，而不是一个直接的数字，刚开始使用可能会不适应。</p>
+</li>
+</ol>
+<h2 id="表压缩"><a href="#表压缩" class="headerlink" title="表压缩"></a>表压缩</h2><p>数据库中的表是由一行行记录（rows）所组成，每行记录被存储在一个页中，在 MySQL 中，一个页的大小默认为 16K，一个个页又组成了每张表的表空间。</p>
+<p>通常认为，如果一个页中存放的记录数越多，数据库的性能越高。这是因为数据库表空间中的页是存放在磁盘上，MySQL 数据库先要将磁盘中的页读取到内存缓冲池，然后<strong>以页为单位来读取和管理记录</strong>。</p>
+<p>一个页中存放的记录越多，内存中能存放的记录数也就越多，那么存取效率也就越高。若想将一个页中存放的记录数变多，可以启用压缩功能。此外，启用压缩后，存储空间占用也变小了，同样单位的存储能存放的数据也变多了。</p>
+<p>若要启用压缩技术，数据库可以根据记录、页、表空间进行压缩，不过在实际工程中，普遍使用页压缩技术，这是为什么呢？</p>
+<ul>
+<li><p>压缩每条记录： 因为每次读写都要压缩和解压，过于依赖 CPU 的计算能力，性能会明显下降；另外，因为单条记录大小不会特别大，一般小于 1K，压缩效率也并不会特别好。</p>
+</li>
+<li><p>压缩表空间： 压缩效率非常不错，但要求表空间文件静态不增长，这对基于磁盘的关系型数据库来说，很难实现。</p>
+</li>
+</ul>
+<p>而基于页的压缩，既能提升压缩效率，又能在性能之间取得一种平衡。</p>
+<p>可能很多人认为，启用表的页压缩功能后，性能有明显损失，因为压缩需要有额外的开销。的确，压缩需要消耗额外的 CPU 指令，但是压缩并不意味着性能下降，或许能额外提升性能，因为<strong>大部分的数据库业务系统，CPU 的处理能力是剩余的，而 I/O 负载才是数据库主要瓶颈</strong>。</p>
+<p>借助页压缩技术，MySQL 可以把一个 16K 的页压缩为 8K，甚至 4K，这样在从磁盘写入或读取时，就能将 I/O 请求大小减半，甚至更小，从而提升数据库的整体性能。</p>
+<p>当然，压缩是一种平衡，并非一定能提升数据库的性能。这种性能“平衡”取决于解压缩开销带来的收益和解压缩带来的开销之间的一种权衡。但无论如何，压缩都可以有效整理数据原本的容量，对存储空间来说，压缩的收益是巨大的。</p>
+<h3 id="MySQL-的表压缩设计"><a href="#MySQL-的表压缩设计" class="headerlink" title="MySQL 的表压缩设计"></a>MySQL 的表压缩设计</h3><h4 id="COMPRESS-页压缩"><a href="#COMPRESS-页压缩" class="headerlink" title="COMPRESS 页压缩"></a>COMPRESS 页压缩</h4><p>COMPRESS 页压缩是 MySQL 5.7 版本之前提供的页压缩功能。只要在创建表时指定<code>ROW_FORMAT=COMPRESS</code>，并设置通过选项 <code>KEY_BLOCK_SIZE</code> 设置压缩的比例。</p>
+<p>需要牢记的是， 虽然是通过选项 <code>ROW_FORMAT</code> 启用压缩功能，但这并不是记录级压缩，依然是根据页的维度进行压缩。</p>
+<p>下面这是一张日志表，<code>ROW_FROMAT</code> 设置为 COMPRESS，表示启用 COMPRESS 页压缩功能，<code>KEY_BLOCK_SIZE</code> 设置为 8，表示将一个 16K 的页压缩为 8K。</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">Log</span> (<br>  logId <span class="hljs-built_in">BINARY</span>(<span class="hljs-number">16</span>) PRIMARY <span class="hljs-keyword">KEY</span>,<br>  ......<br>)<br>ROW_FORMAT=COMPRESSED<br>KEY_BLOCK_SIZE=<span class="hljs-number">8</span><br></code></pre></div></td></tr></table></figure>
+
+<p>COMPRESS 页压缩就是将一个页压缩到指定大小。如 16K 的页压缩到 8K，若一个 16K 的页无法压缩到 8K，则会产生 2 个压缩后的 8K 页，具体如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Comperss%E9%A1%B5%E5%8E%8B%E7%BC%A9.png" alt="COMPRESS 页压缩"></p>
+<p>总的来说，COMPRESS 页压缩，适合用于一些对性能不敏感的业务表，例如日志表、监控表、告警表等，压缩比例通常能达到 50% 左右。</p>
+<p>虽然 COMPRESS 压缩可以有效减小存储空间，但 <strong>COMPRESS 页压缩的实现对性能的开销是巨大的，性能会有明显退化</strong>。主要原因是一个页的数据在内存缓冲池中，会同时存在压缩和解压两个页。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/1%E4%B8%AACOMPRESS%E5%8E%8B%E7%BC%A9%E9%A1%B5%E5%9C%A8%E5%86%85%E5%AD%98%E7%BC%93%E5%86%B2%E6%B1%A0%E4%B8%AD%E4%BC%9A%E6%9C%89%E4%B8%A4%E4%B8%AA%E7%89%88%E6%9C%AC.png" alt="一个COMPRESS压缩页在内存缓冲池中会有两个版本"></p>
+<p>如图所示，Page1 和 Page2 都是压缩页 8K，但是在内存中还有其解压后的 16K 页。这样设计的原因是 <strong>8K 的页用于后续页的更新，16K 的页用于读取，这样读取就不用每次做解压操作了</strong>。</p>
+<p>很明显，这样的实现会增加对内存的开销，会导致缓存池能存放的有效数据变少，MySQL 数据库的性能自然出现明显退化。</p>
+<p>为了 解决压缩性能下降的问题，从MySQL 5.7 版本开始推出了 TPC 压缩功能。</p>
+<h4 id="TPC-压缩"><a href="#TPC-压缩" class="headerlink" title="TPC 压缩"></a>TPC 压缩</h4><p>TPC（Transparent Page Compression）是 5.7 版本推出的一种新的页压缩功能，其利用文件系统的空洞（Punch Hole）特性进行压缩。可以使用下面的命令创建 TPC 压缩表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">Transaction</span> （<br>  transactionId <span class="hljs-built_in">BINARY</span>(<span class="hljs-number">16</span>) PRIMARY <span class="hljs-keyword">KEY</span>,<br>  .....<br>)<br>COMPRESSION=ZLIB | LZ4 | <span class="hljs-keyword">NONE</span>; <span class="hljs-comment">-- 有三种不同的算法</span><br></code></pre></div></td></tr></table></figure>
+
+<p>要使用 TPC 压缩，首先要确认当前的操作系统是否支持空洞特性。通常来说，当前常见的 Linux 操作系统都已支持空洞特性。</p>
+<p>由于空洞是文件系统的一个特性，利用空洞压缩只能压缩到文件系统的最小单位 4K，且其页压缩是 4K 对齐的。比如一个 16K 的页，压缩后为 7K，则实际占用空间 8K；压缩后为 3K，则实际占用空间是 4K；若压缩后是 13K，则占用空间依然为 16K。</p>
+<p>TPC 压缩的具体实现如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/TPC%E9%A1%B5%E5%8E%8B%E7%BC%A9.png" alt="TPC 页压缩"></p>
+<p>上图可以看到，一个 16K 的页压缩后是 8K，接着数据库会对这 16K 的页剩余的 8K 填充 0x00，这样当这个 16K 的页写入到磁盘时，利用文件系统空洞特性，则实际将仅占用 8K 的物理存储空间。</p>
+<p>空洞压缩的另一个好处是，它对数据库性能的侵入几乎是无影响的（小于 20%），甚至可能还能有性能的提升。</p>
+<p>这是因为不同于 COMPRESS 页压缩，<strong>TPC 压缩在内存中只有一个 16K 的解压缩后的页，对于缓冲池没有额外的存储开销</strong>。</p>
+<p>另一方面，所有页的读写操作都和非压缩页一样，没有开销，<strong>只有当这个页需要刷新到磁盘时，才会触发页压缩功能一次</strong>。但由于一个 16K 的页被压缩为了 8K 或 4K，其实写入性能会得到一定的提升。</p>
+<p>在 MySQL 官方的 LinkBench 测试结果中，无压缩的测试结果为 13,432 QPS，传统的 COMPRESS 页压缩性能下降为 10,480 QPS，差不多 30% 的性能下降。基于TPC压缩的测试结果为 18,882，在未压缩的基础上还能有额外 40% 的性能提升。</p>
+<h3 id="表压缩在业务上的使用"><a href="#表压缩在业务上的使用" class="headerlink" title="表压缩在业务上的使用"></a>表压缩在业务上的使用</h3><p>总的来说，对一些对性能不敏感的业务表，例如日志表、监控表、告警表等，它们只对存储空间有要求，因此可以使用 COMPRESS 页压缩功能。</p>
+<p>在一些较为核心的流水业务表上，更推荐使用 TPC压缩。因为流水信息是一种非常核心的数据存储业务，通常伴随核心业务。如一笔电商交易，用户扣钱、下单、记流水，这就是一个核心业务的微模型。</p>
+<p>所以，用户对流水表有性能需求。此外，流水又非常大，启用压缩功能可更为有效地存储数据。</p>
+<p>若对压缩产生的性能抖动有所担心，建议是<strong>由于流水表通常是按月或天进行存储，对当前正在使用的流水表不要启用 TPC 功能，对已经成为历史的流水表启用 TPC 压缩功能</strong>，如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%B5%81%E6%B0%B4%E8%A1%A8%E7%9A%84%E8%AE%BE%E8%AE%A1.png" alt="流水表的设计"></p>
+<p>需要特别注意的是： 通过命令 <code>ALTER TABLE xxx COMPRESSION = ZLIB</code> 可以启用 TPC 页压缩功能，但是这只对后续新增的数据会进行压缩，对于原有的数据则不进行压缩。所以上述 ALTER TABLE 操作只是修改元数据，瞬间就能完成。</p>
+<p>若想要对整个表进行压缩，需要执行 <code>OPTIMIZE TABLE</code> 命令：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> Transaction202102 COMPRESSION=ZLIB；<br><span class="hljs-keyword">OPTIMIZE</span> TALBE Transaction202102;<br></code></pre></div></td></tr></table></figure>
+
+<h1 id="索引调优"><a href="#索引调优" class="headerlink" title="索引调优"></a>索引调优</h1><h2 id="B-树索引"><a href="#B-树索引" class="headerlink" title="B+ 树索引"></a>B+ 树索引</h2><p>B+ 树索引的特点是： 基于磁盘的平衡二叉树，但树非常矮，通常为 3~4 层，能存放千万到上亿的排序数据。树矮意味着访问效率高，从千万或上亿数据里查询一条数据，只用 3、4 次 I/O。</p>
+<p>又因为现在的固态硬盘每秒能执行至少 10000 次 I/O ，所以查询一条数据，哪怕全部在磁盘上，也只需要 0.003 ~ 0.004 秒。另外，因为 B+ 树矮，在做排序时，也只需要比较 3~4 次就能定位数据需要插入的位置，排序效率非常不错。</p>
+<p>所有 B+ 树都是从高度为 1 的树开始，然后根据数据的插入，慢慢增加树的高度。索引是对记录进行排序， 高度为 1 的 B+ 树索引中，存放的记录都已经排序好了，<strong>若要在一个叶子节点内再进行查询，只进行二叉查找，就能快速定位数据</strong>。</p>
+<p>随着插入 B+ 树索引的记录变多，1个页（16K）无法存放这么多数据，所以会发生 B+ 树的分裂，B+ 树的高度变为 2，当 B+ 树的高度大于等于 2 时，根节点和中间节点存放的是索引键对，由（索引键、指针）组成。</p>
+<p>索引键就是排序的列，而<strong>指针是指向下一层的地址，在 MySQL 的 InnoDB 存储引擎中占用 6 个字节</strong>。</p>
+<p>那一个高度为 2 的 B+ 树索引，理论上最多能存放多少行记录呢?</p>
+<p>在 MySQL InnoDB 存储引擎中，一个页的大小为 16K，假设主键是 BIGINT 类型，则：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">根节点能最多存放以下多个键值对 = <span class="hljs-number">16</span>K / 键值对大小(<span class="hljs-number">8</span>+<span class="hljs-number">6</span>) ≈ <span class="hljs-number">1100</span><br></code></pre></div></td></tr></table></figure>
+
+<p>再假设表中每条记录的大小为 500 字节，则：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">叶子节点能存放的最多记录为 = <span class="hljs-number">16</span>K / 每条记录大小 ≈ <span class="hljs-number">32</span><br></code></pre></div></td></tr></table></figure>
+
+<p>综上所述，树高度为 2 的 B+ 树索引，最多能存放的记录数为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">总记录数 = <span class="hljs-number">1100</span> * <span class="hljs-number">32</span> =  <span class="hljs-number">35</span>,<span class="hljs-number">200</span><br></code></pre></div></td></tr></table></figure>
+
+<p>也就是说，35200 条记录排序后，生成的 B+ 树索引高度为 2。在 35200 条记录中根据索引键查询一条记录只需要查询 2 个页，一个根叶，一个叶子节点，就能定位到记录所在的页。</p>
+<p>高度为 3 的 B+ 树索引本质上与高度 2 的索引一致，如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E9%AB%98%E5%BA%A6%E4%B8%89%E7%9A%84B%2B%E6%A0%91%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.png" alt="高度3的B+树（拉勾）"></p>
+<p>同理，树高度为 3 的 B+ 树索引，最多能存放的记录数为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">总记录数 = <span class="hljs-number">1100</span>（根节点） * <span class="hljs-number">1100</span>（中间节点） * <span class="hljs-number">32</span> =  <span class="hljs-number">38</span>,<span class="hljs-number">720</span>,<span class="hljs-number">000</span><br></code></pre></div></td></tr></table></figure>
+
+<p>高度为 3 的 B+ 树索引竟然能存放 3800W 条记录。在 3800W 条记录中定位一条记录，只需要查询 3 个页。</p>
+<p>不过，在真实环境中，每个页其实利用率并没有这么高，还会存在一些碎片的情况，我们假设每个页的使用率为60%，则：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/B%2B%E6%A0%91%E7%9A%84%E9%AB%98%E5%BA%A6%E4%B8%8E%E6%80%BB%E8%AE%B0%E5%BD%95%E6%95%B0%E7%9A%84%E5%85%B3%E7%B3%BB.png" alt="B+树的高度与总记录数的关系"></p>
+<p>表格显示了 B+ 树的威力，即在 50 多亿的数据中，根据索引键值查询记录，只需要 4 次 I/O，大概仅需 0.004 秒。如果这些查询的页已经被缓存在内存缓冲池中，查询性能会更快。</p>
+<p>另外，对于 B+ 树索引的插入性能，在数据是顺序插入（自增ID，时间列）的情况下，B+ 树的插入通常是比较快的。但是在无序插入（例如用户昵称列创建索引）时，B+ 树为了维护排序，需要对页进行分裂、旋转等开销较大的操作，另外，即便对于固态硬盘，随机写的性能也不如顺序写，所以磁盘性能也会收到较大影响。</p>
+<p><strong>在表结构设计时，主键的设计一定要尽可能地使用顺序值，这样才能保证在海量并发业务场景下的性能。</strong></p>
+<p>另外，对于网上所说的：“一般一张表的索引不超过 5 个”的说法纯属无稽之谈，如果业务确实需要，就要根据业务进行对应索引的创建，使用时个人觉得指定索引就好了。</p>
+<p><strong>思考题</strong>：</p>
+<ol>
+<li><p>MySQL数据库中，如何在线上业务中尽快发现对应的 SQL 没有合理创建索引呢？</p>
+<p> 查看 MySQL 的慢查询日志，如设置执行超过 1s 的是慢 SQL，然后优化慢日志中的 SQL。</p>
+</li>
+<li><p>全文索引、R 树索引在哪些业务中可以使用？</p>
+<p> 全文索引用于多个维度的查询，类似我们搜索引擎的查询，输入多个条件，然后输出结果。</p>
+<p> R 数索引用于地理空间查询。</p>
+</li>
+</ol>
+<h2 id="索引组织表"><a href="#索引组织表" class="headerlink" title="索引组织表"></a>索引组织表</h2><p>数据存储有堆表和索引组织表两种方式。堆表中的数据无序存放，数据的排序完全依赖于索引：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%A0%86%E8%A1%A8%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84.png" alt="堆表数据结构"></p>
+<p>从表中可以看出，堆表的组织结构中，数据和索引分开存储。索引是排序后的数据，而堆表中的数据是无序的，索引的叶子节点存放了数据在堆表中的地址，当堆表的数据发生改变，且位置发生了变更，所有索引中的地址都要更新，这非常影响性能，特别是对于 OLTP 业务。</p>
+<p>而索引组织表，数据根据主键排序存放在索引中，主键索引也叫聚集索引（Clustered Index）。在索引组织表中，数据即索引，索引即数据。</p>
+<p>关于MySQL索引数据结构这里不再赘述。</p>
+<h3 id="函数索引"><a href="#函数索引" class="headerlink" title="函数索引"></a>函数索引</h3><p>从 MySQL5.7 开始就支持创建函数索引，也就是索引键是一个函数表达式，函数索引有两大用处：</p>
+<ul>
+<li>优化业务SQL性能；</li>
+<li>配合虚拟列（Generated Column）。</li>
+</ul>
+<p>一般来说，在条件查询的等式左边进行函数运算会导致索引失效。要解决这个问题，就可以使用函数索引，例如假设需要对 <code>register_date</code> 进行函数 <code>DATE_FORMAT</code> 运算，可以创建一个 <code>DATE_FORMAT(register_date)</code> 的索引，这样就能利用排序数据快速定位了：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-keyword">User</span> <br><span class="hljs-keyword">ADD</span> <span class="hljs-keyword">INDEX</span> <br>idx_func_register_date((<span class="hljs-keyword">DATE_FORMAT</span>(register_date,<span class="hljs-string">'%Y-%m'</span>)));<br></code></pre></div></td></tr></table></figure>
+
+<p>对于配合虚拟列的使用，例如类型为 JSON 的列通过函数表达式生成一个虚拟列，就可以为其创建一个函数索引，从而对该虚拟列建立索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> UserLogin (<br>	userId <span class="hljs-built_in">BIGINT</span>,<br>    loginInfo <span class="hljs-keyword">JSON</span>,<br>    cellphone <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">AS</span> (loginInfo-&gt;&gt;<span class="hljs-string">"$.cellphone"</span>),<br>    PRIMARY <span class="hljs-keyword">KEY</span>(userId),<br>    <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">KEY</span> idx_cellphone(cellphone)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>其中的列 cellphone 就是一个虚拟列，它是由后面的函数表达式计算而成，本身这个列不占用任何的存储空间，而索引 idx_cellphone 实质是一个函数索引。</p>
+<p>适用场景：对于爬虫类的业务，会从网上先爬取很多数据，其中有些是我们关心的数据，有些是不关心的数据。通过虚拟列技术，可以展示我们想要的那部分数据，再通过虚拟列上创建索引，就是对爬取的数据进行快速的访问和搜索。</p>
+<p><strong>思考题</strong>：因为二级索引无需维护，索引组织表在更新的场景下性能明显由于堆表。请问堆表在设计上如何优化，能降低更新操作导致性能的大幅下降？</p>
+<p>堆表在设计时，可以让每个页都预留一定的空间，比如 8k 页，预留 4k 空间，当发生更新时，记录可以在这个页中，保持不变，这样就不会每个索引都更新地址了。但是当预留的空间都满了，还是会发生迁移的问题，所以只是缓解问题，而不是像索引组织表那样，完全没有任何问题。</p>
+<h2 id="组合索引"><a href="#组合索引" class="headerlink" title="组合索引"></a>组合索引</h2><p>利用组合索引包含多个列的特性，可以实现索引覆盖技术避免回表查询，提升 SQL 的查询性能。用好索引覆盖技术，性能提升 10 倍不是难事。</p>
+<p><strong>思考题</strong> ：</p>
+<ol>
+<li><p>组合索引可以避免 <code>WHERE a = ? ORDER BY b</code> 这条的额外排序问题，在现有的业务中，如何发现可以的 SQL，通过组合索引进行优化呢？</p>
+<p> 这种情况下使用慢查询是比较难发现的，因为有 a 索引的情况下查询并不会特别慢，不一定能够进入慢查询日志。可以通过下面的 sql 语句进行查看：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">query</span>,rows_sorted<br><span class="hljs-keyword">FROM</span> x$statement_analysis<br><span class="hljs-keyword">WHERE</span> db <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<span class="hljs-string">'sys'</span>,<span class="hljs-string">'mysql'</span>) <span class="hljs-keyword">AND</span> rows_sorted != <span class="hljs-number">0</span><br></code></pre></div></td></tr></table></figure>
+</li>
+<li><p>下面这条 SQL 该如何创建组合索引？同时对比 MySQL 5.7 和 MySQL 8.0 版本，查看优化器的执行计划，看看 8.0 在 5.7 版本基础上，还有哪些进一步的优化：</p>
+ <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderDate <span class="hljs-keyword">DESC</span>,o_orderStatus<br></code></pre></div></td></tr></table></figure>
+
+<p> MySQL 8.0 支持不同方向的索引排序，MySQL 5.7 仅支持一个方向。因此 8.0 可以创建 <code>(o_orderDate DESC,o_orderStatus asc)</code> 的索引。而 5.7 即使创建不同排序方向的索引，也需要额外的排序。</p>
+</li>
+</ol>
+<h2 id="索引选择"><a href="#索引选择" class="headerlink" title="索引选择"></a>索引选择</h2><blockquote>
+<p>在关于 MySQL 的面试问题中，看过一个问题是一条 SQL 为什么执行的很慢，其中有一个原因说的就是 SQL 没有走索引查询，原因在于 SQL优化器会有一个判断，当时并没有深究其判断原理。很意外在这个课程里面了解到了其具体的原理。</p>
+</blockquote>
+<p>在关系型数据库中，B+树索引只是存储的一种数据结构，具体怎么使用，还要依赖数据库的优化器，优化器决定了具体某一索引的选择，也就是常说的执行计划。而优化器的选择是基于成本（cost），哪个优化器的成本越低，优先使用哪个索引。SQL 优化器会分析所有可能的执行计划，选择成本最低的执行，这种优化器被称之为：CBO（Cost-based Optimizer，基于成本的优化器）。</p>
+<p>而在 MySQL中，一条 SQL 的计算成本计算如下所示：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs routeros">Cost  =<span class="hljs-built_in"> Server </span>Cost + Engine Cost<br>      = CPU Cost + IO Cost<br></code></pre></div></td></tr></table></figure>
+
+<p>其中，CPU Cost 表示计算的开销，比如索引键值的比较、记录值的比较、结果集的排序……这些操作都在 Server 层完成；</p>
+<p>IO Cost 表示引擎层 IO 的开销，MySQL 8.0 可以通过区分一张表的数据是否在内存中，分别计算读取内存 IO 开销以及读取磁盘 IO 的开销。</p>
+<p>数据库 mysql 下的表 <code>server_cost</code>、<code>engine_cost</code> 则记录了对于各种成本的计算，如：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/mysql.server_cost.png" alt="mysql.server_cost"></p>
+<p>表 <code>server_cost</code> 记录了 Server 层优化器各种操作的成本，这里面包括了所有 CPU Cost，其具体含义如下。</p>
+<ul>
+<li><p><code>disk_temptable_create_cost</code>：创建磁盘临时表的成本，默认为20。</p>
+</li>
+<li><p><code>disk_temptable_row_cost</code>：磁盘临时表中每条记录的成本，默认为0.5。</p>
+</li>
+<li><p><code>key_compare_cost</code>：索引键值比较的成本，默认为0.05，成本最小。</p>
+</li>
+<li><p><code>memory_temptable_create_cost</code>：创建内存临时表的成本：默认为1。</p>
+</li>
+<li><p><code>memory_temptable_row_cost</code>：内存临时表中每条记录的成本，默认为0.1。</p>
+</li>
+<li><p><code>row_evaluate_cost</code>：记录间的比较成本，默认为0.1。</p>
+</li>
+</ul>
+<p>可以看到， MySQL 优化器认为如果一条 SQL 需要创建基于磁盘的临时表，则这时的成本是最大的，其成本是基于内存临时表的 20 倍。而索引键值的比较、记录之间的比较，其实开销是非常低的，但如果要比较的记录数非常多，则从成本会变得非常大。</p>
+<p>而表 <code>engine_cost</code> 记录了存储引擎层各种操作的成本，这里包含了所有的 IO Cost，具体含义如下。</p>
+<ul>
+<li><p><code>io_block_read_cost</code>：从磁盘读取一个页的成本，默认值为 1。</p>
+</li>
+<li><p><code>memory_block_read_cost</code>：从内存读取一个页的成本，默认值为 0.25。</p>
+</li>
+</ul>
+<p>也就是说， MySQL 优化器认为从磁盘读取的开销是内存开销的 4 倍。</p>
+<p>不过，上述所有的成本都是可以修改的，比如如果数据库使用是传统的 HDD 盘，性能较差，其随机读取性能要比内存读取慢 50 倍，那可以通过下面的 SQL 修改成本：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> <br>engine_cost(engine_name,device_type,cost_name,cost_value,last_update,<span class="hljs-keyword">comment</span>) <br><span class="hljs-keyword">VALUES</span> (<span class="hljs-string">'InnoDB'</span>,<span class="hljs-number">0</span>,<span class="hljs-string">'io_block_read_cost'</span>,<span class="hljs-number">12.5</span>,<span class="hljs-keyword">CURRENT_TIMESTAMP</span>,<span class="hljs-string">'Using HDD for InnoDB'</span>);<br><br><span class="hljs-keyword">FLUSH</span> OPTIMIZER_COSTS;<br></code></pre></div></td></tr></table></figure>
+
+<p>可以通过命令 <code>EXPLAIN</code> 的 <code>FORMAT=json</code> 来查看各成本的值：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">FORMAT</span>=<span class="hljs-keyword">json</span> <br><span class="hljs-keyword">SELECT</span> o_custkey,<span class="hljs-keyword">SUM</span>(o_totalprice) <br><span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> o_custkey<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br> <span class="hljs-keyword">EXPLAIN</span>: &#123;<br>   <span class="hljs-string">"query_block"</span>: &#123;<br>     <span class="hljs-string">"select_id"</span>: <span class="hljs-number">1</span>,<br>     <span class="hljs-string">"cost_info"</span>: &#123;<br>       <span class="hljs-string">"query_cost"</span>: <span class="hljs-string">"626899.50"</span> <span class="hljs-comment"># 总成本</span><br>     &#125;,<br>     <span class="hljs-string">"grouping_operation"</span>: &#123;<br>       <span class="hljs-string">"using_filesort"</span>: <span class="hljs-literal">false</span>,<br>       <span class="hljs-string">"table"</span>: &#123;<br>         <span class="hljs-string">"table_name"</span>: <span class="hljs-string">"orders"</span>,<br>         <span class="hljs-string">"access_type"</span>: <span class="hljs-string">"index"</span>,<br>         <span class="hljs-string">"possible_keys"</span>: [<br>           <span class="hljs-string">"idx_custkey_orderdate"</span>,<br>           <span class="hljs-string">"ORDERS_FK1"</span>,<br>           <span class="hljs-string">"idx_custkey_orderdate_totalprice"</span><br>         ],<br>         <span class="hljs-string">"key"</span>: <span class="hljs-string">"idx_custkey_orderdate_totalprice"</span>,<br>         <span class="hljs-string">"used_key_parts"</span>: [<br>           <span class="hljs-string">"O_CUSTKEY"</span>,<br>           <span class="hljs-string">"O_ORDERDATE"</span>,<br>           <span class="hljs-string">"O_TOTALPRICE"</span><br>         ],<br>         <span class="hljs-string">"key_length"</span>: <span class="hljs-string">"14"</span>,<br>         <span class="hljs-string">"rows_examined_per_scan"</span>: <span class="hljs-number">5778755</span>,<br>         <span class="hljs-string">"rows_produced_per_join"</span>: <span class="hljs-number">5778755</span>,<br>         <span class="hljs-string">"filtered"</span>: <span class="hljs-string">"100.00"</span>,<br>         <span class="hljs-string">"using_index"</span>: <span class="hljs-literal">true</span>,<br>         <span class="hljs-string">"cost_info"</span>: &#123;<br>           <span class="hljs-string">"read_cost"</span>: <span class="hljs-string">"49024.00"</span>, <span class="hljs-comment"># IO Cost(Engine Cost)</span><br>           <span class="hljs-string">"eval_cost"</span>: <span class="hljs-string">"577875.50"</span>, <span class="hljs-comment"># CPU Cost(Server Cost)</span><br>           <span class="hljs-string">"prefix_cost"</span>: <span class="hljs-string">"626899.50"</span>, <span class="hljs-comment"># 总成本</span><br>           <span class="hljs-string">"data_read_per_join"</span>: <span class="hljs-string">"2G"</span> <span class="hljs-comment"># 总的读取记录字节数</span><br>         &#125;,<br>         <span class="hljs-string">"used_columns"</span>: [<br>           <span class="hljs-string">"O_ORDERKEY"</span>,<br>           <span class="hljs-string">"O_CUSTKEY"</span>,<br>           <span class="hljs-string">"O_TOTALPRICE"</span><br>         ]<br>       &#125;<br>     &#125;<br>    &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>从第 32 行开始记录了成本的相关信息：</p>
+<ul>
+<li><code>read_cost</code> ：表示就是从 InnoDB 存储引擎读取的开销；</li>
+<li><code>eval_cost</code> ：表示 Server 层的 CPU 成本；</li>
+<li><code>prefix_cost</code> ：表示这条 SQL 的总成本；</li>
+<li><code>data_read_per_join</code> ：表示总的读取记录的字节数。</li>
+</ul>
+<h3 id="索引选择出错案例分析"><a href="#索引选择出错案例分析" class="headerlink" title="索引选择出错案例分析"></a>索引选择出错案例分析</h3><h4 id="案例1-未能使用创建的索引"><a href="#案例1-未能使用创建的索引" class="headerlink" title="案例1:未能使用创建的索引"></a>案例1:未能使用创建的索引</h4><p>MySQL 优化器永远是根据成本，选择出最优的执行计划。哪怕是同一条 SQL 语句，只要范围不同，优化器的选择也可能不同。</p>
+<p>如下面这两条 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders<br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-01-01'</span> <span class="hljs-keyword">and</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>;<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-02-01'</span> <span class="hljs-keyword">and</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>上面这两条 SQL 都是通过索引字段 <code>o_orderdate</code> 进行查询，然而第一条 SQL 语句的执行计划并未使用索引 <code>idx_orderdate</code>，而是使用了如下的执行计划：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-01-01'</span> <br><span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: orders<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ALL</span><br>possible_keys: idx_orderdate<br>          <span class="hljs-keyword">key</span>: <span class="hljs-literal">NULL</span><br>      key_len: <span class="hljs-literal">NULL</span><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">5799601</span><br>     filtered: <span class="hljs-number">32.35</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br></code></pre></div></td></tr></table></figure>
+
+<p>从上述执行计划中可以发现，优化器已经通过 <code>possible_keys</code> 识别出可以使用索引 <code>idx_orderdate</code>，<strong>但最终却使用全表扫描的方式取出结果。</strong> 最为根本的原因在于：优化器认为使用通过主键进行全表扫描的成本比通过二级索引 <code>idx_orderdate</code> 的成本要低，可以通过 <code>FORMAT=tree</code> 观察得到：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">FORMAT</span>=tree <br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-01-01'</span> <br><br><span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>\G<br><br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br><br><span class="hljs-keyword">EXPLAIN</span>: -&gt; Filter: ((orders.O_ORDERDATE &gt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-01-01'</span>) <span class="hljs-keyword">and</span> (orders.O_ORDERDATE &lt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-12-31'</span>))  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">592267.11</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">1876082</span>)<br><br>    -&gt; <span class="hljs-keyword">Table</span> <span class="hljs-keyword">scan</span> <span class="hljs-keyword">on</span> orders  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">592267.11</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">5799601</span>)<br><br><br><br><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">FORMAT</span>=tree <br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">FORCE</span> <span class="hljs-keyword">INDEX</span>(idx_orderdate)<br><br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-01-01'</span> <br><br><span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>\G<br><br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br><br><span class="hljs-keyword">EXPLAIN</span>: -&gt; <span class="hljs-keyword">Index</span> <span class="hljs-keyword">range</span> <span class="hljs-keyword">scan</span> <span class="hljs-keyword">on</span> orders <span class="hljs-keyword">using</span> idx_orderdate, <span class="hljs-keyword">with</span> <span class="hljs-keyword">index</span> condition: ((orders.O_ORDERDATE &gt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-01-01'</span>) <span class="hljs-keyword">and</span> (orders.O_ORDERDATE &lt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-12-31'</span>))  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">844351.87</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">1876082</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，MySQL 认为全表扫描，然后再通过 WHERE 条件过滤的成本为 592267.11，对比强制使用二级索引 idx_orderdate 的成本为 844351.87。</p>
+<p>成本上看，全表扫描低于使用二级索引。故，MySQL 优化器没有使用二级索引 idx_orderdate。</p>
+<p><strong>为什么全表扫描比二级索引查询快呢？</strong> 因为二级索引需要回表，<strong>当回表的记录数非常大时，成本就会比直接扫描要快，因此这取决于回表的记录数</strong>。</p>
+<p>所以，第二条 SQL 语句，只是时间范围发生了变化，但是 MySQL 优化器就会自动使用二级索引 <code>idx_orderdate</code>了，这时再观察执行计划：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><br><span class="hljs-keyword">WHERE</span> o_orderdate &gt; <span class="hljs-string">'1994-02-01'</span> <br><br><span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1994-12-31'</span>\G<br><br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br><br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br><br>  select_type: SIMPLE<br><br>        <span class="hljs-keyword">table</span>: orders<br><br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">range</span><br><br>possible_keys: idx_orderdate<br><br>          <span class="hljs-keyword">key</span>: idx_orderdate<br><br>      key_len: <span class="hljs-number">3</span><br><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">1633884</span><br><br>     filtered: <span class="hljs-number">100.00</span><br><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">index</span> condition<br></code></pre></div></td></tr></table></figure>
+
+<p>再次强调，并不是 MySQL 选择索引出错，<strong>而是 MySQL 会根据成本计算得到最优的执行计划，</strong> 根据不同条件选择最优执行计划，而不是同一类型一成不变的执行过程，这才是优秀的优化器该有的样子。</p>
+<h4 id="案例2：索引创建在有限状态上"><a href="#案例2：索引创建在有限状态上" class="headerlink" title="案例2：索引创建在有限状态上"></a>案例2：索引创建在有限状态上</h4><p>B+ 树索引通常要建立在高选择性的字段或字段组合上，如性别、订单 ID、日期等，因为这样每个字段值大多并不相同。</p>
+<p>但是对于性别这样的字段，其值只有男和女两种，哪怕记录数再多，也只有两种值，这是低选择性的字段，因此无须在性别字段上创建索引。</p>
+<p>但在有些低选择性的列上，是有必要创建索引的。比如电商的核心业务表 orders，其有字段 <code>o_orderstatus</code>，表示当前的状态。</p>
+<p>在电商业务中会有一个这样的逻辑：即会定期扫描字段 <code>o_orderstatus</code> 为支付中的订单，然后强制让其关闭，从而释放库存，给其他有需求的买家进行购买。</p>
+<p>但字段 <code>o_orderstatus</code> 的状态是有限的，一般仅为已完成、支付中、超时已关闭这几种。</p>
+<p>通常订单状态绝大部分都是已完成，只有绝少部分因为系统故障原因，会在 15 分钟后还没有完成订单，<strong>因此订单状态是存在数据倾斜的。</strong></p>
+<p>这时，虽然订单状态是低选择性的，但是由于其有数据倾斜，且我们只是从索引查询少量数据，因此可以对订单状态创建索引：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> orders <br><span class="hljs-keyword">ADD</span> <span class="hljs-keyword">INDEX</span> idx_orderstatus(o_orderstatus)<br></code></pre></div></td></tr></table></figure>
+
+<p>但这时根据下面的这条 SQL，优化器的选择可能如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_orderstatus = <span class="hljs-string">'P'</span>\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: orders<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ALL</span><br>possible_keys: <span class="hljs-literal">NULL</span><br>          <span class="hljs-keyword">key</span>: <span class="hljs-literal">NULL</span><br>      key_len: <span class="hljs-literal">NULL</span><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">5799601</span><br>     filtered: <span class="hljs-number">50.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br></code></pre></div></td></tr></table></figure>
+
+<p>由于字段 <code>o_orderstatus</code> 仅有三个值，分别为 ‘O’、’P’、’F’。但 MySQL 并不知道这三个列的分布情况，认为这三个值是平均分布的，但其实是这三个值存在严重倾斜：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> o_orderstatus,<span class="hljs-keyword">count</span>(<span class="hljs-number">1</span>) <br><span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> o_orderstatus;<br>+<span class="hljs-comment">---------------+----------+</span><br>| o_orderstatus | count(1) |<br>+<span class="hljs-comment">---------------+----------+</span><br>| F             |  2923619 |<br>| O             |  2923597 |<br>| P             |   152784 |<br>+<span class="hljs-comment">---------------+----------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p>因此，优化器会认为订单状态为 P 的订单占用 1/3 的数据，使用全表扫描，避免二级索引回表的效率会更高。</p>
+<p>然而，由于数据倾斜，订单状态为 P 的数据非常少，根据索引 <code>idx_orderstatus</code> 查询的效率会更高。这种情况下，可以<strong>利用 MySQL 8.0 的直方图功能，创建一个直方图，让优化器知道数据的分布，从而更好地选择执行计划</strong>。直方图的创建命令如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ANALYZE</span> <span class="hljs-keyword">TABLE</span> orders <br><span class="hljs-keyword">UPDATE</span> HISTOGRAM <span class="hljs-keyword">ON</span> o_orderstatus;<br></code></pre></div></td></tr></table></figure>
+
+<p>在创建完直方图后，MySQL会收集到字段 <code>o_orderstatus</code> 的数值分布，可以通过下面的命令查询得到：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>v <span class="hljs-keyword">value</span>, <br><span class="hljs-keyword">CONCAT</span>(<span class="hljs-keyword">round</span>((c - LAG(c, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>) <span class="hljs-keyword">over</span>()) * <span class="hljs-number">100</span>,<span class="hljs-number">1</span>), <span class="hljs-string">'%'</span>) ratio<br><span class="hljs-keyword">FROM</span> information_schema.column_statistics, <br>JSON_TABLE(histogram-&gt;<span class="hljs-string">'$.buckets'</span>,<span class="hljs-string">'$[*]'</span> <span class="hljs-keyword">COLUMNS</span>(v <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">60</span>) <span class="hljs-keyword">PATH</span> <span class="hljs-string">'$[0]'</span>, c <span class="hljs-keyword">double</span> <span class="hljs-keyword">PATH</span> <span class="hljs-string">'$[1]'</span>)) hist<br><span class="hljs-keyword">WHERE</span> column_name = <span class="hljs-string">'o_orderstatus'</span>;<br><br>+<span class="hljs-comment">-------+-------+</span><br>| value | ratio |<br>+<span class="hljs-comment">-------+-------+</span><br>| F     | 49%   |<br>| O     | 48.5% |<br>| P     | 2.5%  |<br>+<span class="hljs-comment">-------+-------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，现在 MySQL 知道状态为 P 的订单只占 2.5%，因此再去查询状态为 P 的订单时，就会使用到索引 <code>idx_orderstatus</code>了，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_orderstatus = <span class="hljs-string">'P'</span>\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: orders<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ref</span><br>possible_keys: idx_orderstatus<br>          <span class="hljs-keyword">key</span>: idx_orderstatus<br>      key_len: <span class="hljs-number">4</span><br>          <span class="hljs-keyword">ref</span>: const<br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">306212</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">index</span> condition<br></code></pre></div></td></tr></table></figure>
+
+<p>此外，对于数据的区分度，MySQL 会进行计算，一个索引的区分度越大，走索引就越有优势，但是对于区分度的计算，MySQL 采用的是获取部分数据进行判断，因此有可能存在误差，统计出来的区分度与实际不符，导致对于 sql 的执行直接走全表扫描。</p>
+<p><strong>思考题</strong>：字段 <code>o_orderstatus</code> 上创建索引虽然能解决问题，但是成本非常大的，需要维护索引 <code>idx_orderstatus</code> 的各种变更，性能会受到一定影响。有什么其他更好的方法来判断还处在支付过程中的订单吗？</p>
+<h2 id="JOIN-连接"><a href="#JOIN-连接" class="headerlink" title="JOIN 连接"></a>JOIN 连接</h2><p>MySQL 8.0 版本支持两种 JOIN 算法用于表之间的关联：</p>
+<ul>
+<li><p>Nested Loop Join；</p>
+</li>
+<li><p>Hash Join。</p>
+</li>
+</ul>
+<p>通常认为，在 OLTP 业务中，因为查询数据量较小、语句相对简单，大多使用索引连接表之间的数据。这种情况下，优化器大多会用 <code>Nested Loop Join</code> 算法；而 OLAP 业务中的查询数据量较大，关联表的数量非常多，所以用 <code>Hash Join</code> 算法，直接扫描全表效率会更高。</p>
+<blockquote>
+<p>联机事务处理OLTP（on-line transaction processing） 主要是执行基本日常的事务处理，通常是数据库记录的增删查改。OLTP的特点一般有：</p>
+<ol>
+<li>实时性要求高。以前银行异地汇款，要隔天才能到账，而现在是分分钟到账的节奏，说明现在银行的实时处理能力大大增强。</li>
+<li>数据量不是很大，生产库上的数据量一般不会太大，而且会及时做相应的数据处理与转移。</li>
+<li>交易一般是确定的，比如银行存取款的金额肯定是确定的，所以OLTP是对确定性的数据进行存取</li>
+<li>高并发，并且要求满足ACID原则。比如两人同时操作一个银行卡账户，比如大型的购物网站秒杀活动时上万的QPS请求。</li>
+</ol>
+<p>联机分析处理OLAP（On-Line Analytical Processing） 是数据仓库系统的主要应用，支持复杂的分析操作，侧重决策支持，并且提供直观易懂的查询结果。典型的应用就是复杂的动态的报表系统。</p>
+<p>OLAP的特点一般有：</p>
+<ol>
+<li>实时性要求不是很高，比如最常见的应用就是天级更新数据，然后出对应的数据报表。</li>
+<li>数据量大，因为 OLAP 支持的是动态查询，所以用户也许要通过将很多数据的统计后才能得到想要知道的信息，例如时间序列分析等等，所以处理的数据量很大;</li>
+<li>OLAP 系统的重点是通过数据提供决策支持，所以查询一般都是动态，自定义的。所以在 OLAP 中，维度的概念特别重要。一般会将用户所有关心的维度数据，存入对应数据平台。</li>
+</ol>
+</blockquote>
+<h3 id="Nested-Loop-Join"><a href="#Nested-Loop-Join" class="headerlink" title="Nested Loop Join"></a>Nested Loop Join</h3><p><code>Nested Loop Join</code> 之间的表关联是使用索引进行匹配的，假设表 R 和 S 进行连接，其算法伪代码大致如下：</p>
+<figure class="highlight oxygene"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs oxygene"><span class="hljs-keyword">for</span> <span class="hljs-keyword">each</span> row r <span class="hljs-keyword">in</span> R <span class="hljs-keyword">with</span> <span class="hljs-keyword">matching</span> condition:<br>    lookup <span class="hljs-keyword">index</span> idx_s <span class="hljs-keyword">on</span> S <span class="hljs-keyword">where</span> index_key = r<br>    <span class="hljs-keyword">if</span> (found)<br>      send <span class="hljs-keyword">to</span> client<br></code></pre></div></td></tr></table></figure>
+
+<p>在上述算法中，表 R 被称为驱动表，表 R 中通过 WHERE 条件过滤出的数据会在表 S 对应的索引上进行一一查询。如果驱动表 R 的数据量不大，上述算法非常高效。</p>
+<p>对以下三种  JOIN  类型的驱动表进行分析：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> ... <span class="hljs-keyword">FROM</span> R <span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> S <span class="hljs-keyword">ON</span> R.x = S.x WEHRE ...<br><span class="hljs-keyword">SELECT</span> ... <span class="hljs-keyword">FROM</span> R <span class="hljs-keyword">RIGHT</span> <span class="hljs-keyword">JOIN</span> S <span class="hljs-keyword">ON</span> R.x = S.x WEHRE ...<br><span class="hljs-keyword">SELECT</span> ... <span class="hljs-keyword">FROM</span> R <span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> S <span class="hljs-keyword">ON</span> R.x = S.x WEHRE ...<br></code></pre></div></td></tr></table></figure>
+
+<p>对于上述 Left Join 来说，驱动表就是 S；Right Join中，驱动表就是 R。这是 JOIN 类型决定左表或右表的数据一定要进行查询。但对于 INNER JOIN，驱动表可能是表 R，也可能是表 S。</p>
+<p>在这种场景下，谁需要查询的数据量越少，谁就是驱动表。 看下面的例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> ... <span class="hljs-keyword">FROM</span> R <span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> S <br><span class="hljs-keyword">ON</span> R.x = S.x <br><span class="hljs-keyword">WHERE</span> R.y = ? <span class="hljs-keyword">AND</span> S.z = ?<br></code></pre></div></td></tr></table></figure>
+
+<p>上面这条 SQL 语句是对表 R 和表 S 进行 INNER JOIN，其中关联的列是 x，WHERE 过滤条件分别过滤表 R 中的列 y 和表 S 中的列 z。那么这种情况下可以有以下两种选择：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/join%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="join执行计划"></p>
+<p>优化器一般认为，通过索引进行查询的效率都一样，所以 <code>Nested Loop Join</code> 算法主要要求驱动表的数量要尽可能少。</p>
+<p>所以，如果 <code>WHERE R.y = ?</code> 过滤出的数据少，那么这条 SQL 语句会先使用表 R 上列 y 上的索引，筛选出数据，然后再使用表 S 上列 x 的索引进行关联，最后再通过 <code>WHERE S.z = ?</code> 过滤出最后数据。</p>
+<p><strong>为了深入理解优化器驱动表的选择</strong>，看下面这条 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">COUNT</span>(<span class="hljs-number">1</span>) <br><span class="hljs-keyword">FROM</span> orders<br><span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> lineitem<br>  <span class="hljs-keyword">ON</span> orders.o_orderkey = lineitem.l_orderkey <br>    <span class="hljs-keyword">WHERE</span> orders.o_orderdate &gt;= <span class="hljs-string">'1994-02-01'</span> <br>      <span class="hljs-keyword">AND</span>  orders.o_orderdate &lt; <span class="hljs-string">'1994-03-01'</span><br></code></pre></div></td></tr></table></figure>
+
+<p>上面的表 <code>orders</code> 类似于电商中的订单表，在示例数据库中记录总量有 600万条记录。</p>
+<p>表 <code>lineitem</code> 是订单明细表，比如一个订单可以包含三件商品，这三件商品的具体价格、数量、商品供应商等详细信息，记录数约 2400 万。</p>
+<p>上述 SQL 语句表示查询日期为 1994 年 2 月购买的商品数量总和，通过命令 EXPLAIN 查看得到执行计划如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span>: -&gt; <span class="hljs-keyword">Aggregate</span>: <span class="hljs-keyword">count</span>(<span class="hljs-number">1</span>)<br> -&gt; <span class="hljs-keyword">Nested</span> <span class="hljs-keyword">loop</span> <span class="hljs-keyword">inner</span> <span class="hljs-keyword">join</span>  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">115366.81</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">549152</span>)<br>     -&gt; Filter: ((orders.O_ORDERDATE &gt;= <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-02-01'</span>) <span class="hljs-keyword">and</span> (orders.O_ORDERDATE &lt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-03-01'</span>))  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">26837.49</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">133612</span>)<br>         -&gt; <span class="hljs-keyword">Index</span> <span class="hljs-keyword">range</span> <span class="hljs-keyword">scan</span> <span class="hljs-keyword">on</span> orders <span class="hljs-keyword">using</span> idx_orderdate  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">26837.49</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">133612</span>)<br>     -&gt; <span class="hljs-keyword">Index</span> lookup <span class="hljs-keyword">on</span> lineitem <span class="hljs-keyword">using</span> PRIMARY (l_orderkey=orders.o_orderkey)  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">0.25</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">4</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>上面的执行计划步骤如下，表 <code>orders</code> 是驱动表，它的选择过程如下所示：</p>
+<p><code>Index range scan on orders using idx_orderdate</code>：使用索引 <code>idx_orderdata</code> 过滤出1994 年 2 月的订单数据，预估记录数超过 13 万。</p>
+<p><code>Index lookup on lineitem using PRIMARY</code>：将第一步扫描的结果作为驱动表，然后将驱动表中的每行数据的 <code>o_orderkey</code> 值，在 <code>lineitem</code> 的主键索引中进行查找。</p>
+<p><code>Nested loop inner join</code>：进行 JOIN 连接，匹配得到的输出结果。</p>
+<p><code>Aggregate: count(1)</code>：统计得到最终的商品数量。</p>
+<p>但若执行的是下面这条 SQL，则执行计划就有了改变：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">FORMAT</span>=tree<br><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">COUNT</span>(<span class="hljs-number">1</span>) <br><span class="hljs-keyword">FROM</span> orders<br><span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> lineitem<br>  <span class="hljs-keyword">ON</span> orders.o_orderkey = lineitem.l_orderkey <br>    <span class="hljs-keyword">WHERE</span> orders.o_orderdate &gt;= <span class="hljs-string">'1994-02-01'</span> <br>      <span class="hljs-keyword">AND</span>  orders.o_orderdate &lt; <span class="hljs-string">'1994-03-01'</span><br>      <span class="hljs-keyword">AND</span> lineitem.l_partkey = <span class="hljs-number">620758</span><br><br><span class="hljs-keyword">EXPLAIN</span>: -&gt; <span class="hljs-keyword">Aggregate</span>: <span class="hljs-keyword">count</span>(<span class="hljs-number">1</span>)<br>-&gt; <span class="hljs-keyword">Nested</span> <span class="hljs-keyword">loop</span> <span class="hljs-keyword">inner</span> <span class="hljs-keyword">join</span>  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">17.37</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">2</span>)<br>    -&gt; <span class="hljs-keyword">Index</span> lookup <span class="hljs-keyword">on</span> lineitem <span class="hljs-keyword">using</span> lineitem_fk2 (L_PARTKEY=<span class="hljs-number">620758</span>)  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">4.07</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">38</span>)<br>    -&gt; Filter: ((orders.O_ORDERDATE &gt;= <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-02-01'</span>) <span class="hljs-keyword">and</span> (orders.O_ORDERDATE &lt; <span class="hljs-built_in">DATE</span><span class="hljs-string">'1994-03-01'</span>))  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">0.25</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">0</span>)<br>        -&gt; Single-<span class="hljs-keyword">row</span> <span class="hljs-keyword">index</span> lookup <span class="hljs-keyword">on</span> orders <span class="hljs-keyword">using</span> PRIMARY (o_orderkey=lineitem.l_orderkey)  (<span class="hljs-keyword">cost</span>=<span class="hljs-number">0.25</span> <span class="hljs-keyword">rows</span>=<span class="hljs-number">1</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>上述 SQL 只是新增了一个条件 <code>lineitem.l_partkey =620758</code>，即查询 1994 年 2 月，商品编号为 620758 的商品购买量。</p>
+<p>这时若仔细查看执行计划，会发现通过过滤条件 <code>l_partkey = 620758</code> 找到的记录大约只有 38 条，因此这时优化器选择表 <code>lineitem</code> 为驱动表。</p>
+<h3 id="Hash-Join"><a href="#Hash-Join" class="headerlink" title="Hash Join"></a>Hash Join</h3><p>MySQL 中的第二种 JOIN 算法是 Hash Join，用于两张表之间连接条件没有索引的情况。</p>
+<p>这里可能有人会有疑问，没有连接，那创建索引不就可以了吗？或许可以，但：如果有些列是低选择度的索引，那么创建索引在导入数据时要对数据排序，影响导入性能；另外，二级索引会有回表问题，若筛选的数据量比较大，则直接全表扫描会更快。</p>
+<p>对于 OLAP 业务查询来说，Hash Join 是必不可少的功能，MySQL 8.0 版本开始支持 Hash Join 算法，加强了对于 OLAP 业务的支持。</p>
+<p>所以，如果查询数据量不是特别大，对于查询的响应时间要求为分钟级别，完全可以使用单个实例 MySQL 8.0 来完成大数据的查询工作。</p>
+<p>Hash Join 算法的伪代码如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">foreach row r in R <span class="hljs-keyword">with</span> matching condition:<br>    <span class="hljs-keyword">create</span> <span class="hljs-keyword">hash</span> <span class="hljs-keyword">table</span> ht <span class="hljs-keyword">on</span> r<br>foreach <span class="hljs-keyword">row</span> s <span class="hljs-keyword">in</span> S <span class="hljs-keyword">with</span> matching condition:<br>    <span class="hljs-keyword">search</span> s <span class="hljs-keyword">in</span> <span class="hljs-keyword">hash</span> <span class="hljs-keyword">table</span> ht:<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">found</span>)<br>        send <span class="hljs-keyword">to</span> <span class="hljs-keyword">client</span><br></code></pre></div></td></tr></table></figure>
+
+<p>Hash Join会扫描关联的两张表：</p>
+<ul>
+<li><p>首先会在扫描驱动表的过程中创建一张哈希表；</p>
+</li>
+<li><p>接着扫描第二张表时，会在哈希表中搜索每条关联的记录，如果找到就返回记录。</p>
+</li>
+</ul>
+<p>Hash Join 选择驱动表和 Nested Loop Join 算法大致一样，都是较小的表作为驱动表。如果驱动表比较大，创建的哈希表超过了内存的大小，MySQL 会自动把结果转储到磁盘。</p>
+<p>为了演示 Hash Join，接下来，再来看一个 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    s_acctbal,<br>    s_name,<br>    n_name,<br>    p_partkey,<br>    p_mfgr,<br>    s_address,<br>    s_phone,<br>    s_comment<br><span class="hljs-keyword">FROM</span><br>    part,<br>    supplier,<br>    partsupp,<br>    nation,<br>    region<br><span class="hljs-keyword">WHERE</span><br>    p_partkey = ps_partkey<br>        <span class="hljs-keyword">AND</span> s_suppkey = ps_suppkey<br>        <span class="hljs-keyword">AND</span> p_size = <span class="hljs-number">15</span><br>        <span class="hljs-keyword">AND</span> p_type <span class="hljs-keyword">LIKE</span> <span class="hljs-string">'%BRASS'</span><br>        <span class="hljs-keyword">AND</span> s_nationkey = n_nationkey<br>        <span class="hljs-keyword">AND</span> n_regionkey = r_regionkey<br>        <span class="hljs-keyword">AND</span> r_name = <span class="hljs-string">'EUROPE'</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>上面这条 SQL 语句是要找出商品类型为 %BRASS，尺寸为 15 的欧洲供应商信息。</p>
+<p>因为商品表 part 不包含地区信息，所以要从关联表 partsupp 中得到商品供应商信息，然后再从供应商元数据表中得到供应商所在地区信息，最后在外表 region 连接，才能得到最终的结果。</p>
+<p>最后的执行计划如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/hash%20join%20%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="hash join执行计划"></p>
+<p>从上图可以发现，其实最早进行连接的是表 supplier 和 nation，接着再和表 partsupp 连接，然后和 part 表连接，再和表 part 连接。上述左右连接算法都是 Nested Loop Join。这时的结果集记录大概有 79,330 条记录。</p>
+<p>最后和表 region 进行关联，表 region 过滤得到结果5条，这时可以有 2 种选择：</p>
+<ul>
+<li><p>在 73390 条记录上创建基于 region 的索引，然后在内表中通过索引进行查询；</p>
+</li>
+<li><p>对表 region 创建哈希表，73390 条记录在哈希表中进行探测；</p>
+</li>
+</ul>
+<p>选择 1 就是 MySQL 8.0 不支持 Hash Join 时优化器的处理方式，缺点是：如关联的数据量非常大，创建索引需要时间；其次可能需要回表，优化器大概率会选择直接扫描内表。</p>
+<p>选择 2 只对大约 5 条记录的表 region 创建哈希索引，时间几乎可以忽略不计，其次直接选择对内表扫描，没有回表的问题。很明显，MySQL 8.0 会选择 Hash Join。</p>
+<p>了解完优化器的选择后，最后看一下命令 EXPLAIN FORMAT=tree 执行计划的最终结果：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">-&gt; Nested loop inner join  (cost=101423.45 rows=79)<br>    -&gt; Nested loop inner join  (cost=92510.52 rows=394)<br>        -&gt; Nested loop inner join  (cost=83597.60 rows=394)<br>            -&gt; Inner hash join (no condition)  (cost=81341.56 rows=98)<br>                -&gt; Filter: ((part.P_SIZE = 15) and (part.P_TYPE like '%BRASS'))  (cost=81340.81 rows=8814)<br>                    -&gt; Table scan on part  (cost=81340.81 rows=793305)<br>                -&gt; Hash<br>                    -&gt; Filter: (region.R_NAME = 'EUROPE')  (cost=0.75 rows=1)<br>                        -&gt; Table scan on region  (cost=0.75 rows=5)<br>            -&gt; Index lookup on partsupp using PRIMARY (ps_partkey=part.p_partkey)  (cost=0.25 rows=4)<br>        -&gt; Single-row index lookup on supplier using PRIMARY (s_suppkey=partsupp.PS_SUPPKEY)  (cost=0.25 rows=1)<br>    -&gt; Filter: (nation.N_REGIONKEY = region.r_regionkey)  (cost=0.25 rows=0)<br>        -&gt; Single-row index lookup on nation using PRIMARY (n_nationkey=supplier.S_NATIONKEY)  (cost=0.25 rows=1)<br></code></pre></div></td></tr></table></figure>
+
+<p>以上就是 MySQL 数据库中 JOIN 的实现原理和应用了。</p>
+<h3 id="对于-OLTP-业务能不能写-join-的疑问"><a href="#对于-OLTP-业务能不能写-join-的疑问" class="headerlink" title="对于 OLTP 业务能不能写 join 的疑问"></a>对于 OLTP 业务能不能写 join 的疑问</h3><p>OLTP 业务是海量并发，要求响应非常及时，在毫秒级别返回结果，如淘宝的电商业务、支付宝的支付业务、美团的外卖业务等。</p>
+<p><strong>如果 OLTP 业务的 JOIN 带有 WHERE 过滤条件，并且是根据主键、索引进行过滤，那么驱动表只有一条或少量记录，这时进行 JOIN 的开销是非常小的</strong>。</p>
+<p>比如在淘宝的电商业务中，用户要查看自己的订单情况，其本质是在数据库中执行类似如下的 SQL 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> o_custkey, o_orderdate, o_totalprice, p_name <span class="hljs-keyword">FROM</span> orders,lineitem, part<br><span class="hljs-keyword">WHERE</span> o_orderkey = l_orderkey<br>  <span class="hljs-keyword">AND</span> l_partkey = p_partkey<br>  <span class="hljs-keyword">AND</span> o_custkey = ?<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span><br><span class="hljs-keyword">LIMIT</span> <span class="hljs-number">30</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>以往看到的很多面经讲解都会建议拆分成简单的 sql 来写：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_custkey = ? <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span>;<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> lineitem<br><span class="hljs-keyword">WHERE</span> l_orderkey = ?;<br><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> part<br><span class="hljs-keyword">WHERE</span> p_part = ?<br></code></pre></div></td></tr></table></figure>
+
+<p>其实完全不用人工拆分语句，<strong>因为拆分的过程就是优化器的执行结果，而且优化器更可靠，速度更快，而拆成三条 SQL 的方式，本身网络交互的时间开销就大了 3 倍</strong>。</p>
+<p>所以，放心写 JOIN，要相信数据库的优化器更为专业。上述 SQL 的执行计划如下：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">EXPLAIN: -&gt; Limit: 30 row(s)  (cost=27.76 rows=30)<br>    -&gt; Nested loop inner join  (cost=27.76 rows=44)<br>        -&gt; Nested loop inner join  (cost=12.45 rows=44)<br>            -&gt; Index lookup on orders using idx_custkey_orderdate (O_CUSTKEY=1; iterate backwards)  (cost=3.85 rows=11)<br>            -&gt; Index lookup on lineitem using PRIMARY (l_orderkey=orders.o_orderkey)  (cost=0.42 rows=4)<br>        -&gt; Single-row index lookup on part using PRIMARY (p_partkey=lineitem.L_PARTKEY)  (cost=0.25 rows=1)<br></code></pre></div></td></tr></table></figure>
+
+<p>由于驱动表的数据是固定 30 条，因此不论表 orders、lineitem、part 的数据量有多大，哪怕是百亿条记录，由于都是通过主键进行关联，上述 SQL 的执行速度几乎不变。</p>
+<p>所以，OLTP 业务完全可以大胆放心地写 JOIN，但是要确保 JOIN 的索引都已添加， DBA 们在业务上线之前一定要做 SQL Review，确保预期内的索引都已创建。</p>
+<p><strong>思考题</strong>：</p>
+<ol>
+<li><p>下面这条较复杂的 SQL 查询的内容是什么？</p>
+</li>
+<li><p>查看它的执行计划，比较 MySQL 5.7 与 8.0 版本的不同，并说明它的执行过程。</p>
+</li>
+<li><p>如何在原有索引的基础上，添加额外的索引，提升查询效率？</p>
+</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>  supp_nation,<br>  cust_nation,<br>  l_year,<br>  <span class="hljs-keyword">SUM</span>(volume) <span class="hljs-keyword">AS</span> revenue<br><span class="hljs-keyword">FROM</span><br>  (<br>    <span class="hljs-keyword">SELECT</span><br>      n1.n_name <span class="hljs-keyword">AS</span> supp_nation,<br>      n2.n_name <span class="hljs-keyword">AS</span> cust_nation,<br>      <span class="hljs-keyword">EXTRACT</span>(<span class="hljs-keyword">YEAR</span> <span class="hljs-keyword">FROM</span> l_shipdate) <span class="hljs-keyword">AS</span> l_year,<br>      l_extendedprice * (<span class="hljs-number">1</span> - l_discount) <span class="hljs-keyword">AS</span> volume<br>    <span class="hljs-keyword">FROM</span><br>      supplier,<br>      lineitem,<br>      orders,<br>      customer,<br>      nation n1,<br>      nation n2<br>    <span class="hljs-keyword">WHERE</span><br>      s_suppkey = l_suppkey<br>      <span class="hljs-keyword">AND</span> o_orderkey = l_orderkey<br>      <span class="hljs-keyword">AND</span> c_custkey = o_custkey<br>      <span class="hljs-keyword">AND</span> s_nationkey = n1.n_nationkey<br>      <span class="hljs-keyword">AND</span> c_nationkey = n2.n_nationkey<br>      <span class="hljs-keyword">AND</span> (<br>        (n1.n_name = <span class="hljs-string">'FRANCE'</span> <span class="hljs-keyword">AND</span> n2.n_name = <span class="hljs-string">'GERMANY'</span>)<br>        <span class="hljs-keyword">OR</span> (n1.n_name = <span class="hljs-string">'GERMANY'</span> <span class="hljs-keyword">AND</span> n2.n_name = <span class="hljs-string">'FRANCE'</span>)<br>      )<br>            <span class="hljs-keyword">AND</span> l_shipdate <span class="hljs-keyword">BETWEEN</span> <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1995-01-01'</span> <span class="hljs-keyword">AND</span> <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1996-12-31'</span><br>  ) <span class="hljs-keyword">AS</span> shipping<br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span><br>  supp_nation,<br>  cust_nation,<br>  l_year<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span><br>  supp_nation,<br>  cust_nation,<br>  l_year;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><p>先下结论：<strong>MySQL 8.0 版本中，子查询的优化得到大幅提升。所以从现在开始，可以放心大胆地在MySQL 中使用子查询！</strong></p>
+<p>通常来讲，开发人员在写 sql 的时候，会更偏向于使用子查询，而不是 Join 语句，因为 JOIN 是一个代数关系，而子查询更偏向于人类的思维角度进行理解。</p>
+<p>例如以“找出1993年，没有下过订单的客户数量”为例子，开发人员可能这样写 sql：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    <span class="hljs-keyword">COUNT</span>(c_custkey) cnt<br><span class="hljs-keyword">FROM</span><br>    customer<br><span class="hljs-keyword">WHERE</span><br>    c_custkey <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<br>		<span class="hljs-keyword">SELECT</span> <br>            o_custkey<br>        <span class="hljs-keyword">FROM</span><br>            orders<br>        <span class="hljs-keyword">WHERE</span><br>            o_orderdate &gt;=  <span class="hljs-string">'1993-01-01'</span><br>			<span class="hljs-keyword">AND</span> o_orderdate &lt;  <span class="hljs-string">'1994-01-01'</span><br>	);<br></code></pre></div></td></tr></table></figure>
+
+<p>从中可以看到，子查询的逻辑非常清晰：通过 NOT IN 查询不在订单表的用户有哪些。</p>
+<p>不过上述查询是一个典型的 LEFT JOIN 问题（即在表 customer 存在，在表 orders 不存在的问题）。所以，这个问题如果用 LEFT JOIN 写，那么 SQL 如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    <span class="hljs-keyword">COUNT</span>(c_custkey) cnt<br><span class="hljs-keyword">FROM</span><br>    customer<br>        <span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span><br>    orders <span class="hljs-keyword">ON</span> <br>			customer.c_custkey = orders.o_custkey <br>			<span class="hljs-keyword">AND</span> o_orderdate &gt;= <span class="hljs-string">'1993-01-01'</span><br>			<span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1994-01-01'</span><br><span class="hljs-keyword">WHERE</span><br>    o_custkey <span class="hljs-keyword">IS</span> <span class="hljs-literal">NULL</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>可以发现，虽然 LEFT JOIN 也能完成上述需求，但不容易理解。所以，大部分人都更倾向写子查询。</p>
+<p>不过从优化器的角度看，LEFT JOIN 更易于理解，能进行传统 JOIN 的两表连接，而子查询则要求优化器聪明地将其转换为最优的 JOIN 连接。</p>
+<p>在 MySQL 8.0 版本中，针对子查询做了优化，对于上述两条 SQL，不论是子查询还是 LEFT JOIN，最终都被转换成了 Nested Loop Join，所以上述两条 SQL 的执行时间是一样的。也就是说，在 MySQL 8.0 中，优化器会自动地将 IN 子查询优化，优化为最佳的 JOIN 执行计划，这样一来，会显著的提升性能。</p>
+<h3 id="子查询-IN-和-EXISTS-的性能对比"><a href="#子查询-IN-和-EXISTS-的性能对比" class="headerlink" title="子查询 IN 和 EXISTS 的性能对比"></a>子查询 IN 和 EXISTS 的性能对比</h3><p>对于上面讲的 NOT IN 子查询，可以改写为 NOT EXISTS 子查询，重写后的 SQL 如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    <span class="hljs-keyword">COUNT</span>(c_custkey) cnt<br><span class="hljs-keyword">FROM</span><br>    customer<br><span class="hljs-keyword">WHERE</span><br>    <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> (<br>		<span class="hljs-keyword">SELECT</span> <br>            <span class="hljs-number">1</span><br>        <span class="hljs-keyword">FROM</span><br>            orders<br>        <span class="hljs-keyword">WHERE</span><br>            o_orderdate &gt;=  <span class="hljs-string">'1993-01-01'</span><br>			<span class="hljs-keyword">AND</span> o_orderdate &lt;  <span class="hljs-string">'1994-01-01'</span><br>            <span class="hljs-keyword">AND</span> c_custkey = o_custkey<br>	);<br></code></pre></div></td></tr></table></figure>
+
+<p>之前在网上看过，查询用 not in 那么内外表都进行全表扫描，没有用到索引；而 not extsts 的子查询依然能用到表上的索引。not exists 都比 not in 要快。然而实际上，在 MySQL 8.0 版本中，上述 sql 的执行计划是一样的，所以<strong>效率其实是一样的</strong>。</p>
+<h3 id="依赖子查询的优化"><a href="#依赖子查询的优化" class="headerlink" title="依赖子查询的优化"></a>依赖子查询的优化</h3><p>在 MySQL 8.0 版本之前，MySQL 对于子查询的优化并不充分。所以在子查询的执行计划中会看到 <code>DEPENDENT SUBQUERY</code> 的提示，这表示是一个依赖子查询，子查询需要依赖外部表的关联。</p>
+<p>如果看到这样的提示，就要警惕， 因为 <code>DEPENDENT SUBQUERY</code> 执行速度可能非常慢，大部分时候需要你手动把它转化成两张表之间的连接。</p>
+<p>以下面这条 SQL 为例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <br>    *<br><span class="hljs-keyword">FROM</span><br>    orders<br><span class="hljs-keyword">WHERE</span><br>    (o_clerk , o_orderdate) <span class="hljs-keyword">IN</span> (<br>		<span class="hljs-keyword">SELECT</span> <br>            o_clerk, <span class="hljs-keyword">MAX</span>(o_orderdate)<br>        <span class="hljs-keyword">FROM</span><br>            orders<br>        <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> o_clerk);<br></code></pre></div></td></tr></table></figure>
+
+<p>上述 SQL 语句的子查询部分表示“计算出每个员工最后成交的订单时间”，然后最外层的 SQL表示返回订单的相关信息。</p>
+<p>这条 SQL 在最新的 MySQL 8.0 中，通过命令 <code>EXPLAIN FORMAT=tree</code> 输出执行计划，可以看到，在第 3 行会有这样的提示：<code>Select #2 (subquery in condition; run only once)</code>。这表示子查询只执行了一次，然后把最终的结果保存起来了。</p>
+<p>执行计划的第 6 行 <code>Index lookup on &lt;materialized_subquery&gt;</code>，表示对表 orders 和子查询结果所得到的表进行 JOIN 连接，最后返回结果。</p>
+<p>所以，当前这个执行计划是对表 orders 做 2 次扫描，每次扫描约 5587618 条记录：</p>
+<ul>
+<li><p>第 1 次扫描，用于内部的子查询操作，计算出每个员工最后一次成交的时间；</p>
+</li>
+<li><p>第 2 次表 oders 扫描，查询并返回每个员工的订单信息，即返回每个员工最后一笔成交的订单信息。</p>
+</li>
+</ul>
+<p>最后，直接用命令 EXPLAIN 查看执行计划，如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/mysql8.0%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%9F%A5%E8%AF%A2%E8%AE%A1%E5%88%92.png" alt="mysql8.0 子查询查询计划"></p>
+<p>如果是老版本的 MySQL 数据库，它的执行计划将会是依赖子查询，执行计划如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E8%80%81%E7%89%88%E6%9C%ACmysql%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%9F%A5%E8%AF%A2%E8%AE%A1%E5%88%92.png" alt="老版本mysql子查询查询计划"></p>
+<p>对比 MySQL 8.0，只是在第二行的 <code>select_type</code> 这里有所不同，一个是 <code>SUBQUERY</code>，一个是<code>DEPENDENT SUBQUERY</code>。</p>
+<p>接着通过命令 <code>EXPLAIN FORMAT=tree</code> 查看更详细的执行计划过程：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E8%80%81%E7%89%88%E6%9C%AC%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%AF%A6%E7%BB%86%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="老版本子查询详细执行计划"></p>
+<p>可以发现，第 3 行的执行技术输出是：<code>Select #2 (subquery in condition; dependent)</code>，并不像先前的执行计划，提示只执行一次。另外，通过第 1 行也可以发现，这条 SQL 变成了 exists 子查询，每次和子查询进行关联。</p>
+<p>所以，上述执行计划其实表示：先查询每个员工的订单信息，接着对每条记录进行内部的子查询进行依赖判断。也就是说，<strong>先进行外表扫描，接着做依赖子查询的判断。所以，子查询执行了5587618，而不是1次</strong>！！！</p>
+<p>所以，两者的执行计划，扫描次数的对比如下所示：</p>
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">表 orders 的扫描次数</th>
+<th align="center">扫描记录数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">独立子查询</td>
+<td align="center">1+1</td>
+<td align="center">5587618+5587618</td>
+</tr>
+<tr>
+<td align="center">依赖子查询</td>
+<td align="center">1+1*5587618</td>
+<td align="center">5587618+5587618*5587618</td>
+</tr>
+</tbody></table>
+<p>对于依赖子查询的优化，就是要避免子查询由于需要对外部的依赖，而需要对子查询扫描多次的情况。所以可以通过派生表的方式，将外表和子查询的派生表进行连接，从而降低对于子查询表的扫描，从而提升 SQL 查询的性能。</p>
+<p>那么对于上面的这条 SQL ，可将其重写为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders o1,<br>(<br>	<span class="hljs-keyword">SELECT</span> <br>		o_clerk, <span class="hljs-keyword">MAX</span>(o_orderdate)<br>	<span class="hljs-keyword">FROM</span><br>		orders<br>	<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> o_clerk<br>) o2<br><span class="hljs-keyword">WHERE</span> <br>	o1.o_clerk = o2.o_clerk <br>    <span class="hljs-keyword">AND</span> o1.o_orderdate = o2.orderdate;<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，我们将子查询改写为了派生表 o2，然后将表 o2 与外部表 orders 进行关联。关联的条件是：<code>o1.o_clerk = o2.o_clerk AND o1.o_orderdate = o2.orderdate</code>。<br>通过上面的重写后，派生表 o2 对表 orders 进行了1次扫描，返回约 5587618 条记录。派生表o1 对表 orders 扫描 1 次，返回约 1792612 条记录。这与 8.0 的执行计划就非常相似了，其执行计划如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%B4%BE%E7%94%9F%E8%A1%A8%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.png" alt="派生表执行计划"></p>
+<p>可以看到，经过 SQL 重写后，派生表的执行速度几乎与独立子查询一样。所以，若<strong>看到依赖子查询的执行计划，记得先进行 SQL 重写优化</strong>。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li><p>子查询相比 JOIN 更易于人类理解，所以受众更广，使用更多；</p>
+</li>
+<li><p>当前 MySQL 8.0 版本可以“毫无顾忌”地写子查询，对于子查询的优化已经相当完备；</p>
+</li>
+<li><p>对于老版本的 MySQL，请 Review 所有子查询的SQL执行计划， 对于出现 DEPENDENT SUBQUERY 的提示，请务必即使进行优化，否则对业务将造成重大的性能影响；</p>
+</li>
+<li><p><strong>DEPENDENT SUBQUERY 的优化，一般是重写为派生表进行表连接</strong>。</p>
+</li>
+</ol>
+<h2 id="分区表"><a href="#分区表" class="headerlink" title="分区表"></a>分区表</h2><p>分区表就是把物理表结构相同的几张表，通过一定算法，组成一张逻辑大表。这种算法叫“分区函数”，当前 MySQL 数据库支持的分区函数类型有 RANGE、LIST、HASH、KEY、COLUMNS。</p>
+<h3 id="分区表的使用"><a href="#分区表的使用" class="headerlink" title="分区表的使用"></a>分区表的使用</h3><p>无论选择哪种分区函数，都要指定相关列成为分区算法的输入条件，这些列就叫“分区列”。另外，在 MySQL 分区表中，<strong>主键也必须是分区列的一部分，不然创建分区表时会失败</strong>，比如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE t (<br>    a INT,<br>    b INT,<br>    c DATETIME(6),<br>    d VARCHAR(32),<br>    e INT,<br>    PRIMARY KEY (a,b)<br>)<br>partition by range columns(c) (<br>    PARTITION p0000 VALUES LESS THAN (&apos;2019-01-01&apos;),<br>    PARTITION p2019 VALUES LESS THAN (&apos;2020-01-01&apos;),<br>    PARTITION p2020 VALUES LESS THAN (&apos;2021-01-01&apos;),<br>    PARTITION p9999 VALUES LESS THAN (MAXVALUE)<br>);<br>ERROR 1503 (HY000): A PRIMARY KEY must include all columns in the table&apos;s partitioning function (prefixed columns are not considered).<br></code></pre></div></td></tr></table></figure>
+
+<p>上面创建了表 t，主键是复合索引，由列 a、b 组成。表 t 创建分区表的意图是根据列 c（时间列）拆分数据，把不同时间数据存放到不同分区中。</p>
+<p>而可以从错误的提示中看到：分区表的主键一定要包含分区函数的列。所以，要创建基于列 c 的数据分片的分区表，主键必须包含列 c，比如下面的建表语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> t (<br>    a <span class="hljs-built_in">INT</span>,<br>    b <span class="hljs-built_in">INT</span>,<br>    c DATETIME,<br>    d <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">32</span>),<br>    e <span class="hljs-built_in">INT</span>,<br>    PRIMARY <span class="hljs-keyword">KEY</span> (a,b,c),<br>    <span class="hljs-keyword">KEY</span> idx_e (e)<br>)<br><span class="hljs-keyword">partition</span> <span class="hljs-keyword">by</span> <span class="hljs-keyword">range</span> <span class="hljs-keyword">columns</span>(c) (<br>    <span class="hljs-keyword">PARTITION</span> p0000 <span class="hljs-keyword">VALUES</span> <span class="hljs-keyword">LESS</span> <span class="hljs-keyword">THAN</span> (<span class="hljs-string">'2019-01-01'</span>),<br>    <span class="hljs-keyword">PARTITION</span> p2019 <span class="hljs-keyword">VALUES</span> <span class="hljs-keyword">LESS</span> <span class="hljs-keyword">THAN</span> (<span class="hljs-string">'2020-01-01'</span>),<br>    <span class="hljs-keyword">PARTITION</span> p2020 <span class="hljs-keyword">VALUES</span> <span class="hljs-keyword">LESS</span> <span class="hljs-keyword">THAN</span> (<span class="hljs-string">'2021-01-01'</span>),<br>    <span class="hljs-keyword">PARTITION</span> p9999 <span class="hljs-keyword">VALUES</span> <span class="hljs-keyword">LESS</span> <span class="hljs-keyword">THAN</span> (MAXVALUE)<br>);<br></code></pre></div></td></tr></table></figure>
+
+<p>创建完表后，在物理存储上会看到四个分区所对应 ibd 文件，也就是把数据根据时间列 c 存储到对应的 4 个文件中：</p>
+<figure class="highlight css"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs css"><span class="hljs-selector-tag">t</span><span class="hljs-selector-id">#p</span><span class="hljs-selector-id">#p0000</span><span class="hljs-selector-class">.ibd</span>  <span class="hljs-selector-tag">t</span><span class="hljs-selector-id">#p</span><span class="hljs-selector-id">#p2019</span><span class="hljs-selector-class">.ibd</span>  <span class="hljs-selector-tag">t</span><span class="hljs-selector-id">#p</span><span class="hljs-selector-id">#p2020</span><span class="hljs-selector-class">.ibd</span>  <span class="hljs-selector-tag">t</span><span class="hljs-selector-id">#p</span><span class="hljs-selector-id">#p9999</span><span class="hljs-selector-class">.ibd</span><br></code></pre></div></td></tr></table></figure>
+
+<p>要理解的是：MySQL 中的分区表是把一张大表拆成了多张表，每张表有自己的索引，从逻辑上看是一张表，但物理上存储在不同文件中。</p>
+<h3 id="分区表的唯一索引"><a href="#分区表的唯一索引" class="headerlink" title="分区表的唯一索引"></a>分区表的唯一索引</h3><p>在 MySQL 数据库中，分区表的索引都是局部，而非全局。也就是说，索引在每个分区文件中都是独立的，所以分区表上的唯一索引必须包含分区列信息，否则创建会报错，比如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> t <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">KEY</span> idx_d(d);<br>ERROR 1503 (HY000): A UNIQUE INDEX must include all columns in the table's partitioning function (prefixed columns are not considered).<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到错误提示： 唯一索引必须包含分区函数中所有列。而下面的创建才能成功：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> t <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">KEY</span> idx_d(d,c);<br></code></pre></div></td></tr></table></figure>
+
+<p>但是，正因为唯一索引包含了分区列，唯一索引也就变成仅在当前分区唯一，而不是全局唯一了。那么对于上面的表 t，插入下面这两条记录都是可以的：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> t <span class="hljs-keyword">VALUES</span> <br>(<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-string">'2021-01-01'</span>,<span class="hljs-string">'aaa'</span>,<span class="hljs-number">1</span>),<br>(<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-string">'2020-01-01'</span>,<span class="hljs-string">'aaa'</span>,<span class="hljs-number">1</span>);<br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> t;<br>+<span class="hljs-comment">---+---+---------------------+------+------+</span><br>| a | b | c                   | d    | e    |<br>+<span class="hljs-comment">---+---+---------------------+------+------+</span><br>| 1 | 1 | 2020-01-01 00:00:00 |aaa   |    1 |<br>| 1 | 1 | 2021-01-01 00:00:00 |aaa   |    1 |<br>+<span class="hljs-comment">---+---+---------------------+------+------+</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，列 d 都是字符串 ‘aaa’，但依然可以插入。这样带来的影响是列 d 并不是唯一的，所以要由当前分区唯一实现全局唯一。</p>
+<p>那如何实现全局唯一索引呢？ 和之前表结构设计时一样，唯一索引使用全局唯一的字符串（如类似 UUID 的实现），这样就能避免局部唯一的问题。</p>
+<h3 id="表分区与性能"><a href="#表分区与性能" class="headerlink" title="表分区与性能"></a>表分区与性能</h3><p>表分区并不能提升性能，<strong>分区表技术不是用于提升 MySQL 数据库的性能，而是方便数据的管理</strong>。</p>
+<p>B+ 树的高度与数据存储量的关系如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/B%2B%E6%A0%91%E7%9A%84%E9%AB%98%E5%BA%A6%E4%B8%8E%E6%80%BB%E8%AE%B0%E5%BD%95%E6%95%B0%E7%9A%84%E5%85%B3%E7%B3%BB.png" alt="B+树的高度与总记录数的关系"></p>
+<p>从表格中可以看到，B+ 树的高度为 4 能存放数十亿的数据，一次查询只需要占用 4 次 I/O，速度非常快。</p>
+<p>但是当使用分区之后，效果就不一样了，比如上面的表 t，我们根据时间拆成每年一张表，这时，虽然 B+ 树的高度从 4 降为了 3，但是这个提升微乎其微。</p>
+<p>除此之外，分区表还会引入新的性能问题，比如非分区列的查询。非分区列的查询，即使分区列上已经创建了索引，但因为索引是每个分区文件对应的本地索引，所以要查询每个分区。</p>
+<p>观察这条 SQL 以及它的执行计划：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> t <span class="hljs-keyword">WHERE</span> d = <span class="hljs-string">'aaa'</span><br>******** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ********<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: t<br>   <span class="hljs-keyword">partitions</span>: p0000,p2019,p2020,p9999<br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ALL</span><br>possible_keys: <span class="hljs-literal">NULL</span><br>          <span class="hljs-keyword">key</span>: <span class="hljs-literal">NULL</span><br>      key_len: <span class="hljs-literal">NULL</span><br>          <span class="hljs-keyword">ref</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">2</span><br>     filtered: <span class="hljs-number">50.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">where</span><br></code></pre></div></td></tr></table></figure>
+
+<p>通过执行计划可以看到：上述 SQL 需要访问 4 个分区，假设每个分区需要 3 次 I/O，则这条 SQL 总共要 12 次 I/O。但是，如果使用普通表，记录数再多，也就 4 次的 I/O 的时间。</p>
+<p>所以，<strong>分区表设计时，务必明白你的查询条件都带有分区字段，否则会扫描所有分区的数据或索引</strong>。所以，分区表设计不解决性能问题，更多的是解决数据迁移和备份的问题。</p>
+<h3 id="分区表在业务上的设计"><a href="#分区表在业务上的设计" class="headerlink" title="分区表在业务上的设计"></a>分区表在业务上的设计</h3><p>以电商中的订单表 Orders 为例，如果在类似淘宝的海量互联网业务中，Orders 表的数据量会非常巨大，假设一天产生 5000 万的订单，那么一年表 Orders 就有近 18 亿的记录。</p>
+<p>所以对于订单表，在数据库中通常只保存最近一年甚至更短时间的数据，而历史订单数据会入历史库。除非存在 1 年以上退款的订单，大部分订单一旦完成，这些数据从业务角度就没用了。</p>
+<p>那么如果想方便管理订单表中的数据，可以对表 Orders 按年创建分区表，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE `orders` (<br>  `o_orderkey` int NOT NULL,<br>  `O_CUSTKEY` int NOT NULL,<br>  `O_ORDERSTATUS` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,<br>  `O_TOTALPRICE` decimal(15,2) NOT NULL,<br>  `O_ORDERDATE` date NOT NULL,<br>  `O_ORDERPRIORITY` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,<br>  `O_CLERK` char(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,<br>  `O_SHIPPRIORITY` int NOT NULL,<br>  `O_COMMENT` varchar(79) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,<br>  PRIMARY KEY (`o_orderkey`,`O_ORDERDATE`),<br>  KEY `orders_fk1` (`O_CUSTKEY`),<br>  KEY `idx_orderdate` (`O_ORDERDATE`)<br>)<br>PARTITION BY RANGE  COLUMNS(o_orderdate)<br>(<br>  PARTITION p0000 VALUES LESS THAN (&apos;1992-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1992 VALUES LESS THAN (&apos;1993-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1993 VALUES LESS THAN (&apos;1994-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1994 VALUES LESS THAN (&apos;1995-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1995 VALUES LESS THAN (&apos;1996-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1996 VALUES LESS THAN (&apos;1997-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1997 VALUES LESS THAN (&apos;1998-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p1998 VALUES LESS THAN (&apos;1999-01-01&apos;) ENGINE = InnoDB,<br>  PARTITION p9999 VALUES LESS THAN (MAXVALUE)<br>）<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，这时 Orders 表的主键修改为了 <code>(o_orderkey,O_ORDERDATE)</code>，数据按照年进行分区存储。那么如果要删除 1 年前的数据，比如删除 1998 年的数据，之前需要使用下面的 SQL，比如:</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> Orders <br><span class="hljs-keyword">WHERE</span> o_orderdate &gt;= <span class="hljs-string">'1998-01-01'</span> <br>  <span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-string">'1999-01-01'</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可这条 SQL 的执行相当慢，产生大量二进制日志，在生产系统上，也会导致数据库主从延迟的问题。而使用分区表的话，对于数据的管理就容易多了，直接使用清空分区的命令就行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> orders_par <br><span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">PARTITION</span> p1998<br></code></pre></div></td></tr></table></figure>
+
+<p>上述 SQL 执行速度非常快，因为实际执行过程是把分区文件删除和重建。另外产生的日志也只有一条 DDL 日志，也不会导致主从复制延迟问题。</p>
+<p><strong>思考题</strong>：</p>
+<ol>
+<li><p>除了订单表，还有那些业务适合使用分区表技术呢？</p>
+</li>
+<li><p>对于电商中的订单表，经常需要根据用户查询购买记录，这时会使用如下 SQL。如果把表 Orders 设计成按年分区，这时的执行计划如何？存在什么样的问题？如何优化呢？</p>
+ <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders_par <br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">limit</span> <span class="hljs-number">30</span><br></code></pre></div></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+</li>
+</ol>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/mysql/">mysql</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/06/09/go%E4%B9%8Bvalidator%E5%BA%93/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">go 之 validator 库</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/05/01/Go%20module/">
+                        <span class="hidden-mobile">Go module</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        粤ICP备18114217号
+      </a>
+    </span>
+    
+      
+        <span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
+            rel="nofollow noopener"
+            class="beian-police"
+            target="_blank"
+          >
+            
+              <span style="visibility: hidden; width: 0">|</span>
+              <img src="/img/police_beian.png" alt="police-icon"/>
+            
+            <span>粤ICP备18114217号-1</span>
+          </a>
+        </span>
+      
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-M2RT7SDT3L', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M2RT7SDT3L');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

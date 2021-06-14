@@ -63,7 +63,7 @@ new 出来的是一个指针
 
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.9","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}}};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
   </script>
   <script  src="/js/utils.js" ></script>
   <script  src="/js/color-schema.js" ></script>
@@ -149,15 +149,13 @@ new 出来的是一个指针
         
         
           <li class="nav-item" id="search-btn">
-            <!-- <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i -->
-              <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
                 class="iconfont icon-search"></i>&nbsp;</a>
           </li>
         
         
           <li class="nav-item" id="color-toggle-btn">
-           <!-- <a class="nav-link" href="javascript:" target="_blank" rel="noopener">&nbsp;<i -->
-             <a class="nav-link" target="_self">&nbsp;<i
+            <a class="nav-link" target="_self">&nbsp;<i
                 class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
           </li>
         
@@ -194,7 +192,7 @@ new 出来的是一个指针
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.5k 字
+      6.1k 字
     </span>
   
 
@@ -204,7 +202,7 @@ new 出来的是一个指针
       <i class="iconfont icon-clock-fill"></i>
       
       
-      70
+      77
        分钟
     </span>
   
@@ -246,7 +244,7 @@ new 出来的是一个指针
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年4月30日 下午
+                  本文最后更新于：2021年5月30日 晚上
                 
               </p>
             
@@ -307,6 +305,24 @@ new 出来的是一个指针
 <p>代码主要做的事情是：找出传入的参数为 Slice，并且 Slice 的元素为结构体，如果其中有一个字段名是 <code>Name</code> 或者是 标签名称为 <code>Name</code>，并且还有一个字段名是 <code>Handsome</code> 的情形。如果找到，并且字段名称为 <code>Name</code> 的实际值是 <code>qcrao</code> 的话，就把另一个字段 <code>Handsome</code> 的值置为 true。</p>
 <p>程序并不关心传入的结构体到底是什么，只要它的字段名包含 <code>Name</code> 和 <code>Handsome</code>，都是 handsome 函数要工作的对象。</p>
 <p>注意一点，<code>Adult</code> 结构体的标签 <code>qson:&quot;Name&quot;</code>，中间是没有空格的，否则 <code>Tag.Get(&quot;qson&quot;)</code> 识别不出来。</p>
+<h1 id="空结构体的应用"><a href="#空结构体的应用" class="headerlink" title="空结构体的应用"></a>空结构体的应用</h1><p>在Go中，每一个基本类型都有对应的字节宽度，声明一个变量后即使不赋值，也需要占用一定的内存。但是对于空结构体来说，其字节宽度为0，因此可以用在某些场景下作为占位符而不占用存储空间。其使用场景主要有：</p>
+<ul>
+<li>实现方法接收者</li>
+<li>实现集合类型</li>
+<li>实现空通道</li>
+</ul>
+<h2 id="实现方法接收者"><a href="#实现方法接收者" class="headerlink" title="实现方法接收者"></a>实现方法接收者</h2><p>在某些业务场景下，需要将方法组合起来，代表一个分组，便于后续的拓展和维护。这时候就会使用空结构体，即节省内存，也便于未来针对该类型进行公共字段等的增加。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> T <span class="hljs-keyword">struct</span>&#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *T)</span> <span class="hljs-title">Call</span><span class="hljs-params">()</span></span> &#123;<br> fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> <span class="hljs-keyword">var</span> s T<br> s.Call()<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在该场景下，使用空结构体从多维度来考量是最合适的，易拓展，省空间，最结构化。</p>
+<h2 id="实现集合类型"><a href="#实现集合类型" class="headerlink" title="实现集合类型"></a>实现集合类型</h2><p>由于 Go 中并没有提供集合（Set）的相关支持，当需要自己实现时，可以使用 map 来替代，对于其 value，使用空结构作为占位符，不会额外增加不必要的内存开销：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Set <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">struct</span>&#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s Set)</span> <span class="hljs-title">Append</span><span class="hljs-params">(k <span class="hljs-keyword">string</span>)</span></span> &#123;<br> s[k] = <span class="hljs-keyword">struct</span>&#123;&#125;&#123;&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s Set)</span> <span class="hljs-title">Remove</span><span class="hljs-params">(k <span class="hljs-keyword">string</span>)</span></span> &#123;<br> <span class="hljs-built_in">delete</span>(s, k)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s Set)</span> <span class="hljs-title">Exist</span><span class="hljs-params">(k <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br> _, ok := s[k]<br> <span class="hljs-keyword">return</span> ok<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> set := Set&#123;&#125;<br> set.Append(<span class="hljs-string">"煎鱼"</span>)<br> set.Append(<span class="hljs-string">"咸鱼"</span>)<br> set.Append(<span class="hljs-string">"蒸鱼"</span>)<br> set.Remove(<span class="hljs-string">"煎鱼"</span>)<br><br> fmt.Println(set.Exist(<span class="hljs-string">"煎鱼"</span>))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="实现空通道"><a href="#实现空通道" class="headerlink" title="实现空通道"></a>实现空通道</h2><p>在 Go channel 的使用场景中，常常会遇到通知型 channel，其不需要发送任何数据，只要用于协调 Goroutine 的运行，用于流转各类状态或是控制并发情况。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> ch := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">struct</span>&#123;&#125;)<br> <span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>  time.Sleep(<span class="hljs-number">1</span> * time.Second)<br>  <span class="hljs-built_in">close</span>(ch)<br> &#125;()<br><br> fmt.Println(<span class="hljs-string">"脑子好像进..."</span>)<br> &lt;-ch<br> fmt.Println(<span class="hljs-string">"煎鱼了！"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>该程序会先输出 ”脑子好像进…“ 后，再睡眠一段时间再输出 “煎鱼了！”，达到间断控制 channel 的效果。</p>
+<p>由于该 channel 使用的是空结构体，因此也不会带来额外的内存开销。</p>
 <h1 id="go-中常用的包"><a href="#go-中常用的包" class="headerlink" title="go 中常用的包"></a>go 中常用的包</h1><h2 id="regexp包"><a href="#regexp包" class="headerlink" title="regexp包"></a>regexp包</h2><p>主要用于正则匹配。</p>
 <p>如果是简单模式，使用 <code>Match</code> 方法便可：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ok, _ := regexp.Match(pat, []<span class="hljs-keyword">byte</span>(searchIn))<br></code></pre></div></td></tr></table></figure>
@@ -425,6 +441,7 @@ new 出来的是一个指针
 <p> <a href="https://mp.weixin.qq.com/s/LjSlxdo5PFVJcUhH3UDU0A" target="_blank" rel="noopener">不要使用 Go 默认的 HTTP 客户端（在生产环境中）</a></p>
 <p> <a href="https://medium.com/@nate510/don-t-use-go-s-default-http-client-4804cb19f779" target="_blank" rel="noopener">Don’t use Go’s default HTTP client (in production)</a></p>
 <p> <a href="https://studygolang.com/topics/6033/comment/17800" target="_blank" rel="noopener">断言的疑惑</a></p>
+<p> <a href="https://mp.weixin.qq.com/s/zbYIdB0HlYwYSQRXFFpqSg" target="_blank" rel="noopener">详解 Go 空结构体的 3 种使用场景</a></p>
 </blockquote>
 
             </div>
@@ -482,7 +499,7 @@ new 出来的是一个指针
                 
                 
   <script type="text/javascript">
-    Fluid.utils.lazyComments('comments', function() {
+    Fluid.utils.loadComments('#comments', function() {
       var light = 'github-light';
       var dark = 'github-dark';
       var schema = document.documentElement.getAttribute('data-user-color-scheme');
@@ -644,7 +661,6 @@ new 出来的是一个指针
 
 <script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
 <script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/debouncer.js" ></script>
 <script  src="/js/events.js" ></script>
 <script  src="/js/plugins.js" ></script>
 
@@ -673,6 +689,10 @@ new 出来的是一个指针
 
 
 
+  <script  src="/js/local-search.js" ></script>
+
+
+
 
   <script defer src="/js/leancloud.js" ></script>
 
@@ -687,21 +707,6 @@ new 出来的是一个指针
       typing(title)
       
     })(window, document);
-  </script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-  <script>
-    (function () {
-      var path = "/local-search.xml";
-      $('#local-search-input').on('click', function() {
-        searchFunc(path, 'local-search-input', 'local-search-result');
-      });
-      $('#modalSearch').on('shown.bs.modal', function() {
-        $('#local-search-input').focus();
-      });
-    })()
   </script>
 
 
