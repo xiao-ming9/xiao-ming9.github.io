@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      22k 字
+      26.2k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      263
+      308
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年6月13日 下午
+                  本文最后更新于：2021年6月18日 下午
                 
               </p>
             
@@ -597,14 +597,17 @@
 <p>另外，对于 B+ 树索引的插入性能，在数据是顺序插入（自增ID，时间列）的情况下，B+ 树的插入通常是比较快的。但是在无序插入（例如用户昵称列创建索引）时，B+ 树为了维护排序，需要对页进行分裂、旋转等开销较大的操作，另外，即便对于固态硬盘，随机写的性能也不如顺序写，所以磁盘性能也会收到较大影响。</p>
 <p><strong>在表结构设计时，主键的设计一定要尽可能地使用顺序值，这样才能保证在海量并发业务场景下的性能。</strong></p>
 <p>另外，对于网上所说的：“一般一张表的索引不超过 5 个”的说法纯属无稽之谈，如果业务确实需要，就要根据业务进行对应索引的创建，使用时个人觉得指定索引就好了。</p>
-<p><strong>思考题</strong>：</p>
-<ol>
+<h3 id="思考题"><a href="#思考题" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>MySQL数据库中，如何在线上业务中尽快发现对应的 SQL 没有合理创建索引呢？</p>
-<p> 查看 MySQL 的慢查询日志，如设置执行超过 1s 的是慢 SQL，然后优化慢日志中的 SQL。</p>
+<blockquote>
+<p>查看 MySQL 的慢查询日志，如设置执行超过 1s 的是慢 SQL，然后优化慢日志中的 SQL。</p>
+</blockquote>
 </li>
 <li><p>全文索引、R 树索引在哪些业务中可以使用？</p>
-<p> 全文索引用于多个维度的查询，类似我们搜索引擎的查询，输入多个条件，然后输出结果。</p>
-<p> R 数索引用于地理空间查询。</p>
+<blockquote>
+<p>全文索引用于多个维度的查询，类似我们搜索引擎的查询，输入多个条件，然后输出结果。</p>
+<p>R 数索引用于地理空间查询。</p>
+</blockquote>
 </li>
 </ol>
 <h2 id="索引组织表"><a href="#索引组织表" class="headerlink" title="索引组织表"></a>索引组织表</h2><p>数据存储有堆表和索引组织表两种方式。堆表中的数据无序存放，数据的排序完全依赖于索引：</p>
@@ -625,19 +628,24 @@
 
 <p>其中的列 cellphone 就是一个虚拟列，它是由后面的函数表达式计算而成，本身这个列不占用任何的存储空间，而索引 idx_cellphone 实质是一个函数索引。</p>
 <p>适用场景：对于爬虫类的业务，会从网上先爬取很多数据，其中有些是我们关心的数据，有些是不关心的数据。通过虚拟列技术，可以展示我们想要的那部分数据，再通过虚拟列上创建索引，就是对爬取的数据进行快速的访问和搜索。</p>
-<p><strong>思考题</strong>：因为二级索引无需维护，索引组织表在更新的场景下性能明显由于堆表。请问堆表在设计上如何优化，能降低更新操作导致性能的大幅下降？</p>
+<h3 id="思考题-1"><a href="#思考题-1" class="headerlink" title="思考题"></a>思考题</h3><p>因为二级索引无需维护，索引组织表在更新的场景下性能明显由于堆表。请问堆表在设计上如何优化，能降低更新操作导致性能的大幅下降？</p>
+<blockquote>
 <p>堆表在设计时，可以让每个页都预留一定的空间，比如 8k 页，预留 4k 空间，当发生更新时，记录可以在这个页中，保持不变，这样就不会每个索引都更新地址了。但是当预留的空间都满了，还是会发生迁移的问题，所以只是缓解问题，而不是像索引组织表那样，完全没有任何问题。</p>
+</blockquote>
 <h2 id="组合索引"><a href="#组合索引" class="headerlink" title="组合索引"></a>组合索引</h2><p>利用组合索引包含多个列的特性，可以实现索引覆盖技术避免回表查询，提升 SQL 的查询性能。用好索引覆盖技术，性能提升 10 倍不是难事。</p>
-<p><strong>思考题</strong> ：</p>
-<ol>
+<h3 id="思考题-2"><a href="#思考题-2" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>组合索引可以避免 <code>WHERE a = ? ORDER BY b</code> 这条的额外排序问题，在现有的业务中，如何发现可以的 SQL，通过组合索引进行优化呢？</p>
-<p> 这种情况下使用慢查询是比较难发现的，因为有 a 索引的情况下查询并不会特别慢，不一定能够进入慢查询日志。可以通过下面的 sql 语句进行查看：</p>
+<blockquote>
+<p>这种情况下使用慢查询是比较难发现的，因为有 a 索引的情况下查询并不会特别慢，不一定能够进入慢查询日志。可以通过下面的 sql 语句进行查看：</p>
+</blockquote>
  <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">query</span>,rows_sorted<br><span class="hljs-keyword">FROM</span> x$statement_analysis<br><span class="hljs-keyword">WHERE</span> db <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<span class="hljs-string">'sys'</span>,<span class="hljs-string">'mysql'</span>) <span class="hljs-keyword">AND</span> rows_sorted != <span class="hljs-number">0</span><br></code></pre></div></td></tr></table></figure>
 </li>
 <li><p>下面这条 SQL 该如何创建组合索引？同时对比 MySQL 5.7 和 MySQL 8.0 版本，查看优化器的执行计划，看看 8.0 在 5.7 版本基础上，还有哪些进一步的优化：</p>
  <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderDate <span class="hljs-keyword">DESC</span>,o_orderStatus<br></code></pre></div></td></tr></table></figure>
 
-<p> MySQL 8.0 支持不同方向的索引排序，MySQL 5.7 仅支持一个方向。因此 8.0 可以创建 <code>(o_orderDate DESC,o_orderStatus asc)</code> 的索引。而 5.7 即使创建不同排序方向的索引，也需要额外的排序。</p>
+<blockquote>
+<p>MySQL 8.0 支持不同方向的索引排序，MySQL 5.7 仅支持一个方向。因此 8.0 可以创建 <code>(o_orderDate DESC,o_orderStatus asc)</code> 的索引。而 5.7 即使创建不同排序方向的索引，也需要额外的排序。</p>
+</blockquote>
 </li>
 </ol>
 <h2 id="索引选择"><a href="#索引选择" class="headerlink" title="索引选择"></a>索引选择</h2><blockquote>
@@ -731,7 +739,10 @@
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">EXPLAIN</span> <span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_orderstatus = <span class="hljs-string">'P'</span>\G<br>*************************** <span class="hljs-number">1.</span> <span class="hljs-keyword">row</span> ***************************<br>           <span class="hljs-keyword">id</span>: <span class="hljs-number">1</span><br>  select_type: SIMPLE<br>        <span class="hljs-keyword">table</span>: orders<br>   <span class="hljs-keyword">partitions</span>: <span class="hljs-literal">NULL</span><br>         <span class="hljs-keyword">type</span>: <span class="hljs-keyword">ref</span><br>possible_keys: idx_orderstatus<br>          <span class="hljs-keyword">key</span>: idx_orderstatus<br>      key_len: <span class="hljs-number">4</span><br>          <span class="hljs-keyword">ref</span>: const<br>         <span class="hljs-keyword">rows</span>: <span class="hljs-number">306212</span><br>     filtered: <span class="hljs-number">100.00</span><br>        Extra: <span class="hljs-keyword">Using</span> <span class="hljs-keyword">index</span> condition<br></code></pre></div></td></tr></table></figure>
 
 <p>此外，对于数据的区分度，MySQL 会进行计算，一个索引的区分度越大，走索引就越有优势，但是对于区分度的计算，MySQL 采用的是获取部分数据进行判断，因此有可能存在误差，统计出来的区分度与实际不符，导致对于 sql 的执行直接走全表扫描。</p>
-<p><strong>思考题</strong>：字段 <code>o_orderstatus</code> 上创建索引虽然能解决问题，但是成本非常大的，需要维护索引 <code>idx_orderstatus</code> 的各种变更，性能会受到一定影响。有什么其他更好的方法来判断还处在支付过程中的订单吗？</p>
+<h3 id="思考题-3"><a href="#思考题-3" class="headerlink" title="思考题"></a>思考题</h3><p>字段 <code>o_orderstatus</code> 上创建索引虽然能解决问题，但是成本非常大的，需要维护索引 <code>idx_orderstatus</code> 的各种变更，性能会受到一定影响。有什么其他更好的方法来判断还处在支付过程中的订单吗？</p>
+<blockquote>
+<p>可以通过订单的时间状态来查询订单状态，比如，查询 5 分钟的订单状态，超过 15 分钟的订单就将状态设置为关闭。</p>
+</blockquote>
 <h2 id="JOIN-连接"><a href="#JOIN-连接" class="headerlink" title="JOIN 连接"></a>JOIN 连接</h2><p>MySQL 8.0 版本支持两种 JOIN 算法用于表之间的关联：</p>
 <ul>
 <li><p>Nested Loop Join；</p>
@@ -741,14 +752,14 @@
 </ul>
 <p>通常认为，在 OLTP 业务中，因为查询数据量较小、语句相对简单，大多使用索引连接表之间的数据。这种情况下，优化器大多会用 <code>Nested Loop Join</code> 算法；而 OLAP 业务中的查询数据量较大，关联表的数量非常多，所以用 <code>Hash Join</code> 算法，直接扫描全表效率会更高。</p>
 <blockquote>
-<p>联机事务处理OLTP（on-line transaction processing） 主要是执行基本日常的事务处理，通常是数据库记录的增删查改。OLTP的特点一般有：</p>
+<p>联机事务处理 OLTP（on-line transaction processing） 主要是执行基本日常的事务处理，通常是数据库记录的增删查改。OLTP的特点一般有：</p>
 <ol>
 <li>实时性要求高。以前银行异地汇款，要隔天才能到账，而现在是分分钟到账的节奏，说明现在银行的实时处理能力大大增强。</li>
 <li>数据量不是很大，生产库上的数据量一般不会太大，而且会及时做相应的数据处理与转移。</li>
 <li>交易一般是确定的，比如银行存取款的金额肯定是确定的，所以OLTP是对确定性的数据进行存取</li>
 <li>高并发，并且要求满足ACID原则。比如两人同时操作一个银行卡账户，比如大型的购物网站秒杀活动时上万的QPS请求。</li>
 </ol>
-<p>联机分析处理OLAP（On-Line Analytical Processing） 是数据仓库系统的主要应用，支持复杂的分析操作，侧重决策支持，并且提供直观易懂的查询结果。典型的应用就是复杂的动态的报表系统。</p>
+<p>联机分析处理 OLAP（On-Line Analytical Processing） 是数据仓库系统的主要应用，支持复杂的分析操作，侧重决策支持，并且提供直观易懂的查询结果。典型的应用就是复杂的动态的报表系统。</p>
 <p>OLAP的特点一般有：</p>
 <ol>
 <li>实时性要求不是很高，比如最常见的应用就是天级更新数据，然后出对应的数据报表。</li>
@@ -973,23 +984,157 @@
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> orders_par <br><span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">PARTITION</span> p1998<br></code></pre></div></td></tr></table></figure>
 
 <p>上述 SQL 执行速度非常快，因为实际执行过程是把分区文件删除和重建。另外产生的日志也只有一条 DDL 日志，也不会导致主从复制延迟问题。</p>
-<p><strong>思考题</strong>：</p>
-<ol>
+<h3 id="思考题-4"><a href="#思考题-4" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>除了订单表，还有那些业务适合使用分区表技术呢？</p>
 </li>
 <li><p>对于电商中的订单表，经常需要根据用户查询购买记录，这时会使用如下 SQL。如果把表 Orders 设计成按年分区，这时的执行计划如何？存在什么样的问题？如何优化呢？</p>
  <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders_par <br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">limit</span> <span class="hljs-number">30</span><br></code></pre></div></td></tr></table></figure>
 
+</li>
+</ol>
+<h1 id="高可用结构篇"><a href="#高可用结构篇" class="headerlink" title="高可用结构篇"></a>高可用结构篇</h1><h2 id="MySQL-复制"><a href="#MySQL-复制" class="headerlink" title="MySQL 复制"></a>MySQL 复制</h2><h3 id="复制架构"><a href="#复制架构" class="headerlink" title="复制架构"></a>复制架构</h3><p>数据库复制本质上就是数据同步。<strong>MySQL 数据库是基于二进制日志（binary log）进行数据增量同步</strong>，而二进制日志记录了所有对于 MySQL 数据库的修改操作。</p>
+<p>在默认 ROW 格式二进制日志中，一条 SQL 操作影响的记录会被全部记录下来，比如一条 SQL语句更新了三行记录，在二进制日志中会记录被修改的这三条记录的前项（before image）和后项（after image）。</p>
+<p><strong>对于 INSERT 或 DELETE 操作，则会记录这条被插入或删除记录所有列的信息</strong>，看一个例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> orders_test <br><span class="hljs-keyword">WHERE</span> o_orderdate = <span class="hljs-string">'1997-12-31'</span>;<br>Query OK, 2482 rows affected (0.07 sec)<br></code></pre></div></td></tr></table></figure>
 
+<p>可以看到，上面这条 SQL 执行的是删除操作，一共删除了有 2482 行记录。可以在 mysql 命令行下使用命令 <code>SHOW BINLOG EVENTS</code> 查看某个二进制日志文件的内容，比如上述删除操作发生在二进制日志文件 <code>binlog.000004</code> 中，可以看到：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/msyql%E5%88%A0%E9%99%A4%E6%97%A5%E5%BF%971.png" alt="mysql 删除日志1"></p>
+<p>通过 MySQL 数据库自带的命令 <code>mysqlbinlog</code>，可以解析二进制日志，观察到更为详细的每条记录的信息，比如：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/mysql%E5%88%A0%E9%99%A4%E6%97%A5%E5%BF%972.png" alt="mysql删除日志2"></p>
+<p>可以看到，通过二进制日志记录看到被删除的每条记录的完整信息，还有每个列的属性，比如列的类型，是否允许为 NULL 值等。</p>
+<p>如果是 UPDATE 操作，二进制日志中还记录了被修改记录完整的前项和后项，比如：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/mysql%20update%20%E6%97%A5%E5%BF%97.png" alt="mysql update 日志"></p>
+<p>在有二进制日志的基础上，MySQL 数据库就可以通过数据复制技术实现数据同步了。而数据复制的本质就是把一台 MySQL 数据库上的变更同步到另一台 MySQL 数据库上。</p>
+<p>另外，MySQL 可以根据需要构建级联的拓扑结构：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/MySQL%E7%BA%A7%E8%81%94%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84.png" alt="MySQL级联拓扑结构"></p>
+<p>在上图中，Slave1、Slave2、Slave3 都是 Master 的从服务器，而 Slave11 是 Slave1 的从服务器，Slave1 服务器既是 Master 的从机，又是 Slave11 的主机，所以 Slave1 是个级联的从机。同理，Slave3 也是台级联的从机。</p>
+<h3 id="MySQL-复制配置"><a href="#MySQL-复制配置" class="headerlink" title="MySQL 复制配置"></a>MySQL 复制配置</h3><p>搭建 MySQL 复制实现非常简单，基本步骤如下：</p>
+<ol>
+<li><p>创建复制所需的账号和权限；</p>
+</li>
+<li><p>从 Master 服务器拷贝一份数据，可以使用逻辑备份工具 mysqldump、mysqlpump，或物理备份工具 Clone Plugin；</p>
+</li>
+<li><p>通过命令 CHANGE MASTER TO 搭建复制关系；</p>
+</li>
+<li><p>通过命令 SHOW SLAVE STATUS 观察复制状态。</p>
+</li>
+</ol>
+<p>虽然 MySQL 复制原理和实施非常简单，但在配置时却容易出错，请务必在配置文件中设置如下配置：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">gtid_mode = on<br>enforce_gtid_consistency = 1<br>binlog_gtid_simple_recovery = 1<br>relay_log_recovery = ON<br>master_info_repository = TABLE <br>relay_log_info_repository = TABLE<br></code></pre></div></td></tr></table></figure>
 
+<p>上述设置都是用于保证 crash safe，即无论 Master 还是 Slave 宕机，当它们恢复后，连上主机后，主从数据依然一致，不会产生任何不一致的问题。</p>
+<h3 id="MySQL-复制类型"><a href="#MySQL-复制类型" class="headerlink" title="MySQL 复制类型"></a>MySQL 复制类型</h3><p>MySQL 复制可以分为以下几种类型：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/MySQL%E5%A4%8D%E5%88%B6%E7%B1%BB%E5%9E%8B.png" alt="MySQL复制类型"></p>
+<p>默认的复制是异步复制。</p>
+<h4 id="异步复制"><a href="#异步复制" class="headerlink" title="异步复制"></a>异步复制</h4><p>在异步复制（async replication）中，Master 不用关心 Slave 是否接收到二进制日志，所以 Master 与 Slave 没有任何的依赖关系。你可以认为 Master 和 Slave 是分别独自工作的两台服务器，数据最终会通过二进制日志达到一致。</p>
+<p>异步复制的性能最好，因为它对数据库本身几乎没有任何开销，除非主从延迟非常大，Dump Thread 需要读取大量二进制日志文件。</p>
+<p>如果业务对于数据一致性要求不高，当发生故障时，能容忍数据的丢失，甚至大量的丢失，推荐用异步复制，这样性能最好（比如像微博这样的业务，虽然它对性能的要求极高，但对于数据丢失，通常可以容忍）。但往往核心业务系统最关心的就是数据安全，比如监控业务、告警系统。</p>
+<h4 id="半同步复制"><a href="#半同步复制" class="headerlink" title="半同步复制"></a>半同步复制</h4><p>半同步复制要求 Master 事务提交过程中，至少有 N 个 Slave 接收到二进制日志，这样就能保证当 Master 发生宕机，至少有 N 台 Slave 服务器中的数据是完整的。</p>
+<p>半同步复制并不是 MySQL 内置的功能，而是要安装半同步插件，并启用半同步复制功能，设置 N 个 Slave 接受二进制日志成功，比如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">plugin-<span class="hljs-keyword">load</span>=<span class="hljs-string">"rpl_semi_sync_master=semisync_master.so;rpl_semi_sync_slave=semisync_slave.so"</span><br>rpl-<span class="hljs-keyword">semi</span>-<span class="hljs-keyword">sync</span>-<span class="hljs-keyword">master</span>-enabled = <span class="hljs-number">1</span><br>rpl-<span class="hljs-keyword">semi</span>-<span class="hljs-keyword">sync</span>-<span class="hljs-keyword">slave</span>-enabled = <span class="hljs-number">1</span><br>rpl_semi_sync_master_wait_no_slave = <span class="hljs-number">1</span><br></code></pre></div></td></tr></table></figure>
 
+<p>上面的配置中：</p>
+<ul>
+<li><p>第 1 行要求数据库启动时安装半同步插件；</p>
+</li>
+<li><p>第 2、3 行表示分别启用半同步 Master 和半同步 Slave 插件；</p>
+</li>
+<li><p>第 4 行表示半同步复制过程中，提交的事务必须至少有一个 Slave 接收到二进制日志。</p>
+</li>
+</ul>
+<p>在半同步复制中，有损半同步复制是 MySQL 5.7 版本前的半同步复制机制，这种半同步复制在Master 发生宕机时，Slave 会丢失最后一批提交的数据，若这时 Slave 提升（Failover）为Master，可能会发生已经提交的事情不见了，发生了回滚的情况。</p>
+<p>有损半同步复制原理如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%9C%89%E6%8D%9F%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86.png" alt="有损半同步复制原理"></p>
+<p>可以看到，有损半同步是在 Master 事务提交后，即步骤 4 后，等待 Slave 返回 ACK，表示至少有 Slave 接收到了二进制日志，如果这时二进制日志还未发送到 Slave，Master 就发生宕机，则此时 Slave 就会丢失 Master 已经提交的数据。</p>
+<p>而 MySQL 5.7 的无损半同步复制解决了这个问题，其原理如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%97%A0%E6%8D%9F%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%8E%9F%E7%90%86.png" alt="无损半同步复制原理"></p>
+<p>从上图可以看到，无损半同步复制 WAIT ACK 发生在事务提交之前，这样即便 Slave 没有收到二进制日志，但是 Master 宕机了，由于最后一个事务还没有提交，所以本身这个数据对外也不可见，不存在丢失的问题。</p>
+<p>所以，对于任何有数据一致性要求的业务，如电商的核心订单业务、银行、保险、证券等与资金密切相关的业务，务必使用无损半同步复制。这样数据才是安全的、有保障的、即使发生宕机，从机也有一份完整的数据。</p>
+<h4 id="多源复制"><a href="#多源复制" class="headerlink" title="多源复制"></a>多源复制</h4><p>无论是异步复制还是半同步复制，都是 1 个 Master 对应 N 个 Slave。其实 MySQL 也支持 N 个 Master 对应 1 个 Slave，这种架构就称之为多源复制。</p>
+<p>多源复制允许在不同 MySQL 实例上的数据同步到 1 台 MySQL 实例上，方便在 1 台 Slave 服务器上进行一些统计查询，如常见的 OLAP 业务查询。</p>
+<p>多源复制的架构如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%A4%9A%E6%BA%90%E5%A4%8D%E5%88%B6.png" alt="多源复制"></p>
+<p>上图显示了订单库、库存库、供应商库，通过多源复制同步到了一台 MySQL 实例上，接着就可以通过 MySQL 8.0 提供的复杂 SQL 能力，对业务进行深度的数据分析和挖掘。</p>
+<h4 id="延迟复制"><a href="#延迟复制" class="headerlink" title="延迟复制"></a>延迟复制</h4><p>前面介绍的复制架构，Slave 在接收二进制日志后会尽可能快地回放日志，这样是为了避免主从之间出现延迟。而延迟复制却允许Slave 延迟回放接收到的二进制日志，为了避免主服务器上的误操作，马上又同步到了从服务器，导致数据完全丢失。</p>
+<p>可以通过以下命令设置延迟复制：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CHANGE</span> <span class="hljs-keyword">MASTER</span> <span class="hljs-keyword">TO</span> master_delay = <span class="hljs-number">3600</span><br></code></pre></div></td></tr></table></figure>
 
+<p>这样就人为设置了 Slave 落后 Master 服务器1个小时。</p>
+<p>延迟复制在数据库的备份架构设计中非常常见，比如可以设置一个延迟一天的延迟备机，这样本质上说，用户可以有 1 份 24 小时前的快照。</p>
+<p>那么当线上发生误操作，如 DROP TABLE、DROP DATABASE 这样灾难性的命令时，用户有一个 24 小时前的快照，数据可以快速恢复。</p>
+<p><strong>对金融行业来说，延迟复制是备份设计中，必须考虑的一个架构部分。</strong></p>
+<h3 id="思考题-5"><a href="#思考题-5" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<li><p>若有 N 个 Slave，Master 上是有 1 个 Dump 线程还是 N 个 Dump 线程呢？</p>
+</li>
+<li><p>二进制日志能完整记录一条记录，但它的缺点是什么呢？</p>
+</li>
+</ol>
+<h2 id="MySQL-读写分离设计"><a href="#MySQL-读写分离设计" class="headerlink" title="MySQL 读写分离设计"></a>MySQL 读写分离设计</h2><h3 id="逻辑日志的优缺点"><a href="#逻辑日志的优缺点" class="headerlink" title="逻辑日志的优缺点"></a>逻辑日志的优缺点</h3><p>MySQL 复制基于的二进制日志是一种逻辑日志，其写入的是每个事务中已变更的每条记录的前项、后项。</p>
+<p>有了每条记录的变化内容，用户可以方便地通过分析 MySQL 的二进制日志内容，准时地将 MySQL 中的数据同步到异构的数据平台，如 HBase、ES、Hive 等大数据平台。</p>
+<p>可以发现，逻辑日志简单易懂，方便数据之间的同步，但它的缺点是：事务不能太大，否则会导致二进制日志非常大，一个大事务的提交会非常慢。</p>
+<p>假设有个 DELETE 删除操作，删除当月数据，由于数据量可能有 1 亿条记录，可能会产生 100G 的二进制日志，则这条 SQL 在提交时需要等待 100G 的二进制日志写入磁盘，如果二进制日志磁盘每秒写入速度为 100M/秒，至少要等待 1000 秒才能完成这个事务的提交。</p>
+<p>所以在 MySQL 中，一定要对大事务特别对待， 总结起来就是：</p>
+<ol>
+<li><p>设计时，把 DELETE 删除操作转化为 DROP TABLE/PARTITION 操作；</p>
+</li>
+<li><p>业务设计时，把大事务拆成小事务。</p>
+</li>
+</ol>
+<p>对于第一点（把 DELETE 删除操作转化为 DROP TABLE/PARTITION 操作），主要是在设计时把流水或日志类的表按时间分表或者分区，这样在删除时，二进制日志内容就是一条 DROP TABLE/PARITION 的 SQL，写入速度就非常快了。</p>
+<p>而第二点（把大事务拆分成小事务）也能控制二进制日志的大小。比如对于前面的 DELETE 操作，如果设计时没有分表或分区，那么可以进行如下面的小事务拆分：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> ...<br>WHEREE <span class="hljs-built_in">time</span> <span class="hljs-keyword">between</span> ... <span class="hljs-keyword">and</span> ...<br><span class="hljs-keyword">LIMIT</span> <span class="hljs-number">1000</span>;<br></code></pre></div></td></tr></table></figure>
 
+<p>上面的 SQL 就是把一个大的 DELETE 操作拆分成了每次删除 1000 条记录的小操作。而小事务的另一个优势是：可以进行多线程的并发操作，进一步提升删除效率。</p>
+<p>MySQL 数据库中，大事务除了会导致提交速度变慢，还会导致主从复制延迟。</p>
+<p>试想一下，一个大事务在主服务器上运行了 30 分钟，那么在从服务器上也需要运行 30 分钟。在从机回放这个大事务的过程中，主从服务器之间的数据就产生了延迟；产生大事务的另一种可能性是主服务上没有创建索引，导致一个简单的操作时间变得非常长。这样在从机回放时，也会需要很长的时间从而导致主从的复制延迟。</p>
+<p>除了把大事务拆分成小事务，可以避免主从复制延迟，还可以设置复制回放相关的配置参数。</p>
+<h3 id="主从复制延迟优化"><a href="#主从复制延迟优化" class="headerlink" title="主从复制延迟优化"></a>主从复制延迟优化</h3><p>要牢记：要彻底避免 MySQL 主从复制延迟，数据库版本至少要升级到 5.7，因为之前的 MySQL 版本从机回放二进制都是单线程的（5.6 是基于库级别的单线程）。</p>
+<p>从 MySQL 5.7 版本开始，MySQL 支持了从机多线程回放二进制日志的方式，通常把它叫作“并行复制”，官方文档中称为“Multi-Threaded Slave（MTS）”。</p>
+<p>MySQL 的从机并行复制有两种模式。</p>
+<ul>
+<li><p>COMMIT ORDER： 主机怎么并行，从机就怎么并行。</p>
+</li>
+<li><p>WRITESET： 基于每个事务，只要事务更新的记录不冲突，就可以并行。</p>
+</li>
+</ul>
+<p>COMMIT ORDER 模式的从机并行复制，从机完全根据主服务的并行度进行回放。理论上来说，主从延迟极小。但如果主服务器上并行度非常小，事务并不小，比如单线程每次插入 1000 条记录，则从机单线程回放，也会存在一些复制延迟的情况。</p>
+<p>而 WRITESET 模式是基于每个事务并行，如果事务间更新的记录不冲突，就可以并行。还是以“单线程每次插入 1000 条记录”为例，如果插入的记录没有冲突，比如唯一索引冲突，那么虽然主机是单线程，但从机可以是多线程并行回放！！！</p>
+<p>所以在 WRITESET 模式下，主从复制几乎没有延迟。要启用 WRITESET 复制模式，需要做这样的配置：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">binlog_transaction_dependency_tracking = WRITESET                 <br>transaction_write_set_extraction = XXHASH64<br>slave-parallel-type = LOGICAL_CLOCK<br>slave-parallel-workers = 16<br></code></pre></div></td></tr></table></figure>
 
+<p>因为主从复制延迟会影响到后续高可用的切换，以及读写分离的架构设计，所以在真实的业务中，要对主从复制延迟进行监控。</p>
+<h3 id="主从延迟监控"><a href="#主从延迟监控" class="headerlink" title="主从延迟监控"></a>主从延迟监控</h3><h4 id="Seconds-Behind-Master"><a href="#Seconds-Behind-Master" class="headerlink" title="Seconds_Behind_Master"></a>Seconds_Behind_Master</h4><p>通过命令 <code>SHOW SLAVE STATUS</code>，其中的 <code>Seconds_Behind_Master</code> 可以查看复制延迟，如：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%9F%A5%E7%9C%8B%E5%A4%8D%E5%88%B6%E5%BB%B6%E8%BF%9F%E5%91%BD%E4%BB%A4.png" alt="查看复制延迟命令"></p>
+<p>但是，<code>Seconds_Behind_Master</code> 不准确！用于严格判断主从延迟的问题并不合适， 有这样三个原因。</p>
+<ol>
+<li><p>它计算规则是（当前回放二进制时间 - 二进制日志中的时间），如果 I/O 线程有延迟，那么 <code>Second_Behind_Master</code> 为 0，这时可能已经落后非常多了，例如存在有大事务的情况下；</p>
+</li>
+<li><p>对于级联复制，最下游的从服务器延迟是不准确的，因为它只表示和上一级主服务器之间的延迟；</p>
+</li>
+<li><p>若主从时区不一样，那么 <code>second_behind_master</code> 也不准确；</p>
+</li>
+</ol>
+<p>总的来说，线上业务通过 <code>Seconds_Begind_Master</code> 值观察主从复制延迟并不准确，需要额外引入一张表，才能真正监控主从的复制延迟情况。</p>
+<h4 id="心跳表"><a href="#心跳表" class="headerlink" title="心跳表"></a>心跳表</h4><p>想要实时准确地监控主从复制延迟，可以在主服务器上引入一张心跳表 heartbeat，用于定期更新时间（比如每 3 秒一次）。于主从复制机制，主机上写入的时间会被复制到从机，这时对于主从复制延迟的判断可以根据如下规则：</p>
+<figure class="highlight fix"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs fix"><span class="hljs-attr">主从延迟 </span>=<span class="hljs-string"> 从机当前时间 - 表 heartbeat 中的时间</span><br></code></pre></div></td></tr></table></figure>
 
+<p>这可以很好解决上述 <code>Seconds_Behind_Master</code> 值存在的问题。表 heartbeat 和定期更新时间可以根据类似的设计：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">USE</span> DBA;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> heartbeat (<br>  <span class="hljs-keyword">server</span>-<span class="hljs-keyword">uuid</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">36</span>) PRIMARY <span class="hljs-keyword">KEY</span>,<br>  ts <span class="hljs-built_in">TIMESTAMP</span>(<span class="hljs-number">6</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span><br>);<br><span class="hljs-keyword">REPLACE</span> <span class="hljs-keyword">INTO</span> heartbeat(@@server_uuid, <span class="hljs-keyword">NOW</span>())<br></code></pre></div></td></tr></table></figure>
 
+<p>上面的设计中，创建了DBA库，以及库下的一张表 heartbeat，用于记录当前时间。</p>
+<p><strong>REPLACE 语句用于定期更新当前时间，并存入到表 heartbeat，表 heartbeat 在正常运行情况下只有一条记录</strong>。定期执行 REPLACE 语句可以使用定期的脚本调度程序，也可以使用 MySQL自带的事件调度器（event scheduler），如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">EVENT</span> e_heartbeat<br><span class="hljs-keyword">ON</span> SCHEDULE  <br>    EVERY <span class="hljs-number">3</span> <span class="hljs-keyword">SECOND</span>  <br><span class="hljs-keyword">DO</span>  <br><span class="hljs-keyword">BEGIN</span>  <br>    <span class="hljs-keyword">REPLACE</span> <span class="hljs-keyword">INTO</span> DBA.heartbeat <span class="hljs-keyword">VALUES</span> (@@server_uuid,<span class="hljs-keyword">NOW</span>())<br><span class="hljs-keyword">END</span><br></code></pre></div></td></tr></table></figure>
 
-
+<h3 id="读写分离设计"><a href="#读写分离设计" class="headerlink" title="读写分离设计"></a>读写分离设计</h3><p>读写分离设计的前提是从机不能落后主机很多，最好是能准实时数据同步，务必一定要开启并行复制，并确保线上已经将大事务拆成小事务。</p>
+<p>当然，若是一些报表类的查询，只要不影响最终结果，业务是能够容忍一些延迟的。但无论如何，请一定要在线上数据库环境中做好主从复制延迟的监控。</p>
+<p>如果真的由于一些不可预知的情况发生，比如一个初级 DBA 在主机上做了一个大事务操作，导致主从延迟发生，那么怎么做好读写分离设计的兜底呢？</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%85%9C%E5%BA%95.png" alt="主从复制兜底"></p>
+<p>在 Load Balance 服务器，可以配置较小比例的读取请求访问主机，如上图所示的 1%，其余三台从服务器各自承担 33% 的读取请求。</p>
+<p>如果发生严重的主从复制情况，可以设置下面从机权重为 0，将主机权重设置为 100%，这样就不会因为数据延迟，导致对于业务的影响了。</p>
+<h3 id="思考题-6"><a href="#思考题-6" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<li><p>读写分离设计后，主服务器就完全没有读取请求了吗？</p>
+</li>
+<li><p>还有一种主从延迟问题的处理，调用函数 <code>WAIT_UNTIL_SQL_THREAD_AFTER_GITDS</code>，请问这个设计的原理如何？是一种好的设计吗？</p>
 </li>
 </ol>
 
