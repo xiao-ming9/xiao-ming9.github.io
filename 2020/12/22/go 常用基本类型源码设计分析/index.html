@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
@@ -238,7 +238,7 @@ Go 语言数组在初始化之后大小就无法改变，存储元素类型相�
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年3月27日 中午
+                  本文最后更新于：2021年6月20日 下午
                 
               </p>
             
@@ -555,7 +555,7 @@ Go 语言数组在初始化之后大小就无法改变，存储元素类型相�
 <p>现要置一 key 于 map 中，该 key 经过哈希后，得到的哈希值如下：</p>
 <p>![图片](假定key经过哈希计算后得到64bit位的哈希值。如果B=5，buckets数组的长度，即桶的数量是32（2的5次方）。</p>
 <p>例如，现要置一key于map中，该key经过哈希后，得到的哈希值如下：</p>
-<p><img src="https://mmbiz.qpic.cn/sz_mmbiz_png/HR9EgRcLqUtUb8P4XltZLgRwISYwA9K7Umg4kaUq45vcRpeZGFuTnniapQkibEIU8gX14rCBWshors43rua0TqrA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" alt="假定的64位哈希值"></p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%81%87%E5%AE%9A%E7%9A%8464%E4%BD%8D%E5%93%88%E5%B8%8C%E5%80%BC.png" alt="假定的64位哈希值"></p>
 <p>哈希值低位（<code>low-order bits</code>）用于选择桶，哈希值高位（<code>high-order bits</code>）用于在一个独立的桶中区别出键。当 B 等于 5 时，那么选择的哈希值低位也是 5 位，即 01010，它的十进制值为10，代表 10 号桶。再用哈希值的高 8 位，找到此 key 在桶中的位置。最开始桶中还没有 key，那么新加入的 key 和 value 就会被放入第一个 key 空位和 value 空位。</p>
 <p>注意：对于高八位的选择，该操作的实质是取余，但是取余开销很大，在实际代码实现中采用的是位操作，其实现如下：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">tophash</span><span class="hljs-params">(hash <span class="hljs-keyword">uintptr</span>)</span> <span class="hljs-title">uint8</span></span> &#123;<br>	top := <span class="hljs-keyword">uint8</span>(hash &gt;&gt; (sys.PtrSize*<span class="hljs-number">8</span> - <span class="hljs-number">8</span>))<br>	<span class="hljs-keyword">if</span> top &lt; minTopHash &#123;<br>		top += minTopHash<br>	&#125;<br>	<span class="hljs-keyword">return</span> top<br>&#125;<br></code></pre></div></td></tr></table></figure>
@@ -1639,20 +1639,5 @@ Go 语言数组在初始化之后大小就无法改变，存储元素类型相�
 <script  src="/js/boot.js" ></script>
 
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

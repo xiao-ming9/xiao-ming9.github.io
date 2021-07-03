@@ -1,0 +1,659 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Wechat:934933088">
+  <meta name="author" content="Silverming">
+  <meta name="keywords" content="">
+  
+  <title>go 常用关键字的原理及设计 - Silverming</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="go 常用关键字的原理及设计">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-06-21 09:55" pubdate>
+        2021年6月21日 上午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      40
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">go 常用关键字的原理及设计</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2021年6月21日 晚上
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="for-和-range"><a href="#for-和-range" class="headerlink" title="for 和 range"></a>for 和 range</h1><p>循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 <code>range</code> 用于快速遍历数组、哈希表以及 Channel 等元素。</p>
+<p>这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。</p>
+<p>for 循环和 for…range 循环的形式分别如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    <span class="hljs-comment">// for 循环</span><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;<br>		<span class="hljs-built_in">println</span>(i)<br>	&#125;<br>    <br>    <span class="hljs-comment">// for range 循环</span><br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>	<span class="hljs-keyword">for</span> i, _ := <span class="hljs-keyword">range</span> arr &#123;<br>		<span class="hljs-built_in">println</span>(i)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在汇编语言中，无论是经典的 for  循环还是 for-range 循环都会使用 <code>JMP</code> 等命令跳回循环体的开始位置复用代码，所以<strong>使用 for…range 语法的控制结构最终应该也会被 Go 语言的编译器转换成普通的 for 循环</strong>。</p>
+<p>接下来将逐个分析每一种循环的场景。</p>
+<h2 id="for-经典循环"><a href="#for-经典循环" class="headerlink" title="for 经典循环"></a>for 经典循环</h2><p>Go 语言中的for 经典循环在编译器看来就是一个 <code>OFOR</code> 类型的节点，这个节点具有以下的结构：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">for</span> Ninit; Left; Right &#123;<br>    NBody<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>其中包括初始化循环的 <code>Ninit</code>、循环的中止条件 <code>Left</code>、循环体结束时执行的 <code>Right</code> 表达式以及循环体 <code>NBody</code>。</p>
+<p>一个常见的 for 循环代码会被 <code>stmt</code> 方法转换成以下的控制结构，其中包含了 4 个不同的块，这些不同的代码块之间会通过边去连接，与我们理解的 for 循环控制结构其实没有太多的差别。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp" alt="go经典循环"></p>
+<h2 id="for-range-范围循环"><a href="#for-range-范围循环" class="headerlink" title="for-range 范围循环"></a>for-range 范围循环</h2><p>范围循环在 go 中更为常见，它会使用 <code>for</code> 和 <code>range</code> 两个关键字，<strong>编译器会在编译期间将带有 <code>range</code> 的循环变成普通的经典循环，也就是将 <code>ORANGE</code> 类型的节点转换成 <code>OFOR</code> 类型</strong>。所有的 <code>range</code> 都会被 <code>walkrange</code> 函数转换成只包含基本表达式的语句，不包含任何复杂的结构。</p>
+<p>下面分别分析每一种结构下的循环场景。</p>
+<h3 id="数组和切片"><a href="#数组和切片" class="headerlink" title="数组和切片"></a>数组和切片</h3><p>对于数组和切片来说，for-range 循环有三种不同的遍历方式，这三种不同的遍历方式会在 <code>walkrange</code> 函数中被转换成不同的控制逻辑，这三种不同的逻辑分别对应着代码中的不同条件。</p>
+<h4 id="清空数组和切片"><a href="#清空数组和切片" class="headerlink" title="清空数组和切片"></a>清空数组和切片</h4><p>当想要清空数组或者哈希表等结构时，通常会使用遍历清除的方式：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    <span class="hljs-keyword">for</span> i, _ := <span class="hljs-keyword">range</span> arr &#123;<br>        arr[i] = <span class="hljs-number">0</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>依次遍历切片和哈希是非常耗费性能的，因为数组、切片和哈希占用的内存空间都是连续的，所以<strong>最快的方法是直接清空这片内存中的内容</strong>。<strong>在 go 的编译器中，针对这种情况，编译器会直接使用 <code>memclrNoHeapPointers</code> 直接清空切片中的数据</strong>。</p>
+<p>在 <code>walkrange</code> 最开始的逻辑就是数组和切片的清空逻辑：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">walkrange</span><span class="hljs-params">(n *Node)</span> *<span class="hljs-title">Node</span></span> &#123;<br>    <span class="hljs-keyword">switch</span> t.Etype &#123;<br>    <span class="hljs-keyword">case</span> TARRAY, TSLICE:<br>        <span class="hljs-keyword">if</span> arrayClear(n, v1, v2, a) &#123;<br>            <span class="hljs-keyword">return</span> n<br>        &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><code>arrayClear</code> 是一个非常有趣的优化，当在 Go 语言中遍历去删除所有的元素时，其实会在这个函数中被优化成如下的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// 原代码</span><br><span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> a &#123;<br>    a[i] = zero<br>&#125;<br><br><span class="hljs-comment">// 优化后</span><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(a) != <span class="hljs-number">0</span> &#123;<br>    hp = &amp;a[<span class="hljs-number">0</span>]<br>    hn = <span class="hljs-built_in">len</span>(a)*sizeof(elem(a))<br>    memclrNoHeapPointers(hp, hn)<br>    i = <span class="hljs-built_in">len</span>(a) - <span class="hljs-number">1</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>相比于依次清除数组或者切片中的数据，Go 语言会直接使用 <code>memclrNoHeapPointers</code> 或者 <code>memclrHashPointers</code> 函数直接清除目标数组对应内存空间中的数据并在执行完成后更新用于遍历数组的索引，保证上下文不会出现问题，这也印证了我们在概述一节中观察到的现象。</p>
+<h4 id="for-range-a-遍历数组和切片"><a href="#for-range-a-遍历数组和切片" class="headerlink" title="for range a {} 遍历数组和切片"></a><code>for range a {}</code> 遍历数组和切片</h4><p>在处理了上面清空这种特殊的情况之后，继续回到 <code>ORANGE</code> 节点的处理过程了，在这里首先会设置 for 循环的 <code>Left</code> 和 <code>Right</code> 字段，也就是终止的条件和循环体每次执行结束后运行的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := a<br><br>      hv1 := temp(types.Types[TINT])<br>      hn := temp(types.Types[TINT])<br><br>      init = <span class="hljs-built_in">append</span>(init, nod(OAS, hv1, <span class="hljs-literal">nil</span>))<br>      init = <span class="hljs-built_in">append</span>(init, nod(OAS, hn, nod(OLEN, ha, <span class="hljs-literal">nil</span>)))<br><br>      n.Left = nod(OLT, hv1, hn)<br>      n.Right = nod(OAS, hv1, nod(OADD, hv1, nodintconst(<span class="hljs-number">1</span>)))<br><br>      <span class="hljs-keyword">if</span> v1 == <span class="hljs-literal">nil</span> &#123;<br>          <span class="hljs-keyword">break</span><br>      &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果循环是 <code>for range a {}</code>，那么就满足了上述代码中的条件 <code>v1 == nil</code>，即循环不关心数组的索引和数据，在这种情况下只是单纯的遍历，并不关心索引和数据的情况，那么它会被转换成如下所示的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := a<br>hv1 := <span class="hljs-number">0</span><br>hn := <span class="hljs-built_in">len</span>(ha)<br>v1 := hv1<br><span class="hljs-keyword">for</span> ; hv1 &lt; hn; hv1++ &#123;<br>    <span class="hljs-comment">// ...</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这其实是最简单的 <code>range</code> 结构在编译期间被转换后的形式，由于原代码其实并不需要数组中任何元素的信息，只需要使用数组或者切片的数量执行对应次数的循环。</p>
+<h4 id="for-i-range-a-遍历数组和切片"><a href="#for-i-range-a-遍历数组和切片" class="headerlink" title="for i := range a {} 遍历数组和切片"></a><code>for i := range a {}</code> 遍历数组和切片</h4><p>如果我们只需要使用遍历数组时的索引就会执行如下的代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">if</span> v2 == <span class="hljs-literal">nil</span> &#123;<br>          body = []*Node&#123;nod(OAS, v1, hv1)&#125;<br>          <span class="hljs-keyword">break</span><br>      &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>它会将类似 <code>for i := range a {}</code> 的结构转换成如下所示的逻辑，与第一种循环相比，这种循环额外地在循环体中添加了 <code>v1 := hv1</code> 用于传递遍历数组时的索引：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := a<br>hv1 := <span class="hljs-number">0</span><br>hn := <span class="hljs-built_in">len</span>(ha)<br>v1 := hv1<br><span class="hljs-keyword">for</span> ; hv1 &lt; hn; hv1++ &#123;<br>    v1 := hv1<br>    <span class="hljs-comment">// ...</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h4 id="for-i-elem-range-a-遍历数组和切片"><a href="#for-i-elem-range-a-遍历数组和切片" class="headerlink" title="for i, elem := range a {} 遍历数组和切片"></a><code>for i, elem := range a {}</code> 遍历数组和切片</h4><p>这种场景下需要同时获取索引和值，也是最常用的一种场景，处理这种情况在 <code>walkrange</code> 中使用如下代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">	tmp := nod(OINDEX, ha, hv1)<br>        tmp.SetBounded(<span class="hljs-literal">true</span>)<br>        a := nod(OAS2, <span class="hljs-literal">nil</span>, <span class="hljs-literal">nil</span>)<br>        a.List.Set2(v1, v2)<br>        a.Rlist.Set2(hv1, tmp)<br>        body = []*Node&#123;a&#125;<br>    &#125;<br>    n.Ninit.Append(init...)<br>    n.Nbody.Prepend(body...)<br><br>    <span class="hljs-keyword">return</span> n<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这段代码处理的就是类似 <code>for i, elem := range a {}</code> 的逻辑，它不止会在循环体中插入更新索引的表达式，还会插入赋值的操作让循环体内部的代码能够访问数组中的元素：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := a<br>hv1 := <span class="hljs-number">0</span><br>hn := <span class="hljs-built_in">len</span>(ha)<br>v1 := hv1<br>v2 := <span class="hljs-literal">nil</span><br><span class="hljs-keyword">for</span> ; hv1 &lt; hn; hv1++ &#123;<br>    tmp := ha[hv1]<br>    v1, v2 = hv1, tmp<br>    ...<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>对于所有的 range 循环，<strong>Go 语言都会在编译期将原切片或者数组赋值给一个新变量 <code>ha</code>，在赋值的过程中就发生了拷贝</strong>，而我们又通过 <code>len</code> 关键字预先获取了切片的长度，所以此时遍历的切片其实已经不是原有的切片变量了。</p>
+<p>下面的这个例子中，在每次循环中都往数组中加入的变量，以此试图构建一个永不停止的循环，然而<strong>实际上该循环只会循环三次</strong>，原因就是编译期间传入循环的是 arr 的一个拷贝，并不是当前实时的 arr，所以在循环中追加新的元素也不会改变循环执行的次数。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> arr &#123;<br>        arr = <span class="hljs-built_in">append</span>(arr, v)<br>    &#125;<br>    fmt.Println(arr)<br>&#125;<br><br>$ <span class="hljs-keyword">go</span> run main.<span class="hljs-keyword">go</span><br><span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span><br></code></pre></div></td></tr></table></figure>
+
+<p>遇到这种同时遍历索引和元素的 <code>range</code> 循环时，从上面的代码中可以看到，Go 语言会额外创建一个新的 <code>v2</code> 变量存储切片中的元素，<strong>循环中使用的这个变量 v2 会在每一次迭代中都被重新赋值，在赋值时也发生了拷贝</strong>。</p>
+<p>在下面的代码中，在一个循环中将 range 返回的变量值的地址赋值给另外一个新数组，当打印这个新数组中变量地址的值的时候，实际上这个新数组中的值都是老数组的最后一个值。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    newArr := []*<span class="hljs-keyword">int</span>&#123;&#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> arr &#123;<br>        newArr = <span class="hljs-built_in">append</span>(newArr, &amp;v)<br>    &#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> newArr &#123;<br>        fmt.Println(*v)<br>    &#125;<br>&#125;<br><br>$ <span class="hljs-keyword">go</span> run main.<span class="hljs-keyword">go</span><br><span class="hljs-number">3</span> <span class="hljs-number">3</span> <span class="hljs-number">3</span><br></code></pre></div></td></tr></table></figure>
+
+<p>在这种场景下，<strong>正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code></strong>。</p>
+<p>所以如果想要访问数组中元素所在的地址，不应该直接获取 <code>range</code> 返回的 <code>v2</code> 变量的地址 <code>&amp;v2</code>，想要解决这个问题应该使用 <code>&amp;a[index]</code> 这种方式获取数组中元素对应的地址。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    newArr := []*<span class="hljs-keyword">int</span>&#123;&#125;<br>    <span class="hljs-keyword">for</span> i, _ := <span class="hljs-keyword">range</span> arr &#123;<br>        newArr = <span class="hljs-built_in">append</span>(newArr, &amp;arr[i])<br>    &#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> newArr &#123;<br>        fmt.Println(*v)<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在遇到这种问题时，应该使用如上所示的代码来获取数组中元素的地址，而不应该使用编译器生成的、会被复用的临时变量。</p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map 的遍历详细在这里：<a href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/#%E9%81%8D%E5%8E%86-map" target="_blank" rel="noopener">map 遍历</a></p>
+<p>总的来说，哈希表的遍历会随机选择开始的位置，然后依次遍历桶中的元素，桶中元素如果被遍历完，就会遍历当前桶对应的溢出桶，溢出桶都遍历结束之后才会遍历哈希中的下一个桶，直到所有的桶都被遍历完成。</p>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>字符串的遍历与数组和哈希表非常相似，只是在遍历的过程中会获取字符串中索引对应的字节，然后将字节转换成 <code>rune</code>，我们在遍历字符串时拿到的值都是 <code>rune</code> 类型的变量，其实类似 <code>for i, r := range s {}</code> 的结构都会被转换成如下的形式：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := s<br><span class="hljs-keyword">for</span> hv1 := <span class="hljs-number">0</span>; hv1 &lt; <span class="hljs-built_in">len</span>(ha); &#123;<br>    hv1t := hv1<br>    hv2 := <span class="hljs-keyword">rune</span>(ha[hv1])<br>    <span class="hljs-keyword">if</span> hv2 &lt; utf8.RuneSelf &#123;<br>        hv1++<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        hv2, hv1 = decoderune(h1, hv1)<br>    &#125;<br>    v1, v2 = hv1t, hv2<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这段代码的框架与上面提到的数组和哈希其实非常相似，只是细节有一些不同。<strong>字符串其实就是一个只读的字节数组切片</strong>，所以使用下标访问字符串中的元素时其实得到的就是字节，但是这段代码会将当前的字节转换成 <code>rune</code> 类型，如果当前的 <code>rune</code> 是 ASCII 的，那么只会占用一个字节长度，这时只需要将索引加一，但是如果当前的 <code>rune</code> 占用了多个字节就会使用 <code>decoderune</code> 进行解码，具体的过程就不详细介绍了。</p>
+<h3 id="通道"><a href="#通道" class="headerlink" title="通道"></a>通道</h3><p>在 <code>range</code> 循环中使用 Channel 其实也是比较常见的做法，一个形如 <code>for v := range ch {}</code> 的表达式会最终被转换成如下的格式：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ha := a<br>hv1, hb := &lt;-ha<br><span class="hljs-keyword">for</span> ; hb != <span class="hljs-literal">false</span>; hv1, hb = &lt;-ha &#123;<br>    v1 := hv1<br>    hv1 = <span class="hljs-literal">nil</span><br>    <span class="hljs-comment">// ...</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这里的代码可能与编译器生成的稍微有一些出入，但是结构和效果是完全相同的。该循环会使用 <code>&lt;-ch</code> 从管道中取出等待处理的值，这个操作会调用 <code>runtime.chanrecv2</code> 并阻塞当前的协程，当 <code>runtime.chanrecv2</code> 返回时会根据布尔值 <code>hb</code> 判断当前的值是否存在：</p>
+<ul>
+<li>如果不存在当前值，意味着当前的管道已经被关闭；</li>
+<li>如果存在当前值，会为 <code>v1</code> 赋值并清除 <code>hv1</code> 变量中的数据，然后重新陷入阻塞等待新数据；</li>
+</ul>
+<h2 id="常见现象总结"><a href="#常见现象总结" class="headerlink" title="常见现象总结"></a>常见现象总结</h2><h3 id="永不停止的循环"><a href="#永不停止的循环" class="headerlink" title="永不停止的循环"></a>永不停止的循环</h3><p>下面的代码中，在每次循环中都往数组中加入的变量，以此试图构建一个永不停止的循环，然而<strong>实际上该循环只会循环三次</strong>。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> arr &#123;<br>        arr = <span class="hljs-built_in">append</span>(arr, v)<br>    &#125;<br>    fmt.Println(arr)<br>&#125;<br><br>$ <span class="hljs-keyword">go</span> run main.<span class="hljs-keyword">go</span><br><span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="循环中的指针赋值"><a href="#循环中的指针赋值" class="headerlink" title="循环中的指针赋值"></a>循环中的指针赋值</h3><p>在下面的代码中，在一个循环中将 range 返回的变量值的地址赋值给另外一个新数组，当打印这个新数组中变量地址的值的时候，实际上这个新数组中的值都是老数组的最后一个值。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    newArr := []*<span class="hljs-keyword">int</span>&#123;&#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> arr &#123;<br>        newArr = <span class="hljs-built_in">append</span>(newArr, &amp;v)<br>    &#125;<br>    <span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> newArr &#123;<br>        fmt.Println(*v)<br>    &#125;<br>&#125;<br><br>$ <span class="hljs-keyword">go</span> run main.<span class="hljs-keyword">go</span><br><span class="hljs-number">3</span> <span class="hljs-number">3</span> <span class="hljs-number">3</span><br></code></pre></div></td></tr></table></figure>
+
+<p>在这种场景下，<strong>正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code></strong>。</p>
+<h3 id="清空数组"><a href="#清空数组" class="headerlink" title="清空数组"></a>清空数组</h3><p>当想要清空数组或者哈希表等结构时，通常会使用遍历清除的方式：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>&#125;<br>    <span class="hljs-keyword">for</span> i, _ := <span class="hljs-keyword">range</span> arr &#123;<br>        arr[i] = <span class="hljs-number">0</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>依次遍历切片和哈希是非常耗费性能的，因为数组、切片和哈希占用的内存空间都是连续的，所以<strong>最快的方法是直接清空这片内存中的内容</strong>。<strong>在 go 的编译器中，针对这种情况，编译器会直接使用 <code>memclrNoHeapPointers</code> 直接清空切片中的数据</strong>。</p>
+<h3 id="随机遍历"><a href="#随机遍历" class="headerlink" title="随机遍历"></a>随机遍历</h3><p>当遍历 map 结构时，每次遍历出来的结果的顺序都是不确定的，这是 Go 故意设计的，为了提高这种不确定性，go 甚至还做了一些工作，以此告诉所有使用 Go 语言的开发者不要依赖于哈希遍历的稳定。</p>
+<p><strong>参考文章</strong></p>
+<blockquote>
+<p><a href="https://mp.weixin.qq.com/s/-kV1nvWvYonGkXhdv3iNWg" target="_blank" rel="noopener">Go 语言 for 和 range 的实现</a></p>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/go/">go</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">gomock 使用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/">
+                        <span class="hidden-mobile">腾讯开源 go 代码规范</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        粤ICP备18114217号
+      </a>
+    </span>
+    
+      
+        <span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
+            rel="nofollow noopener"
+            class="beian-police"
+            target="_blank"
+          >
+            
+              <span style="visibility: hidden; width: 0">|</span>
+              <img src="/img/police_beian.png" alt="police-icon"/>
+            
+            <span>粤ICP备18114217号-1</span>
+          </a>
+        </span>
+      
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-M2RT7SDT3L', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M2RT7SDT3L');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

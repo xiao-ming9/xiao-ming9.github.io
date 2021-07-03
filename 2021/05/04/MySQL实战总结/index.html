@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      26.2k 字
+      31.9k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      308
+      370
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年6月18日 下午
+                  本文最后更新于：2021年6月27日 晚上
                 
               </p>
             
@@ -850,16 +850,25 @@
 
 <p>由于驱动表的数据是固定 30 条，因此不论表 orders、lineitem、part 的数据量有多大，哪怕是百亿条记录，由于都是通过主键进行关联，上述 SQL 的执行速度几乎不变。</p>
 <p>所以，OLTP 业务完全可以大胆放心地写 JOIN，但是要确保 JOIN 的索引都已添加， DBA 们在业务上线之前一定要做 SQL Review，确保预期内的索引都已创建。</p>
-<p><strong>思考题</strong>：</p>
-<ol>
-<li><p>下面这条较复杂的 SQL 查询的内容是什么？</p>
-</li>
-<li><p>查看它的执行计划，比较 MySQL 5.7 与 8.0 版本的不同，并说明它的执行过程。</p>
-</li>
-<li><p>如何在原有索引的基础上，添加额外的索引，提升查询效率？</p>
-</li>
+<h3 id="思考题："><a href="#思考题：" class="headerlink" title="思考题："></a>思考题：</h3><ol>
+<li>下面这条较复杂的 SQL 查询的内容是什么？</li>
 </ol>
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>  supp_nation,<br>  cust_nation,<br>  l_year,<br>  <span class="hljs-keyword">SUM</span>(volume) <span class="hljs-keyword">AS</span> revenue<br><span class="hljs-keyword">FROM</span><br>  (<br>    <span class="hljs-keyword">SELECT</span><br>      n1.n_name <span class="hljs-keyword">AS</span> supp_nation,<br>      n2.n_name <span class="hljs-keyword">AS</span> cust_nation,<br>      <span class="hljs-keyword">EXTRACT</span>(<span class="hljs-keyword">YEAR</span> <span class="hljs-keyword">FROM</span> l_shipdate) <span class="hljs-keyword">AS</span> l_year,<br>      l_extendedprice * (<span class="hljs-number">1</span> - l_discount) <span class="hljs-keyword">AS</span> volume<br>    <span class="hljs-keyword">FROM</span><br>      supplier,<br>      lineitem,<br>      orders,<br>      customer,<br>      nation n1,<br>      nation n2<br>    <span class="hljs-keyword">WHERE</span><br>      s_suppkey = l_suppkey<br>      <span class="hljs-keyword">AND</span> o_orderkey = l_orderkey<br>      <span class="hljs-keyword">AND</span> c_custkey = o_custkey<br>      <span class="hljs-keyword">AND</span> s_nationkey = n1.n_nationkey<br>      <span class="hljs-keyword">AND</span> c_nationkey = n2.n_nationkey<br>      <span class="hljs-keyword">AND</span> (<br>        (n1.n_name = <span class="hljs-string">'FRANCE'</span> <span class="hljs-keyword">AND</span> n2.n_name = <span class="hljs-string">'GERMANY'</span>)<br>        <span class="hljs-keyword">OR</span> (n1.n_name = <span class="hljs-string">'GERMANY'</span> <span class="hljs-keyword">AND</span> n2.n_name = <span class="hljs-string">'FRANCE'</span>)<br>      )<br>            <span class="hljs-keyword">AND</span> l_shipdate <span class="hljs-keyword">BETWEEN</span> <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1995-01-01'</span> <span class="hljs-keyword">AND</span> <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1996-12-31'</span><br>  ) <span class="hljs-keyword">AS</span> shipping<br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span><br>  supp_nation,<br>  cust_nation,<br>  l_year<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span><br>  supp_nation,<br>  cust_nation,<br>  l_year;<br></code></pre></div></td></tr></table></figure>
+
+<p>这条 sql 表示查询 1995年到 1996 年期间供应商是德国或法国，客户是法国或德国，按年供应商、客户、年分组统计销售额，大致结果如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%80%9D%E8%80%83%E9%A2%98%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C.jpg" alt="子查询思考题查询结果"></p>
+<ol start="2">
+<li><p>查看它的执行计划，比较 MySQL 5.7 与 8.0 版本的不同，并说明它的执行过程。</p>
+<p> 5.7 由于不支持 Hash Join，因此执行计划使用 Nested Loop Join 算法，MySQL8.0 的执行计划如下：</p>
+</li>
+</ol>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%80%9D%E8%80%83%E9%A2%98mysql8.0%E6%89%A7%E8%A1%8C%E8%AE%A1%E5%88%92.jpg" alt="子查询思考题mysql8.0执行计划"></p>
+<ol start="3">
+<li><p>如何在原有索引的基础上，添加额外的索引，提升查询效率？</p>
+<p> 使用索引覆盖技术，避免回表带来的性能影响。观察发现表 lineitem 需要大量回表，在表上添加索引，观察 explain 结果，是否出现 using index 提示。sql 大致如下：</p>
+</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">alter</span> trable lineitem <span class="hljs-keyword">and</span> <span class="hljs-keyword">index</span> idx_opt(L_SUPPKEY,l_orderkey,l_shipdate,l_extendeprice,l_discount);<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="子查询"><a href="#子查询" class="headerlink" title="子查询"></a>子查询</h2><p>先下结论：<strong>MySQL 8.0 版本中，子查询的优化得到大幅提升。所以从现在开始，可以放心大胆地在MySQL 中使用子查询！</strong></p>
 <p>通常来讲，开发人员在写 sql 的时候，会更偏向于使用子查询，而不是 Join 语句，因为 JOIN 是一个代数关系，而子查询更偏向于人类的思维角度进行理解。</p>
@@ -938,6 +947,19 @@
 <li><p><strong>DEPENDENT SUBQUERY 的优化，一般是重写为派生表进行表连接</strong>。</p>
 </li>
 </ol>
+<h3 id="思考题-4"><a href="#思考题-4" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<li><p>下面的 SQL 大概表示什么样的业务逻辑？</p>
+ <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span><br>        o_orderpriority,<br>        <span class="hljs-keyword">COUNT</span>(*) <span class="hljs-keyword">AS</span> order_count<br><span class="hljs-keyword">FROM</span><br>        orders<br><span class="hljs-keyword">WHERE</span><br>        o_orderdate &gt;= <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1993-07-01'</span><br>        <span class="hljs-keyword">AND</span> o_orderdate &lt; <span class="hljs-built_in">DATE</span> <span class="hljs-string">'1993-07-01'</span> + <span class="hljs-built_in">INTERVAL</span> <span class="hljs-string">'3'</span> <span class="hljs-keyword">MONTH</span><br>        <span class="hljs-keyword">AND</span> <span class="hljs-keyword">EXISTS</span> (<br>                <span class="hljs-keyword">SELECT</span><br>                        *<br>                <span class="hljs-keyword">FROM</span><br>                        lineitem<br>                <span class="hljs-keyword">WHERE</span><br>                        l_orderkey = o_orderkey<br>                        <span class="hljs-keyword">AND</span> l_commitdate &lt; l_receiptdate<br>        )<br><span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span><br>        o_orderpriority<br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span><br>        o_orderpriority;<br></code></pre></div></td></tr></table></figure>
+
+<p> 查询 1993 年第三季度中，根据发货优先级分组，未达承诺交付时间的订单数量，结果大致如下：</p>
+<p> <img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%80%9D%E8%80%83%E9%A2%98%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C.jpg" alt="拉勾子查询思考题查询结果"></p>
+</li>
+<li><p>查看通过命令 EXPLAIN 查看执行计划，说出 MySQL 8.0 的执行过程。</p>
+</li>
+<li><p>执行 <code>SET @@optimizer_switch=&#39;semijoin=off&#39;</code>; 接着再通过命令 EXPLAIN 查看执行计划，说出执行的过程。</p>
+<p> <img src="https://qiniu.xiaoming.net.cn/%E5%AD%90%E6%9F%A5%E8%AF%A2%E6%80%9D%E8%80%83%E9%A2%982%EF%BC%8C3%E7%AD%94%E6%A1%88.jpg" alt="子查询思考题2，3答案"></p>
+</li>
+</ol>
 <h2 id="分区表"><a href="#分区表" class="headerlink" title="分区表"></a>分区表</h2><p>分区表就是把物理表结构相同的几张表，通过一定算法，组成一张逻辑大表。这种算法叫“分区函数”，当前 MySQL 数据库支持的分区函数类型有 RANGE、LIST、HASH、KEY、COLUMNS。</p>
 <h3 id="分区表的使用"><a href="#分区表的使用" class="headerlink" title="分区表的使用"></a>分区表的使用</h3><p>无论选择哪种分区函数，都要指定相关列成为分区算法的输入条件，这些列就叫“分区列”。另外，在 MySQL 分区表中，<strong>主键也必须是分区列的一部分，不然创建分区表时会失败</strong>，比如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">CREATE TABLE t (<br>    a INT,<br>    b INT,<br>    c DATETIME(6),<br>    d VARCHAR(32),<br>    e INT,<br>    PRIMARY KEY (a,b)<br>)<br>partition by range columns(c) (<br>    PARTITION p0000 VALUES LESS THAN (&apos;2019-01-01&apos;),<br>    PARTITION p2019 VALUES LESS THAN (&apos;2020-01-01&apos;),<br>    PARTITION p2020 VALUES LESS THAN (&apos;2021-01-01&apos;),<br>    PARTITION p9999 VALUES LESS THAN (MAXVALUE)<br>);<br>ERROR 1503 (HY000): A PRIMARY KEY must include all columns in the table&apos;s partitioning function (prefixed columns are not considered).<br></code></pre></div></td></tr></table></figure>
@@ -984,12 +1006,17 @@
 <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">TABLE</span> orders_par <br><span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">PARTITION</span> p1998<br></code></pre></div></td></tr></table></figure>
 
 <p>上述 SQL 执行速度非常快，因为实际执行过程是把分区文件删除和重建。另外产生的日志也只有一条 DDL 日志，也不会导致主从复制延迟问题。</p>
-<h3 id="思考题-4"><a href="#思考题-4" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<h3 id="思考题-5"><a href="#思考题-5" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>除了订单表，还有那些业务适合使用分区表技术呢？</p>
+<ul>
+<li>日志、监控等非核心数据</li>
+</ul>
 </li>
 <li><p>对于电商中的订单表，经常需要根据用户查询购买记录，这时会使用如下 SQL。如果把表 Orders 设计成按年分区，这时的执行计划如何？存在什么样的问题？如何优化呢？</p>
  <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders_par <br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span> <br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">limit</span> <span class="hljs-number">30</span><br></code></pre></div></td></tr></table></figure>
 
+<p> <code>o_custkey</code> 不是分区键，会扫描所有分区，可以自己建一张表，用于索引表功能，如 <code>idx_orders_par_custkey(o_custkey,o_orderkey,o_orderdate)</code>，查询时先查询索引表，再通过分区表进行查询，由于有 <code>o_oerder_date</code> 分区键，反查时只需要查询指定分区。</p>
+<p> 这里其实优化的思路就是人为的实现二级索引的回表。</p>
 </li>
 </ol>
 <h1 id="高可用结构篇"><a href="#高可用结构篇" class="headerlink" title="高可用结构篇"></a>高可用结构篇</h1><h2 id="MySQL-复制"><a href="#MySQL-复制" class="headerlink" title="MySQL 复制"></a>MySQL 复制</h2><h3 id="复制架构"><a href="#复制架构" class="headerlink" title="复制架构"></a>复制架构</h3><p>数据库复制本质上就是数据同步。<strong>MySQL 数据库是基于二进制日志（binary log）进行数据增量同步</strong>，而二进制日志记录了所有对于 MySQL 数据库的修改操作。</p>
@@ -1063,10 +1090,12 @@
 <p>延迟复制在数据库的备份架构设计中非常常见，比如可以设置一个延迟一天的延迟备机，这样本质上说，用户可以有 1 份 24 小时前的快照。</p>
 <p>那么当线上发生误操作，如 DROP TABLE、DROP DATABASE 这样灾难性的命令时，用户有一个 24 小时前的快照，数据可以快速恢复。</p>
 <p><strong>对金融行业来说，延迟复制是备份设计中，必须考虑的一个架构部分。</strong></p>
-<h3 id="思考题-5"><a href="#思考题-5" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<h3 id="思考题-6"><a href="#思考题-6" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>若有 N 个 Slave，Master 上是有 1 个 Dump 线程还是 N 个 Dump 线程呢？</p>
+<p> N 个 dump 线程</p>
 </li>
 <li><p>二进制日志能完整记录一条记录，但它的缺点是什么呢？</p>
+<p> 由于二进制日志记录一整行记录的信息， UPDATE 时还会记录前项和后项，以及保存会话变量信息，因此占用存储空间较大。</p>
 </li>
 </ol>
 <h2 id="MySQL-读写分离设计"><a href="#MySQL-读写分离设计" class="headerlink" title="MySQL 读写分离设计"></a>MySQL 读写分离设计</h2><h3 id="逻辑日志的优缺点"><a href="#逻辑日志的优缺点" class="headerlink" title="逻辑日志的优缺点"></a>逻辑日志的优缺点</h3><p>MySQL 复制基于的二进制日志是一种逻辑日志，其写入的是每个事务中已变更的每条记录的前项、后项。</p>
@@ -1131,12 +1160,174 @@
 <p><img src="https://qiniu.xiaoming.net.cn/%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%85%9C%E5%BA%95.png" alt="主从复制兜底"></p>
 <p>在 Load Balance 服务器，可以配置较小比例的读取请求访问主机，如上图所示的 1%，其余三台从服务器各自承担 33% 的读取请求。</p>
 <p>如果发生严重的主从复制情况，可以设置下面从机权重为 0，将主机权重设置为 100%，这样就不会因为数据延迟，导致对于业务的影响了。</p>
-<h3 id="思考题-6"><a href="#思考题-6" class="headerlink" title="思考题"></a>思考题</h3><ol>
+<h3 id="思考题-7"><a href="#思考题-7" class="headerlink" title="思考题"></a>思考题</h3><ol>
 <li><p>读写分离设计后，主服务器就完全没有读取请求了吗？</p>
+<p> UPDATE,DELETE 操作还是需要读取的，先读取再修改。另外，对于一些实时性要求非常高的数据，业务还是需要读取主服务器。</p>
 </li>
 <li><p>还有一种主从延迟问题的处理，调用函数 <code>WAIT_UNTIL_SQL_THREAD_AFTER_GITDS</code>，请问这个设计的原理如何？是一种好的设计吗？</p>
+<p> 要求从机已经回放到指定的 GTID，这样表示数据已经同步，没有主从延迟。这种设计对于业务侵入性较大，不是一种通用的设计。如果担心主从延迟，要么就彻底解决主从复制，但如果 DBA 把控能力不够，又或者改造需要时间，这不失为一种读写分离避免延迟的一种方法。</p>
 </li>
 </ol>
+<h2 id="MySQL-高可用设计"><a href="#MySQL-高可用设计" class="headerlink" title="MySQL 高可用设计"></a>MySQL 高可用设计</h2><p>业界度量高可用能力有一个统一的标准：判断宕机时间，并以此计算出每年系统可用时间达到几个 9，来判断高可用架构是否健壮。具体如下表所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E9%AB%98%E5%8F%AF%E7%94%A8%E6%A0%87%E5%87%86.png" alt="高可用标准"></p>
+<p>通常来说，系统至少要达到 4 个 9（99.99%），也就是每年宕机时间不超过 52.56 分钟，否则用户体验会非常差，感觉系统不稳定。</p>
+<p>不过 4 个 9 宕机 52 分钟对于生产环境的影响还是比较大，但是 5 个 9 对大部分系统来说要求又太高。所以一些云服务商会提出一个 99.995% 的可用性概念，那么系统一年的不可用时长为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">不可用时长 = (<span class="hljs-number">1</span> - <span class="hljs-number">99.995</span>%)*<span class="hljs-number">365</span>*<span class="hljs-number">24</span>*<span class="hljs-number">60</span> = <span class="hljs-number">26.28</span> (分钟)<br></code></pre></div></td></tr></table></figure>
+
+<p>即一年最多的影响服务的时间为 26.28 分钟。</p>
+<h3 id="高可用架构设计"><a href="#高可用架构设计" class="headerlink" title="高可用架构设计"></a>高可用架构设计</h3><p>系统要达到高可用，一定要做好软硬件的冗余，消除单点故障（SPOF single point of failure）。</p>
+<p>冗余是高可用的基础，通常认为，系统投入硬件资源越多，冗余也就越多，系统可用性也就越高。</p>
+<p>除了做好冗余，系统还要做好故障转移（Failover）的处理。也就是在最短的时间内发现故障，然后把业务切换到冗余的资源上。</p>
+<p>在明确上述高可用设计的基本概念后之后，看一下高可用架构设计的类型，主要分为两种：</p>
+<ul>
+<li>无状态服务高可用设计</li>
+<li>数据库高可用架构设计</li>
+</ul>
+<h4 id="无状态服务高可用设计"><a href="#无状态服务高可用设计" class="headerlink" title="无状态服务高可用设计"></a>无状态服务高可用设计</h4><p>无状态的服务（如 Nginx ）高可用设计非常简单，发现问题直接转移就行，甚至可以通过负载均衡服务，当发现有问题，直接剔除，对于上层用户来说，他只会在几秒内的访问出现问题，之后服务就立刻恢复了。对于无状态的服务来说，高可用设计相对简单。</p>
+<h4 id="数据库高可用架构设计"><a href="#数据库高可用架构设计" class="headerlink" title="数据库高可用架构设计"></a>数据库高可用架构设计</h4><p>所以，系统高可用设计，真正的难点、痛点不在于无状态服务的设计，而在于数据库的高可用设计，这是因为：</p>
+<ul>
+<li><p>数据持久化在数据库中，是有状态的服务；</p>
+</li>
+<li><p>数据库的容量比较大，Failover 的时间相对无状态服务会更多；</p>
+</li>
+</ul>
+<p>一些系统，如金融场景的数据库，会要求数据完全不能丢失，这又增加了高可用实现的难度。</p>
+<p>其实从架构角度看，数据库高可用本身也是业务高可用，所以要从业务全流程的角度出发，思考数据库的高可用设计。</p>
+<p>作者在这里提供了三种数据库的高可用架构设计方法，它们不但适用于 MySQL 数据库，也适用于其他数据库。</p>
+<h5 id="基于数据层的数据库高可用架构"><a href="#基于数据层的数据库高可用架构" class="headerlink" title="基于数据层的数据库高可用架构"></a>基于数据层的数据库高可用架构</h5><p>基于数据层的数据库高可用架构，就是基于数据同步技术。当主服务器 Master 发生宕机，则故障转移到从服务器 Slave。</p>
+<p>对于 MySQL 数据库来说，就是基于前面介绍的复制技术。对于上面的读写分离架构，如果主服务器发生宕机，做如下操作就行了：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E5%9F%BA%E4%BA%8E%E6%95%B0%E6%8D%AE%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84.png" alt="拉勾网基于数据层的数据库高可用架构"></p>
+<p>可以发现，原先的 Slave3 从服务器提升为了新主机，然后建立了新的复制拓扑架构，Slave2、Slave3 都连到新 Master 进行数据同步。</p>
+<p>为了在故障转移后对 Service 服务无感知，所以需要引入 VIP（Virtual IP）虚拟 IP 技术，当发生宕机时，VIP 也需要漂移到新的主服务器。</p>
+<p>那么这个架构的真正难点在于：</p>
+<ul>
+<li><p>如何保障数据一致性；</p>
+</li>
+<li><p>如何发现主服务器宕机；</p>
+</li>
+<li><p>故障转移逻辑的处理；</p>
+</li>
+</ul>
+<p>可以通过 MySQL 提供的无损复制技术，来保障“数据一致性”。而“发现主服务器宕机”“处理故障转移逻辑”要由数据库高可用套件完成(后面进行描述)</p>
+<h5 id="基于业务层的数据库高可用架构"><a href="#基于业务层的数据库高可用架构" class="headerlink" title="基于业务层的数据库高可用架构"></a>基于业务层的数据库高可用架构</h5><p>第二种“基于业务层的数据库高可用架构设计”则完全基于业务实现，数据库只是用于存储数据。</p>
+<p>当一台数据库主服务器不可用，业务直接写另一台数据库主服务器就可以了。这个架构如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E5%9F%BA%E4%BA%8E%E4%B8%9A%E5%8A%A1%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E5%BA%93%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84.png" alt="拉勾网基于业务层的数据库高可用架构"></p>
+<p>从上图可以看到，Service 服务写入 Master1 主服务器失败后，不用等待故障转移程序启用主从切换，而是直接把数据写入 Master2 主服务器。</p>
+<p>这看似是一种非常简单、粗暴的高可用架构实现方式，但能符合这样设计的业务却并不多，因为该设计前提是状态可修改。</p>
+<p>比如电商中的订单服务，其基本逻辑就是存储电商业务中每笔订单信息，核心逻辑就是往表 Orders 中插入数据，即：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> Orders(o_orderkey, ... ) <span class="hljs-keyword">VALUES</span> (...)<br></code></pre></div></td></tr></table></figure>
+
+<p>这里 <code>o_orderkey</code> 是主键。为了实现基于业务层的数据库高可用，可以在主键生成过程中加入额外信息，比如服务器编号，这样订单的主键设计变为了：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">PK</span> = 有序UUID-服务器编号<br></code></pre></div></td></tr></table></figure>
+
+<p>这样的话，当写入服务器编号 1 时失败了，业务层会把订单的主键修改为服务器编号 2，这样就实现了业务层的高可用，电商中的这种订单号生成方式也称为“跳单”。</p>
+<p>而当查询订单信息时，由于主键中包含了服务器编号，那么业务知道该笔订单存储在哪台服务器，就可以非常快速地路由到指定的服务器。</p>
+<p>但这样设计的前提是整个服务的写入主键是可以进行跳单设计，且查询全部依赖主键进行搜索。</p>
+<h5 id="融合的高可用架构设计"><a href="#融合的高可用架构设计" class="headerlink" title="融合的高可用架构设计"></a>融合的高可用架构设计</h5><p>刚刚“基于业务层的数据库高可用架构”中，虽然通过跳单设计，可以实现写入业务的高可用实现。但这时订单服务的查询功能会受到极大影响。在上面的例子中，当发生宕机时，服务器编号为 1 的订单无法查询。</p>
+<p>所以，作者给出了另一种业务和数据层相结合的高可用设计。这个架构可以解决宕机后，查询服务受限的问题。其架构图如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E8%9E%8D%E5%90%88%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.png" alt="拉勾网融合的高可用架构设计"></p>
+<p>上图中，将不同编号的订单根据不同的数据库进行存放，比如服务器编号为 1 的订单存放在数据库 DB1 中，服务器编号为 2 的订单存放在数据库 DB2 中。</p>
+<p>此外，这里也用到了 MySQL 复制中的部分复制技术，即左上角的主服务器仅将 DB1 中的数据同步到右上角的服务器。同理，右上角的主服务器仅将 DB2 中的数据同步到左上角的服务器。下面的两台从服务器不变，依然从原来的 MySQL 实例中同步数据。</p>
+<p>这样做得好处是：</p>
+<ul>
+<li><p>在常态情况下，上面两台 MySQL 数据库是双活的，都可以有数据的写入，业务的性能得到极大提升。</p>
+</li>
+<li><p>订单数据是完整的，服务器编号为 1 和 2 的数据都在一个 MySQL 实例上。</p>
+</li>
+<li><p>更重要的是，这样当发生宕机时，Service 服务的写入不受到影响，写入服务器编号为 1 的订单通过跳单设计写入 DB2。同时，对于订单读取也不会受到影响，因为数据都是一个实例上。</p>
+</li>
+</ul>
+<h3 id="思考题-8"><a href="#思考题-8" class="headerlink" title="思考题"></a>思考题</h3><p>针对本讲所学习的数据库三大高可用架构设计，请讲述它们的优缺点。</p>
+<h2 id="金融级高可用架构"><a href="#金融级高可用架构" class="headerlink" title="金融级高可用架构"></a>金融级高可用架构</h2><p>对有状态的数据库服务来说，在一些核心业务系统中，比如电商、金融等，还要保证数据一致性。</p>
+<p>这里的“数据一致性”是指在任何灾难场景下，一条数据都不允许丢失（一般也把这种数据复制方式叫作“强同步”）。</p>
+<h3 id="复制类型的选择"><a href="#复制类型的选择" class="headerlink" title="复制类型的选择"></a>复制类型的选择</h3><p>在银行、保险、证券等核心业务，需要严格保障数据一致性。那么要想实现数据的强同步，在进行复制的配置时，就要使用无损半同步复制模式。</p>
+<p>在 MySQL 内部就是要把参数 <code>rpl_semi_sync_master_wait_point</code> 设置成 <code>AFTER_SYNC</code> 。</p>
+<p>但是在高可用设计时，当数据库 FAILOVER 完后，有时还要对原来的主机做额外的操作，这样才能保证主从数据的完全一致性。</p>
+<p>来看这样一张图：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%841.png" alt="拉勾网金融级高可用架构1"></p>
+<p>从图中可以看到，即使启用无损半同步复制，依然存在当发生主机宕机时，最后一组事务没有上传到从机的可能。图中宕机的主机已经提交事务到 101，但是从机只接收到事务 100。如果这个时候 Failover，从机提升为主机，那么这时：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%842.png" alt="拉勾网金融级高可用架构2"></p>
+<p>可以看到当主从切换完成后，新的 MySQL 开始写入新的事务 102，如果这时老的主服务器从宕机中恢复，则这时事务 101 不会同步到新主服务器，导致主从数据不一致。</p>
+<p>但设置 <code>AFTER_SYNC</code> 无损半同步的好处是，虽然事务 101 在原主机已经提交，但是在从机没有收到并返回 ACK 前，这个事务对用户是不可见的，所以，用户感受不到事务已经提交了。</p>
+<p>所以，在做高可用设计时，当老主机恢复时，需要做一次额外的处理，把事务 101 给“回滚”。</p>
+<p>这里只要记住，设计数据强一致的高可用方案时，要选择无损半同步复制，另外在发生宕机 FAILOVER 后，若老主机恢复，还需要额外处理老主机上已提交但还未发送到从机的数据。</p>
+<h3 id="容灾级别"><a href="#容灾级别" class="headerlink" title="容灾级别"></a>容灾级别</h3><p>高可用用于处理各种宕机问题，而宕机可以分成服务器宕机、机房级宕机，甚至是一个城市发生宕机。</p>
+<ul>
+<li><p>机房级宕机： 机房光纤不通/被挖断，机房整体掉电（双路备用电源也不可用）；</p>
+</li>
+<li><p>城市级宕机： 一般指整个城市的进出口网络，骨干交换机发生的故障（这种情况发生的概率很小）。</p>
+</li>
+</ul>
+<p>如果综合考虑的话，高可用就成了一种容灾处理机制，对应的高可用架构的评判标准就上升了。</p>
+<ul>
+<li><p>机房内容灾： 机房内某台数据库服务器不可用，切换到同机房的数据库实例，保障业务连续性；</p>
+</li>
+<li><p>同城容灾： 机房不可用，切换到同城机房的数据库实例，保障业务连续性；</p>
+</li>
+<li><p>跨城容灾： 单个城市机房都不可用，切换到跨城机房的数据库实例，保障业务连续性。</p>
+</li>
+</ul>
+<p>前面谈到的高可用设计，都只是机房内的容灾。也就是说，主服务器和从服务器都在一个机房内，现在来看一下同城和跨城的容灾设计（不论是机房内容灾、同城容灾，还是跨城容灾，都是基于 MySQL 的无损半同步复制，只是物理部署方式不同，解决不同的问题）。</p>
+<p>对于同城容灾，有很多这样的设计：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%843.png" alt="拉勾网金融级高可用架构3"></p>
+<p>这种设计没有考虑到机房网络的抖动。如果机房 1 和机房 2 之间的网络发生抖动，那么因为事务提交需要机房 2 中的从服务器接收日志，所以会出现事务提交被 hang 住的问题。</p>
+<p>而机房网络抖动非常常见，所以核心业务同城容灾务要采用三园区的架构，如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%844.png" alt="拉勾网金融级高可用架构4"></p>
+<p>该架构称为“三园区的架构”，如果三个机房都在一个城市，则称为“ 一地三中心”，如果在相邻两个城市，那么就叫“两地三中心”。但这种同城/近城容灾，要求机房网络之间的延迟不超过 5ms。</p>
+<p>在三园区架构中，一份数据被存放在了 3 个机房，机房之间根据半同步复制。这里将 MySQL 的半同步复制参数 <code>rpl_semi_sync_master_wait_for_slave_count</code> 设置为 1，表示只要有 1 个半同步备机接收到日志，主服务器上的事务就可以提交。</p>
+<p>这样的设计，保证除主机房外，数据在其他机房至少一份完整的数据。</p>
+<p>另外，即便机房 1 与机房 2 发生网络抖动，因为机房 1 与机房 3 之间的网络很好，不会影响事务在主服务器上的提交。如果机房 1 的出口交换机或光纤发生故障，那么这时高可用套件会 FAILOVER 到机房 2 或机房 3，因为至少有一份数据是完整的。</p>
+<p>机房 2、机房 3 的数据用于保障数据一致性，但是如果要实现读写分离，或备份，还需要引入异步复制的备机节点。所以整体架构调整为：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%845.png" alt="拉勾网金融级高可用架构5"></p>
+<p>从图中可以看到，加入两个异步复制的节点，用于业务实现读写分离，另外再从机房 3 的备机中，引入一个异步复制的延迟备机，用于做数据误删除操作的恢复。</p>
+<p>当设计成类似上述的架构时，才能认为自己的同城容灾架构是合格的！</p>
+<p>另一个重要的点：因为机房 1 中的主服务器要向四个从服务器发送日志，这时网卡有成为瓶颈的可能，所以请务必配置万兆网卡。</p>
+<p>在明白三园区架构后，要实现跨城容灾也就非常简单了， 只要把三个机房放在不同城市就行。但这样的设计，当主服务器发生宕机时，数据库就会切到跨城，而跨城之间的网络延迟超过了 25 ms。所以，跨城容灾一般设计成“三地五中心”的架构，如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%846.png" alt="拉勾网金融级高可用架构6"></p>
+<p>在上图中：机房 1、机房 2 在城市 1 中；机房 3、机房 4 在城市 2 中；机房 5 在城市 3 中，三个城市之间的距离超过 200 公里，延迟超过 25ms。</p>
+<p>由于有五个机房，所以 ACK 设置为 2，保证至少一份数据在两个机房有数据。这样当发生城市级故障，则城市 2 或城市 3 中，至少有一份完整的数据。</p>
+<p>在真实的互联网业务场景中，“三地五中心”应用并不像“三园区”那样普遍。这是因为 25ms 的延迟对业务的影响非常大，一般这种架构应用于读多写少的场景，比如用户中心。</p>
+<p>另外，真实的互联网业务场景中，实现跨城容灾，一般基于同城容灾架构，然后再由业务层来保障跨城的数据一致性。</p>
+<h3 id="兜底策略：数据核对"><a href="#兜底策略：数据核对" class="headerlink" title="兜底策略：数据核对"></a>兜底策略：数据核对</h3><p>到目前为止，前面的高可用是基于 MySQL 的复制技术。但这可能出现这样几个问题：</p>
+<ul>
+<li><p>万一数据库的复制有 Bug 呢？导致最终的数据在逻辑上不一致呢？</p>
+</li>
+<li><p>主从的数据一定一致吗？你如何判断一定一致呢？</p>
+</li>
+</ul>
+<p>所以，除了高可用的容灾架构设计，还要做一层兜底服务，用于判断数据的一致性。这里要引入数据核对，用来解决以下两方面的问题。</p>
+<ul>
+<li><p>数据在业务逻辑上一致： 这个保障业务是对的；</p>
+</li>
+<li><p>主从服务器之间的数据一致： 这个保障从服务器的数据是安全的、可切的。</p>
+</li>
+</ul>
+<p>业务逻辑核对由业务的同学负责编写， 从整个业务逻辑调度看账平不平。例如“今天库存的消耗”是否等于“订单明细表中的总和”，“在途快递” + “已收快递”是否等于“已下快递总和”。总之，这是个业务逻辑，用于对账。</p>
+<p>主从服务器之间的核对，是由数据库团队负责的。 需要额外写一个主从核对服务，用于保障主从数据的一致性。这个核对不依赖复制本身，也是一种逻辑核对。思路是：将最近一段时间内主服务器上变更过的记录与从服务器核对，从逻辑上验证是否一致。</p>
+<p>那么现在的难题是：如何判断最近一段时间内主服务器上变更过的记录？这里有两种思路：</p>
+<ul>
+<li><p>表结构设计规范中，每张表有一个 <code>last_modify_date</code>，用于记录每条记录的最后修改时间，按照这个条件过滤就能查出最近更新的记录，然后每条记录比较即可。</p>
+</li>
+<li><p>核对服务扫描最近的二进制日志，筛选出最近更新过记录的表和主键，然后核对数据。这种的实现难度会更大一些，但是不要求在数据库上进行查询。</p>
+</li>
+</ul>
+<p>如果在核对过程中，记录又在主上发生了变化，但是还没有同步到从机，可以加入复核逻辑，按理来说多复核几次，主从数据应该就一致了。如果复核多次不一致，那么大概率，主从数据就已经是不一致的了。</p>
+<h3 id="思考题-9"><a href="#思考题-9" class="headerlink" title="思考题"></a>思考题</h3><p>对于跨城容灾，有什么优化技术可以减少耗时增大带来的性能影响呢？</p>
+<h1 id="MySQL-修改列为-auto-increment-时存在的问题"><a href="#MySQL-修改列为-auto-increment-时存在的问题" class="headerlink" title="MySQL 修改列为 auto_increment 时存在的问题"></a>MySQL 修改列为 auto_increment 时存在的问题</h1><p>在这里再多描述一个作者在 MySQL 官方提交的一个 bug，详细地址如下：<a href="https://bugs.mysql.com/bug.php?id=103784" target="_blank" rel="noopener">column value seems to be wrong when modifying column to auto_increment</a></p>
+<p>该 bug 里描述了在 MySQL 中，当对一个列的属性进行修改了，如果原来的列已经具备了 <code>auto_increment</code> 属性，且原来的列中留有 0 值，则修改后会保留 0 值。但是，如果把一个非 <code>auto_increment</code> 的列修改成 <code>auto_increment</code>，则该过程会将原列的 0 值修改成 1：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.50 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.15 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.16 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  1 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>如果开启 <code>NO_AUTO_VALUE_ON_ZERO</code> 模式，则不会出现这种错误：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; set sql_mode = 'NO_AUTO_VALUE_ON_ZERO';<br>Query OK, 0 rows affected (0.04 sec)<br><br>mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.47 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.08 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.13 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
+
+<p>作者认为这是官方的一个 bug，并针对这个 bug 提出了修复意见。</p>
+<p>这是原先的相关代码：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">/*<br>        If we are going to copy contents of one auto_increment column to<br>        another auto_increment column it is sensible to preserve zeroes.<br>        This condition also covers case when we are don't actually alter<br>        auto_increment column.<br>      */<br>     if (def-&gt;field == from-&gt;found_next_number_field)<br>         thd-&gt;variables.sql_mode |= MODE_NO_AUTO_VALUE_ON_ZERO;<br></code></pre></div></td></tr></table></figure>
+
+<p>代码仅涵盖将表从 <code>auto_increment</code> 列更改为 <code>auto_increment</code> 列，它不包括将表从非 <code>auto_increment</code> 列更改为 <code>auto_increment</code> 列，就像前面展示的一样。作者认为这里应该修改如下：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">-        if (def-&gt;field == from-&gt;found_next_number_field)<br>-            thd-&gt;variables.sql_mode |= MODE_NO_AUTO_VALUE_ON_ZERO;<br>+        //if (def-&gt;field == from-&gt;found_next_number_field)<br>+        thd-&gt;variables.sql_mode |= MODE_NO_AUTO_VALUE_ON_ZERO;<br></code></pre></div></td></tr></table></figure>
+
+<p>但是MySQL 官方则认为这不是一个错误，而是为了转换的安全考虑，因为存在如果将有符号更改为无符号，则不能有负值这样的场景。目前这个问题尚存在争议。</p>
 
             </div>
             <hr>
@@ -1463,20 +1654,5 @@
 <script  src="/js/boot.js" ></script>
 
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
