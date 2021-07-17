@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
 
 
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      31.9k 字
+      36.2k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      370
+      418
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年6月27日 晚上
+                  本文最后更新于：2021年7月3日 中午
                 
               </p>
             
@@ -1313,6 +1313,110 @@
 </ul>
 <p>如果在核对过程中，记录又在主上发生了变化，但是还没有同步到从机，可以加入复核逻辑，按理来说多复核几次，主从数据应该就一致了。如果复核多次不一致，那么大概率，主从数据就已经是不一致的了。</p>
 <h3 id="思考题-9"><a href="#思考题-9" class="headerlink" title="思考题"></a>思考题</h3><p>对于跨城容灾，有什么优化技术可以减少耗时增大带来的性能影响呢？</p>
+<h2 id="MySQL-相关的一些高可用套件"><a href="#MySQL-相关的一些高可用套件" class="headerlink" title="MySQL 相关的一些高可用套件"></a>MySQL 相关的一些高可用套件</h2><p>前面介绍了 MySQL 数据库的高可用解决方案，并且学习了怎么根据金融业务的要求，通过无损半同步复制的方式进行三园区的同城容灾设计，以及三地务中心的跨城容灾设计。但是当数据库发生宕机时，MySQL 的主从复制并不会自动地切换，这需要高可用套件对数据库主从进行管理。</p>
+<h3 id="高可用套件所需的透明切换机制"><a href="#高可用套件所需的透明切换机制" class="headerlink" title="高可用套件所需的透明切换机制"></a>高可用套件所需的透明切换机制</h3><p>MySQL 的高可用套件用于负责数据库的 Failover 操作，也就是当数据库发生宕机时，MySQL 可以剔除原有主机，选出新的主机，然后对外提供服务，保证业务的连续性。</p>
+<p>可以看到，MySQL 复制是高可用的技术基础，用于将数据实时同步到从机。高可用套件是 MySQL 高可用实现的解决方案，负责切换新主机。</p>
+<p>为了不让业务感知到数据库的宕机切换，这里要用到 VIP（Virtual IP）技术。其中，VIP 不是真实的物理 IP，而是可以随意绑定在任何一台服务器上。</p>
+<p>业务访问数据库，不是服务器上与网卡绑定的物理 IP，而是这台服务器上的 VIP。当数据库服务器发生宕机时，高可用套件会把 VIP 插拔到新的服务器上。数据库 Failover后，业务依旧访问的还是 VIP，所以使用 VIP 可以做到对业务透明。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84VIP%E6%8A%80%E6%9C%AF.png" alt="数据库VIP技术"></p>
+<p>从上图可以看到，MySQL 的主服务器的 IP 地址是 192.168.1.10，两个从服务器的 IP 地址分别为 192.168.1.20、192.168.1.30。</p>
+<p>上层服务访问数据库并没有直接通过物理 IP 192.168.1.10，而是访问 VIP，地址为192.168.1.100。这时，如果 MySQL 数据库主服务器发生宕机，则请求会变成这样子：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93VIP%E6%8A%80%E6%9C%AF2.png" alt="数据库VIP技术2"></p>
+<p>可以看到，当发生 Failover 后，由于上层服务访问的是 VIP 192.168.1.100，所以切换对服务来说是透明的，只是在切换过程中，服务会收到连接数据库失败的提示。但是通过重试机制，当下层数据库完成切换后，服务就可以继续使用了。所以，<strong>上层服务一定要做好错误重试的逻辑，否则就算启用 VIP，也无法实现透明的切换</strong>。</p>
+<p>但是 VIP 也是有局限性的，仅限于同机房同网段的 IP 设定。如果是之前设计的三园区同城跨机房容灾架构，VIP 就不可用了。这时就要用名字服务，常见的名字服务就是 DNS（Domain Name Service），如下所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%B8%E6%9C%BA%E6%88%BFDNS%E6%96%B9%E5%BC%8F.png" alt="数据库夸机房DNS方式"></p>
+<p>从上图可以看到，这里将域名<code>m1.insidemysql.com</code> 对应的 IP 指向为了 <code>192.168.1.10</code>，上层业务通过域名进行访问。当发生宕机，将会进行机房的切换，会把 DNS 指向的域名切换到机房2：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%B8%E6%9C%BA%E6%88%BFDNS%E6%96%B9%E5%BC%8F2.png" alt="数据库夸机房DNS方式2"></p>
+<p>虽然使用域名或其他名字服务可以解决跨机房的切换问题，但是引入了新的组件。新组件的高可用的问题也需要特别注意。在架构设计时，请咨询公司提供名字服务的小组，和他们一起设计高可用的容灾架构。</p>
+<h3 id="几款常用的高可用套件"><a href="#几款常用的高可用套件" class="headerlink" title="几款常用的高可用套件"></a>几款常用的高可用套件</h3><h4 id="MHA"><a href="#MHA" class="headerlink" title="MHA"></a>MHA</h4><p>MHA(Master High Availability)是一款开源的 MySQL 高可用程序，它为 MySQL 数据库主从复制架构提供了 automating master failover 的功能。</p>
+<p>MHA 是由业界大名鼎鼎的 Facebook 工程师 Yoshinorim 开发，开源地址为：<a href="https://github.com/yoshinorim/mha4mysql-manager。它由两大组件所组成，MHA" target="_blank" rel="noopener">https://github.com/yoshinorim/mha4mysql-manager。它由两大组件所组成，MHA</a> Manger 和 MHA Node：</p>
+<ul>
+<li><p>MHA Manager 通常部署在一台服务器上，用来判断多个 MySQL 高可用组是否可用。当发现有主服务器发生宕机，就发起 failover 操作。MHA Manger 可以看作是 failover 的总控服务器。</p>
+</li>
+<li><p>而 MHA Node 部署在每台 MySQL 服务器上，MHA Manager 通过执行 Node 节点的脚本完成 failover 切换操作。</p>
+</li>
+</ul>
+<p>MHA Manager 和 MHA Node 的通信是采用 ssh 的方式，也就是需要在生产环境中打通 MHA Manager 到所有 MySQL 节点的 ssh 策略，那么这里就存在潜在的安全风险。</p>
+<p>另外，ssh 通信，效率也不是特别高。所以，MHA 比较适合用于规模不是特别大的公司，所有MySQL 数据库的服务器数量不超过 20 台。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/MHA%E6%9E%B6%E6%9E%84.png" alt="MHA架构"></p>
+<h4 id="Orchestrator"><a href="#Orchestrator" class="headerlink" title="Orchestrator"></a>Orchestrator</h4><p>Orchestrator 是另一款开源的 MySQL 高可用套件，除了支持 failover 的切换，还可通过 Orchestrator 完成 MySQL 数据库的一些简单的复制管理操作。Orchestrator 的开源地址为：<a href="https://github.com/openark/orchestrator" target="_blank" rel="noopener">https://github.com/openark/orchestrator</a></p>
+<p>你可以把 Orchestrator 当成 MHA 的升级版，而且提供了 HTTP 接口来进行相关数据库的操作，比起 MHA 需要每次登录 MHA Manager 服务器来说，方便很多。</p>
+<p>下图显示了 Orchestrator 的高可用设计架构：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Orchestrator%E6%9E%B6%E6%9E%84.png" alt="Orchestrator架构"></p>
+<p>其基本实现原理与 MHA 是一样的，只是把元数据信息存储在了元数据库中，并且提供了 HTTP 接口和命令的访问方式，使用上更为友好。</p>
+<p>但是由于管控节点到下面的 MySQL 数据库的管理依然是 ssh 的方式，依然存在 MHA 一样的短板问题，总的来说，关于 Orchestrator 依然只建议使用在较小规模的数据库集群。</p>
+<h4 id="数据库管理平台"><a href="#数据库管理平台" class="headerlink" title="数据库管理平台"></a>数据库管理平台</h4><p>虽然 MHA 和 Orchestrator 都可以完成 MySQL 高可用的 failover 操作，但是，在生产环境中如果需要管理成千乃至上万的数据库服务器，由于它们的通信仅采用 ssh 的方式，并不能满足生产上的安全性和性能的要求。</p>
+<p>所以，几乎每家互联网公司都会自研一个数据库的管理平台，用于管理公司所有的数据库集群，以及数据库的容灾切换工作。</p>
+<p>下图显示了数据库管理平台大致的实现框架：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%A1%E7%90%86%E5%B9%B3%E5%8F%B0%E5%A4%A7%E8%87%B4%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%A1%86%E6%9E%B6.png" alt="数据库管理平台大致的实现框架"></p>
+<p>上图中的数据库管理平台是用户操作数据库的入口。对数据库的大部分操作，比如数据库的初始化、数据查询、数据备份等操作、后续都能在这个平台完成，不用登录数据库服务器，这样的好处是能大大提升数据库操作的效率。</p>
+<p>数据库管理平台提供了 HTTP API 的方式，可用前后端分离的方式支持 Web、手机等多种访问方式。</p>
+<p>元数据库用于存储管理 MySQL 数据库所有的节点信息，比如 IP 地址、端口、域名等。</p>
+<p>数据库管理平台 Manager 用来实际控制下面的所有 MySQL 节点，Manager 和后端 MySQL 的通信通过 MySQL 服务器上部署的 agent 方式进行。两者通过 BP 协议以 grpc 的方式通信。这样解决了 ssh 的不安全性以及性能。</p>
+<p>其中，agent 用来上报数据库各节点的状态给 Manager，管理节点 Manager 通过上报的信息判断数据库是否宕机，是否需要进行切换，切换到哪个节点。</p>
+<p>上图的设计，能完成一个比较基本的数据库管理平台。另外，每个公司有自己的一些需求，也可以做到数据库管理平台中，比如安全要求、审计需求、工单系统等。</p>
+<p>所以，有了数据库管理平台，数据库的高可用切换、数据库日常管理和访问，都可以由平台自动完成。有了数据库管理平台，才能真正实现数据库管理的无人驾驶。</p>
+<h3 id="思考题-10"><a href="#思考题-10" class="headerlink" title="思考题"></a>思考题</h3><p><img src="https://qiniu.xiaoming.net.cn/%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A4%B8%E6%9C%BA%E6%88%BFDNS%E6%96%B9%E5%BC%8F2.png" alt="数据库夸机房DNS方式2"></p>
+<p>上图切换完成后，还存在什么缺陷？如何进行架构设计，避免此问题呢？</p>
+<h2 id="InnoDB-Cluster"><a href="#InnoDB-Cluster" class="headerlink" title="InnoDB Cluster"></a>InnoDB Cluster</h2><p>前面介绍的所有切换判断都是通过一组外部的心跳检查机制完成，这依赖于高可用套件自身的能力，如果高可用套件本身不可靠，就意味着高可用的不可靠性。比如，当数据库真的发生宕机时，数据库是否一定能切换成功呢？</p>
+<p>最后，数据库复制技术的瓶颈在于：只能在一个节点完成写入，然后再将日志同步各个节点，这样单点写入会导致数据库性能无法进行扩展。那么能不能有一种技术，能实现 MySQL 多个节点写入，并且保证数据同步的能力呢？</p>
+<p>有的，这就是 InnoDB Cluster，它的底层是由 MySQL Group Replication（下面简称MGR）实现。</p>
+<h3 id="MGR技术"><a href="#MGR技术" class="headerlink" title="MGR技术"></a>MGR技术</h3><p>MGR 是官方在 MySQL 5.7 版本推出的一种基于状态机的数据同步机制。与半同步插件类似，MGR 是通过插件的方式启用或禁用此功能。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/MGR%E6%8A%80%E6%9C%AF.png" alt="MGR技术"></p>
+<p>注意，对于 MGR，不要简单认为它是一种新的数据同步技术，而是应该把它理解为高可用解决方案，而且特别适合应用于对于数据一致性要求极高的金融级业务场景。</p>
+<p>首先，MGR 之间的数据同步并没有采用复制技术，而是采用 GCS（Group Communication System）协议的日志同步技术。</p>
+<p><strong>GSC 本身是一种类似 Paxos 算法的协议，要求组中的大部分节点都接收到日志，事务才能提交</strong>。所以，MRG 是严格要求数据一致的，特别适合用于金融级的环境。由于是类 Paxos 算法，集群的节点要求数量是奇数个，这样才能满足大多数的要求。</p>
+<p>那之前介绍的无损半同步也能保证数据强一致的要求吗？</p>
+<p>是的，虽然通过无损半同步复制也能保证主从数据的一致性，但通过 GCS 进行数据同步有着更好的性能：当启用 MGR 插件时，MySQL 会新开启一个端口用于数据的同步，而不是如复制一样使用 MySQL 服务端口，这样会大大提升复制的效率。</p>
+<p>其次，MGR 有两种模式：</p>
+<ul>
+<li><p>单主（Single Primary）模式；</p>
+</li>
+<li><p>多主（Multi Primary）模式。</p>
+</li>
+</ul>
+<p>单主模式只有 1 个节点可以写入，多主模式能让每个节点都可以写入。而<strong>多个节点之间写入，如果存在变更同一行的冲突，MySQL 会自动回滚其中一个事务，自动保证数据在多个节点之间的完整性和一致性</strong>。</p>
+<p>最后，在单主模式下，MGR 可以自动进行 Failover 切换，不用依赖外部的各种高可用套件，所有的事情都由数据库自己完成，比如最复杂的选主（Primary Election）逻辑，都是由 MGR 自己完成，用户不用部署额外的 Agent 等组件。</p>
+<p>说了这么多 MGR 的优势，那么它有没有缺点或限制呢？ 当然有，主要是这样几点：</p>
+<ul>
+<li><p>仅支持 InnoDB 表，并且每张表一定要有一个主键；</p>
+</li>
+<li><p>目前一个 MGR 集群，最多只支持 9 个节点；</p>
+</li>
+<li><p>有一个节点网络出现抖动或不稳定，会影响集群的性能。</p>
+</li>
+</ul>
+<p>第 1、2 点问题不大，因为目前用 MySQL 主流的就是使用 InnoDB 存储引擎，9 个节点也足够用了。</p>
+<p>而第 3 点需要注意，和复制不一样的是，由于 MGR 使用的是 Paxos 协议，对于网络极其敏感，如果其中一个节点网络变慢，则会影响整个集群性能。而半同步复制，比如 ACK 为1，则 1 个节点网络出现问题，不影响整个集群的性能。所以，在决定使用 MGR 后，切记一定要严格保障网络的质量。</p>
+<p>而多主模式是一种全新的数据同步模式，接下来看看在多主模式时，该做哪些架构上的调整，从而充分发挥 MGR 多主的优势。</p>
+<h3 id="多主模式的注意事项"><a href="#多主模式的注意事项" class="headerlink" title="多主模式的注意事项"></a>多主模式的注意事项</h3><h4 id="冲突检测"><a href="#冲突检测" class="headerlink" title="冲突检测"></a>冲突检测</h4><p>MGR 多主模式是近几年数据库领域最大的一种创新，而且目前来看，仅 MySQL 支持这种多写的 Share Nothing 架构。</p>
+<p>多主模式要求每个事务在本节点提交时，还要去验证其他节点是否有同样的记录也正在被修改。如果有的话，其中一个事务要被回滚。</p>
+<p>比如两个节点同时执行下面的 SQL 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-comment">-- 节点1</span><br><span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">User</span> <span class="hljs-keyword">set</span> money = money - <span class="hljs-number">100</span> <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">id</span> = <span class="hljs-number">1</span>;<br><span class="hljs-comment">-- 节点2</span><br><span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">User</span> <span class="hljs-keyword">set</span> money = money + <span class="hljs-number">300</span> <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">id</span> = <span class="hljs-number">1</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果一开始用户的余额为 200，当节点 1 执行 SQL 后，用户余额变为 100，当节点 2 执行SQL，用户余额变味了 500，这样就导致了节点数据的不同。所以 MGR 多主模式会在事务提交时，进行行记录冲突检测，发现冲突，就会对事务进行回滚。</p>
+<p>在上面的例子中，若节点 2 上的事务先提交，则节点 1 提交时会失败，事务会进行回滚。</p>
+<p>所以，如果要发挥多主模式的优势，就要避免写入时有冲突。最好的做法是：<strong>每个节点写各自的数据库，比如节点 1 写 DB1，节点 2 写 DB2，节点 3 写 DB3，这样集群的写入性能就能线性提升了</strong>。</p>
+<p>不过这要求在架构设计时，就做好这样的考虑，否则多主不一定能带来预期中的性能提升。</p>
+<h4 id="自增处理"><a href="#自增处理" class="headerlink" title="自增处理"></a>自增处理</h4><p>在多主模式下，自增的逻辑发生了很大的变化。简单来说，自增不再连续自增。</p>
+<p>因为，如果连续自增，这要求每次写入时要等待自增值在多个节点中的分配，这样性能会大幅下降，所以 MGR 多主模式下，我们可以通过设置自增起始值和步长来解决自增的性能问题。看下面的参数：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">group_replication_auto_increment_increment</span> = <span class="hljs-number">7</span><br></code></pre></div></td></tr></table></figure>
+
+<p>假设 MGR 有 3 个节点 Node1、Node2、Node3，对应的 server-id 分别是 1、2、3, 如果这时多主插入自增的顺序为 Node1、Node1、Node2、Node3、Node1，则自增值产生的结果为：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/MGR%E4%B8%8B%E7%9A%84%E8%87%AA%E5%A2%9E.png" alt="MGR下的自增"></p>
+<p>可以看到，由于是多主模式，允许多个节点并发的产生自增值。所以自增的产生结果为1、8、16、17、22，自增值不一定是严格连续的，而仅仅是单调递增的，这与单实例 MySQL 有着很大的不同。</p>
+<p>在前面已经说过，尽量不要使用自增值做主键，在 MGR 存在问题，在后续分布式架构中也一样存在类似的自增问题。<strong>所以，对于核心业务表，还是使用有序 UUID 的方式更为可靠，性能也会更好。</strong></p>
+<p>总之，使用 MGR 技术后，所有高可用事情都由数据库自动完成。那么，业务该如何利用 MGR的能力，是否还需要 VIP、DNS 等机制保证业务的透明性呢？接下来看一下，<strong>业务如何利用 MGR 的特性构建高可用解决方案。</strong></p>
+<h3 id="InnoDB-Cluster-1"><a href="#InnoDB-Cluster-1" class="headerlink" title="InnoDB Cluster"></a>InnoDB Cluster</h3><p>MGR 是基于 Paxos 算法的数据同步机制，将数据库状态和日志通过 Paxos 算法同步到各个节点，但如果要实现一个完整的数据库高可用解决方案，就需要更高一层级的 InnoDB Cluster 完成。</p>
+<p>一个 InnoDB Cluster 由三个组件组成：MGR 集群、MySQL Shell、MySQL Router。具体如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%20InnoDB%20Cluster%E7%9A%84%E4%B8%89%E4%B8%AA%E7%BB%84%E4%BB%B6.png" alt="InnoDB Cluster的三个组件"></p>
+<p>其中，MySQL Shell 用来管理 MGR 集群的创建、变更等操作。以后我们最好不要手动去管理 MGR 集群，而是通过 MySQL Shell 封装的各种接口完成 MGR 的各种操作。如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mysql">mysql-js&gt; cluster.status()<br>&#123;<br>    &quot;clusterName&quot;: &quot;myCluster&quot;, <br>    &quot;defaultReplicaSet&quot;: &#123;<br>        &quot;name&quot;: &quot;default&quot;, <br>        &quot;primary&quot;: &quot;ic-2:3306&quot;, <br>        &quot;ssl&quot;: &quot;REQUIRED&quot;, <br>        &quot;status&quot;: &quot;OK&quot;, <br>        &quot;statusText&quot;: &quot;Cluster is ONLINE and can tolerate up to ONE failure.&quot;, <br>        &quot;topology&quot;: &#123;<br>            &quot;ic-1:3306&quot;: &#123;<br>                &quot;address&quot;: &quot;ic-1:3306&quot;, <br>                &quot;mode&quot;: &quot;R/O&quot;, <br>                &quot;readReplicas&quot;: &#123;&#125;, <br>                &quot;role&quot;: &quot;HA&quot;, <br>                &quot;status&quot;: &quot;ONLINE&quot;<br>            &#125;, <br>            &quot;ic-2:3306&quot;: &#123;<br>                &quot;address&quot;: &quot;ic-2:3306&quot;, <br>                &quot;mode&quot;: &quot;R/W&quot;, <br>                &quot;readReplicas&quot;: &#123;&#125;, <br>                &quot;role&quot;: &quot;HA&quot;, <br>                &quot;status&quot;: &quot;ONLINE&quot;<br>            &#125;, <br>            &quot;ic-3:3306&quot;: &#123;<br>                &quot;address&quot;: &quot;ic-3:3306&quot;, <br>                &quot;mode&quot;: &quot;R/O&quot;, <br>                &quot;readReplicas&quot;: &#123;&#125;, <br>                &quot;role&quot;: &quot;HA&quot;, <br>                &quot;status&quot;: &quot;ONLINE&quot;<br>            &#125;<br>        &#125;<br>    &#125;, <br>    &quot;groupInformationSourceMember&quot;: &quot;mysql://root@localhost:6446&quot;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>MySQL Router 是一个轻量级的代理，用于业务访问 MGR 集群中的数据，当 MGR 发生切换时（这里指 Single Primary 模式），自动路由到新的 MGR 主节点，这样业务就不用感知下层MGR 数据的切换。</p>
+<p>为了减少引入 MySQL Router 带来的性能影响，官方建议 MySQL Router 与客户端程序部署在一起，以一种类似 sidecar 的方式进行物理部署。这样能减少额外一次额外的网络开销，基本消除引入 MySQL Router 带来的影响。</p>
+<p>所以，这里 MySQL Router 的定位是一种轻量级的路由转发，而不是一个数据库中间件，主要解决数据库切换后，做到对业务无感知。</p>
+<h3 id="思考题-11"><a href="#思考题-11" class="headerlink" title="思考题"></a>思考题</h3><p>请问 2 个节点的 MGR 集群能工作吗？</p>
 <h1 id="MySQL-修改列为-auto-increment-时存在的问题"><a href="#MySQL-修改列为-auto-increment-时存在的问题" class="headerlink" title="MySQL 修改列为 auto_increment 时存在的问题"></a>MySQL 修改列为 auto_increment 时存在的问题</h1><p>在这里再多描述一个作者在 MySQL 官方提交的一个 bug，详细地址如下：<a href="https://bugs.mysql.com/bug.php?id=103784" target="_blank" rel="noopener">column value seems to be wrong when modifying column to auto_increment</a></p>
 <p>该 bug 里描述了在 MySQL 中，当对一个列的属性进行修改了，如果原来的列已经具备了 <code>auto_increment</code> 属性，且原来的列中留有 0 值，则修改后会保留 0 值。但是，如果把一个非 <code>auto_increment</code> 的列修改成 <code>auto_increment</code>，则该过程会将原列的 0 值修改成 1：</p>
 <figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.50 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.15 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.16 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  1 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
@@ -1654,5 +1758,20 @@
 <script  src="/js/boot.js" ></script>
 
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

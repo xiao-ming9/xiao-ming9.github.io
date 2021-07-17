@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
 
 
 
@@ -186,7 +186,7 @@ pizza 和 pi 并未以大写字母开头，所以它们是未导出的。
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      40k 字
+      40.3k 字
     </span>
   
 
@@ -196,7 +196,7 @@ pizza 和 pi 并未以大写字母开头，所以它们是未导出的。
       <i class="iconfont icon-clock-fill"></i>
       
       
-      526
+      529
        分钟
     </span>
   
@@ -238,7 +238,7 @@ pizza 和 pi 并未以大写字母开头，所以它们是未导出的。
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年3月16日 下午
+                  本文最后更新于：2021年7月17日 上午
                 
               </p>
             
@@ -426,7 +426,15 @@ pizza 和 pi 并未以大写字母开头，所以它们是未导出的。
 <p>三次调用函数 f 的过程中函数 Adder () 中变量 delta 的值分别为：1、20 和 300。</p>
 <p>我们可以看到，在多次调用中，变量 x 的值是被保留的，即 <code>0 + 1 = 1</code>，然后 <code>1 + 20 = 21</code>，最后 <code>21 + 300 = 321</code>：闭包函数保存并积累其中的变量的值，不管外部函数退出与否，它都能够继续操作外部函数中的局部变量。</p>
 <p>这些局部变量同样可以是参数，例如之前例子中的 <code>Adder(as int)</code>。</p>
-<p>一个返回值为另一个函数的函数可以被称之为工厂函数，这在需要创建一系列相似的函数的时候非常有用：书写一个工厂函数而不是针对每种情况都书写一个函数。下面的函数演示了如何动态返回追加后缀的函数：</p>
+<p>可以把闭包看成是一个类，一个闭包函数调用就是实例化一个类。闭包在运行时可以有多个实例，它会将同一个作用域里的变量和常量捕获下来，无论闭包在什么地方被调用（实例化）时，都可以使用这些变量和常量。而且，<strong>闭包捕获的变量和常量是引用传递，不是值传递</strong>。</p>
+<p>对于下面的例子：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> <span class="hljs-string">"fmt"</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br><br>	<span class="hljs-keyword">var</span> a = Accumulator()<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, a(<span class="hljs-number">1</span>))<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, a(<span class="hljs-number">10</span>))<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, a(<span class="hljs-number">100</span>))<br><br>	fmt.Println(<span class="hljs-string">"------------------------"</span>)<br><br>	<span class="hljs-keyword">var</span> b = Accumulator()<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, b(<span class="hljs-number">1</span>))<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, b(<span class="hljs-number">10</span>))<br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, b(<span class="hljs-number">100</span>))<br><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Accumulator</span><span class="hljs-params">()</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;<br>	<span class="hljs-keyword">var</span> x <span class="hljs-keyword">int</span><br>	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(delta <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">int</span></span> &#123;<br>		fmt.Printf(<span class="hljs-string">"(%+v, %+v) - "</span>, &amp;x, x)<br>		x += delta<br>		<span class="hljs-keyword">return</span> x<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>执行结果如下：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">(<span class="hljs-number">0xc00018c000</span>, <span class="hljs-number">0</span>) - <span class="hljs-number">1</span><br>(<span class="hljs-number">0xc00018c000</span>, <span class="hljs-number">1</span>) - <span class="hljs-number">11</span><br>(<span class="hljs-number">0xc00018c000</span>, <span class="hljs-number">11</span>) - <span class="hljs-number">111</span><br>------------------------<br>(<span class="hljs-number">0xc00018c020</span>, <span class="hljs-number">0</span>) - <span class="hljs-number">1</span><br>(<span class="hljs-number">0xc00018c020</span>, <span class="hljs-number">1</span>) - <span class="hljs-number">11</span><br>(<span class="hljs-number">0xc00018c020</span>, <span class="hljs-number">11</span>) - <span class="hljs-number">111</span><br></code></pre></div></td></tr></table></figure>
+
+<p>闭包引用了 x 变量，a,b 可看作 2 个不同的实例，实例之间互不影响。实例内部，x 变量是同一个地址，因此具有“累加效应”。</p>
+<h5 id="工厂函数"><a href="#工厂函数" class="headerlink" title="工厂函数"></a>工厂函数</h5><p>一个返回值为另一个函数的函数可以被称之为工厂函数，这在需要创建一系列相似的函数的时候非常有用：书写一个工厂函数而不是针对每种情况都书写一个函数。下面的函数演示了如何动态返回追加后缀的函数：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">MakeAddSuffix</span><span class="hljs-params">(suffix <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">func</span><span class="hljs-params">(<span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(name <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;<br>        <span class="hljs-keyword">if</span> !strings.HasSuffix(name, suffix) &#123;<br>            <span class="hljs-keyword">return</span> name + suffix<br>        &#125;<br>        <span class="hljs-keyword">return</span> name<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>现在，可以生成如下函数：</p>
@@ -2142,5 +2150,20 @@ pizza 和 pi 并未以大写字母开头，所以它们是未导出的。
 <script  src="/js/boot.js" ></script>
 
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
