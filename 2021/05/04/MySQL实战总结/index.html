@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
 
 
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      36.2k 字
+      36.5k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      418
+      422
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年7月3日 中午
+                  本文最后更新于：2021年7月17日 上午
                 
               </p>
             
@@ -1417,6 +1417,13 @@
 <p>为了减少引入 MySQL Router 带来的性能影响，官方建议 MySQL Router 与客户端程序部署在一起，以一种类似 sidecar 的方式进行物理部署。这样能减少额外一次额外的网络开销，基本消除引入 MySQL Router 带来的影响。</p>
 <p>所以，这里 MySQL Router 的定位是一种轻量级的路由转发，而不是一个数据库中间件，主要解决数据库切换后，做到对业务无感知。</p>
 <h3 id="思考题-11"><a href="#思考题-11" class="headerlink" title="思考题"></a>思考题</h3><p>请问 2 个节点的 MGR 集群能工作吗？</p>
+<h2 id="数据库备份"><a href="#数据库备份" class="headerlink" title="数据库备份"></a>数据库备份</h2><p>除了高可用设计外，对架构师来说，还要做好备份架构的设计。因为我们要防范意外情况的发生，比如黑客删除了数据库中所有的核心数据；又或者某个员工有意也罢、无意也好，删除了线上的数据。</p>
+<h3 id="数据库备份-1"><a href="#数据库备份-1" class="headerlink" title="数据库备份"></a>数据库备份</h3><p>复制技术（Replication）或 InnoDB Cluster 只负责业务的可用性，保障数据安全除了线上的副本数据库，我们还要构建一个完整的离线备份体系。这样即使线上数据库被全部破坏，用户也可以从离线备份恢复出数据。</p>
+<p>所以，第一步要做好：线上数据库与离线备份系统的权限隔离。</p>
+<p>也就是说，可以访问线上数据库权限的同学一定不能访问离线备份系统，反之亦然。否则，如果两边的数据都遭受破坏，依然无法恢复数据。</p>
+<p>而对于 MySQL 数据库来说，数据库备份分为全量备份、增量备份。</p>
+<h4 id="全量备份"><a href="#全量备份" class="headerlink" title="全量备份"></a>全量备份</h4><p>指备份当前时间点数据库中的所有数据，根据备份内容的不同，全量备份可以分为逻辑备份、物理备份两种方式。</p>
+<p>逻辑备份</p>
 <h1 id="MySQL-修改列为-auto-increment-时存在的问题"><a href="#MySQL-修改列为-auto-increment-时存在的问题" class="headerlink" title="MySQL 修改列为 auto_increment 时存在的问题"></a>MySQL 修改列为 auto_increment 时存在的问题</h1><p>在这里再多描述一个作者在 MySQL 官方提交的一个 bug，详细地址如下：<a href="https://bugs.mysql.com/bug.php?id=103784" target="_blank" rel="noopener">column value seems to be wrong when modifying column to auto_increment</a></p>
 <p>该 bug 里描述了在 MySQL 中，当对一个列的属性进行修改了，如果原来的列已经具备了 <code>auto_increment</code> 属性，且原来的列中留有 0 值，则修改后会保留 0 值。但是，如果把一个非 <code>auto_increment</code> 的列修改成 <code>auto_increment</code>，则该过程会将原列的 0 值修改成 1：</p>
 <figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.50 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.15 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.16 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  1 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
@@ -1758,5 +1765,20 @@
 <script  src="/js/boot.js" ></script>
 
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
