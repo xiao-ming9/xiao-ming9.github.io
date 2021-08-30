@@ -192,7 +192,7 @@ new 出来的是一个指针
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9.6k 字
+      9.8k 字
     </span>
   
 
@@ -202,7 +202,7 @@ new 出来的是一个指针
       <i class="iconfont icon-clock-fill"></i>
       
       
-      125
+      127
        分钟
     </span>
   
@@ -244,7 +244,7 @@ new 出来的是一个指针
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年7月4日 中午
+                  本文最后更新于：2021年7月18日 下午
                 
               </p>
             
@@ -305,6 +305,10 @@ new 出来的是一个指针
 <p>代码主要做的事情是：找出传入的参数为 Slice，并且 Slice 的元素为结构体，如果其中有一个字段名是 <code>Name</code> 或者是 标签名称为 <code>Name</code>，并且还有一个字段名是 <code>Handsome</code> 的情形。如果找到，并且字段名称为 <code>Name</code> 的实际值是 <code>qcrao</code> 的话，就把另一个字段 <code>Handsome</code> 的值置为 true。</p>
 <p>程序并不关心传入的结构体到底是什么，只要它的字段名包含 <code>Name</code> 和 <code>Handsome</code>，都是 handsome 函数要工作的对象。</p>
 <p>注意一点，<code>Adult</code> 结构体的标签 <code>qson:&quot;Name&quot;</code>，中间是没有空格的，否则 <code>Tag.Get(&quot;qson&quot;)</code> 识别不出来。</p>
+<h1 id="time-的时区设置"><a href="#time-的时区设置" class="headerlink" title="time 的时区设置"></a>time 的时区设置</h1><p>对于需要使用时间的场景，默认情况下会从当前系统中找时区信息，如果需要手动设置时区，最好所有的解析和格式化的操作都指定时区信息：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">t,_ := time.ParseInLocation(layout,inputTime,location)<br>dateTime := time.Unix(t.Unix(),<span class="hljs-number">0</span>).In(loacation).Format(layout)<br></code></pre></div></td></tr></table></figure>
+
+<p>常用的 <code>Parse</code> 方法在解析时间模板时会使用读取参数中的时区信息，没有的话就采用 UTC 时间，此时如果再调用 <code>time.Unix(t.Unix(),0).In(loacation).Format(layout)</code> ，生成的时间会加上时区时间，所以最好采用上述方式，在解析的时候就把时区信息通过 <code>ParseInLocation</code> 传入，避免时区问题。</p>
 <h1 id="空结构体的应用"><a href="#空结构体的应用" class="headerlink" title="空结构体的应用"></a>空结构体的应用</h1><p>在Go中，每一个基本类型都有对应的字节宽度，声明一个变量后即使不赋值，也需要占用一定的内存。但是对于空结构体来说，其字节宽度为0，因此可以用在某些场景下作为占位符而不占用存储空间。其使用场景主要有：</p>
 <ul>
 <li>实现方法接收者</li>

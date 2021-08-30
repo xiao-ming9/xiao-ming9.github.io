@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      36.5k 字
+      53.5k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      422
+      605
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年7月17日 上午
+                  本文最后更新于：2021年8月28日 下午
                 
               </p>
             
@@ -1423,7 +1423,433 @@
 <p>也就是说，可以访问线上数据库权限的同学一定不能访问离线备份系统，反之亦然。否则，如果两边的数据都遭受破坏，依然无法恢复数据。</p>
 <p>而对于 MySQL 数据库来说，数据库备份分为全量备份、增量备份。</p>
 <h4 id="全量备份"><a href="#全量备份" class="headerlink" title="全量备份"></a>全量备份</h4><p>指备份当前时间点数据库中的所有数据，根据备份内容的不同，全量备份可以分为逻辑备份、物理备份两种方式。</p>
-<p>逻辑备份</p>
+<h5 id="逻辑备份"><a href="#逻辑备份" class="headerlink" title="逻辑备份"></a>逻辑备份</h5><p>指备份数据库的逻辑内容，就是<strong>每张表中的内容通过 INSERT 语句的形式进行备份</strong>。</p>
+<p>MySQL 官方提供的逻辑备份工具有 <code>mysqldump</code> 和 <code>mysqlpump</code>。通过 <code>mysqldump</code> 进行备份，可以使用以下 SQL 语句：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysqldump -A <span class="hljs-comment">--single-transaction &gt; backup.sql</span><br></code></pre></div></td></tr></table></figure>
+
+<p>上面的命令就是通过 <code>mysqldump</code> 进行全量的逻辑备份：</p>
+<ol>
+<li>参数 <code>-A</code> 表示备份所有数据库；</li>
+<li>参数 <code>--single-transaction</code> 表示进行一致性的备份。</li>
+</ol>
+<p>特别强调，参数 <code>--single-transaction</code> 是必须加的参数，否则备份文件的内容不一致，这样的备份几乎没有意义。</p>
+<p>如果总忘记参数 <code>--single-transaction</code>，可以在 MySQL 的配置文件中加上如下提示：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs toml"># my.cnf <br>[mysqldump]<br>single-transaction<br></code></pre></div></td></tr></table></figure>
+
+<p>按上面配置，每当在服务器上运行命令时 <code>mysqldump</code> 就会自动加上参数 <code>--single-transaction</code>，也就不会再忘记了。</p>
+<p>在上面的命令中，最终的备份文件名为 <code>backup.sql</code>，打开这个文件，会看到类似的内容：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-comment">-- MySQL dump 10.13  Distrib 8.0.23, for Linux (x86_64)</span><br><span class="hljs-comment">--</span><br><span class="hljs-comment">-- Host: localhost    Database:</span><br><span class="hljs-comment">-- ------------------------------------------------------</span><br><span class="hljs-comment">-- Server version       8.0.23</span><br><span class="hljs-comment">/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */</span>;<br><span class="hljs-comment">/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */</span>;<br><span class="hljs-comment">/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */</span>;<br><span class="hljs-comment">/*!50503 SET NAMES utf8mb4 */</span>;<br><span class="hljs-comment">/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */</span>;<br><span class="hljs-comment">/*!40103 SET TIME_ZONE='+00:00' */</span>;<br><span class="hljs-comment">/*!50606 SET @OLD_INNODB_STATS_AUTO_RECALC=@@INNODB_STATS_AUTO_RECALC */</span>;<br><span class="hljs-comment">/*!50606 SET GLOBAL INNODB_STATS_AUTO_RECALC=OFF */</span>;<br><span class="hljs-comment">/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */</span>;<br><span class="hljs-comment">/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */</span>;<br><span class="hljs-comment">/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */</span>;<br><span class="hljs-comment">/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */</span>;<br><span class="hljs-comment">--</span><br><span class="hljs-comment">-- Current Database: `mysql`</span><br><span class="hljs-comment">--</span><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">DATABASE</span> <span class="hljs-comment">/*!32312 IF NOT EXISTS*/</span> <span class="hljs-string">`mysql`</span> <span class="hljs-comment">/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */</span> <span class="hljs-comment">/*!80016 DEFAULT ENCRYPTION='N' */</span>;<br><span class="hljs-keyword">USE</span> <span class="hljs-string">`mysql`</span>;<br>...<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，文件 backup.sql 本质就是一个文本文件，里面记录的就是一条条 SQL 语句，而这就是逻辑备份。要恢复逻辑备份非常简单，就是执行文件中的 SQL 语句，这时可以使用下面的 SQL：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql &lt; backup.sql<br></code></pre></div></td></tr></table></figure>
+
+<p>虽然 <code>mysqldump</code> 简单易用，但因为它备份是单线程进行的，所以速度会比较慢，于是 MySQL 推出了 <code>mysqlpump</code> 工具。</p>
+<p>命令 <code>mysqlpump</code> 的使用几乎与 <code>mysqldump</code> 一模一样，唯一不同的是它可以设置备份的线程数，如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">mysqlpump -A --single-transaction --default-parallelism=8 &gt; backup.sql<br>Dump progress: 1/1 tables, 0/0 rows<br>Dump progress: 25/37 tables, 881632/42965650 rows<br>Dump progress: 25/37 tables, 1683132/42965650 rows<br>......<br></code></pre></div></td></tr></table></figure>
+
+<p>上面的命令显示了通过 <code>mysqlpump</code> 进行备份。参数 <code>--default-parallelism</code> 表示设置备份的并行线程数。此外，与 <code>mysqldump</code> 不同的是，<code>mysqlpump</code> 在备份过程中可以查看备份的进度。</p>
+<p><strong>不过在真正的线上生产环境中，并不推荐使用 mysqlpump，</strong> 因为当备份并发线程数超过 1 时，它不能构建一个一致性的备份。见 mysqlpump 的提示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/mysqlpump%E4%B8%8D%E6%94%AF%E6%8C%81%E4%B8%80%E8%87%B4%E6%80%A7%E5%A4%87%E4%BB%BD.jpg" alt="mysqlpump不支持一致性备份"></p>
+<p>另外，<code>mysqlpump</code> 的备份多线程是基于多个表的并行备份，如果数据库中存在一个超级大表，那么对于这个表的备份依然还是单线程的。那么有没有一种基于记录级别的并行备份，且支持一致性的逻辑备份工具呢？</p>
+<p>有的，那就是开源的 <code>mydumper</code> 工具，地址：<a href="https://github.com/maxbube/mydumper。mydumper" target="_blank" rel="noopener">https://github.com/maxbube/mydumper。mydumper</a> 的强大之处在于：</p>
+<ol>
+<li>支持一致性的备份；</li>
+<li>可以根据表中的记录进行分片，从而进行多线程的备份；</li>
+<li>对于恢复操作，也可以是多线程的备份；</li>
+<li>可以指定单个表进行多线程的恢复。</li>
+</ol>
+<p>可以看到，<code>mydumper</code> 几乎是一个完美的逻辑备份工具，是构建备份系统的首选工具。这里提供一个简单的 <code>mydumper</code> 的使用方法：</p>
+<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">mydumper -o /bak -r 100000 --trx-consistency-only -t 8<br></code></pre></div></td></tr></table></figure>
+
+<p>上面的命令表示，将备份文件保存到目录 <code>/bak</code> 下，其中：</p>
+<ol>
+<li>参数 <code>-r</code> 表示每张表导出 100000 条记录后保存到一张表；</li>
+<li>参数 <code>--trx-consistency-only</code>表示一致性备份；</li>
+<li>参数 <code>-t</code> 表示 8 个线程并行备份。</li>
+</ol>
+<p>可以看到，即便对于一张大表，也可以以 8 个线程，按照每次 10000 条记录的方式进行备份，这样大大提升了备份的性能。</p>
+<h5 id="物理备份"><a href="#物理备份" class="headerlink" title="物理备份"></a>物理备份</h5><p>当然，逻辑备份虽然好，但是它所需要的时间比较长，因为本质上逻辑备份就是进行 <code>INSERT ... SELECT ...</code> 的操作。</p>
+<p>而物理备份直接备份数据库的物理表空间文件和重做日志，不用通过逻辑的 SELECT 取出数据。所以物理备份的速度，通常是比逻辑备份快的，恢复速度也比较快。</p>
+<p>但它不如 mydumper 的是，物理备份只能恢复整个实例的数据，而不能按指定表进行恢复。MySQL 8.0 的物理备份工具可以选择官方的 <code>Clone Plugin</code>。</p>
+<p>Clone Plugin 是 MySQL 8.0.17 版本推出的物理备份工具插件，在安装完插件后，就可以对MySQL 进行物理备份了。而我们要使用 Clone Plugin 就要先安装 Clone Plugin 插件，推荐在配置文件中进行如下设置：</p>
+<figure class="highlight toml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs toml"><span class="hljs-section">[mysqld]</span><br><span class="hljs-attr">plugin-load-add</span>=mysql_clone.so<br><span class="hljs-attr">clone</span>=FORCE_PLUS_PERMANENT<br></code></pre></div></td></tr></table></figure>
+
+<p>这时进行物理备份可以通过如下命令：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; CLONE LOCAL DATA DIRECTORY = '/path/to/clone_dir';<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，在 mysql 命令行下输入 clone 命令，就可以进行本地实例的 MySQL 物理备份了。</p>
+<p>Clone Plugin 插件强大之处还在于其可以进行远程的物理备份，命令如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">CLONE INSTANCE FROM 'user'@'host':port<br>IDENTIFIED BY 'password'<br>[DATA DIRECTORY [=] 'clone_dir']<br>[REQUIRE [NO] SSL];<br></code></pre></div></td></tr></table></figure>
+
+<p>从上面的命令可以看到，Clone Plugin 支持指定的用户名密码，备份远程的物理备份到当前服务器上，根据 Clone Plugin 可以非常容易地构建备份系统。</p>
+<p>对于 MySQL 8.0 之前的版本，可以使用第三方开源工具 Xtrabackup，官方网址：<a href="https://github.com/percona/percona-xtrabackup。" target="_blank" rel="noopener">https://github.com/percona/percona-xtrabackup。</a></p>
+<p>不过，物理备份实现机制较逻辑备份复制很多，需要深入了解 MySQL 数据库内核的实现，<strong>强烈建议使用 MySQL 官方的物理备份工具，开源第三方物理备份工具只作为一些场景的辅助手段。</strong></p>
+<h4 id="增量备份"><a href="#增量备份" class="headerlink" title="增量备份"></a>增量备份</h4><p>前面所讲的逻辑备份、物理备份都是全量备份，也就是对整个数据库进行备份。然而，数据库中的数据不断变化，不可能每时每分对数据库进行增量的备份。</p>
+<p>所以，需要通过“全量备份 + 增量备份”的方式，构建完整的备份策略。<strong>增量备份就是对日志文件进行备份，在 MySQL 数据库中就是二进制日志文件。</strong></p>
+<p>因为二进制日志保存了对数据库所有变更的修改，所以“全量备份 + 增量备份”，就可以实现基于时间点的恢复（point in time recovery），也就是“通过全量 + 增量备份”可以恢复到任意时间点。</p>
+<p>全量备份时会记录这个备份对应的时间点位，一般是某个 GTID 位置，增量备份可以在这个点位后重放日志，这样就能实现基于时间点的恢复。</p>
+<p>如果二进制日志存在一些删库的操作，可以跳过这些点，然后接着重放后续二进制日志，这样就能对极端删库场景进行灾难恢复了。</p>
+<p>想要准实时地增量备份 MySQL 的二进制日志，可以使用下面的命令：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysqlbinlog <span class="hljs-comment">--read-from-remote-server --host=host_name --raw --stop-never binlog.000001</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，增量备份就是使用之前了解的 mysqlbinlog，但这次额外加上了参数 <code>--read-from-remote-server</code>，表示可以从远程某个 MySQL 上拉取二进制日志，这个远程 MySQL 就是由参数 <code>--host</code> 指定。</p>
+<p>参数 <code>--raw</code> 表示根据二进制的方式进行拉取，参数 -<code>-stop-never</code> 表示永远不要停止，即一直拉取一直保存，参数 <code>binlog.000001</code> 表示从这个文件开始拉取。</p>
+<p>MySQL 增量备份的本质是<strong>通过 mysqlbinlog 模拟一个 slave 从服务器，然后主服务器不断将二进制日志推送给从服务器，利用之前介绍的复制技术，实现数据库的增量备份</strong>。</p>
+<p>增量备份的恢复，就是通过 mysqlbinlog 解析二进制日志，然后进行恢复，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysqlbinlog binlog.000001 binlog.000002 | mysql -u root -p<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="备份策略"><a href="#备份策略" class="headerlink" title="备份策略"></a>备份策略</h3><p>在掌握全量备份、增量备份的知识点后，就能构建自己的备份策略了。</p>
+<p>首先，要设置全量备份的频率，因为全量备份比较大，所以建议设置 1 周 1 次全量备份，实时增量备份的频率。这样最坏的情况就是要恢复 7 天前的一个全备，然后通过 7 天的增量备份恢复。</p>
+<p>对于备份文件，也需要进行备份。不能认为备份文件的存储介质不会损坏。所以，至少在 2 个机房的不同存储服务器上存储备份文件，即备份文件至少需要 2 个副本。至于备份文件的保存期限，取决于每个公司自己的要求（比如有的公司要求永久保存，有的公司要求保留至少近 3 个月的备份文件）。</p>
+<p>所有的这些备份策略，都需要自己的备份系统进行调度，这个并没有什么特别好的开源项目，需要根据自己的业务需求，定制开发。</p>
+<h3 id="备份文件的检查"><a href="#备份文件的检查" class="headerlink" title="备份文件的检查"></a>备份文件的检查</h3><p>备份系统非常关键，并不亚于线上的高可用系统。</p>
+<p>前面说到线上主从复制的高可用架构，还需要进行主从之间的数据核对，用来确保数据是真实一致的。</p>
+<p>同样，对于备份文件，也需要进行校验，才能确保备份文件的正确的，当真的发生灾难时，可通过备份文件进行恢复。<strong>因此，备份系统还需要一个备份文件的校验功能</strong>。</p>
+<p>牢记，只有当核对是 OK 的，才能证明你的备份文件是安全的。所以备份文件同样要检查。</p>
+<h3 id="思考题-12"><a href="#思考题-12" class="headerlink" title="思考题"></a>思考题</h3><p>“全备+增量备份”的策略虽然很好，但在极端场景恢复所需的时间比较长，如何进一步提升恢复的速度呢？</p>
+<h1 id="分布式架构篇"><a href="#分布式架构篇" class="headerlink" title="分布式架构篇"></a>分布式架构篇</h1><h2 id="分布式数据库架构"><a href="#分布式数据库架构" class="headerlink" title="分布式数据库架构"></a>分布式数据库架构</h2><h3 id="分布式数据库的概念"><a href="#分布式数据库的概念" class="headerlink" title="分布式数据库的概念"></a>分布式数据库的概念</h3><p>Wiki 官方对分布式数据库的定义为：</p>
+<blockquote>
+<p>A distributed database is a database in which data is stored across different physical locations. It may be stored in multiple computers located in the same physical location (e.g. a data centre); or maybe dispersed over a network of interconnected computers.</p>
+</blockquote>
+<p>从定义来看，分布式数据库是一种把数据分散存储在不同物理位置的数据库。</p>
+<p>对比之前学习的数据库，数据都是存放在一个实例对应的物理存储上，而在分布式数据库中，数据将存放在不同的数据库实例上。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%9E%B6%E6%9E%84%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="分布式数据库的架构（拉勾"></p>
+<p>从图中可以看到，在分布式数据库下，分布式数据库本身分为计算层、元数据层和存储层：</p>
+<ul>
+<li>计算层就是之前单机数据库中的 SQL 层，用来对数据访问进行权限检查、路由访问，以及对计算结果等操作。</li>
+<li>元数据层记录了分布式数据库集群下有多少个存储节点，对应 IP、端口等元数据信息是多少。当分布式数据库的计算层启动时，会先访问元数据层，获取所有集群信息，才能正确进行 SQL 的解析和路由等工作。另外，因为元数据信息存放在元数据层，那么分布式数据库的计算层可以有多个，用于实现性能的扩展。</li>
+<li>存储层用来存放数据，但存储层要和计算层在同一台服务器上，甚至不求在同一个进程中。</li>
+</ul>
+<p>可以看到，分布式数据库的优势是把数据打散到不同的服务器上，这种横向扩展的 Scale Out 能力，能解决单机数据库的性能与存储瓶颈。</p>
+<p>从理论上来看，分布式数据库的性能可以随着计算层和存储层的扩展，做到性能的线性提升。</p>
+<p>从可用性的角度看，如果存储层发生宕机，那么只会影响 1/N 的数据，N 取决于数据被打散到多少台服务器上。所以，分布式数据库的可用性对比单机会有很大提升，单机数据库要实现99.999% 的可用性或许很难，但是分布式数据库就容易多了。</p>
+<p>当然，分布式数据库也存在缺点：正因为数据被打散了，分布式数据库会引入很多新问题，比如自增实现、索引设计、分布式事务等。</p>
+<p>接下来，看一看分布式 MySQL 数据库的整体架构。</p>
+<h3 id="分布式MySQL架构"><a href="#分布式MySQL架构" class="headerlink" title="分布式MySQL架构"></a>分布式MySQL架构</h3><p>原先单机的 MySQL 架构中，客户端是通过 MySQL 通信协议访问 MySQL 数据库，MySQL 数据库会通过高可用技术做多副本，当发生宕机进行切换。</p>
+<p>对于分布式 MySQL 数据库架构，其整体架构如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E5%B8%83%E5%BC%8FMySQL%E6%9E%B6%E6%9E%84%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="分布式MySQL架构（拉勾）"></p>
+<p>从上图可以看到，这时数据将打散存储在下方各个 MySQL 实例中，每份数据叫“分片（Shard）”。</p>
+<p>在分布式 MySQL 架构下，客户端不再是访问 MySQL 数据库本身，而是访问一个分布式中间件。</p>
+<p>这个分布式中间件的通信协议依然采用 MySQL 通信协议（因为原先客户端是如何访问的MySQL 的，现在就如何访问分布式中间件）。分布式中间件会根据元数据信息，自动将用户请求路由到下面的 MySQL 分片中，从而将存储存取到指定的节点。</p>
+<p>另外，分布式 MySQL 数据库架构的每一层都要由高可用，保证分布式数据库架构的高可用性。</p>
+<p>对于上层的分布式中间件，是可以平行扩展的：即用户可以访问多个分布式中间件，如果其中一个中间件发生宕机，那么直接剔除即可。</p>
+<p>因为分布式中间件是无状态的，数据保存在元数据服务中，它的高可用设计比较容易。</p>
+<p>对于元数据来说，虽然它的数据量不大，但数据非常关键，一旦宕机则可能导致中间件无法工作，所以，元数据要通过副本技术保障高可用。</p>
+<p>最后，每个分片存储本身都有副本，通过提到的高可用技术，保证分片的可用性。也就是说，如果分片 1 的 MySQL 发生宕机，分片 1 的从服务器会接替原先的 MySQL 主服务器，继续提供服务。</p>
+<p>但由于使用了分布式架构，那么即使分片 1 发生宕机，需要 60 秒的时间恢复，这段时间对于业务的访问来说，只影响了 1/N 的数据请求。</p>
+<p>可以看到，分布式 MySQL 数据库架构实现了计算层与存储层的分离，每一层都可以进行 Scale Out 平行扩展，每一层又通过高可用技术，保证了计算层与存储层的连续性，大大提升了MySQL 数据库的性能和可靠性，为海量互联网业务服务打下了坚实的基础。</p>
+<h3 id="思考题-13"><a href="#思考题-13" class="headerlink" title="思考题"></a>思考题</h3><p>Oracle 数据库在 12c 版本中提供了 Oracle Sharding 的分布式数据库功能，请对比我们今天学习的 MySQL 分布式数据库架构，思考一下，你会考虑在生产环境中使用 Oracle Sharding 功能吗？为什么？</p>
+<h2 id="分布式数据库表结构设计：数据分片"><a href="#分布式数据库表结构设计：数据分片" class="headerlink" title="分布式数据库表结构设计：数据分片"></a>分布式数据库表结构设计：数据分片</h2><h3 id="选出分片键"><a href="#选出分片键" class="headerlink" title="选出分片键"></a>选出分片键</h3><p>在对表中的数据进行分片时，首先要选出一个分片键（Shard Key），即用户可以通过这个字段进行数据的水平拆分。</p>
+<p>对于之前使用的电商业务的订单表 orders，其表结构如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`orders`</span> (<br>  <span class="hljs-string">`O_ORDERKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_CUSTKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERSTATUS`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_TOTALPRICE`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERDATE`</span> <span class="hljs-built_in">date</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERPRIORITY`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">15</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_CLERK`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">15</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_SHIPPRIORITY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_COMMENT`</span> <span class="hljs-built_in">varchar</span>(<span class="hljs-number">79</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`O_ORDERKEY`</span>),<br>  <span class="hljs-keyword">KEY</span> <span class="hljs-string">`idx_custkey_orderdate`</span> (<span class="hljs-string">`O_CUSTKEY`</span>,<span class="hljs-string">`O_ORDERDATE`</span>),<br>  <span class="hljs-keyword">KEY</span> <span class="hljs-string">`ORDERS_FK1`</span> (<span class="hljs-string">`O_CUSTKEY`</span>),<br>  <span class="hljs-keyword">KEY</span> <span class="hljs-string">`idx_custkey_orderdate_totalprice`</span> (<span class="hljs-string">`O_CUSTKEY`</span>,<span class="hljs-string">`O_ORDERDATE`</span>,<span class="hljs-string">`O_TOTALPRICE`</span>),<br>  <span class="hljs-keyword">KEY</span> <span class="hljs-string">`idx_orderdate`</span> (<span class="hljs-string">`O_ORDERDATE`</span>),<br>  <span class="hljs-keyword">KEY</span> <span class="hljs-string">`idx_orderstatus`</span> (<span class="hljs-string">`O_ORDERSTATUS`</span>),<br>  <span class="hljs-keyword">CONSTRAINT</span> <span class="hljs-string">`orders_ibfk_1`</span> <span class="hljs-keyword">FOREIGN</span> <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`O_CUSTKEY`</span>) <span class="hljs-keyword">REFERENCES</span> <span class="hljs-string">`customer`</span> (<span class="hljs-string">`C_CUSTKEY`</span>)<br>) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span><br></code></pre></div></td></tr></table></figure>
+
+<p>对于类似淘宝、京东、拼多多这样业务体量的应用来说，单实例 MySQL 数据库在性能和存储容量上肯定无法满足“双 11、618 ”大促的要求，所以要改造成分布式数据库架构。</p>
+<p>而第一步就是要对表选出一个分片键，然后进行分布式架构的设计。</p>
+<p>对于上面的表orders，可以选择的分片键有：<code>o_orderkey</code>、<code>o_orderdate</code>、也可以是 <code>o_custkey</code>。在选出分片键后，就要选择分片的算法，比较常见的有 <code>RANGE</code> 和 <code>HASH</code> 算法。</p>
+<p>比如，表 orders，选择分片键 <code>o_orderdate</code>，根据函数 YEAR 求出订单年份，然后根据RANGE 算法进行分片，这样就能设计出基于 RANGE 分片算法的分布式数据库架构：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%9F%BA%E4%BA%8Erange%E5%88%86%E7%89%87%E7%AE%97%E6%B3%95%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="基于range分片算法的分布式架构（拉勾）"></p>
+<p>从图中可以看到，采用 RANGE 算法进行分片后，表 orders 中，1992 年的订单数据存放在分片 1 中、1993 年的订单数据存放在分片 2 中、1994 年的订单数据存放在分片 3中，依次类推，如果要存放新年份的订单数据，追加新的分片即可。</p>
+<p>不过，RANGE 分片算法在分布式数据库架构中，是一种非常糟糕的算法，因为对于分布式架构，通常希望能解决传统单实例数据库两个痛点：</p>
+<ul>
+<li><p>性能可扩展，通过增加分片节点，性能可以线性提升；</p>
+</li>
+<li><p>存储容量可扩展，通过增加分片节点，解决单点存储容量的数据瓶颈。</p>
+</li>
+</ul>
+<p>那么对于订单表 orders 的 RANGE 分片算法来说，会发现以上两点都无法实现，因为当年的数据依然存储在一个分片上（即热点还是存在于一个数据节点上）。</p>
+<p>如果继续拆细呢？比如根据每天进行 RANGE 分片？这样的确会好一些，但是对“双 11、618”这样的大促来说，依然是单分片在工作，热点依然异常集中。</p>
+<p>所以在分布式架构中，RANGE 分区算法是一种比较糟糕的算法。但它也有好处：可以方便数据在不同机器间进行迁移（migrate），比如要把分片 2 中 1992 年的数据迁移到分片 1，直接将表进行迁移就行。</p>
+<p>而对海量并发的 OLTP 业务来说，一般推荐用 HASH 的分区算法。这样分片的每个节点都可以有实时的访问，每个节点负载都能相对平衡，从而实现性能和存储层的线性可扩展。</p>
+<p>来看表 orders 根据 <code>o_orderkey</code> 进行 HASH 分片，分片算法如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%A0%B9%E6%8D%AE%20o_orderkey%20%E8%BF%9B%E8%A1%8C%20HASH%20%E5%88%86%E7%89%87.jpg" alt="根据 o_orderkey 进行 HASH 分片"></p>
+<p>在上述分片算法中，分片键是 <code>o_orderkey</code>，总的分片数量是 4（即把原来 1 份数据打散到 4 张表中），具体来讲，分片算法是将 <code>o_orderkey</code> 除以 4 进行取模操作。</p>
+<p>最终，将表orders 根据 HASH 算法进行分布式设计后的结果如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%A0%B9%E6%8D%AEHASH%E7%AE%97%E6%B3%95%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%BE%E8%AE%A1%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="根据HASH算法的分布式设计（拉勾）"></p>
+<p>可以看到，对于订单号除以 4，余数为 0 的数据存放在分片 1 中，余数为 1 的数据存放在分片 2 中，余数为 2 的数据存放在分片 3 中，以此类推。</p>
+<p>这种基于 HASH 算法的分片设计才能较好地应用于大型互联网业务，真正做到分布式数据库架构弹性可扩展的设计要求。</p>
+<p>但是，表 orders 分区键选择 <code>o_orderkey</code> 是最好地选择吗？并不是。</p>
+<p>看一下库中的其他表，如表 customer、lineitem，这三张表应该是经常一起使用的，比如查询用户最近的订单明细。</p>
+<p>如果用 <code>o_orderkey</code> 作分区键，那么 lineitem 可以用 <code>l_orderkey</code> 作为分区键，但这时会发现表customer 并没有订单的相关信息，即无法使用订单作为分片键。</p>
+<p>如果表 customer 选择另一个字段作为分片键，那么业务数据无法做到单元化，也就是对于表customer、orders、lineitem，分片数据在同一数据库实例上。</p>
+<p>所以，如果要实现分片数据的单元化，最好的选择是把用户字段作为分区键，在表 customer 中就是将 <code>c_custkey</code> 作为分片键，表orders 中将 <code>o_custkey</code> 作为分片键，表 lineitem 中将 <code>l_custkey</code> 作为分片键：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%A0%B9%E6%8D%AEHASH%E7%AE%97%E6%B3%95%E7%9A%84%E5%88%86%E5%B8%83%E5%BC%8F%E8%AE%BE%E8%AE%A1%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%892.jpg" alt="根据HASH算法的分布式设计（拉勾）2"></p>
+<p>这样做的好处是：根据用户维度进行查询时，可以在单个分片上完成所有的操作，不用涉及跨分片的访问，如下面的 SQL：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders<br><span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> lineitem <span class="hljs-keyword">ON</span> o_orderkey = l_orderkey<br><span class="hljs-keyword">INNER</span> <span class="hljs-keyword">JOIN</span> customer <span class="hljs-keyword">ON</span> o_custkey = c_custkey<br><span class="hljs-keyword">WHERE</span> o_custkey = <span class="hljs-number">1</span><br><span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o_orderdate <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">LIMIT</span> <span class="hljs-number">10</span><br></code></pre></div></td></tr></table></figure>
+
+<p>所以，分布式数据库架构设计的原则是：<strong>选择一个适合的分片键和分片算法，把数据打散，并且业务的绝大部分查询都是根据分片键进行访问</strong>。</p>
+<p>那为什么互联网业务这么适合进行分布式架构的设计呢？因为互联网业务大部分是 To C 业务，分片键就是用户的 ID，业务的大部分访问都是根据用户 ID 进行查询，比如：</p>
+<ul>
+<li><p>查看某个用户下的微博/短视频；</p>
+</li>
+<li><p>查看某个用户的商品信息/购买记录；</p>
+</li>
+<li><p>查看某个用户自己的余额信息。</p>
+</li>
+</ul>
+<p>说完分片键的选择后，接着就是规划分片，也就我们经常提到的分库分表。</p>
+<h3 id="分库分表"><a href="#分库分表" class="headerlink" title="分库分表"></a>分库分表</h3><p>说了这么久分片，分片到底是什么呢？其实，前面说的分片本质是一张张表，而不是数据库实例，只是每个分片是在 MySQL 数据库实例中，严格来说：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs elixir">分片 = 实例 + 库 + 表 = ip<span class="hljs-variable">@port</span><span class="hljs-symbol">:db_name</span><span class="hljs-symbol">:table_name</span><br></code></pre></div></td></tr></table></figure>
+
+
+<p>对于前面的表 orders，假设根据 HASH 算法进行分片，那么可以进行如下的分库分表设计：</p>
+<ul>
+<li><p>每个分片的表名库名都一样，如库 tpch，表名 orders；</p>
+</li>
+<li><p>每个分片的库名不一样，表名一样，如库名 tpch01、tpch02、tpch03、tpch04，表名 orders；</p>
+</li>
+<li><p>每个分片的表名不一样，库名一样，如库名 tpch，表名分别为 orders01、orders02、orders03、orders04；</p>
+</li>
+<li><p>每个分片的库名不一样，表名也不一样，如分片 1 的表在库名 tpch01下，表名为oders01；分片 2 的表名在库名 tpch02，表名为 orders02；分片 3 的表名在库名tpch03，表名为 orders03；分片 3 的表名在库名 tpch04，表名为 orders04。</p>
+</li>
+</ul>
+<p>在这 4 种分库分表规则中，最推荐的是第 4 种，也是我们通常意义说的分库分表，这样做的好处有以下几点：</p>
+<ul>
+<li><p>不同分片的数据可以在同一 MySQL 数据库实例上，便于做容量的规划和后期的扩展；</p>
+</li>
+<li><p>同一分片键的表都在同一库下，方便做整体数据的迁移和扩容。</p>
+</li>
+</ul>
+<p>如果根据第 4 种标准的分库分表规范，那么分布式 MySQL 数据库的架构可以是这样：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E6%9E%B6%E6%9E%84%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="分库分表架构（拉勾）"></p>
+<p>按上面这样的分布式设计，数据分片完成后，所有的库表依然是在同一个 MySQL实例上！！！</p>
+<p>牢记，分布式数据库并不一定要求有很多个实例，最基本的要求是将数据进行打散分片。接着，用户可以根据自己的需要，进行扩缩容，以此实现数据库性能和容量的伸缩性。这才是分布式数据库真正的魅力所在。</p>
+<p>对于上述的分布式数据库架构，一开始将 4 个分片数据存储在一个 MySQL 实例上，但是如果遇到一些大促活动，可以对其进行扩容，比如把 4 个分片扩容到 4 个MySQL实例上：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E6%9E%B6%E6%9E%842%EF%BC%88%E6%8B%89%E5%8B%BE%EF%BC%89.jpg" alt="分库分表架构2（拉勾）"></p>
+<p>如果完成了大促活动，又可以对资源进行回收，将分片又都放到一台 MySQL 实例上，这就是对资源进行缩容。</p>
+<p>总的来说，对分布式数据库进行扩缩容在互联网公司是一件常见的操作，比如对阿里来说，每年下半年 7 月开始，他们就要进行双 11 活动的容量评估，然后根据评估结果规划数据库的扩容。</p>
+<p>一般来说，电商的双 11 活动后，还有双 12、新年、春节，所以一般会持续到过完年再对数据库进行缩容。接下来，来看看如何进行扩缩容。</p>
+<h3 id="扩缩容"><a href="#扩缩容" class="headerlink" title="扩缩容"></a>扩缩容</h3><p>在 HASH 分片的例子中，把数据分片到了 4 个节点，然而在生产环境中，为了方便之后的扩缩容操作，推荐一开始就把分片的数量设置为不少于 1000 个。</p>
+<p>不用担心分片数量太多，因为分片 1 个还是 1000 个，管理方式都是一样的，但是 1000 个，意味着可以扩容到 1000 个实例上，对于一般业务来说，1000 个实例足够满足业务的需求了（BTW，网传阿里某核心业务的分布式数据库分片数量为 10000个）。</p>
+<p>如果到了 1000 个分片依然无法满足业务的需求，这时能不能拆成 2000 个分片呢？从理论上来说是可以的，但是这意味着需要对一张表中的数据进行逻辑拆分，这个工作非常复杂，通常不推荐。</p>
+<p>所以，一开始一定要设计足够多的分片。在实际工作中，我遇到很多次业务将分片数量从 32、64 拆成 256、512。每次这样的工作，都是扒一层皮，太不值得。所以，做好分布式数据库设计的工作有多重要！</p>
+<p>那么扩容在 MySQL 数据库中如何操作呢？其实，本质是搭建一个复制架构，然后通过设置过滤复制，仅回放分片所在的数据库就行，这个数据库配置在从服务器上大致进行如下配置：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-comment"># 分片1从服务器配置</span><br><span class="hljs-attr">replicate_do_db</span> =<span class="hljs-string">"tpch01"</span><br></code></pre></div></td></tr></table></figure>
+
+<p>所以在进行扩容时，首先根据下图的方式对扩容的分片进行过滤复制的配置：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%89%A9%E5%AE%B9%E8%BF%87%E6%BB%A4%E5%A4%8D%E5%88%B6%E9%85%8D%E7%BD%AE.jpg" alt="扩容过滤复制配置"></p>
+<p>然后再找一个业务低峰期，将业务的请求转向新的分片，完成最终的扩容操作：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%AE%8C%E6%88%90%E6%89%A9%E5%AE%B9%E6%93%8D%E4%BD%9C.jpg" alt="完成扩容操作"></p>
+<p>至于缩容操作，本质就是扩容操作的逆操作。</p>
+<h3 id="思考题-14"><a href="#思考题-14" class="headerlink" title="思考题"></a>思考题</h3><p>标准 tpch 库的 lineitem 表结构如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">Create</span> <span class="hljs-keyword">Table</span>: <span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`lineitem`</span> (<br>  <span class="hljs-string">`l_orderkey`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_PARTKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_SUPPKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_LINENUMBER`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_QUANTITY`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_EXTENDEDPRICE`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_DISCOUNT`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_TAX`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_RETURNFLAG`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">COLLATE</span> utf8mb4_general_ci <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_LINESTATUS`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">COLLATE</span> utf8mb4_general_ci <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_SHIPDATE`</span> <span class="hljs-built_in">date</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_COMMITDATE`</span> <span class="hljs-built_in">date</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_RECEIPTDATE`</span> <span class="hljs-built_in">date</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_SHIPINSTRUCT`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">25</span>) <span class="hljs-keyword">COLLATE</span> utf8mb4_general_ci <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_SHIPMODE`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">COLLATE</span> utf8mb4_general_ci <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`L_COMMENT`</span> <span class="hljs-built_in">varchar</span>(<span class="hljs-number">44</span>) <span class="hljs-keyword">COLLATE</span> utf8mb4_general_ci <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span><br>) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span><br></code></pre></div></td></tr></table></figure>
+
+<p>看看上面的表结构该如何修改，才能更好地符合分片的要求？</p>
+<h2 id="分布式数据库索引设计"><a href="#分布式数据库索引设计" class="headerlink" title="分布式数据库索引设计"></a>分布式数据库索引设计</h2><p>在分布式数据库架构下，索引的设计也需要做调整，否则无法充分发挥分布式架构线性可扩展的优势。</p>
+<h3 id="主键选择"><a href="#主键选择" class="headerlink" title="主键选择"></a>主键选择</h3><p>对主键来说，要保证在所有分片中都唯一，它本质上就是一个全局唯一的索引。如果用大部分同学喜欢的自增作为主键，就会发现存在很大的问题。</p>
+<p><strong>因为自增并不能在插入前就获得值，而是要通过填 NULL 值，然后再通过函数 <code>last_insert_id()</code> 获得自增的值。所以，如果在每个分片上通过自增去实现主键，可能会出现同样的自增值存在于不同的分片上</strong>。</p>
+<p>比如，对于电商的订单表 orders，其表结构如下（分片键是o_custkey，表的主键是o_orderkey）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`orders`</span> (<br>  <span class="hljs-string">`O_ORDERKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> auto_increment,<br>  <span class="hljs-string">`O_CUSTKEY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERSTATUS`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">1</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_TOTALPRICE`</span> <span class="hljs-built_in">decimal</span>(<span class="hljs-number">15</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERDATE`</span> <span class="hljs-built_in">date</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_ORDERPRIORITY`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">15</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_CLERK`</span> <span class="hljs-built_in">char</span>(<span class="hljs-number">15</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_SHIPPRIORITY`</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  <span class="hljs-string">`O_COMMENT`</span> <span class="hljs-built_in">varchar</span>(<span class="hljs-number">79</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,<br>  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`O_ORDERKEY`</span>),<br>  <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`O_CUSTKEY`</span>)<br>  ......<br>) <span class="hljs-keyword">ENGINE</span>=<span class="hljs-keyword">InnoDB</span><br></code></pre></div></td></tr></table></figure>
+
+<p>如果把 o_orderkey 设计成上面所示的自增，那么很可能 o_orderkey 同为 1 的记录在不同的分片出现。</p>
+<p><strong>所以，在分布式数据库架构下，尽量不要用自增作为表的主键</strong>，这也是在第一模块“表结构设计”中强调过的：<strong>自增性能很差、安全性不高、不适用于分布式架构</strong>。</p>
+<p>那么该如何设计主键呢？依然还是用全局唯一的键作为主键，比如 MySQL 自动生成的有序 UUID；业务生成的全局唯一键（比如发号器）；或者是开源的 UUID 生成算法，比如雪花算法（但是存在时间回溯的问题）。</p>
+<h3 id="索引设计"><a href="#索引设计" class="headerlink" title="索引设计"></a>索引设计</h3><p>通过分片键可以把 SQL 查询路由到指定的分片，但是在现实的生产环境中，业务还要通过其他的索引访问表。</p>
+<p>还是以前面的表 orders 为例，如果业务还要根据 o_orderkey 字段进行查询，比如查询订单 ID 为 1 的订单详情：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> o_orderkey = <span class="hljs-number">1</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，由于分片规则不是分片键，所以需要查询 4 个分片才能得到最终的结果，如果下面有 1000 个分片，那么就需要执行 1000 次这样的 SQL，这时性能就比较差了。</p>
+<p>但是， o_orderkey 是主键，应该只有一条返回记录，也就是说，o_orderkey 只存在于一个分片中。这时，可以有以下两种设计：</p>
+<ul>
+<li>同一份数据，表 orders 根据 o_orderkey 为分片键，再做一个分库分表的实现；</li>
+<li>在索引中额外添加分片键的信息。</li>
+</ul>
+<p>这两种设计的本质都是通过冗余实现空间换时间的效果，否则就需要扫描所有的分片，当分片数据非常多，效率就会变得极差。</p>
+<p>而第一种做法通过对表进行冗余，对于 o_orderkey 的查询，只需要在 o_orderkey = 1 的分片中直接查询就行，效率最高，但是设计的缺点又在于冗余数据量太大。</p>
+<p>所以，改进的做法之一是实现一个索引表，表中只包含 o_orderkey 和分片键 o_custkey，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> idx_orderkey_custkey （<br>  o_orderkey <span class="hljs-built_in">INT</span><br>  o_custkey <span class="hljs-built_in">INT</span>,<br>  PRIMARY <span class="hljs-keyword">KEY</span> (o_orderkey)<br>)<br></code></pre></div></td></tr></table></figure>
+
+<p>如果这张索引表很大，也可以将其分库分表，但是它的分片键是 o_orderkey，如果这时再根据字段 o_orderkey 进行查询，可以进行类似二级索引的回表实现：先通过查询索引表得到记录 o_orderkey = 1 对应的分片键 o_custkey 的值，接着再根据 o_custkey 进行查询，最终定位到想要的数据，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <span class="hljs-keyword">WHERE</span> o_orderkey = <span class="hljs-number">1</span><br><br>=&gt;<br><br><span class="hljs-comment"># step 1</span><br><span class="hljs-keyword">SELECT</span> o_custkey <span class="hljs-keyword">FROM</span> idx_orderkey_custkey <br><span class="hljs-keyword">WHERE</span> o_orderkey = <span class="hljs-number">1</span><br><span class="hljs-comment"># step 2</span><br><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> orders <br><span class="hljs-keyword">WHERE</span> o_custkey = ? <span class="hljs-keyword">AND</span> o_orderkey = <span class="hljs-number">1</span><br></code></pre></div></td></tr></table></figure>
+
+<p>这个例子是将一条 SQL 语句拆分成 2 条 SQL 语句，但是拆分后的 2 条 SQL 都可以通过分片键进行查询，这样能保证只需要在单个分片中完成查询操作。不论有多少个分片，也只需要查询 2个分片的信息，这样 SQL 的查询性能可以得到极大的提升。</p>
+<p>通过索引表的方式，虽然存储上较冗余全表容量小了很多，但是要根据另一个分片键进行数据的存储，依然显得不够优雅。</p>
+<p>因此，最优的设计，不是创建一个索引表，而是<strong>将分片键的信息保存在想要查询的列中，这样通过查询的列就能直接知道所在的分片信息</strong>。</p>
+<p>如果将订单表 orders 的主键设计为一个字符串，这个字符串中最后一部分包含分片键的信息，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">o_orderkey = string（o_orderkey + o_custkey）<br></code></pre></div></td></tr></table></figure>
+
+<p>那么这时如果根据 o_orderkey 进行查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> Orders<br><span class="hljs-keyword">WHERE</span> o_orderkey = <span class="hljs-string">'1000-1'</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>由于字段 o_orderkey 的设计中直接包含了分片键信息，所以可以直接知道这个订单在分片1 中，直接查询分片 1 就行。</p>
+<p>同样地，在插入时，由于可以知道插入时 o_custkey 对应的值，所以只要在业务层做一次字符的拼接，然后再插入数据库就行了。</p>
+<p>这样的实现方式较冗余表和索引表的设计来说，效率更高，查询可以提前知道数据对应的分片信息，只需 1 次查询就能获取想要的结果。</p>
+<p>这样实现的缺点是，主键值会变大一些，存储也会相应变大。但正如 05 讲说的，只要主键值是有序的，插入的性能就不会变差。而通过在主键值中保存分片信息，却可以大大提升后续的查询效率，这样空间换时间的设计，总体上看是非常值得的。</p>
+<p>当然，这里谈的设计都是针对于唯一索引的设计，如果是非唯一的二级索引查询，那么非常可惜，依然需要扫描所有的分片才能得到最终的结果，如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> Orders<br><span class="hljs-keyword">WHERE</span> o_orderate &gt;= ? o_orderdate &lt; ?<br></code></pre></div></td></tr></table></figure>
+
+<p>因此，分布式数据库架构设计的要求是<strong>业务的绝大部分请求能够根据分片键定位到 1 个分片上</strong>。</p>
+<p>如果业务大部分请求都需要扫描所有分片信息才能获得最终结果，那么就不适合进行分布式架构的改造或设计。</p>
+<h3 id="全局表"><a href="#全局表" class="headerlink" title="全局表"></a>全局表</h3><p>在分布式数据库中，有时会有一些无法提供分片键的表，但这些表又非常小，一般用于保存一些全局信息，平时更新也较少，绝大多数场景仅用于查询操作。</p>
+<p>例如 tpch 库中的表 nation，用于存储国家信息，但是在 1SQL 关联查询中，又经常会使用到这张表，对于这种全局表，可以在每个分片中存储，这样就不用跨分片地进行查询了。如下面的设计：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E5%BA%93%E5%85%A8%E5%B1%80%E8%A1%A8%E8%AE%BE%E8%AE%A1.jpg" alt="分布式数据库全局表的设计"></p>
+<h3 id="唯一索引"><a href="#唯一索引" class="headerlink" title="唯一索引"></a>唯一索引</h3><p>最后来谈谈唯一索引的设计，与主键一样，如果只是通过数据库表本身唯一约束创建的索引，则无法保证在所有分片中都是唯一的。</p>
+<p>所以，在分布式数据库中，唯一索引一样要通过类似主键的 UUID 的机制实现，用全局唯一去替代局部唯一，但实际上，即便是单机的 MySQL 数据库架构，也推荐使用全局唯一的设计。因为你不知道，什么时候，业务就会升级到全局唯一的要求了。</p>
+<h2 id="分布式数据库架构选型"><a href="#分布式数据库架构选型" class="headerlink" title="分布式数据库架构选型"></a>分布式数据库架构选型</h2><p>前面了解了分布式数据库的分片设计、表结构设计、索引设计等，已经有能力构建一个分布式数据库系统了。</p>
+<p>但现在数据分好了，索引也设计好了，但是如果访问这些数据和索引呢？</p>
+<p>访问分布式数据库有两种模式：</p>
+<ul>
+<li>业务直接根据分库分表访问 MySQL 数据库节点；</li>
+<li>根据中间件访问。</li>
+</ul>
+<h3 id="分库分表直接访问"><a href="#分库分表直接访问" class="headerlink" title="分库分表直接访问"></a>分库分表直接访问</h3><p>在设计分片时，已经明确了每张表的分片键信息，所以业务或服务可以直接根据分片键对应的数据库信息，直接访问底层的 MySQL 数据节点，比如在代码里可以做类似的处理：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">void InsertOrders(String orderKey, int userKey...) &#123;<br>  <br>  int shard_id = userKey % 4;<br>  if (shard_id == 0) &#123;<br>    conn = MySQLConncetion('shard1',...);<br>    conn.query(...);<br>  &#125; else if (shard_id == 1) &#123;<br>    conn = MySQLConncetion('shard2',...);<br>    conn.query(...);   <br>  &#125; else if (shard_id == 2) &#123;<br>    conn = MySQLConncetion('shard3',...);<br>    conn.query(...);   <br>  &#125; else if (shard_id == 3) &#123;<br>    conn = MySQLConncetion('shard4',...);<br>    conn.query(...);   <br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>从这段代码中可以看到，在业务代码中会嵌入分库分表的路由逻辑，在业务层计算出对应分片的信息，然后访问数据库：</p>
+<ul>
+<li>这种处理方式的好处是与单实例数据库没有太大的不同，只是多了一次计算分片的操作，没有额外的开销，性能非常好（听说支付宝的分布式数据库为了最求极致的性能，用的就是直接访问分片的方式）。</li>
+<li>这种处理逻辑的缺点是业务需要知道分片信息，感知分片的变化。对于上面的例子，如果分片 shard1 发生变化，又或者进行了扩容，业务就需要跟着修改。</li>
+</ul>
+<p>为了解决这个缺点，比较好的处理方式是使用名字服务，而不要直接通过 IP 访问分片。这样当分片发生切换，又或者扩容缩容时，业务也不需要进行很大的改动。</p>
+<p>又因为业务比较多，需要访问分布式数据库分片逻辑的地方也比较多。所以，可以把分片信息存储在缓存中，当业务启动时，自动加载分片信息。比如，在 Memcached 或 Redis 中保存如下的分片信息，key 可以是分库分表的表名，value通过 JSON 或字典的方式存放分片信息：</p>
+<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>  'key': 'orders',<br>  'shard_info' : &#123;<br>    'shard_key' : 'o_custkey',<br>    'shard_count' : 4，<br>    'shard_host' : ['shard1.xxx.com','shard2.xxx.com','...']，<br>    ‘shard_table' : ['tpch00/orders01','tpch01/orders02','...'],<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果要进行跨分片的访问，则需要业务自己处理相关逻辑。不过前面已经说过，分布式数据库设计要求单元化，绝大部分操作需要在一个分片中完成。如果不能，那么可能都不推荐分布数据库的改造。</p>
+<p>总之，分库分表的直接访问方式，要求业务控制一切有关分布式数据库的操作，需要明确每个分片的具体信息，做好全流程的把控。</p>
+<h3 id="使用中间件技术"><a href="#使用中间件技术" class="headerlink" title="使用中间件技术"></a>使用中间件技术</h3><p>另一种比较流行的分布式数据库访问方式是通过分布式数据库中间件。数据库中间件本身模拟成一个 MySQL 数据库，通信协议也都遵循 MySQL 协议：业务之前怎么访问MySQL数据库的，就如何访问MySQL分布式数据库中间件。</p>
+<p>这样做的优点是：业务不用关注分布式数据库中的分片信息，把它默认为一个单机数据库使用就好了。这种模式也是大部分同学认为分布式数据库该有的样子，如下面的图：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/Mysql%E5%88%86%E5%B8%83%E5%BC%8F%E4%B8%AD%E9%97%B4%E4%BB%B6.jpg" alt="Mysql分布式中间件"></p>
+<p>可以看到，通过分布式 MySQL 中间件，用户只需要访问中间件就行，下面的数据路由、分布式事务的实现等操作全部交由中间件完成。所以，分布式数据库中间件变成一个非常关键的核心组件。</p>
+<p>业界比较知名的 MySQL 分布式数据库中间件产品有：ShardingShpere、DBLE、TDSQL 等。</p>
+<p>ShardingSphere于 2020 年 4 月 16 日成为 Apache 软件基金会的顶级项目、社区熟度、功能支持较多，特别是对于分布式事务的支持，有多种选择（<a href="https://shardingsphere.apache.org/" target="_blank" rel="noopener">ShardingSphere 官网地址</a>）。</p>
+<p><a href="https://opensource.actionsky.com/dble/" target="_blank" rel="noopener">DBLE </a>是由知名 MySQL 服务商爱可生公司开源的 MySQL 中间件产品，已用于四大行核心业务，完美支撑传统银行去 IOE，转型分布式架构的探索。除了中间件技术外，爱可生公司还有很多关于 MySQL 数据库、分布式数据库设计等方面的综合经验。</p>
+<p>TDSQL MySQL 版（<a href="https://cloud.tencent.com/product/dcdb" target="_blank" rel="noopener">TDSQL for MySQL</a>）是腾讯打造的一款分布式数据库产品，具备强一致高可用、全球部署架构、分布式水平扩展、高性能、企业级安全等特性，同时提供智能 DBA、自动化运营、监控告警等配套设施，为客户提供完整的分布式数据库解决方案。</p>
+<p>目前 TDSQL 已经为超过500+的政企和金融机构提供数据库的公有云及私有云服务，客户覆盖银行、保险、证券、互联网金融、计费、第三方支付、物联网、互联网+、政务等领域。TDSQL MySQL 版亦凭借其高质量的产品及服务，获得了多项国际和国家认证，得到了客户及行业的一致认可。</p>
+<p>要注意，使用数据库中间件虽好，但其存在一个明显的缺点，即多了一层中间层的访问，单个事务的访问耗时会有上升，对于性能敏感的业务来说，需要有这方面的意识和考虑。</p>
+<p>重要的一点是，虽然使用分布式数据库中间件后，单个事务的耗时会有所上升，但整体的吞吐率是不变的，通过增大并发数，可以有效提升分布式数据库的整体性能。</p>
+<h3 id="如何选型"><a href="#如何选型" class="headerlink" title="如何选型"></a>如何选型</h3><p>那么，选择业务直连分布式数据库？还是通过数据库中间件访问？这是一个架构选型要考虑的问题。</p>
+<p>根据作者的经验来说，对于较小业务（高峰期每秒事务不超过 1000 的业务），选择通过数据库中间件访问分布式数据库是比较优的方式。</p>
+<p>因为这样的业务通常处于爬升期，满足业务的各项功能或许是业务的主要目标。通过分布式中间件屏蔽下面的分片信息，可以让开发同学专注于业务的开发。</p>
+<p>另一方面，通过使用中间件提供的分布式事务就能满足简单的跨分片交易，解决分布式数据库中最难的问题。</p>
+<p>但如果业务是一个海量互联网业务，中间件的瓶颈就会显现，单个事务的耗时会上升，低并发下，性能会有一定下降。而且中间件提供的 2PC 分布式事务性能就更不能满足业务的需求了。所以类似支付宝、阿里这样的业务，并没有使用分布式数据库中间件的架构，而是采用了业务直连的模式。</p>
+<p>很多同学或许会问，如果不用数据库中间件，怎么解决 JOIN 这些问题呢？业务层去实现还是很麻烦的。的确，中间件可以完成这部分的功能。但如果真是数据量比较大，跨分片的场景，中间件也不能满足你的要求。</p>
+<h2 id="分布式数据库全链路条带化设计"><a href="#分布式数据库全链路条带化设计" class="headerlink" title="分布式数据库全链路条带化设计"></a>分布式数据库全链路条带化设计</h2><p>当提到分布式架构时，除了数据库要完成分布式架构的改造，业务层也要完成分布式架构的改造，最终完成条带化的设计。</p>
+<p>条带化是存储的一种技术，将磁盘进行条带化后，可以把连续的数据分割成相同大小的数据块，简单的说，条带化就是把每段数据分别写入阵列中不同磁盘上的方法。</p>
+<p>可以看到，条带化的本质是通过将数据打散到多个磁盘，从而提升存储的整体性能，<strong>这与分布式数据库的分片理念是不是非常类似呢</strong>？下图显示了 RAID0 的条带化存储：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/RAID0%E6%9D%A1%E5%B8%A6%E5%8C%96%E5%AD%98%E5%82%A8.png" alt="RAID0条带化存储"></p>
+<p>从图中可以看到，进行 RAID 条带化后，数据存放在了三块磁盘上，分别是磁盘 1、磁盘 2、磁盘 3，存储的数据也进行了打散，分别存储在了条带 1、条带 2、条带 3 上。</p>
+<p>这样一来，当访问某一个数据的时候，可以并行地从 3 个磁盘上取出数据，写入也可以同时写入 3 个磁盘，提升了存储的性能。</p>
+<p>了解完条带化的基础知识之后，分布式数据库架构的“条带化”的访问情况又是怎么样的呢？</p>
+<h3 id="全链路的条带化设计"><a href="#全链路的条带化设计" class="headerlink" title="全链路的条带化设计"></a>全链路的条带化设计</h3><p>在前面已经讲过分布式数据库的本质是：将数据根据某个或几个列（称之为“分片键”），然后依据预先设定的算法（分片算法）进行打散，形成一个个的分片。</p>
+<p>更重要的是，分布式数据库中的表，要能选出一个统一的分片键，即大部分表都能根据这个分片键打散数据，这样当后续业务进行访问数据时，可以在一个分片中完成单元化的闭环操作，不用涉及跨分片的访问。</p>
+<p>下图显示了对于 tpch 分布式架构改造后的分片效果：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%20tpch%20%E5%88%86%E5%B8%83%E5%BC%8F%E6%9E%B6%E6%9E%84%E6%94%B9%E9%80%A0%E5%90%8E%E7%9A%84%E5%88%86%E7%89%87%E6%95%88.png" alt="拉勾网 tpch 分布式架构改造后的分片效果"></p>
+<p>从图中可以看到，这与之前所提倡的条带化的思想比较类似，即数据打散，性能得到提升，对于分布式数据库来说，分片越多，性能上限也就越高。</p>
+<p>但是，这只是对数据库层做了条带化，没有站在全链路的角度上进行条带化设计，假设是电商中比较重要的订单服务，并且对表 orders 进行了分布式的条带化设计：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E6%9D%A1%E5%B8%A6%E5%8C%96%E8%AE%BE%E8%AE%A11.png" alt="拉勾条带化设计1"></p>
+<p>可以看到，订单服务可以根据字段 o_custkey 访问不同分片的数据，这也是大部分业务会进行的设计（由于服务层通常是无状态的，因此这里不考虑高可用的情况）。<strong>但是，这样的设计不符合全链路的条带化设计思想</strong>。</p>
+<p>全链路的设计思想，要将上层服务也作为条带的一部分进行处理，也就是说，订单服务也要跟着分片进行分布式架构的改造。</p>
+<p>所以，如果进行全链路的条带化设计，那么上面的订单服务应该设计成：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E6%9D%A1%E5%B8%A6%E5%8C%96%E8%AE%BE%E8%AE%A12.png" alt="拉勾条带化设计2"></p>
+<p>可以看到，如果要进行分布式的条带化设计时，上层业务服务也需要进行相应的分布式改造，将1个“大”订单服务层也拆分成多个“小”订单服务，其中每个订单服务访问自己分片的数据。</p>
+<p>这样设计的好处在于：</p>
+<ul>
+<li>安全性更好，每个服务可以校验访问用户是否本分片数据；</li>
+<li>上层服务跟着数据分片进行条带化部署，业务性能更好；</li>
+<li>上层服务跟着数据分片进行条带化部署，可用性更好；</li>
+</ul>
+<p>第1点通常比较好理解，但是 2、3点 就不怎么好理解了。<strong>为什么性能也会更好呢</strong>？这里请考虑一下业务的部署情况，也就是，经常听说的多活架构设计。</p>
+<h3 id="多活架构"><a href="#多活架构" class="headerlink" title="多活架构"></a>多活架构</h3><p>在前面的高可用的章节中已经说过，对于高可用的架构设计要做到跨机房部署，实现的方式是无损半同复制，以及最新的 MySQL Group Rreplication 技术。数据库实例通过三园区进行部署。这样，当一个机房发生宕机，可以快速切换到另一个机房。再来回顾下三园区的架构设计：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E7%BD%91%E9%87%91%E8%9E%8D%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E6%9E%B6%E6%9E%844.png" alt="拉勾网金融级高可用架构4"></p>
+<p>图中显示了通过无损半同步复制方式进行的三园区高可用架构设计，从而实现同城跨机房的切换能力。但这只是单实例 MySQL 数据库架构，如果到分布式架构呢？所有分片都是在一个机房吗？</p>
+<p>如果所有分片都在一个机房，你会发现，这时机房 2、机房3 中的数据库都只是从机，只能进行读取操作，而无法实现写入操作，这就是我们说的单活架构。</p>
+<p>与单活架构不同，多活架构是指不同地理位置上的系统，都能够提供业务读/写服务。这里的“活”是指实时提供读/写服务的意思，而不仅仅只是读服务。多活架构主要是为了提升系统的容灾能力，提高系统的可用性，保障业务持续可用。</p>
+<p>要实现多活架构，首先要进行分布式数据库的改造，然后是将不同数据分片的主服务器放到不同机房，最后是实现业务条带化的部署。如下面的这张图：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E6%9D%A1%E5%B8%A6%E5%8C%96%E8%AE%BE%E8%AE%A13.png" alt="拉勾条带化设计3"></p>
+<p>可以看到，对于上一节的订单服务和订单数据分片，通过将其部署在不同的机房，使得订单服务1 部署在机房 1，可以对分片1进行读写；订单服务 2 部署在机房 1，可以对分片 2 进行读写；订单服务 3 部署在机房 3，可以对分片 3 进行读写。</p>
+<p>这样每个机房都可以有写入流量，每个机房都是“活”的，这就是多活架构设计。</p>
+<p>若一个机房发生宕机，如机房 1 宕机，则切换到另一个机房，上层服务和数据库跟着一起切换，切换后上层服务和数据库依然还是在一个机房，访问不用跨机房访问，依然能提供最好的性能和可用性保障。</p>
+<h2 id="分布式事务"><a href="#分布式事务" class="headerlink" title="分布式事务"></a>分布式事务</h2><h3 id="分布式事务概念"><a href="#分布式事务概念" class="headerlink" title="分布式事务概念"></a>分布式事务概念</h3><p>事务的概念相信已经非常熟悉了，事务就是要满足 ACID 的特性，总结来说。</p>
+<ul>
+<li>A（Atomicity） 原子性：事务内的操作，要么都做，要么都不做；</li>
+<li>C（Consistency） 一致性：事务开始之前和事务结束以后，数据的完整性没有被破坏；如唯一性约束，外键约束等；</li>
+<li>I（Isolation）隔离性：一个事务所做的操作对另一个事务不可见，好似是串行执行；</li>
+<li>D（Durability）持久性：事务提交后，数据的修改是永久的。即使发生宕机，数据也能修复；</li>
+</ul>
+<p>特别需要注意的是，当前数据库的默认事务隔离级别都没有达到隔离性的要求，MySQL、Oracle、PostgreSQL等关系型数据库都是如此。大多数数据库事务隔离级别都默认设置为 READ-COMMITTED，这种事务隔离级别没有解决可重复度和幻读问题。</p>
+<p>但由于在绝大部分业务中，都不会遇到这两种情况。若要达到完全隔离性的要求，性能往往又会比较低。因此在性能和绝对的隔离性前，大多数关系型数据库选择了一种折中。</p>
+<p>那什么是分布式事务呢？简单来说，就是要在分布式数据库的架构下实现事务的ACID特性。</p>
+<p>前面讲了分布式数据库架构设计的一个原则，即大部分的操作要能单元化。即在一个分片中完成。如对用户订单明细的查询，由于分片键都是客户ID，因此可以在一个分片中完成。那么他能满足事务的ACID特性。</p>
+<p>但是，如果是下面的一个电商核心业务逻辑，那就无法实现在一个分片中完成，即用户购买商品，其大致逻辑如下所示：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">START</span> TRANSATION;<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> orders <span class="hljs-keyword">VALUES</span> (......);<br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> lineitem <span class="hljs-keyword">VALUES</span> (......);<br><span class="hljs-keyword">UPDATE</span> STOCK <span class="hljs-keyword">SET</span> <span class="hljs-keyword">COUNT</span> = <span class="hljs-keyword">COUNT</span> - <span class="hljs-number">1</span> <span class="hljs-keyword">WHERE</span> sku_id = ?<br><span class="hljs-keyword">COMMIT</span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>可以看到，在分布式数据库架构下，表orders、linitem的分片键是用户ID。但是表stock是库存品，是商品维度的数据，没有用户ID的信息。因此stock的分片规则肯定与表orders和lineitem不同。</p>
+<p>所以，上述的事务操作大部分情况下并不能在一个分片中完成单元化，因此就是一个分布式事务，它要求用户维度的表 orders、lineitem 和商品维度的表 stock 的变更，要么都完成，要么都完成不了。</p>
+<p>常见的分布式事务的实现就是通过 2PC（two phase commit 两阶段提交）实现，接着来看下 2PC。</p>
+<h3 id="2PC的分布式事务实现"><a href="#2PC的分布式事务实现" class="headerlink" title="2PC的分布式事务实现"></a>2PC的分布式事务实现</h3><p>2PC 是数据库层面实现分布式事务的一种强一致性实现。在 2PC 中，引入事务协调者的角色用于协调管理各参与者（也可称之为各本地资源）的提交和回滚。而 2PC 所谓的两阶段是指parepare（准备）阶段和 commit（提交）两个阶段。</p>
+<p>在 2PC 的实现中，参与者就是分钟的 MySQL 数据库实例，那事务协调者是谁呢？这取决于分布式数据库的架构。若分布式数据库的架构采用业务通过分库分表规则直连分片的话，那么事务协调者就是业务程序本身。如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE2PC-1.png" alt="拉勾2PC-1"></p>
+<p>若采用数据库中间件的模式，那么事务协调者就是数据库中间件。如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE2PC-2.png" alt="拉勾2PC-2"></p>
+<p>从上图可以发现，使用分布式数据库中间件后，可以对上层服务屏蔽分布式事务的实现，服务不需要关心下层的事务是本地事务还是分布式事务，就好像是单机事务本身一样。</p>
+<p>但是 2PC 的一个难点在于 prepare 都成功了，但是在进行第二阶段 commit 的时候，其中一个节点挂了。这时挂掉的那个节点在恢复后，或进行主从切换后，节点上之前执行成功的prepare 事务需要人为的接入处理，这个事务就称之为悬挂事务。</p>
+<p>用户可以通过命令 <code>XA_RECOVER</code> 查看节点上事务有悬挂事务：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE-%E6%82%AC%E6%8C%82%E4%BA%8B%E5%8A%A1.png" alt="拉勾-悬挂事务"></p>
+<p>如果有悬挂事务，则这个事务持有的锁资源都是没有释放的。可以通过命令 <code>SHOW ENGINE INNODB STATUS</code> 进行查看：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE-%E6%82%AC%E6%8C%82%E4%BA%8B%E5%8A%A12.png" alt="拉勾-悬挂事务2"></p>
+<p>从上图可以看到，事务 5136 处于 PREPARE状态，已经有 218 秒了，这就是一个悬挂事务，并且这个事务只有了两个行锁对象。</p>
+<p>可以通过命令 <code>XA RECOVER</code> 人工的进行提交：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE-%E6%82%AC%E6%8C%82%E4%BA%8B%E5%8A%A13.png" alt="拉勾-悬挂事务3"></p>
+<p>到这里应该都了了分布式事务的 2PC 实现和使用方法。它是一种由数据库层实现强一致事务解决方案。其优点是使用简单，当前大部分的语言都支持 2PC 的实现。若使用中间件，业务完全就不用关心事务是不是分布式的。</p>
+<p>然而，他的缺点是，事务的提交开销变大了，从 1 次 COMMIT 变成了两次 PREPARE 和COMMIT。而对于海量的互联网业务来说，2PC 的性能是无法接受。因此，这就有了业务级的分布式事务实现，即柔性事务。</p>
+<h3 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h3><p>柔性事务是指分布式事务由业务层实现，通过最终一致性完成分布式事务的工作。可以说，通过牺牲了一定的一致性，达到了分布式事务的性能要求。</p>
+<p>业界常见的柔性事务有 TCC、SAGA、SEATA 这样的框架、也可以通过消息表实现。它们实现原理本身就是通过补偿机制，实现最终的一致性。柔性事务的难点就在于对于错误逻辑的处理。</p>
+<p>为了讲述简单，这里用消息表作为柔性事务的案例分享。对于上述电商的核心电商下单逻辑，用消息表就拆分为 3 个阶段：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">阶段1：<br><span class="hljs-keyword">START</span> <span class="hljs-keyword">TRANSACTION</span>;<br><span class="hljs-comment"># 订单号，订单状态</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> orders <span class="hljs-keyword">VALUES</span> (...) <br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> lineitem <span class="hljs-keyword">VALUES</span> (...)<br><span class="hljs-keyword">COMMIT</span>;<br><br>阶段2：<br><span class="hljs-keyword">START</span> <span class="hljs-keyword">TRANSACTION</span>;<br><span class="hljs-keyword">UPDATE</span> stock <span class="hljs-keyword">SET</span> <span class="hljs-keyword">count</span> = <span class="hljs-keyword">count</span> <span class="hljs-number">-1</span> <span class="hljs-keyword">WHERE</span> sku_id = ?<br><span class="hljs-comment"># o_orderkey是消息表中的主键，具有唯一约束</span><br><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> stock_message <span class="hljs-keyword">VALUES</span> (o_orderkey, ... )  <br><span class="hljs-keyword">COMMIT</span>;<br><br>阶段3：<br><span class="hljs-keyword">UPDATE</span> orders <span class="hljs-keyword">SET</span> o_orderststus = <span class="hljs-string">'F'</span> <span class="hljs-keyword">WHERE</span> o_orderkey = ?<br></code></pre></div></td></tr></table></figure>
+
+<p>上面的柔性事务中，订单表中的列 o_orderstatus 用于记录柔性事务是否完成，初始状态都是未完成。表 stock_message 记录对应订单是否已经扣除过相应的库存。若阶段 2 完成，则柔性事务必须完成。阶段 3 就是将柔性事务设置为完成，最终一致性的确定。</p>
+<p>接着我们来下，若阶段 2 执行失败，即执行过程中节点发生了宕机。则后台的补偿逻辑回去扫描订单表中 o_orderstatus 为未完成的超时订单有哪些，然后看一下是否在对应的表stock_message 有记录，若有，则执行阶段 3。若无，可选择告知用户下单失败。</p>
+<p>若阶段 3 执行失败，处理逻辑与阶段 2 基本一致，只是这时 2 肯定是完成的，只需要接着执行阶段 3 即可。</p>
+<p>所以，这里的补偿逻辑程序就是实时/定期扫描超时订单，通过消息表判断这个柔性事务是继续执行还是执行失败，执行失败又要做哪些业务处理。</p>
+<p>上面介绍的框架实现的柔性事务原理大致如此，只不过对于补偿的逻辑处理有些不同，又或者使用上更为通用一些。</p>
+<p>对于海量的互联网业务来说，柔性事务性能更好，因此支付宝、淘宝等互联网业务都是使用柔性事务完成分布式事务的实现。</p>
+<h1 id="实战篇"><a href="#实战篇" class="headerlink" title="实战篇"></a>实战篇</h1><h2 id="MySQL-数据库开发规范"><a href="#MySQL-数据库开发规范" class="headerlink" title="MySQL 数据库开发规范"></a>MySQL 数据库开发规范</h2><h3 id="表结构设计的-10-个规范"><a href="#表结构设计的-10-个规范" class="headerlink" title="表结构设计的 10 个规范"></a>表结构设计的 10 个规范</h3><ol>
+<li>INT 类型不使用 unsigned 无符号属性，容易引入额外的计算问题。</li>
+<li>自增用 8 字节 BIG INT，不要使用 4 字节 INT，且自增在 MySQL 8.0 版本前有回溯问题，请考虑是否业务有影响。</li>
+<li>字符集使用 UTF8MB4 字符编码，不推荐 GBK、UTF-8 等其他字符集。</li>
+<li>日期类型用 DATETIME 类型，需要精确到毫秒用 DATETIME(6)，不要使用 INT、TIMESTAMP。</li>
+<li>类型 JSON 可用于存储非结构化数据，典型场景为用户标签，不要将 JSON 用于频繁更新的字段场景。</li>
+<li>每张表一定要有一个主键，这样至少满足一范式的要求，核心业务表用全局唯一字段（雪花算法、有序UUID）做主键，不要使用自增做主键。</li>
+<li>对于日志类的流水表、报警表、日志表，可以使用压缩设计，提升存储效率。MySQL 5.7 版本开始推荐使用透明页压缩，不要使用传统的 KEY_BLOCK_SIZE 的页压缩。</li>
+<li>类别设计，用 ENUM+CHECK 约束，不要使用 INT 类型的设计。</li>
+<li>敏感字段需加密，如账户密码、信用卡号等存储使用：动态盐 + 非固定加密算法（MD5/AES256等） + 多轮加密，不要简单使用 MD5 算法加密，容易被暴力破解。</li>
+<li>MySQL 可以通过 KV 的方式访问表中的数据，若业务只是简单的 SET、GET 请求，可考虑将其转化为 Memcached 的 KV 访问方式，减少 SQL 解析的开销，性能可以有至少 50% 的提升。</li>
+</ol>
+<h3 id="索引设计的-10-个规范"><a href="#索引设计的-10-个规范" class="headerlink" title="索引设计的 10 个规范"></a>索引设计的 10 个规范</h3><ol>
+<li>不要陷入设置单表行数、列数限制的固有印象，其他关系型数据库没有行数、列数限制，MySQL 也没有，大表的缺点不是性能，而是后续的 DDL 管理问题，随着 MySQL 8.0 快速加列功能的上线，大表 DDL 问题基本已解决。</li>
+<li>MySQL 是索引组织表，表中的数据以 B+ 树索引结构，根据主键逻辑排序，由于 B+ 树索引的特点是树的高度为 3~4 层，所以从数十亿的记录中，通过主键查询一条记录只需要 3、4 次 I/O，当前到 SSD 存储设备设置每秒至少能完成 10000 次的 I/O 查询，不要担心通过索引查询一条或几条记录的性能，每秒百万次查询并不难。</li>
+<li>MySQL 是索引组织表，二级索引只存储（键值、主键值），因此需要再通过一次主键索引查询得到记录，这种方式成为回表。在核心业务中，使用索引覆盖技术，提升索引查询性能，对于回表记录数比较大的场景，甚至可以有 10 倍的性能提升；</li>
+<li>对类似 <code>WHERE a = ? ORDER BY b</code> 这样的查询，一定要创建（a、b）组合索引，这样可以避免一次额外排序，提升查询性能。</li>
+<li>MySQL 优化器是 CBO（Cost-based Optimizer），所有查询基于成本而不是规则，若发现 SQL 执行计划发生变化，不要怀疑 MySQL 出错，请先分析数据特点、索引创建是否合理，是否可以通过直方图校准数据。</li>
+<li>MySQL JOIN 支持 NLJ（Nested Loop Join）和 NHJ（Nested Hash Join）两种方式。对于 OLTP 业务，放心大胆使用 JOIN，但一定要做好索引的设计和索引覆盖的考虑（不考虑分布式数据库场景）；对于 OLAP 业务，MySQL 8.0 版本开始，支持 Hash Join，对于大数据量的关联，性能提升非常多，可以在不超过 10T 的数仓场景中考虑使用，超过 10T数据量，请一定使用大数据产品，如 Hive、Spark、麒麟等产品。</li>
+<li>MySQL 5.7 版本开始子查询优化已经做得不错，但是编写的子查询不能是关联子查询，上线前一定需要确认，若发现关联子查询，请改写子查询为 JOIN 或其他方式。</li>
+<li>不要因为数据量大，使用分区表，MySQL 是索引组织表，数据量再大，定位记录也只需要3、4 次 I/O。可以考虑分区表唯一的应用场景是：需要定期清理历史流水类数据，但如果业务可以按月、按天做分表，那么当前 MySQL 8.0 版本，分区表也不推荐使用。</li>
+<li>业务上线或新版本发布前，DBA 一定要进行所有 SQL Review，确保 SQL 走索引，否则不予上线，或由业务以邮件等正式方式，通知 DBA 该 SQL 不会引起线上事故，业务方承担后续责任。</li>
+<li>DBA 每天要对数据库进行巡检，及早发现慢查询或潜在数据库风险，将任何潜在问题尽早抛出，否则后续自己承担相关责任。</li>
+</ol>
+<h3 id="高可用架构设计的-10-个规范"><a href="#高可用架构设计的-10-个规范" class="headerlink" title="高可用架构设计的 10 个规范"></a>高可用架构设计的 10 个规范</h3><ol>
+<li>MySQL 高可用的基石是利用二进制日志的复制技术，核心业务一定要使用无损半同步方式，但凡不适用无损半同步的高可用架构，请业务方业务以邮件等正式方式回复，数据丢失等后续问题自己承担相关责任。</li>
+<li>MySQL 5.7 版本开始，一定要使用基于 WRITESET 的从机回放，避免主从延迟。</li>
+<li>当前 MySQL 发生主从延迟的可能性主要是存在大事务，比如定期计算收益等操作，这类大事务，一定要通知业务方将大事务拆成小事务，否则不予上线；若要上线，请业务方以邮件等方式回复，自己承担后续主从延迟带来的后续一系列问题。</li>
+<li>MySQL 8.0 版本开始推荐金融业务使用 MGR(MySQL Group Replication），通过 Paxos 协议保证数据一致性，并自己完成选主的逻辑，也可以使用多主模式，数据不冲突的情况下，可以大幅提升写入性能。</li>
+<li>对于核心业务，必须遵循互不信任原则，数据一致性不单单依赖 MySQL 复制本身，DBA 这里需要通过逻辑的方式，对主从数据进行核对，业务这里也需要一套业务层的逻辑进行“对账”。</li>
+<li>核心业务，务必使用一地三中心，两地三中心的跨机房复制架构，这样发生机房级故障，可以切换到另一个机房，保证业务可用性。</li>
+<li>同城容灾架构一定要评估切换到另一个机房后业务访问的性能，多次跨机房访问 DB，虽然每次只多了 2~3ms，但也存在业务雪崩问题，推荐 DB 切换机房，上层业务跟着一起联动切换。</li>
+<li>对于有跨城容灾需求的业务，可以考虑使用三地五中心架构，但是由于 30ms 延迟，业务需要进行评估，对于核心业务，务必使用业务层的跨城机制，将数据层的多次网络耗时合并为一次，这样能大大提升业务的性能。</li>
+<li>业界的 MHA、Ochestrator 等高可用套件都是基于 ssh 访问 MySQL，稳定性、安全性不高，不推荐大厂使用；自己开发一个数据库管理平台，通过 agent 的模式管理高可用和 MySQL 数据库的日常操作更为安全、有效。</li>
+<li>一定做好数据备份架构的设计，全备 + 增量备份 + 延迟备机（可选），做到可以基于任何一点恢复和回滚，同时，遵循互不信任原则，备份文件一定要进行检查，确保需要时一定能够进行恢复。</li>
+</ol>
+<h3 id="分布式架构设计的-10-个规范"><a href="#分布式架构设计的-10-个规范" class="headerlink" title="分布式架构设计的 10 个规范"></a>分布式架构设计的 10 个规范</h3><ol>
+<li>分布式数据库的本质就是根据某几个列的规则，将数据水平打散，存在不同的实例中。数据拆分的列就成为分区键，分区键一定是业务大部分访问（超过 80%）的表都会使用的列。若选不出合适的分区键，那就一定不要进行分布式数据库架构的设计；互联网业务绝大部分分区键的选择是用户维度。</li>
+<li>分区算法绝大部分场景使用 Hash算法，这样数据的存储和访问可以平均到下面多个实例，真正的做到可扩展性，Range 算法通常无法解决热点问题，会是灾难，但 Range 算法可以但实例中使用，作为二级拆分数据的规则。</li>
+<li>分布式数据库分片时，一开始就设计为不少于 1000 个分片的规则，不用担心分片过多的问题，管理 1 个分片和 1000 个分片的成本是一样的，但为后续的扩展做好了充足的准备。</li>
+<li>分布式数据库扩缩容就是通过部分过滤的复制技术，按库或按表进行数据同步，分库分表设计推荐库名、表都不同，做到全局唯一，方便后续拆分。</li>
+<li>分布式数据库索引设计中，非分区键的唯一索引一定带入分区键信息，这样业务查询时可以直接定位到数据所在分片，提升查询效率。</li>
+<li>分布式数据库索引设计中，数据库层的唯一约束只在单个实例中保证，若要保证全局唯一，一定要使用全局唯一的索引设计。</li>
+<li>直接使用 JOIN 请确认一定可以单元化在一个分片中完成，如果涉及跨分片的 JOIN，请通知业务修改成多条 SQL 的访问方式，只访问指定分片而不是所有分片。</li>
+<li>分布式数据库可以进行业务层的分库分表访问，和通过数据库中间件的访问，对于业务耗时敏感的业务，推荐业务层直接根据路由规则访问数据，否则使用数据库中间件，简单易用。</li>
+<li>对于耗时敏感的核心业务，推荐使用最终一致的业务层柔性事务，数据库层的 2PC 分布式事务耗时较大，性能较为一般，但是 2PC 使用简单，能满足大部分业务的使用。</li>
+<li>一定要利用好分布式数据库架构的特点，设计多活架构，每个机房都可以有写入流量，提升资源使用率和业务连续性，请 DBA 和业务方一起做好全链路的架构设计。</li>
+</ol>
 <h1 id="MySQL-修改列为-auto-increment-时存在的问题"><a href="#MySQL-修改列为-auto-increment-时存在的问题" class="headerlink" title="MySQL 修改列为 auto_increment 时存在的问题"></a>MySQL 修改列为 auto_increment 时存在的问题</h1><p>在这里再多描述一个作者在 MySQL 官方提交的一个 bug，详细地址如下：<a href="https://bugs.mysql.com/bug.php?id=103784" target="_blank" rel="noopener">column value seems to be wrong when modifying column to auto_increment</a></p>
 <p>该 bug 里描述了在 MySQL 中，当对一个列的属性进行修改了，如果原来的列已经具备了 <code>auto_increment</code> 属性，且原来的列中留有 0 值，则修改后会保留 0 值。但是，如果把一个非 <code>auto_increment</code> 的列修改成 <code>auto_increment</code>，则该过程会将原列的 0 值修改成 1：</p>
 <figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.50 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.15 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.16 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  1 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>

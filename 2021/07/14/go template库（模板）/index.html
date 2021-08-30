@@ -1,0 +1,892 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="模板能够分离数据和逻辑，使得逻辑变得简洁清晰，同时提高复用率。
+
+模板引擎按照功能可以划分为两种类型：
+
+无逻辑模板引擎：此类模板引擎只进行字符串的替换，无其它逻辑；
+嵌入逻辑模板引擎：此类模板引擎可以在模板中嵌入逻辑，实现流程控制/循环等。
+
+这两类模板引擎都比较极端。无逻辑模板引擎需要在处理器中额外添加很多逻辑用于生成替换的文本。而嵌入逻辑模板引擎则在模板中混入了大量逻辑，导致维护性较差。实用">
+  <meta name="author" content="Silverming">
+  <meta name="keywords" content="">
+  
+  <title>go template 库（模板） - Silverming</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="go template 库（模板）">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-07-14 19:29" pubdate>
+        2021年7月14日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      5.5k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      73
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">go template 库（模板）</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2021年8月31日 凌晨
+                
+              </p>
+            
+            <div class="markdown-body">
+              <p>模板能够分离数据和逻辑，使得逻辑变得简洁清晰，同时提高复用率。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E%E7%BB%93%E6%9E%84%E5%9B%BE.png" alt="模板引擎结构图"></p>
+<p>模板引擎按照功能可以划分为两种类型：</p>
+<ul>
+<li><strong>无逻辑模板引擎</strong>：此类模板引擎只进行字符串的替换，无其它逻辑；</li>
+<li><strong>嵌入逻辑模板引擎</strong>：此类模板引擎可以在模板中嵌入逻辑，实现流程控制/循环等。</li>
+</ul>
+<p>这两类模板引擎都比较极端。无逻辑模板引擎需要在处理器中额外添加很多逻辑用于生成替换的文本。而嵌入逻辑模板引擎则在模板中混入了大量逻辑，导致维护性较差。实用的模板引擎一般介于这两者之间。</p>
+<a id="more"></a>
+
+<p>在Go 语言中，<code>text/template</code> 和 <code>html/template</code> 两个库实现模板功能。</p>
+<p>模板内容可以是UTF-8编码的任何内容。其中用 <code>\{\{\}\}</code> 包围的部分称为<strong>动作</strong>，<code>\{\{\}\}</code> 外的其他文本在输出时保持不变。模板需要应用到数据，模板中的动作会根据数据生成对应的内容进行替换。</p>
+<p>模板解析之后可以多次执行，也可以并行执行，但是注意使用同一个 <code>Writer</code> 会导致输出交替出现。</p>
+<p>这里主要记录 <code>text/template</code> 的用法。</p>
+<h1 id="template-使用示例"><a href="#template-使用示例" class="headerlink" title="template 使用示例"></a>template 使用示例</h1><p>使用模板引擎一般分为 3 个步骤：</p>
+<ul>
+<li>定义模板（直接使用字符串字面量或文件）；</li>
+<li>解析模板（使用 <code>text/template</code> 或 <code>html/template</code> 中的方法解析）；</li>
+<li>传入数据生成输出。</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"os"</span><br>	<span class="hljs-string">"text/template"</span><br>)<br><br><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	Name <span class="hljs-keyword">string</span><br>	Age  <span class="hljs-keyword">int</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">stringLiteralTemplate</span><span class="hljs-params">()</span></span> &#123;<br>	s := <span class="hljs-string">"My name is &#123;&#123; .Name &#125;&#125;. I am &#123;&#123; .Age &#125;&#125; years old.\n"</span><br>  <span class="hljs-comment">// 首先调用 template.New 创建一个模板，参数为模板名</span><br>  <span class="hljs-comment">// 然后调用 Template 类型的 Parse 方法，解析模板字符串，生成模板主体</span><br>  <span class="hljs-comment">// 这个方法返回两个值。如果模板语法正确，则返回模板对象本身和一个 nil 值。</span><br>  <span class="hljs-comment">// 如果有语法错误，则返回一个 error 类型的值作为第二个返回值</span><br>	t, err := template.New(<span class="hljs-string">"test"</span>).Parse(s)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse string literal template error:"</span>, err)<br>	&#125;<br><br>	u := User&#123;Name: <span class="hljs-string">"silverming"</span>, Age: <span class="hljs-number">18</span>&#125;<br>	err = t.Execute(os.Stdout, u)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute string literal template error:"</span>, err)<br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fileTemplate</span><span class="hljs-params">()</span></span> &#123;<br>  <span class="hljs-comment">// 相当于 template.New("test").ParseFiles("test")</span><br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse file template error:"</span>, err)<br>	&#125;<br><br>	u := User&#123;Name: <span class="hljs-string">"zm"</span>, Age: <span class="hljs-number">18</span>&#125;<br>	err = t.Execute(os.Stdout, u)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute file template error:"</span>, err)<br>	&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	stringLiteralTemplate()<br><br>	fileTemplate()<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在可执行程序目录中新建模板文件<code>test</code>，并写入下面的内容：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs applescript">My <span class="hljs-built_in">name</span> <span class="hljs-keyword">is</span> &#123;&#123; .Name &#125;&#125;. I am &#123;&#123; .Age &#125;&#125; years old.<br></code></pre></div></td></tr></table></figure>
+
+<p>最后，调用模板对象的<code>Execute</code>方法，传入参数。<code>Execute</code>执行模板中的动作，将结果输出到<code>os.Stdout</code>，即<strong>标准输出</strong>。最终我们看到模板中<code>\{\{ .Name \}\}</code>被<code>u</code>的<code>Name</code>字段替换，<code>\{\{ .Age \}\}</code>被<code>u</code>的<code>Age</code>字段替换，标准输出中显示下面一行字符串：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs pgsql">My <span class="hljs-type">name</span> <span class="hljs-keyword">is</span> silverming. I am <span class="hljs-number">18</span> years <span class="hljs-built_in">old</span>.<br></code></pre></div></td></tr></table></figure>
+
+<h1 id="动作"><a href="#动作" class="headerlink" title="动作"></a>动作</h1><p>Go 模板中的动作就是一些嵌入在模板里面的命令。动作大体上可以分为以下几种类型：</p>
+<ul>
+<li>点动作；</li>
+<li>条件动作；</li>
+<li>迭代动作；</li>
+<li>设置动作；</li>
+<li>包含动作。</li>
+</ul>
+<h2 id="点动作"><a href="#点动作" class="headerlink" title="点动作"></a>点动作</h2><p>点动作 <code>\{\{ . \}\}</code> 是最重要的一个动作，代表传递给模板的数据，其他的动作和函数基本都是对这个数据进行处理，以此来达到格式化和内容展示的目的。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	s := <span class="hljs-string">"The user is &#123;&#123; . &#125;&#125;."</span><br>	t, err := template.New(<span class="hljs-string">"test"</span>).Parse(s)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	u := User&#123;Name: <span class="hljs-string">"silverming"</span>, Age: <span class="hljs-number">18</span>&#125;<br>	err = t.Execute(os.Stdout, u)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行后输出结果为：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs routeros">The<span class="hljs-built_in"> user </span>is &#123;silverming 18&#125;.<br></code></pre></div></td></tr></table></figure>
+
+<p>实际上，<code>\{\{ . \}\}</code> 会被替换为传给给模板的数据的字符串表示。这个字符串与以数据为参数调用 <code>fmt.Sprint</code> 函数得到的内容相同，也就是使用结构体的 <code>String</code> 方法来进行输出，如果修改了 <code>String()</code> 方法，对应的输出也就跟着改变。</p>
+<h2 id="条件动作"><a href="#条件动作" class="headerlink" title="条件动作"></a>条件动作</h2><p>条件动作的形式如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">if</span>  pipeline &#125;&#125; T1 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>其中 <code>pipeline</code> 表示一个值，<code>T1</code> 代表语句块，里面可以嵌套其他类型的动作。</p>
+<p>条件动作的语法与编程语言中的<code>if</code>语句语法类似，有几种形式：</p>
+<h3 id="形式一："><a href="#形式一：" class="headerlink" title="形式一："></a>形式一：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">if</span> pipeline &#125;&#125; T1 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果管道计算出来的值不为空，执行<code>T1</code>。否则，不生成输出。下面都表示空值：</p>
+<ul>
+<li><code>false</code>、0、空指针或接口；</li>
+<li>长度为 0 的数组、切片、map 或字符串。</li>
+</ul>
+<h3 id="形式二："><a href="#形式二：" class="headerlink" title="形式二："></a>形式二：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">if</span> pipeline &#125;&#125; T1 &#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125; T2 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果管道计算出来的值不为空，执行<code>T1</code>。否则，执行<code>T2</code>。</p>
+<h3 id="形式三："><a href="#形式三：" class="headerlink" title="形式三："></a>形式三：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">if</span> pipeline1 &#125;&#125; T1 &#123;&#123; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> pipeline2 &#125;&#125; T2 &#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125; T3 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果管道<code>pipeline1</code>计算出来的值不为空，则执行<code>T1</code>。反之如果管道<code>pipeline2</code>的值不为空，执行<code>T2</code>。如果都为空，执行<code>T3</code>。</p>
+<p>使用示例：</p>
+<p>test 文件内容：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Your age is: &#123;&#123; .Age &#125;&#125;<br>&#123;&#123; <span class="hljs-keyword">if</span> .GreaterThan60 &#125;&#125;<br>Old People!<br>&#123;&#123; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> .GreaterThan40 &#125;&#125;<br>Middle Aged!<br>&#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125;<br>Young!<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>代码：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> AgeInfo <span class="hljs-keyword">struct</span> &#123;<br>	Age           <span class="hljs-keyword">int</span><br>	GreaterThan60 <span class="hljs-keyword">bool</span><br>	GreaterThan40 <span class="hljs-keyword">bool</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	rand.Seed(time.Now().Unix())<br>	age := rand.Intn(<span class="hljs-number">100</span>)<br>	info := AgeInfo &#123;<br>		Age:           age,<br>		GreaterThan60: age &gt; <span class="hljs-number">60</span>,<br>		GreaterThan40: age &gt; <span class="hljs-number">40</span>,<br>	&#125;<br>	err = t.Execute(os.Stdout, info)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行后，通过随机生成的年龄，可能会出现如下的输出：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">Your age <span class="hljs-keyword">is</span>: <span class="hljs-number">7</span><br><br>Young!<br></code></pre></div></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">Your age <span class="hljs-keyword">is</span>: <span class="hljs-number">79</span><br><br>Old People!<br></code></pre></div></td></tr></table></figure>
+
+<p>这里会出现的问题就是有多余的空格，因为<strong>除了动作之外的任何文本都会原样保持，包括空格和换行</strong>。对于这个问题，有两种解决方式：</p>
+<p>第一种方案是删除多余的空格和换行，<code>test</code> 文件修改为：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Your age is: &#123;&#123; .Age &#125;&#125;<br>&#123;&#123; <span class="hljs-keyword">if</span> .GreaterThan60 &#125;&#125;Old People!&#123;&#123; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> .GreaterThan40 &#125;&#125;Middle Aged!&#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125;Young!&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这个方法会导致模板内容很难阅读，不够理想。为此，Go 提供了针对空白符的处理。如果一个动作以 <code>\{\{-</code>（注意有一个空格），那么该动作与它前面相邻的非空文本或动作间的空白符将会被全部删除。类似地，如果一个动作以<code>-\}\}</code> 结尾，那么该动作与它后面相邻的非空文本或动作间的空白符将会被全部删除。例如：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">&#123;&#123;<span class="hljs-number">23</span> -&#125;&#125; &lt; &#123;&#123;- <span class="hljs-number">45</span>&#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>输出结果为：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript"><span class="hljs-number">23</span>&lt;<span class="hljs-number">45</span><br></code></pre></div></td></tr></table></figure>
+
+<p>所以，对于上面的 test 文件可以修改成下面这样：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Your age is: &#123;&#123; .Age &#125;&#125;<br>&#123;&#123; <span class="hljs-keyword">if</span> .GreaterThan60 -&#125;&#125;<br><span class="hljs-string">"Old People!"</span><br>&#123;&#123;- <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> .GreaterThan40 -&#125;&#125;<br><span class="hljs-string">"Middle Aged!"</span><br>&#123;&#123;- <span class="hljs-keyword">else</span> -&#125;&#125;<br><span class="hljs-string">"Young!"</span><br>&#123;&#123;- end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这样，输出的文本就不会包含多余的空格了。</p>
+<h2 id="迭代动作"><a href="#迭代动作" class="headerlink" title="迭代动作"></a>迭代动作</h2><p>迭代其实与编程语言中的循环遍历类似。有两种形式：</p>
+<h3 id="形式一：-1"><a href="#形式一：-1" class="headerlink" title="形式一："></a>形式一：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">range</span> pipeline &#125;&#125; T1 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>pipeline 的值类型必须是数组、切片、map、channel。如果值的长度为 0，那么无输出。否则，<strong><code>.</code> 被设置为当前遍历到的元素，然后执行<code>T1</code>，即在<code>T1</code>中<code>.</code>表示遍历的当前元素，而非传给模板的参数</strong>。如果值是 map 类型，且键是可比较的基本类型，<strong>元素将会以键的顺序访问</strong>。</p>
+<h3 id="形式二：-1"><a href="#形式二：-1" class="headerlink" title="形式二："></a>形式二：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">range</span> pipeline &#125;&#125; T1 &#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125; T2 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>与前一种形式基本一样，如果值的长度为 0，那么执行<code>T2</code>。</p>
+<p>使用例子如下，假设有以下模板文件：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Apple Products:<br>&#123;&#123; <span class="hljs-keyword">range</span> . &#125;&#125;<br>&#123;&#123; .Name &#125;&#125;: ￥&#123;&#123; .Price &#125;&#125;<br>&#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125;<br>No Products!!!<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>执行代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Item <span class="hljs-keyword">struct</span> &#123;<br>	Name	<span class="hljs-keyword">string</span><br>	Price	<span class="hljs-keyword">int</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	items := []Item &#123;<br>		&#123; <span class="hljs-string">"iPhone"</span>, <span class="hljs-number">5499</span> &#125;,<br>		&#123; <span class="hljs-string">"iPad"</span>, <span class="hljs-number">6331</span> &#125;,<br>		&#123; <span class="hljs-string">"iWatch"</span>, <span class="hljs-number">1499</span> &#125;,<br>		&#123; <span class="hljs-string">"MacBook"</span>, <span class="hljs-number">8250</span> &#125;,<br>	&#125;<br><br>	err = t.Execute(os.Stdout, items)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>会得到如下的输出：</p>
+<figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">Apple</span> <span class="hljs-string">Products:</span><br><br><span class="hljs-attr">iPhone</span>: <span class="hljs-string">￥5499</span><br><br><span class="hljs-attr">iPad</span>: <span class="hljs-string">￥6331</span><br><br><span class="hljs-attr">iWatch</span>: <span class="hljs-string">￥1499</span><br><br><span class="hljs-attr">MacBook</span>: <span class="hljs-string">￥8250</span><br></code></pre></div></td></tr></table></figure>
+
+<p>在 <code>range</code> 语句循环体内，<code>.</code> 被设置为当前遍历的元素，可以直接使用 <code>\{\{ .Name \}\}</code> 或 <code>\{\{ .Price \}\}</code> 访问产品名称和价格。在程序中，将 <code>nil</code> 传给 <code>Execute</code> 方法会得到下面的输出：</p>
+<figure class="highlight erlang-repl"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs erlang-repl">Apple Products:<br><br>No Products!!!<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="设置动作"><a href="#设置动作" class="headerlink" title="设置动作"></a>设置动作</h2><p>设置动作使用 <code>with</code> 关键字重定义 <code>.</code>。在 <code>with</code> 语句内，<code>.</code> 会被定义为指定的值。一般用在结构嵌套很深时，能起到简化代码的作用。</p>
+<h3 id="形式一：-2"><a href="#形式一：-2" class="headerlink" title="形式一："></a>形式一：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; with pipeline &#125;&#125; T1 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果管道值不为空，则将 <code>.</code> 设置为 <code>pipeline</code> 的值，然后执行 <code>T1</code>。否则，不生成输出。</p>
+<h3 id="形式二：-2"><a href="#形式二：-2" class="headerlink" title="形式二："></a>形式二：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; with pipeline &#125;&#125; T1 &#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125; T2 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>与前一种形式的不同之处在于当管道值为空时，不改变 <code>.</code> 执行 <code>T2</code>。</p>
+<p>使用例子如下：</p>
+<p>模板文件内容：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Pet Info:<br>Name: &#123;&#123; .Name &#125;&#125;<br>Age: &#123;&#123; .Age &#125;&#125;<br>Owner:<br>&#123;&#123; with .Owner &#125;&#125;<br>  Name: &#123;&#123; .Name &#125;&#125;<br>  Age: &#123;&#123; .Age &#125;&#125;<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	Name <span class="hljs-keyword">string</span><br>	Age  <span class="hljs-keyword">int</span><br>&#125;<br><br><span class="hljs-keyword">type</span> Pet <span class="hljs-keyword">struct</span> &#123;<br>	Name  <span class="hljs-keyword">string</span><br>	Age   <span class="hljs-keyword">int</span><br>	Owner User<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	p := Pet &#123;<br>		Name:  <span class="hljs-string">"Orange"</span>,<br>		Age:   <span class="hljs-number">2</span>,<br>		Owner: User &#123;<br>			Name: <span class="hljs-string">"zm"</span>,<br>			Age:  <span class="hljs-number">18</span>,<br>		&#125;,<br>	&#125;<br><br>	err = t.Execute(os.Stdout, p)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>执行代码后输出如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Pet Info:<br>Name: Orange<br>Age: <span class="hljs-number">2</span><br>Owner:<br><br>  Name: zm<br>  Age: <span class="hljs-number">18</span><br></code></pre></div></td></tr></table></figure>
+
+<p>可见，在 <code>with</code> 语句内，<code>.</code> 被替换成了 <code>Owner</code> 字段的值。</p>
+<h2 id="包含动作"><a href="#包含动作" class="headerlink" title="包含动作"></a>包含动作</h2><p>包含动作可以在一个模板中嵌入另一个模板，方便模板的复用。</p>
+<h3 id="形式一：-3"><a href="#形式一：-3" class="headerlink" title="形式一："></a>形式一：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; template <span class="hljs-string">"name"</span> &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="形式二：-3"><a href="#形式二：-3" class="headerlink" title="形式二："></a>形式二：</h3><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; template <span class="hljs-string">"name"</span> pipeline &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>其中 <code>name</code> 表示嵌入的模板名称。第一种形式，将使用 <code>nil</code> 作为传入内嵌模板的参数。第二种形式，管道<code>pipeline</code>的值将会作为参数传给内嵌的模板。</p>
+<p>使用例子如下：</p>
+<p>模板文件：</p>
+<p><strong>test1</strong>:</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">This is in test1.<br>&#123;&#123; template <span class="hljs-string">"test2"</span> &#125;&#125;<br><br>&#123;&#123; template <span class="hljs-string">"test2"</span> . &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>test2</strong>：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">This is in test2.<br>Get: &#123;&#123; . &#125;&#125;.<br></code></pre></div></td></tr></table></figure>
+
+<p>代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"os"</span><br>	<span class="hljs-string">"text/template"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test1"</span>, <span class="hljs-string">"test2"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	err = t.Execute(os.Stdout, <span class="hljs-string">"test data"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行后程序输出如下：</p>
+<figure class="highlight mercury"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mercury">This <span class="hljs-keyword">is</span> in test1.<br>This <span class="hljs-keyword">is</span> in test2.<br>Get: &lt;no value&gt;.<br><br>This <span class="hljs-keyword">is</span> in test2.<br>Get: test data.<br></code></pre></div></td></tr></table></figure>
+
+<p>前一个嵌入模板，没有传递参数。后一个传入<code>.</code>，即传给<code>test1</code>模板的参数。</p>
+<h1 id="其他元素"><a href="#其他元素" class="headerlink" title="其他元素"></a>其他元素</h1><h2 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h2><p>注释只有一种语法：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-comment">/* 注释 */</span> &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>注释的内容不会呈现在输出中，它就像代码注释一样，是为了让模板更易读。</p>
+<h2 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h2><p>一个参数就是模板中的一个值。它的取值有多种：</p>
+<ul>
+<li>布尔值、字符串、字符、整数、浮点数、虚数和复数等<strong>字面量</strong>；</li>
+<li>结构中的一个字段或 map 中的一个键。<strong>结构的字段名必须是导出的，即大写字母开头，map 的键名则不必</strong>；</li>
+<li>一个函数或方法。必须只返回一个值，或者只返回一个值和一个错误。如果返回了非空的错误，则<code>Execute</code>方法执行终止，返回该错误给调用者；</li>
+</ul>
+<p>上面几种形式可以结合使用：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; .Field1.Key1.Method1.Field2.Key2.Method2 &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>在前面的例子中也已经用过很多次参数了。下面举一个例子：</p>
+<p>模板文件内容如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">My full name is &#123;&#123; .FullName &#125;&#125;.<br></code></pre></div></td></tr></table></figure>
+
+<p>代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	FirstName 	<span class="hljs-keyword">string</span><br>	LastName	<span class="hljs-keyword">string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u User)</span> <span class="hljs-title">FullName</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> &#123;<br>	<span class="hljs-keyword">return</span> u.FirstName + <span class="hljs-string">" "</span> + u.LastName<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	err = t.Execute(os.Stdout, User&#123;FirstName: <span class="hljs-string">"silver"</span>, LastName: <span class="hljs-string">"ming"</span>&#125;)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>运行后输出如下：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs pgsql">My <span class="hljs-keyword">full</span> <span class="hljs-type">name</span> <span class="hljs-keyword">is</span> silver ming.<br></code></pre></div></td></tr></table></figure>
+
+<p>关于参数的几个要点：</p>
+<ul>
+<li>参数可以是任何类型；</li>
+<li>如果参数为指针，实现会根据需要取其基础类型；</li>
+<li>如果参数计算得到一个函数类型，它不会自动调用。例如 <code>\{\{ .Method1 \}\}</code>，如果 <code>Method1</code> 方法返回一个函数，那么返回值函数不会调用。如果要调用它，使用内置的 <code>call</code> 函数。</li>
+</ul>
+<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>管道也就是前面看到的 <code>pipeline</code>，管道的语法与 Linux 中的管道类似，即<strong>命令</strong>的链式序列：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; p1 | p2 | p3 &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>每个单独的命令（即<code>p1/p2/p3...</code>）可以是下面三种类型：</p>
+<ul>
+<li>参数，见上面；</li>
+<li>可能带有参数的方法调用；</li>
+<li>可能带有参数的函数调用。</li>
+</ul>
+<p><strong>在一个链式管道中，每个命令的结果会作为下一个命令的最后一个参数。最后一个命令的结果作为整个管道的值。</strong></p>
+<p>管道必须只返回一个值，或者只返回一个值和一个错误。如果返回了非空的错误，那么<code>Execute</code>方法执行终止，并将该错误返回给调用者。</p>
+<p>在迭代程序的基础上稍作修改：</p>
+<p>模板文件如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Product: &#123;&#123; .Name &#125;&#125;<br>Price: ￥&#123;&#123; .Price &#125;&#125;<br>Num: &#123;&#123; .Num &#125;&#125;<br>Total: ￥&#123;&#123; .Total | printf <span class="hljs-string">"%.2f"</span> &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>先调用 <code>Item.Total</code> 方法计算商品总价，然后使用 <code>printf</code> 格式化，保留两位小数。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Item <span class="hljs-keyword">struct</span> &#123;<br>	Name  <span class="hljs-keyword">string</span><br>	Price <span class="hljs-keyword">float64</span><br>	Num   <span class="hljs-keyword">int</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(item Item)</span> <span class="hljs-title">Total</span><span class="hljs-params">()</span> <span class="hljs-title">float64</span></span> &#123;<br>	<span class="hljs-keyword">return</span> item.Price * <span class="hljs-keyword">float64</span>(item.Num)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	item := Item &#123;<span class="hljs-string">"iPhone"</span>, <span class="hljs-number">5499.99</span>, <span class="hljs-number">2</span> &#125;<br><br>	err = t.Execute(os.Stdout, item)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>最终输出：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-attr">Product:</span> <span class="hljs-string">iPhone</span><br><span class="hljs-attr">Price:</span> <span class="hljs-string">￥5499.99</span><br><span class="hljs-attr">Num:</span> <span class="hljs-number">2</span><br><span class="hljs-attr">Total:</span> <span class="hljs-string">￥10999.98</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>printf</code> 是 Go 模板内置的函数，类似的函数在源码中有以下这些：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">builtins</span><span class="hljs-params">()</span> <span class="hljs-title">FuncMap</span></span> &#123;<br>	<span class="hljs-keyword">return</span> FuncMap&#123;<br>		<span class="hljs-string">"and"</span>:      and,<br>		<span class="hljs-string">"call"</span>:     call,<br>		<span class="hljs-string">"html"</span>:     HTMLEscaper,<br>		<span class="hljs-string">"index"</span>:    index,<br>		<span class="hljs-string">"slice"</span>:    slice,<br>		<span class="hljs-string">"js"</span>:       JSEscaper,<br>		<span class="hljs-string">"len"</span>:      length,<br>		<span class="hljs-string">"not"</span>:      not,<br>		<span class="hljs-string">"or"</span>:       or,<br>		<span class="hljs-string">"print"</span>:    fmt.Sprint,<br>		<span class="hljs-string">"printf"</span>:   fmt.Sprintf,<br>		<span class="hljs-string">"println"</span>:  fmt.Sprintln,<br>		<span class="hljs-string">"urlquery"</span>: URLQueryEscaper,<br><br>		<span class="hljs-comment">// Comparisons</span><br>		<span class="hljs-string">"eq"</span>: eq, <span class="hljs-comment">// ==</span><br>		<span class="hljs-string">"ge"</span>: ge, <span class="hljs-comment">// &gt;=</span><br>		<span class="hljs-string">"gt"</span>: gt, <span class="hljs-comment">// &gt;</span><br>		<span class="hljs-string">"le"</span>: le, <span class="hljs-comment">// &lt;=</span><br>		<span class="hljs-string">"lt"</span>: lt, <span class="hljs-comment">// &lt;</span><br>		<span class="hljs-string">"ne"</span>: ne, <span class="hljs-comment">// !=</span><br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><p>在动作中，可以用管道的值定义一个变量。</p>
+<figure class="highlight gams"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs gams"><span class="hljs-meta"><span class="hljs-meta-keyword">$variable</span> := pipeline</span><br></code></pre></div></td></tr></table></figure>
+
+<p><code>$variable</code> 为变量名，声明变量的动作不生成输出。</p>
+<p>类似地，变量也可以重新赋值：</p>
+<figure class="highlight gams"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs gams"><span class="hljs-meta"><span class="hljs-meta-keyword">$variable</span> = pipeline</span><br></code></pre></div></td></tr></table></figure>
+
+<p>在<code>range</code>动作中可以定义两个变量：</p>
+<figure class="highlight stata"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs stata"><span class="hljs-keyword">range</span> <span class="hljs-variable">$index</span>, <span class="hljs-variable">$element</span> := <span class="hljs-keyword">range</span> pipeline<br></code></pre></div></td></tr></table></figure>
+
+<p>这样就可以在循环中通过<code>$index</code>和<code>$element</code>访问索引和元素了。</p>
+<p>变量的作用域持续到定义它的控制结构的<code>\{\{ end \}\}</code>动作。如果没有这样的控制结构，则持续到模板结束。模板调用不继承变量。</p>
+<p>执行开始时，<code>$</code> 被设置为传入的数据参数，即<code>.</code>的值。</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>Go 模板提供了大量的预定义函数，如果有特殊需求也可以实现自定义函数。模板执行时，遇到函数调用，先从模板自定义函数表中查找，而后查找全局函数表。</p>
+<h3 id="预定义函数"><a href="#预定义函数" class="headerlink" title="预定义函数"></a>预定义函数</h3><p>预定义函数分为以下几类：</p>
+<ul>
+<li>逻辑运算，<code>and/or/not</code>；</li>
+<li>调用操作，<code>call</code>；</li>
+<li>格式化操作，<code>print/printf/println</code>，与用参数直接调用<code>fmt.Sprint/Sprintf/Sprintln</code>得到的内容相同；</li>
+<li>比较运算，<code>eq/ne/lt/le/gt/ge</code>。</li>
+</ul>
+<p>在上面条件动作的示例代码中，我们在代码中计算出大小关系再传入模板，这样比较繁琐，可以直接使用比较运算简化。</p>
+<p>有两点需要注意：</p>
+<ul>
+<li>由于是函数调用，所有的参数都会被求值，没有<strong>短路求值</strong>；</li>
+<li>比较运算只作用于基本类型，且没有 Go 语法那么严格，例如可以比较有符号和无符号整数。</li>
+</ul>
+<h3 id="自定义函数"><a href="#自定义函数" class="headerlink" title="自定义函数"></a>自定义函数</h3><p>默认情况下，模板中无自定义函数，可以使用模板的<code>Funcs</code>方法添加。下面实现一个格式化日期的自定义函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"os"</span><br>	<span class="hljs-string">"text/template"</span><br>	<span class="hljs-string">"time"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">formatDate</span><span class="hljs-params">(t time.Time)</span> <span class="hljs-title">string</span></span> &#123;<br>	<span class="hljs-keyword">return</span> t.Format(<span class="hljs-string">"2016-01-02"</span>)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	funcMap := template.FuncMap &#123;<br>		<span class="hljs-string">"fdate"</span>: formatDate,<br>	&#125;<br>	t := template.New(<span class="hljs-string">"test"</span>).Funcs(funcMap)<br>	t, err := t.ParseFiles(<span class="hljs-string">"test"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse errr:"</span>, err)<br>	&#125;<br><br>	err = t.Execute(os.Stdout, time.Now())<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Exeute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>模板文件<code>test</code>：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Today is &#123;&#123; . | fdate &#125;&#125;.<br></code></pre></div></td></tr></table></figure>
+
+<p>模板的 <code>Func</code> 方法接受一个 <code>template.FuncMap</code> 类型变量，键为函数名，值为实际定义的函数。 可以一次设置多个自定义函数。自定义函数要求只返回一个值，或者返回一个值和一个错误。 设置之后就可以在模板中使用 <code>fdate</code> 了，输出：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">Today <span class="hljs-keyword">is</span> <span class="hljs-number">7016</span><span class="hljs-number">-01</span><span class="hljs-number">-07.</span><br></code></pre></div></td></tr></table></figure>
+
+<p>这里不能使用<code>template.ParseFiles</code>，因为在解析模板文件的时候 <code>fdate</code> 未定义会导致解析失败。<strong>必须先创建模板，调用 <code>Funcs</code> 设置自定义函数，然后再解析模板。</strong></p>
+<h1 id="模板的几种创建方式"><a href="#模板的几种创建方式" class="headerlink" title="模板的几种创建方式"></a>模板的几种创建方式</h1><p>模板创建的方式主要有两种：</p>
+<ul>
+<li>先调用 <code>template.New</code> 创建模板，然后使用 <code>Parse/ParseFiles</code> 解析模板内容；</li>
+<li>直接使用 <code>template.ParseFiles</code> 创建并解析模板文件。</li>
+</ul>
+<h2 id="第一种方法"><a href="#第一种方法" class="headerlink" title="第一种方法"></a>第一种方法</h2><p>第一种方式，调用 <code>template.New</code> 创建模板时需要传入一个模板名字，后续调用 <code>ParseFiles</code> 可以传入一个或多个文件，<strong>这些文件中必须有一个基础名（即去掉路径部分）与模板名相同</strong>。如果没有文件名与模板名相同，则 <code>Execute</code> 调用失败，返回错误。例如：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"os"</span><br>	<span class="hljs-string">"text/template"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t := template.New(<span class="hljs-string">"test"</span>)<br>	t, err := t.ParseFiles(<span class="hljs-string">"test1"</span>)<br><br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	err = t.Execute(os.Stdout, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>上面的代码执行会出现以下的错误：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Execute error:template: test: <span class="hljs-string">"test"</span> is an incomplete or empty template<br></code></pre></div></td></tr></table></figure>
+
+<p>之所以会出现这种情况，跟模板的结构定义有关：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// src/text/template.go</span><br><span class="hljs-keyword">type</span> common <span class="hljs-keyword">struct</span> &#123;<br>	tmpl   <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]*Template <span class="hljs-comment">// Map from name to defined templates.</span><br>	option option<br>	muFuncs    sync.RWMutex <span class="hljs-comment">// protects parseFuncs and execFuncs</span><br>	parseFuncs FuncMap<br>	execFuncs  <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]reflect.Value<br>&#125;<br><br><span class="hljs-keyword">type</span> Template <span class="hljs-keyword">struct</span> &#123;<br>	name <span class="hljs-keyword">string</span><br>	*parse.Tree<br>	*common<br>	leftDelim  <span class="hljs-keyword">string</span><br>	rightDelim <span class="hljs-keyword">string</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>模板结构 <code>Template</code> 中有一个字段 <code>common</code>，<code>common</code> 中又有一个字段<code>tmpl</code>保存名字到模板的映射。其实，最外层的<code>Template</code>结构是<strong>主模板</strong>，我们调用<code>Execute</code>方法时执行的就是主模板。 <strong>执行<code>ParseFiles</code>方法时，每个文件都会生成一个模板。只有文件基础名与模板名相同时，该文件的内容才会解析到主模板中。这也是上面的程序执行失败的原因——主模板为空。</strong> 其它文件解析生成<strong>关联模板</strong>，存储在字段<code>tmpl</code>中。关联模板可以是在主模板中通过 <code>\{\{ define \}\}</code> 动作定义，或者在非主模板文件中定义。关联模板也可以执行，但是需要使用<code>ExecuteTemplate</code>方法，显式传入模板名：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br>    t := template.New(<span class="hljs-string">"test"</span>)<br>    t, err := t.ParseFiles(<span class="hljs-string">"test1"</span>)<br>    <br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    	log.Fatal(<span class="hljs-string">"in associatedTemplate Parse error:"</span>, err)<br>    &#125;<br>    <br>    err = t.ExecuteTemplate(os.Stdout, <span class="hljs-string">"test1"</span>, <span class="hljs-literal">nil</span>)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    	log.Fatal(<span class="hljs-string">"in associatedTemplate Execute error:"</span>, err)<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="第二种方法"><a href="#第二种方法" class="headerlink" title="第二种方法"></a>第二种方法</h2><p>第二种方式将创建和解析两步合并在一起了。<code>template.ParseFiles</code>方法将传入的第一个文件名作为模板名称，其余的文件（如果有的话）解析后存放在<code>tmpl</code>中：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">t, err := template.ParseFiles(<span class="hljs-string">"file1"</span>, <span class="hljs-string">"file2"</span>, <span class="hljs-string">"file3"</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>其实就等价于：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">t := template.New(<span class="hljs-string">"file1"</span>)<br>t, err := t.ParseFiles(<span class="hljs-string">"file1"</span>, <span class="hljs-string">"file2"</span>, <span class="hljs-string">"file3"</span>)<br></code></pre></div></td></tr></table></figure>
+
+<p>少了不一致的可能性，所以调用 <code>Execute</code> 方法时不会出现上面的错误。</p>
+<h2 id="第三种方法"><a href="#第三种方法" class="headerlink" title="第三种方法"></a>第三种方法</h2><p>还有一种创建方式，使用 <code>ParseGlob</code> 函数。<code>ParseGlob</code> 会对匹配给定模式的所有文件进行语法分析。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    t, err := template.ParseGlob(<span class="hljs-string">"tmpl*.glob"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"in globTemplate parse error:"</span>, err)<br>	&#125;<br><br>	err = t.Execute(os.Stdout, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">3</span>; i++ &#123;<br>		err = t.ExecuteTemplate(os.Stdout, fmt.Sprintf(<span class="hljs-string">"tmpl%d.glob"</span>, i), <span class="hljs-literal">nil</span>)<br>		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>			log.Fatal(err)<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><code>ParseGlob</code> 返回的模板以匹配的第一个文件基础名作为名称。<code>ParseGlob</code> 解析时会对同一个目录下的文件进行排序，所以第一个文件总是固定的。</p>
+<p>这里创建三个模板文件，<code>tmpl1.glob</code>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp">In glob <span class="hljs-keyword">template</span> file1.<br></code></pre></div></td></tr></table></figure>
+
+<p>``tmpl2.glob`:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp">In glob <span class="hljs-keyword">template</span> file2.<br></code></pre></div></td></tr></table></figure>
+
+<p><code>tmpl3.glob</code>:</p>
+<figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp">In glob <span class="hljs-keyword">template</span> file3.<br></code></pre></div></td></tr></table></figure>
+
+<p>最终输出为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp">In glob <span class="hljs-keyword">template</span> file1.<br>In glob <span class="hljs-keyword">template</span> file1.<br>In glob <span class="hljs-keyword">template</span> file2.<br>In glob <span class="hljs-keyword">template</span> file3.<br></code></pre></div></td></tr></table></figure>
+
+<p>注意，<strong>如果多个不同路径下的文件名相同，那么后解析的会覆盖之前的。</strong></p>
+<h1 id="嵌套模板"><a href="#嵌套模板" class="headerlink" title="嵌套模板"></a>嵌套模板</h1><p>在一个模板文件中还可以通过 <code>\{\{ define \}\}</code> 动作定义其它的模板，这些模板就是<strong>嵌套模板</strong>。模板定义必须在模板内容的最顶层，像 Go 程序中的全局变量一样。</p>
+<p>嵌套模板一般用于<strong>布局（layout）</strong>。很多文本的结构其实非常固定，例如邮件有标题和正文，网页有首部、正文和尾部等。 我们可以为这些固定结构的每部分定义一个模板。</p>
+<p>定义模板文件 <code>layout.tmpl</code>：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; define <span class="hljs-string">"layout"</span> &#125;&#125;<br>This is body.<br>&#123;&#123; template <span class="hljs-string">"content"</span> . &#125;&#125;<br>&#123;&#123; end &#125;&#125;<br><br>&#123;&#123; define <span class="hljs-string">"content"</span> &#125;&#125;<br>This is &#123;&#123; . &#125;&#125; content.<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>上面定义了两个模板<code>layout</code>和<code>content</code>，<code>layout</code>中使用了<code>content</code>。执行这种方式定义的模板必须使用<code>ExecuteTemplate</code>方法：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	t, err := template.ParseFiles(<span class="hljs-string">"layout.tmpl"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	err = t.ExecuteTemplate(os.Stdout, <span class="hljs-string">"layout"</span>, <span class="hljs-string">"amazing"</span>)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h1 id="块动作"><a href="#块动作" class="headerlink" title="块动作"></a>块动作</h1><p>块动作其实就是定义一个默认模板，语法如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; block <span class="hljs-string">"name"</span> arg &#125;&#125;<br>T1<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>其实它就等价于定义一个模板，然后立即使用它：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; define <span class="hljs-string">"name"</span> &#125;&#125;<br>T1<br>&#123;&#123; end &#125;&#125;<br><br>&#123;&#123; template <span class="hljs-string">"name"</span> arg &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>如果后面定义了模板 <code>content</code>，那么使用后面的定义，否则使用默认模板。</p>
+<p>例如上面的示例中，我们将模板修改如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; define <span class="hljs-string">"layout"</span> &#125;&#125;<br>This is body.<br>&#123;&#123; block <span class="hljs-string">"content"</span> . &#125;&#125;<br>This is <span class="hljs-keyword">default</span> content.<br>&#123;&#123; end &#125;&#125;<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>去掉后面的<code>content</code>模板定义，执行<code>layout</code>时，<code>content</code>部分会显示默认值。</p>
+<p><strong>参考文档</strong>：</p>
+<blockquote>
+<p><a href="https://darjun.github.io/2019/12/31/goweb/template1/#&gid=1&pid=1" target="_blank" rel="noopener">Go Web 编程之 模板（一）</a></p>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/go/">go</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Go 如何进行单元测试</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/">
+                        <span class="hidden-mobile">gomock 使用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        粤ICP备18114217号
+      </a>
+    </span>
+    
+      
+        <span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
+            rel="nofollow noopener"
+            class="beian-police"
+            target="_blank"
+          >
+            
+              <span style="visibility: hidden; width: 0">|</span>
+              <img src="/img/police_beian.png" alt="police-icon"/>
+            
+            <span>粤ICP备18114217号-1</span>
+          </a>
+        </span>
+      
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-M2RT7SDT3L', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M2RT7SDT3L');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
