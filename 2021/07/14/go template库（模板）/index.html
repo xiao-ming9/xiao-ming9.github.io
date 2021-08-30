@@ -258,7 +258,7 @@
 <a id="more"></a>
 
 <p>在Go 语言中，<code>text/template</code> 和 <code>html/template</code> 两个库实现模板功能。</p>
-<p>模板内容可以是UTF-8编码的任何内容。其中用 <code>\{\{\}\}</code> 包围的部分称为<strong>动作</strong>，<code>\{\{\}\}</code> 外的其他文本在输出时保持不变。模板需要应用到数据，模板中的动作会根据数据生成对应的内容进行替换。</p>
+<p>模板内容可以是UTF-8编码的任何内容。其中用 <code>{ { } }</code> 包围的部分称为<strong>动作</strong>，<code>{ { } }</code> 外的其他文本在输出时保持不变。模板需要应用到数据，模板中的动作会根据数据生成对应的内容进行替换。</p>
 <p>模板解析之后可以多次执行，也可以并行执行，但是注意使用同一个 <code>Writer</code> 会导致输出交替出现。</p>
 <p>这里主要记录 <code>text/template</code> 的用法。</p>
 <h1 id="template-使用示例"><a href="#template-使用示例" class="headerlink" title="template 使用示例"></a>template 使用示例</h1><p>使用模板引擎一般分为 3 个步骤：</p>
@@ -272,7 +272,7 @@
 <p>在可执行程序目录中新建模板文件<code>test</code>，并写入下面的内容：</p>
 <figure class="highlight applescript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs applescript">My <span class="hljs-built_in">name</span> <span class="hljs-keyword">is</span> &#123;&#123; .Name &#125;&#125;. I am &#123;&#123; .Age &#125;&#125; years old.<br></code></pre></div></td></tr></table></figure>
 
-<p>最后，调用模板对象的<code>Execute</code>方法，传入参数。<code>Execute</code>执行模板中的动作，将结果输出到<code>os.Stdout</code>，即<strong>标准输出</strong>。最终我们看到模板中<code>\{\{ .Name \}\}</code>被<code>u</code>的<code>Name</code>字段替换，<code>\{\{ .Age \}\}</code>被<code>u</code>的<code>Age</code>字段替换，标准输出中显示下面一行字符串：</p>
+<p>最后，调用模板对象的<code>Execute</code>方法，传入参数。<code>Execute</code>执行模板中的动作，将结果输出到<code>os.Stdout</code>，即<strong>标准输出</strong>。最终我们看到模板中<code>{ { .Name } }</code>被<code>u</code>的<code>Name</code>字段替换，<code>{ { .Age } }</code>被<code>u</code>的<code>Age</code>字段替换，标准输出中显示下面一行字符串：</p>
 <figure class="highlight pgsql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs pgsql">My <span class="hljs-type">name</span> <span class="hljs-keyword">is</span> silverming. I am <span class="hljs-number">18</span> years <span class="hljs-built_in">old</span>.<br></code></pre></div></td></tr></table></figure>
 
 <h1 id="动作"><a href="#动作" class="headerlink" title="动作"></a>动作</h1><p>Go 模板中的动作就是一些嵌入在模板里面的命令。动作大体上可以分为以下几种类型：</p>
@@ -283,13 +283,13 @@
 <li>设置动作；</li>
 <li>包含动作。</li>
 </ul>
-<h2 id="点动作"><a href="#点动作" class="headerlink" title="点动作"></a>点动作</h2><p>点动作 <code>\{\{ . \}\}</code> 是最重要的一个动作，代表传递给模板的数据，其他的动作和函数基本都是对这个数据进行处理，以此来达到格式化和内容展示的目的。</p>
+<h2 id="点动作"><a href="#点动作" class="headerlink" title="点动作"></a>点动作</h2><p>点动作 <code>{ { . } }</code> 是最重要的一个动作，代表传递给模板的数据，其他的动作和函数基本都是对这个数据进行处理，以此来达到格式化和内容展示的目的。</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	s := <span class="hljs-string">"The user is &#123;&#123; . &#125;&#125;."</span><br>	t, err := template.New(<span class="hljs-string">"test"</span>).Parse(s)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Parse error:"</span>, err)<br>	&#125;<br><br>	u := User&#123;Name: <span class="hljs-string">"silverming"</span>, Age: <span class="hljs-number">18</span>&#125;<br>	err = t.Execute(os.Stdout, u)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(<span class="hljs-string">"Execute error:"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>运行后输出结果为：</p>
 <figure class="highlight routeros"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs routeros">The<span class="hljs-built_in"> user </span>is &#123;silverming 18&#125;.<br></code></pre></div></td></tr></table></figure>
 
-<p>实际上，<code>\{\{ . \}\}</code> 会被替换为传给给模板的数据的字符串表示。这个字符串与以数据为参数调用 <code>fmt.Sprint</code> 函数得到的内容相同，也就是使用结构体的 <code>String</code> 方法来进行输出，如果修改了 <code>String()</code> 方法，对应的输出也就跟着改变。</p>
+<p>实际上，<code>{ { . } }</code> 会被替换为传给给模板的数据的字符串表示。这个字符串与以数据为参数调用 <code>fmt.Sprint</code> 函数得到的内容相同，也就是使用结构体的 <code>String</code> 方法来进行输出，如果修改了 <code>String()</code> 方法，对应的输出也就跟着改变。</p>
 <h2 id="条件动作"><a href="#条件动作" class="headerlink" title="条件动作"></a>条件动作</h2><p>条件动作的形式如下：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; <span class="hljs-keyword">if</span>  pipeline &#125;&#125; T1 &#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -325,7 +325,7 @@
 <p>第一种方案是删除多余的空格和换行，<code>test</code> 文件修改为：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">Your age is: &#123;&#123; .Age &#125;&#125;<br>&#123;&#123; <span class="hljs-keyword">if</span> .GreaterThan60 &#125;&#125;Old People!&#123;&#123; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> .GreaterThan40 &#125;&#125;Middle Aged!&#123;&#123; <span class="hljs-keyword">else</span> &#125;&#125;Young!&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
 
-<p>这个方法会导致模板内容很难阅读，不够理想。为此，Go 提供了针对空白符的处理。如果一个动作以 <code>\{\{-</code>（注意有一个空格），那么该动作与它前面相邻的非空文本或动作间的空白符将会被全部删除。类似地，如果一个动作以<code>-\}\}</code> 结尾，那么该动作与它后面相邻的非空文本或动作间的空白符将会被全部删除。例如：</p>
+<p>这个方法会导致模板内容很难阅读，不够理想。为此，Go 提供了针对空白符的处理。如果一个动作以 <code>{ {-</code>（注意有一个空格），那么该动作与它前面相邻的非空文本或动作间的空白符将会被全部删除。类似地，如果一个动作以<code>-} }</code> 结尾，那么该动作与它后面相邻的非空文本或动作间的空白符将会被全部删除。例如：</p>
 <figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">&#123;&#123;<span class="hljs-number">23</span> -&#125;&#125; &lt; &#123;&#123;- <span class="hljs-number">45</span>&#125;&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>输出结果为：</p>
@@ -351,7 +351,7 @@
 <p>会得到如下的输出：</p>
 <figure class="highlight properties"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs properties"><span class="hljs-attr">Apple</span> <span class="hljs-string">Products:</span><br><br><span class="hljs-attr">iPhone</span>: <span class="hljs-string">￥5499</span><br><br><span class="hljs-attr">iPad</span>: <span class="hljs-string">￥6331</span><br><br><span class="hljs-attr">iWatch</span>: <span class="hljs-string">￥1499</span><br><br><span class="hljs-attr">MacBook</span>: <span class="hljs-string">￥8250</span><br></code></pre></div></td></tr></table></figure>
 
-<p>在 <code>range</code> 语句循环体内，<code>.</code> 被设置为当前遍历的元素，可以直接使用 <code>\{\{ .Name \}\}</code> 或 <code>\{\{ .Price \}\}</code> 访问产品名称和价格。在程序中，将 <code>nil</code> 传给 <code>Execute</code> 方法会得到下面的输出：</p>
+<p>在 <code>range</code> 语句循环体内，<code>.</code> 被设置为当前遍历的元素，可以直接使用 <code>{ { .Name } }</code> 或 <code>{ { .Price } }</code> 访问产品名称和价格。在程序中，将 <code>nil</code> 传给 <code>Execute</code> 方法会得到下面的输出：</p>
 <figure class="highlight erlang-repl"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs erlang-repl">Apple Products:<br><br>No Products!!!<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="设置动作"><a href="#设置动作" class="headerlink" title="设置动作"></a>设置动作</h2><p>设置动作使用 <code>with</code> 关键字重定义 <code>.</code>。在 <code>with</code> 语句内，<code>.</code> 会被定义为指定的值。一般用在结构嵌套很深时，能起到简化代码的作用。</p>
@@ -420,7 +420,7 @@
 <ul>
 <li>参数可以是任何类型；</li>
 <li>如果参数为指针，实现会根据需要取其基础类型；</li>
-<li>如果参数计算得到一个函数类型，它不会自动调用。例如 <code>\{\{ .Method1 \}\}</code>，如果 <code>Method1</code> 方法返回一个函数，那么返回值函数不会调用。如果要调用它，使用内置的 <code>call</code> 函数。</li>
+<li>如果参数计算得到一个函数类型，它不会自动调用。例如 <code>{ { .Method1 } }</code>，如果 <code>Method1</code> 方法返回一个函数，那么返回值函数不会调用。如果要调用它，使用内置的 <code>call</code> 函数。</li>
 </ul>
 <h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>管道也就是前面看到的 <code>pipeline</code>，管道的语法与 Linux 中的管道类似，即<strong>命令</strong>的链式序列：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; p1 | p2 | p3 &#125;&#125;<br></code></pre></div></td></tr></table></figure>
@@ -457,7 +457,7 @@
 <figure class="highlight stata"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs stata"><span class="hljs-keyword">range</span> <span class="hljs-variable">$index</span>, <span class="hljs-variable">$element</span> := <span class="hljs-keyword">range</span> pipeline<br></code></pre></div></td></tr></table></figure>
 
 <p>这样就可以在循环中通过<code>$index</code>和<code>$element</code>访问索引和元素了。</p>
-<p>变量的作用域持续到定义它的控制结构的<code>\{\{ end \}\}</code>动作。如果没有这样的控制结构，则持续到模板结束。模板调用不继承变量。</p>
+<p>变量的作用域持续到定义它的控制结构的<code>{ { end } }</code>动作。如果没有这样的控制结构，则持续到模板结束。模板调用不继承变量。</p>
 <p>执行开始时，<code>$</code> 被设置为传入的数据参数，即<code>.</code>的值。</p>
 <h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><p>Go 模板提供了大量的预定义函数，如果有特殊需求也可以实现自定义函数。模板执行时，遇到函数调用，先从模板自定义函数表中查找，而后查找全局函数表。</p>
 <h3 id="预定义函数"><a href="#预定义函数" class="headerlink" title="预定义函数"></a>预定义函数</h3><p>预定义函数分为以下几类：</p>
@@ -497,7 +497,7 @@
 <p>之所以会出现这种情况，跟模板的结构定义有关：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// src/text/template.go</span><br><span class="hljs-keyword">type</span> common <span class="hljs-keyword">struct</span> &#123;<br>	tmpl   <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]*Template <span class="hljs-comment">// Map from name to defined templates.</span><br>	option option<br>	muFuncs    sync.RWMutex <span class="hljs-comment">// protects parseFuncs and execFuncs</span><br>	parseFuncs FuncMap<br>	execFuncs  <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]reflect.Value<br>&#125;<br><br><span class="hljs-keyword">type</span> Template <span class="hljs-keyword">struct</span> &#123;<br>	name <span class="hljs-keyword">string</span><br>	*parse.Tree<br>	*common<br>	leftDelim  <span class="hljs-keyword">string</span><br>	rightDelim <span class="hljs-keyword">string</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
 
-<p>模板结构 <code>Template</code> 中有一个字段 <code>common</code>，<code>common</code> 中又有一个字段<code>tmpl</code>保存名字到模板的映射。其实，最外层的<code>Template</code>结构是<strong>主模板</strong>，我们调用<code>Execute</code>方法时执行的就是主模板。 <strong>执行<code>ParseFiles</code>方法时，每个文件都会生成一个模板。只有文件基础名与模板名相同时，该文件的内容才会解析到主模板中。这也是上面的程序执行失败的原因——主模板为空。</strong> 其它文件解析生成<strong>关联模板</strong>，存储在字段<code>tmpl</code>中。关联模板可以是在主模板中通过 <code>\{\{ define \}\}</code> 动作定义，或者在非主模板文件中定义。关联模板也可以执行，但是需要使用<code>ExecuteTemplate</code>方法，显式传入模板名：</p>
+<p>模板结构 <code>Template</code> 中有一个字段 <code>common</code>，<code>common</code> 中又有一个字段<code>tmpl</code>保存名字到模板的映射。其实，最外层的<code>Template</code>结构是<strong>主模板</strong>，我们调用<code>Execute</code>方法时执行的就是主模板。 <strong>执行<code>ParseFiles</code>方法时，每个文件都会生成一个模板。只有文件基础名与模板名相同时，该文件的内容才会解析到主模板中。这也是上面的程序执行失败的原因——主模板为空。</strong> 其它文件解析生成<strong>关联模板</strong>，存储在字段<code>tmpl</code>中。关联模板可以是在主模板中通过 <code>{ { define } }</code> 动作定义，或者在非主模板文件中定义。关联模板也可以执行，但是需要使用<code>ExecuteTemplate</code>方法，显式传入模板名：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br>    t := template.New(<span class="hljs-string">"test"</span>)<br>    t, err := t.ParseFiles(<span class="hljs-string">"test1"</span>)<br>    <br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    	log.Fatal(<span class="hljs-string">"in associatedTemplate Parse error:"</span>, err)<br>    &#125;<br>    <br>    err = t.ExecuteTemplate(os.Stdout, <span class="hljs-string">"test1"</span>, <span class="hljs-literal">nil</span>)<br>    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    	log.Fatal(<span class="hljs-string">"in associatedTemplate Execute error:"</span>, err)<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <h2 id="第二种方法"><a href="#第二种方法" class="headerlink" title="第二种方法"></a>第二种方法</h2><p>第二种方式将创建和解析两步合并在一起了。<code>template.ParseFiles</code>方法将传入的第一个文件名作为模板名称，其余的文件（如果有的话）解析后存放在<code>tmpl</code>中：</p>
@@ -524,7 +524,7 @@
 <figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp">In glob <span class="hljs-keyword">template</span> file1.<br>In glob <span class="hljs-keyword">template</span> file1.<br>In glob <span class="hljs-keyword">template</span> file2.<br>In glob <span class="hljs-keyword">template</span> file3.<br></code></pre></div></td></tr></table></figure>
 
 <p>注意，<strong>如果多个不同路径下的文件名相同，那么后解析的会覆盖之前的。</strong></p>
-<h1 id="嵌套模板"><a href="#嵌套模板" class="headerlink" title="嵌套模板"></a>嵌套模板</h1><p>在一个模板文件中还可以通过 <code>\{\{ define \}\}</code> 动作定义其它的模板，这些模板就是<strong>嵌套模板</strong>。模板定义必须在模板内容的最顶层，像 Go 程序中的全局变量一样。</p>
+<h1 id="嵌套模板"><a href="#嵌套模板" class="headerlink" title="嵌套模板"></a>嵌套模板</h1><p>在一个模板文件中还可以通过 <code>{ { define } }</code> 动作定义其它的模板，这些模板就是<strong>嵌套模板</strong>。模板定义必须在模板内容的最顶层，像 Go 程序中的全局变量一样。</p>
 <p>嵌套模板一般用于<strong>布局（layout）</strong>。很多文本的结构其实非常固定，例如邮件有标题和正文，网页有首部、正文和尾部等。 我们可以为这些固定结构的每部分定义一个模板。</p>
 <p>定义模板文件 <code>layout.tmpl</code>：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">&#123;&#123; define <span class="hljs-string">"layout"</span> &#125;&#125;<br>This is body.<br>&#123;&#123; template <span class="hljs-string">"content"</span> . &#125;&#125;<br>&#123;&#123; end &#125;&#125;<br><br>&#123;&#123; define <span class="hljs-string">"content"</span> &#125;&#125;<br>This is &#123;&#123; . &#125;&#125; content.<br>&#123;&#123; end &#125;&#125;<br></code></pre></div></td></tr></table></figure>
