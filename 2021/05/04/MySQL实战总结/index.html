@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
@@ -184,7 +184,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      53.5k 字
+      56.7k 字
     </span>
   
 
@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      605
+      639
        分钟
     </span>
   
@@ -236,7 +236,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年8月28日 下午
+                  本文最后更新于：2021年9月13日 晚上
                 
               </p>
             
@@ -1850,6 +1850,93 @@
 <li>对于耗时敏感的核心业务，推荐使用最终一致的业务层柔性事务，数据库层的 2PC 分布式事务耗时较大，性能较为一般，但是 2PC 使用简单，能满足大部分业务的使用。</li>
 <li>一定要利用好分布式数据库架构的特点，设计多活架构，每个机房都可以有写入流量，提升资源使用率和业务连续性，请 DBA 和业务方一起做好全链路的架构设计。</li>
 </ol>
+<h2 id="删除生产环境中的大表"><a href="#删除生产环境中的大表" class="headerlink" title="删除生产环境中的大表"></a>删除生产环境中的大表</h2><p>引起 MySQL 数据库性能抖动的原因有很多，比如大事务、定时批量查询等，而这些原因一般都会注意到。但是，有一个引起性能抖动的原因却经常被忽视，那就是在生产环境删除无用的大表，即 DROP TABLE。</p>
+<p>生产环境中，为什么要 DROP TABLE？绝大部分原因是为了释放空间。</p>
+<p>生产环境大多数是已经确定的库表，一般不会进行 DROP TABLE 这么重的操作，甚至大部分DBA 都不应该拥有 DROP 权限。</p>
+<p>但是随着数据无限增长，在某些系统中，需要将数据归档到历史数据库，删除生产数据库中的表，从而释放存储空间，典型的就是偏日志、流水类的数据。</p>
+<p>不过，当谈一个数据库多大的时候，单纯讨论存储容量意义并不大，我们更希望得到的是活跃记录有多少。</p>
+<p>银行系统的 Oracle 数据库，虽然单库都可以数 T，但大部分都是日志数据或流水数据。</p>
+<p>生产环境的流水表，单表容量可能几百 G，上 T，怎样在不影响业务的情况下，优雅地 DROP TABLE 呢（这里优雅的定义为业务耗时上升不超过20%）？</p>
+<h3 id="BP-互斥锁"><a href="#BP-互斥锁" class="headerlink" title="BP 互斥锁"></a>BP 互斥锁</h3><p>在 MySQL 5.5.23 版本前，当删除一张表时，会去遍历 BP（Buffer Pool 缓冲池）中所有该表对应的页，这时需要持有 BP 的互斥锁，而这是一把巨大的锁，对于 BP 的访问都需要持有该锁才能继续。</p>
+<p>随着硬件的发展，128G、256G 的内存都已是常态，若 BP 非常大，如 100G，则遍历 BP 所需要的时间就会非常长，可能是 5 秒，甚至更长。这时，业务对于数据库的请求会直接掉底，直接变为 0。显然，这不符合我们对于优雅的定义。</p>
+<p>MySQL 5.5.23 版本开始，做了两点优化：</p>
+<ol>
+<li><p>遍历脏页列表（flush list）时，只持有一小段时间，之后就释放 BP 的大锁，并且不需要真正刷新脏页，这样的处理能让其他业务请求有机会获得大锁的可能，从而业务的请求不会掉底；</p>
+</li>
+<li><p>不处理 LRU 列表中干净的页。因为 LRU 中不使用的页会慢慢被淘汰，因此删除表，不用同步地去处理对应的页，可以通过 LRU 机制，异步最终淘汰机制。</p>
+</li>
+</ol>
+<p>MySQL 5.6 版本支持了多个 BP 拆分，5.7 版本支持多个脏页列表，因此对于上述 DROP TABLE 的处理，又得到进一步优化，即持有大锁的时间越来越少，对业务的影响也就越来越少。</p>
+<h3 id="IO优化"><a href="#IO优化" class="headerlink" title="IO优化"></a>IO优化</h3><p>上面的这些优化是针对内存中的锁进行优化，在 DROP TABLE 的过程中，让持有的大锁尽可能的时间缩短，从而避免 QPS 掉底的问题。</p>
+<p>然而，想要对业务操作的耗时响应时间控制在 20%，还需要考虑物理 I/O 的影响。</p>
+<p>例如，删除一张 100G 的表，意味着要删除 100G 的物理文件，在删除过程中，I/O 的开销也将会是非常巨大，从而影响业务的耗时。</p>
+<p>常见优化的思想是在 DROP TABLE 前，对 ibd 文件创建硬链接，这样在 DROP TABLE 时，只会删除 ibd 链接，不会真正删除 ibd 文件，也就不会释放空间。</p>
+<p>这样 DROP TABLE 的操作速度就能得到进一步提升。不过，这时存储空间并没有第一时间释放，还是需要选择低峰期删除文件，方能最终释放存储空间。</p>
+<p>但同样的问题，虽然异步删除物理文件，但又如何做到最业务的耗时影响最小呢？这时，可以考虑使用 ionice 这个工具，选择在业务低峰期进行 ibd 文件的删除，如：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">ionice -c <span class="hljs-number">2</span> -n <span class="hljs-number">6</span> rm xxx.ibd<br></code></pre></div></td></tr></table></figure>
+
+<h3 id="自适应哈希功能"><a href="#自适应哈希功能" class="headerlink" title="自适应哈希功能"></a>自适应哈希功能</h3><p>自适应哈希（Adaptive Hash Index，下简称AHI）特性作为一个几乎透明的功能，其实一般用户无需关心，基本可以认为 AHI 是即开即用的功能。</p>
+<p>默认 AHI 参数的设置也是比较合理的，例如参数 <code>innodb_adaptive_hash_index_parts</code> 设置为 8 。然而，AHI 存在一个副作用：当删除大表，且缓冲池（Buffer Pool，下简称 BP）比较大，如超过 32G，则 MySQL 数据库可能会有短暂被 hang 住的情况发生。</p>
+<p>这时会对业务线程造成一定影响，从而导致业务系统的抖动。</p>
+<p>产生这个问题的原因是在删除表的时候，InnoDB 存储引擎会将该表在 BP 中的内存都淘汰掉，释放可用空间。这其中包括数据页、索引页、自适应哈希页等。</p>
+<p>当 BP 比较大时，扫描 BP 中 flush_list 链表需要比较长的时间，因此会产生系统的抖动。</p>
+<p>所以在海量的互联网并发业务中，删除表操作需要做精细的逻辑控制，如：</p>
+<ul>
+<li><p>业务低峰期删除大表；</p>
+</li>
+<li><p>删除表前禁用 AHI 功能；</p>
+</li>
+<li><p>控制脏页链表长度，只有长度小于一定阈值，才发起删除操作；</p>
+</li>
+<li><p>删除表后启用 AHI 功能。</p>
+</li>
+</ul>
+<p>不过，这么麻烦的处理在 MySQL 8.0.23 版本之后，就都不再需要了。因为官方已经彻底修复了这个问题。</p>
+<h3 id="终极删除优化"><a href="#终极删除优化" class="headerlink" title="终极删除优化"></a>终极删除优化</h3><p>除了前面的这些对于版本的选择、I/O 的优化、自适应哈希算法的调整，还可以有进一步减小删除大表时发生抖动的可能性。</p>
+<p>当前 MySQL 数据库对于删除时内存的控制已经做的很好了，接下去的问题在于还需要进行 I/O操作，从磁盘上删除操作。ionice 等命令依然有 I/O 开销，性能抖动依然不可避免。</p>
+<p>如果根据第一性原理，那是不是可以实现不删除表文件，也能释放存储空间呢？为什么要这么辛苦地去释放空间？只需要把原来的物理存储空间给新表使用不就好了吗？</p>
+<p>是的，很多人会想到系统共享表空间（System Tablespace），每张表的表空间都存放到系统的系统共享表空间 ibdata1中，这样删除操作就不需要删除物理空间，而释放的空间可以给到其他表使用。</p>
+<p>推荐在初始化时，就完成 ibdata1 的空间分配，即固定单个 MySQL 实例能使用到存储空间上限。这样可以省去后续磁盘空间的申请释放，进一步提升在业务高峰期，数据库耗时的平稳性。</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">innodb_file_per_table</span> = <span class="hljs-number">0</span><br><span class="hljs-attr">innodb_data_file_path</span>=ibdata1:<span class="hljs-number">500</span>G<br></code></pre></div></td></tr></table></figure>
+
+<p>有可能觉得这样不够灵活，因为用户可能只想日志表、流水表等数据放在一个表空间中，这样 DROP TABLE 时不需要删除物理空间。</p>
+<p>这样的话，可以使用 MySQL 中的通用表空间（General Tablespace）：</p>
+<figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLESPACE</span> <span class="hljs-string">`ts_log`</span> <span class="hljs-keyword">ADD</span> <span class="hljs-keyword">DATAFILE</span> <span class="hljs-string">'ts_log.ibd'</span><br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> log_2020_01 ( ... ) <span class="hljs-keyword">tablespace</span> = ts_log;<br><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> log_2020_02 ( ... ) <span class="hljs-keyword">tablespace</span> = ts_log;<br></code></pre></div></td></tr></table></figure>
+
+<p>这样一来，在生产系统上，通过将表存储在共享表空间文件中，这时删除表只是将存储空间释放，并不删除表空间文件本身。</p>
+<h2 id="数据库系统迁移"><a href="#数据库系统迁移" class="headerlink" title="数据库系统迁移"></a>数据库系统迁移</h2><h3 id="历史数据库"><a href="#历史数据库" class="headerlink" title="历史数据库"></a>历史数据库</h3><p>对于海量的互联网业务来说，数据量是非常巨大的。</p>
+<p>假设一天 10 亿笔交易，每笔交易至少需要有一条记录，用于记录该笔交易，这就是通常所谓的流水数据。再假设一笔流水占用 1K 存储空间，那么每日流水占用存储空间 1000G，365 天就需要占用 365T 的存储空间。</p>
+<p>即便做了分布式数据库架构，有 1000 个分片，每个分片 1 年的流水数据就需要 365G，这还不包括其他数据，仅仅只是一笔交易的流水。而线上的库表和业务就更为复杂了。</p>
+<p>有同学或许会说，为什么要存储 1 年以上的数据呢？超过一定期限删除不就可以了吗？想一想，历史微博是不是都是能看的？淘宝历史交易也都是能查询的？对于金融业务来说，每笔历史交易是不是也都可以可以回溯的？</p>
+<p>所以，即便是历史的数据，也要求是可以查询的。所以，对于海量的互联网业务来说，除了线上的数据库，还需要有一套对应的历史数据库，用于查询历史的数据。</p>
+<p>注意，这里谈论的历史数据库，不是用于数据分析的系统，而仅仅是一个历史查询数据库。</p>
+<h3 id="历史数据库架构"><a href="#历史数据库架构" class="headerlink" title="历史数据库架构"></a>历史数据库架构</h3><p>从架构角度看，线上数据库系统与历史数据库系统的架构如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E6%95%99%E8%82%B2%E5%8E%86%E5%8F%B2%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9E%B6%E6%9E%84.png" alt="拉勾教育历史数据库架构"></p>
+<p>可以看到，业务会将最新的数据变更插入在线的 MySQL 数据库，但 MySQL 数据库仅保留最近半年的数据，超过半年的数据会存放在历史数据库系统中。对于历史数据库的选型来说，一般可以是（分布式）MySQL 数据库、HBase、ElasticSearch。</p>
+<p>历史数据库是 MySQL，那么基本和线上架构一致，只是存储的容量会更大。但缺点是，即便使用分布式架构，数据节点的扩容需要搬迁数据，这部分工作相对比较麻烦一些。</p>
+<p>HBase 是 Hadoop 生态的大数据系统，是一个 KV 系统，非常适合进行点查询，其对于数据的扩容也是非常容易。但是它的缺点是不支持事务，没有二级索引，所以在使用时会有诸多限制，比如二级索引需要自己创建索引表，索引表和主表的数据一致性有可能会存在问题。ElasticSearch 是文档数据库，其他特性与 HBase 类似，支持数据节点动态的扩缩容，查询支持也更为丰富一些。</p>
+<p>历史数据库的选型需要结合业务具体分析，通常个人更倾向于使用 ElasticSearch，简单易用。</p>
+<p>但是，如何将线上的数据迁移到历史数据库呢？这时就需要迁移系统了。</p>
+<h3 id="迁移系统"><a href="#迁移系统" class="headerlink" title="迁移系统"></a>迁移系统</h3><p>简单来说，迁移系统需要做以下两件事情：</p>
+<ul>
+<li>将线上数据尽可能地准实时同步到历史数据；</li>
+<li>清理线上数据库系统，仅保留最近一段时间的数据，如半年的数据。</li>
+</ul>
+<p>这时，整体的数据库系统架构如下图所示：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%8B%89%E5%8B%BE%E6%95%99%E8%82%B2%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB%E7%B3%BB%E7%BB%9F.png" alt="拉勾教育数据库迁移系统"></p>
+<p>上图中，DTS 是 Data Transfer Service，数据迁移服务，负责将在线数据准实时地同步到历史数据库。</p>
+<p>DTS 的实现原理是<strong>订阅 MySQL 的二进制日志变化</strong>，将数据库的变更同步到历史数据库。虽然原理并不复杂，但是由于是异构数据库系统，在数据消费这里还需要做不少的工作。此外，要做到准实时要求，如仅 30 秒内的延迟，对于 DTS 也是一种考验。</p>
+<p>业界的 DTS 有 Maxwell、Canal。但通常这些 DTS 仅负责订阅二进制日志，消费需要用户自己实现存储到不同的数据库。</p>
+<p>DAS 是 Data Archive Service，数据归档服务，负责清理超过一定时间的线上数据，同时需要确保清理的数据都已经在历史数据库中。所以，DAS 又需要做两件事情：</p>
+<ol>
+<li><p>获取超过某个阈值的数据，确保这些数据都已经在历史数据库中；</p>
+</li>
+<li><p>根据调度，在非业务高峰期，从 MySQL 数据库中删除超过某个阈值的数据。</p>
+</li>
+</ol>
+<p>由于在前面的库表结构设计中，要求每张业务核心表都要有一个最后修改时间的字段，因此那些数据已经超过某一时间点，如半年，是比较容易知道的。然后，再进行线上数据与历史数据库的核对即可。</p>
+<p>第二个步骤会真实删除线上数据库中的数据，风险较高，但通过多次数据校验和逻辑判断，DAS 可以确保删除数据的正确性，从而正确删除超过阈值的数据。</p>
+<p>同时，为了不影响删除时对于业务的影响，DAS 还需要做调度，删除是小批量的，并且是在非业务高峰期执行的操作。</p>
 <h1 id="MySQL-修改列为-auto-increment-时存在的问题"><a href="#MySQL-修改列为-auto-increment-时存在的问题" class="headerlink" title="MySQL 修改列为 auto_increment 时存在的问题"></a>MySQL 修改列为 auto_increment 时存在的问题</h1><p>在这里再多描述一个作者在 MySQL 官方提交的一个 bug，详细地址如下：<a href="https://bugs.mysql.com/bug.php?id=103784" target="_blank" rel="noopener">column value seems to be wrong when modifying column to auto_increment</a></p>
 <p>该 bug 里描述了在 MySQL 中，当对一个列的属性进行修改了，如果原来的列已经具备了 <code>auto_increment</code> 属性，且原来的列中留有 0 值，则修改后会保留 0 值。但是，如果把一个非 <code>auto_increment</code> 的列修改成 <code>auto_increment</code>，则该过程会将原列的 0 值修改成 1：</p>
 <figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">mysql&gt; create table x ( a bigint primary key );<br>Query OK, 0 rows affected (0.50 sec)<br><br>mysql&gt; insert into x values (-1),(0),(2);<br>Query OK, 3 rows affected (0.15 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  0 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br><br>mysql&gt; ALTER TABLE x MODIFY COLUMN a bigint auto_increment;<br>Query OK, 3 rows affected (2.16 sec)<br>Records: 3  Duplicates: 0  Warnings: 0<br><br>mysql&gt; select * from x;<br>+----+<br>| a  |<br>+----+<br>| -1 |<br>|  1 |<br>|  2 |<br>+----+<br>3 rows in set (0.00 sec)<br></code></pre></div></td></tr></table></figure>
@@ -2191,20 +2278,5 @@
 <script  src="/js/boot.js" ></script>
 
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
