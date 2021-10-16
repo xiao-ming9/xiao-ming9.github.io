@@ -183,7 +183,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      19.8k 字
+      20.1k 字
     </span>
   
 
@@ -193,7 +193,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      264
+      268
        分钟
     </span>
   
@@ -235,7 +235,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年12月24日 下午
+                  本文最后更新于：2021年10月16日 中午
                 
               </p>
             
@@ -894,6 +894,23 @@
 <p><img src="http://qiniu.xiaoming.net.cn/%E5%89%91%E6%8C%87offer12%E9%A2%98%E7%9F%A9%E9%98%B5%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84.png" alt="剑指offer12题矩阵中的路径"></p>
 <p><img src="http://qiniu.xiaoming.net.cn/%E5%89%91%E6%8C%87offer12%E9%A2%98%E7%9F%A9%E9%98%B5%E4%B8%AD%E7%9A%84%E8%B7%AF%E5%BE%84%E5%9B%9E%E6%BA%AF.png" alt="剑指offer12题矩阵中的路径回溯"></p>
 <h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">WordSearchInMatrix</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">exist</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[][] board, String word)</span> </span>&#123;<br>        <span class="hljs-keyword">char</span>[] words = word.toCharArray();<br>        <span class="hljs-comment">// 这里遍历了任意开始的位置</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; board.length; i++) &#123;<br>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> j = <span class="hljs-number">0</span>; j &lt; board[<span class="hljs-number">0</span>].length; j++) &#123;<br>                <span class="hljs-keyword">if</span> (bfs(board, words, i, j, <span class="hljs-number">0</span>)) &#123;<br>                    <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">bfs</span><span class="hljs-params">(<span class="hljs-keyword">char</span>[][] board, <span class="hljs-keyword">char</span>[] words, <span class="hljs-keyword">int</span> i, <span class="hljs-keyword">int</span> j, <span class="hljs-keyword">int</span> k)</span> </span>&#123;<br>        <span class="hljs-comment">//判断下标是否越界，值是否相等</span><br>        <span class="hljs-keyword">if</span> (i &lt; <span class="hljs-number">0</span> || i &gt;= board.length || j &lt; <span class="hljs-number">0</span> || j &gt;= board[<span class="hljs-number">0</span>].length<br>                || board[i][j] != words[k]) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (k == words.length - <span class="hljs-number">1</span>) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>        &#125;<br>        <span class="hljs-keyword">char</span> temp = board[i][j];<br>        board[i][j] = <span class="hljs-string">'/'</span>;<br>        <span class="hljs-comment">//深度递归遍历（顺序为下、上、右、左）</span><br>        <span class="hljs-keyword">boolean</span> res = bfs(board, words, i + <span class="hljs-number">1</span>, j, k + <span class="hljs-number">1</span>) || bfs(board, words, i - <span class="hljs-number">1</span>, j, k + <span class="hljs-number">1</span>)<br>                || bfs(board, words, i, j + <span class="hljs-number">1</span>, k + <span class="hljs-number">1</span>) || bfs(board, words, i, j - <span class="hljs-number">1</span>, k + <span class="hljs-number">1</span>);<br>        board[i][j] = temp;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h1 id="46-Z-字形变换"><a href="#46-Z-字形变换" class="headerlink" title="46. Z 字形变换"></a>46. Z 字形变换</h1><blockquote>
+<p>leetcodee 第六题</p>
+</blockquote>
+<p>将一个给定字符串 s ，根据给定的行数 numRows ，以从上往下、从左到右进行 Z 字形排列。</p>
+<p>比如输入字符串为 “PAYPALISHIRING” 行数为 3 时，排列如下：(И字型)</p>
+<figure class="highlight tp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs tp"><span class="hljs-keyword">P</span>   A   H   N <br>A <span class="hljs-keyword">P</span> L S I I G<br><span class="hljs-keyword">Y</span>   I   <span class="hljs-keyword">R</span><br></code></pre></div></td></tr></table></figure>
+
+
+<p>之后，输出需要从左往右逐行读取，产生出一个新的字符串，比如：”PAHNAPLSIIGYIR”。</p>
+<h2 id="解题思路-1"><a href="#解题思路-1" class="headerlink" title="解题思路"></a>解题思路</h2><p>解题的思路关键在于想到这种方式：首先构造一个长度为 numRows 的数组，在数组中来回移动放入字符串的值，这样就满足了题目要求了。</p>
+<h2 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h2><blockquote>
+<p>从这道题开始，因为工作需要，改用 go 实现代码了。</p>
+</blockquote>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"strings"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">convert</span><span class="hljs-params">(s <span class="hljs-keyword">string</span>, numRows <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">string</span></span> &#123;<br>	<span class="hljs-comment">// 行数大直接返回整个字符串</span><br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(s) &lt;= numRows &#123;<br>		<span class="hljs-keyword">return</span> s<br>	&#125;<br>	<span class="hljs-comment">// 1. 初始化一个Builder数组</span><br>	resultArray := <span class="hljs-built_in">make</span>([]strings.Builder, numRows)<br>	<span class="hljs-comment">// 2. 指针在数组上来回移动赋值</span><br>	curPoint := <span class="hljs-number">0</span><br>	backPoint := <span class="hljs-literal">false</span><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> s &#123;<br>		resultArray[curPoint].WriteByte(s[i])<br>		<span class="hljs-comment">// 3. 到边界时反转</span><br>		<span class="hljs-keyword">if</span> curPoint == <span class="hljs-number">0</span> || curPoint == numRows<span class="hljs-number">-1</span> &#123;<br>			backPoint = !backPoint<br>		&#125;<br><br>		<span class="hljs-comment">// 当前所在的数组格子</span><br>		<span class="hljs-keyword">if</span> backPoint &#123;<br>			curPoint += <span class="hljs-number">1</span><br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			curPoint -= <span class="hljs-number">1</span><br>		&#125;<br>	&#125;<br><br>	result := strings.Builder&#123;&#125;<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> resultArray &#123;<br>		result.WriteString(resultArray[i].String())<br>	&#125;<br>	<span class="hljs-keyword">return</span> result.String()<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+
 
 
 

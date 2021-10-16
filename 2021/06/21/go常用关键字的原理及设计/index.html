@@ -183,7 +183,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      5.8k 字
+      6.7k 字
     </span>
   
 
@@ -193,7 +193,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      69
+      81
        分钟
     </span>
   
@@ -235,7 +235,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年7月17日 上午
+                  本文最后更新于：2021年10月16日 中午
                 
               </p>
             
@@ -421,6 +421,81 @@
 <li>函数的 <code>defer</code> 关键字不能在循环中执行；</li>
 <li>函数的 <code>return</code> 语句与 <code>defer</code> 语句的乘积小于或者等于 15 个；</li>
 </ol>
+<h1 id="make-和-new"><a href="#make-和-new" class="headerlink" title="make 和 new"></a>make 和 new</h1><p><code>make</code> 的作用是初始化内置的数据结构，也就是切片、哈希表和 Channel</p>
+<p>在代码中往往都会使用如下所示的语句初始化这三类基本类型，这三个语句分别返回了不同类型的数据结构：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">slice := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">100</span>)<br>hash := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">bool</span>, <span class="hljs-number">10</span>)<br>ch := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>, <span class="hljs-number">5</span>)<br></code></pre></div></td></tr></table></figure>
+
+<ol>
+<li><code>slice</code> 是一个包含 <code>data</code>、<code>cap</code> 和 <code>len</code> 的结构体 <code>reflect.SliceHeader</code></li>
+<li><code>hash</code> 是一个指向 <code>runtime.hmap</code> 结构体的指针；</li>
+<li><code>ch</code> 是一个指向 <code>runtime.hchan</code> 结构体的指针；</li>
+</ol>
+<p><code>new</code> 的作用是根据传入的类型分配一片内存空间并返回指向这片内存空间的指针</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">i := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">int</span>)<br><br><span class="hljs-keyword">var</span> v <span class="hljs-keyword">int</span><br>i := &amp;v<br></code></pre></div></td></tr></table></figure>
+
+<p>上述代码片段中的两种不同初始化方法是等价的，它们都会创建一个指向 <code>int</code> 零值的指针。</p>
+<h2 id="make-实现"><a href="#make-实现" class="headerlink" title="make 实现"></a>make 实现</h2><p>make 的实现在<a href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">go 常用基本类型源码设计分析</a>中已经分析过了，具体总结如下：在编译期间的类型检查阶段，Go 语言会将代表 <code>make</code> 关键字的 <code>OMAKE</code> 节点根据参数类型的不同转换成了 <code>OMAKESLICE</code>、<code>OMAKEMAP</code> 和 <code>OMAKECHAN</code> 三种不同类型的节点，这些节点会调用不同的运行时函数来初始化相应的数据结构。</p>
+<h2 id="new-实现"><a href="#new-实现" class="headerlink" title="new 实现"></a>new 实现</h2><p>编译器会在中间代码生成阶段通过以下两个函数处理该关键字：</p>
+<ol>
+<li><p><code>cmd/compile/internal/gc.callnew</code> 会将关键字转换成 <code>ONEWOBJ</code> 类型的节点；</p>
+</li>
+<li><p><code>cmd/compile/internal/gc.state.expr</code> 会根据申请空间的大小分两种情况处理：</p>
+<ul>
+<li><p>如果申请的空间为 0，就会返回一个表示空指针的 <code>zerobase</code> 变量；</p>
+</li>
+<li><p>在遇到其他情况时会将关键字转换成 <code>runtime.newobject</code> 函数：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">callnew</span><span class="hljs-params">(t *types.Type)</span> *<span class="hljs-title">Node</span></span> &#123;<br>	...<br>	n := nod(ONEWOBJ, typename(t), <span class="hljs-literal">nil</span>)<br>	...<br>	<span class="hljs-keyword">return</span> n<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(s *state)</span> <span class="hljs-title">expr</span><span class="hljs-params">(n *Node)</span> *<span class="hljs-title">ssa</span>.<span class="hljs-title">Value</span></span> &#123;<br>	<span class="hljs-keyword">switch</span> n.Op &#123;<br>	<span class="hljs-keyword">case</span> ONEWOBJ:<br>		<span class="hljs-keyword">if</span> n.Type.Elem().Size() == <span class="hljs-number">0</span> &#123;<br>			<span class="hljs-keyword">return</span> s.newValue1A(ssa.OpAddr, n.Type, zerobaseSym, s.sb)<br>		&#125;<br>		typ := s.expr(n.Left)<br>		vv := s.rtcall(newobject, <span class="hljs-literal">true</span>, []*types.Type&#123;n.Type&#125;, typ)<br>		<span class="hljs-keyword">return</span> vv[<span class="hljs-number">0</span>]<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ol>
+<p>需要注意的是，无论是直接使用 <code>new</code>，还是使用 <code>var</code> 初始化变量，它们在编译器看来都是 <code>ONEW</code> 和 <code>ODCL</code> 节点。如果变量会逃逸到堆上，这些节点在这一阶段都会被 <code>cmd/compile/internal/gc.walkstmt</code> 转换成通过 <code>runtime.newobject</code> 函数并在堆上申请内存。不过这也不是绝对的，如果通过 <code>var</code> 或者 <code>new</code> 创建的变量不需要在当前作用域外生存，例如不用作为返回值返回给调用方，那么就不需要初始化在堆上。</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">walkstmt</span><span class="hljs-params">(n *Node)</span> *<span class="hljs-title">Node</span></span> &#123;<br>	<span class="hljs-keyword">switch</span> n.Op &#123;<br>	<span class="hljs-keyword">case</span> ODCL:<br>		v := n.Left<br>		<span class="hljs-keyword">if</span> v.Class() == PAUTOHEAP &#123;<br>			<span class="hljs-keyword">if</span> prealloc[v] == <span class="hljs-literal">nil</span> &#123;<br>				prealloc[v] = callnew(v.Type)<br>			&#125;<br>			nn := nod(OAS, v.Name.Param.Heapaddr, prealloc[v])<br>			nn.SetColas(<span class="hljs-literal">true</span>)<br>			nn = typecheck(nn, ctxStmt)<br>			<span class="hljs-keyword">return</span> walkstmt(nn)<br>		&#125;<br>	<span class="hljs-keyword">case</span> ONEW:<br>    <span class="hljs-comment">// 如果没有逃逸，直接在栈上分配内存</span><br>		<span class="hljs-keyword">if</span> n.Esc == EscNone &#123;<br>			r := temp(n.Type.Elem())<br>			r = nod(OAS, r, <span class="hljs-literal">nil</span>)<br>			r = typecheck(r, ctxStmt)<br>			init.Append(r)<br>			r = nod(OADDR, r.Left, <span class="hljs-literal">nil</span>)<br>			r = typecheck(r, ctxExpr)<br>			n = r<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>      <span class="hljs-comment">// 逃逸了就在堆上分配内存</span><br>			n = callnew(n.Type.Elem())<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><code>runtime.newobject</code> 函数会获取传入类型占用空间的大小，调用 <code>runtime.mallocgc</code> 在堆上申请一片内存空间并返回指向这片内存空间的指针：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newobject</span><span class="hljs-params">(typ *_type)</span> <span class="hljs-title">unsafe</span>.<span class="hljs-title">Pointer</span></span> &#123;<br>	<span class="hljs-keyword">return</span> mallocgc(typ.size, typ, <span class="hljs-literal">true</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <p><strong>参考文章</strong></p>
 <blockquote>
 <p><a href="https://mp.weixin.qq.com/s/-kV1nvWvYonGkXhdv3iNWg" target="_blank" rel="noopener">Go 语言 for 和 range 的实现</a></p>
