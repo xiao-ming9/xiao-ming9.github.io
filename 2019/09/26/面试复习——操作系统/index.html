@@ -187,7 +187,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      55.4k 字
+      57.3k 字
     </span>
   
 
@@ -197,7 +197,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      591
+      612
        分钟
     </span>
   
@@ -239,7 +239,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年4月30日 下午
+                  本文最后更新于：2021年10月17日 晚上
                 
               </p>
             
@@ -1730,10 +1730,55 @@
 <figure class="highlight reasonml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs reasonml"><span class="hljs-built_in">int</span> epoll<span class="hljs-constructor">_create(<span class="hljs-params">int</span> <span class="hljs-params">size</span>)</span>;<br><span class="hljs-built_in">int</span> epoll<span class="hljs-constructor">_ctl(<span class="hljs-params">int</span> <span class="hljs-params">epfd</span>, <span class="hljs-params">int</span> <span class="hljs-params">op</span>, <span class="hljs-params">int</span> <span class="hljs-params">fd</span>, <span class="hljs-params">struct</span> <span class="hljs-params">epoll_event</span> <span class="hljs-operator">*</span><span class="hljs-params">event</span>)</span>；<br><span class="hljs-built_in">int</span> epoll<span class="hljs-constructor">_wait(<span class="hljs-params">int</span> <span class="hljs-params">epfd</span>, <span class="hljs-params">struct</span> <span class="hljs-params">epoll_event</span> <span class="hljs-operator">*</span> <span class="hljs-params">events</span>, <span class="hljs-params">int</span> <span class="hljs-params">maxevents</span>, <span class="hljs-params">int</span> <span class="hljs-params">timeout</span>)</span>;<br><br><span class="hljs-comment">// epoll_wait检查是否有事件发生时，只需要检查 eventpoll 对象中的 rdlist 双链表中是否有 epitem 元素即可</span><br><span class="hljs-keyword">struct</span> eventpoll &#123;<br>    <span class="hljs-comment">/*红黑树的根节点，这颗树中存储着所有添加到epoll中的需要监控的事件*/</span><br>    <span class="hljs-keyword">struct</span> rb_root  rbr;<br>    <span class="hljs-comment">/*双链表中则存放着将要通过epoll_wait返回给用户的满足条件的事件*/</span><br>    <span class="hljs-keyword">struct</span> list_head rdlist;<br>&#125;;<br></code></pre></div></td></tr></table></figure>
 
 <ul>
-<li><code>epoll_create</code> 是创建一个 <code>epoll</code>句柄；</li>
-<li><code>epoll_ctl</code>是注册要监听的事件类型,用于向内核注册新的描述符或者是改变某个文件描述符的状态；</li>
-<li><code>epoll_wait</code>则是等待事件的产生,已注册的描述符在内核中会被维护在一棵红黑树上，通过回调函数内核会将 I/O 准备好的描述符加入到一个链表中管理，进程调用<code>epoll_wait()</code>便可以得到事件完成的描述符。</li>
+<li><code>epoll_create</code> 是创建一个 <code>epoll</code>句柄，也就是负责创建一个监控和管理句柄 fd 的池子；</li>
+<li><code>epoll_ctl</code>是注册要监听的事件类型,用于向内核注册新的描述符或者是改变某个文件描述符的状态，也就是负责管理这个池子里的 fd 增、删、改；</li>
+<li><code>epoll_wait</code>则是等待事件的产生,已注册的描述符在内核中会被维护在一棵红黑树上，通过回调函数内核会将 I/O 准备好的描述符加入到一个链表中管理，进程调用<code>epoll_wait()</code>便可以得到事件完成的描述符，让出 CPU 调度，但是只要有“事”，立马会从这里唤醒。</li>
 </ul>
+<h5 id="epoll-高效的原因"><a href="#epoll-高效的原因" class="headerlink" title="epoll 高效的原因"></a>epoll 高效的原因</h5><p><strong>一： 通过红黑树实现句柄快速，稳定的查找</strong></p>
+<p>首先，epoll 的第一步是创建一个池子。这个使用 <code>epoll_create</code> 来做：</p>
+<p>原型：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">epoll_create</span><span class="hljs-params">(<span class="hljs-keyword">int</span> <span class="hljs-built_in">size</span>)</span></span>;<br></code></pre></div></td></tr></table></figure>
+
+<p>示例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++">epollfd = epoll_create(<span class="hljs-number">1024</span>);<br><span class="hljs-keyword">if</span> (epollfd == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">"epoll_create"</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这个池子对我们来说是黑盒，这个黑盒是用来装 fd 的。当拿到了一个 <code>epollfd</code> ，这个 <code>epollfd</code> 就能唯一代表这个 epoll 池。<strong>注意，这里又有一个细节：用户可以创建多个 epoll 池。</strong></p>
+<p>然后，就要往这个 epoll 池里放 fd 了，这就要用到 <code>epoll_ctl</code> 了。</p>
+<p>示例：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">if</span> (epoll_ctl(epollfd, EPOLL_CTL_ADD, <span class="hljs-number">11</span>, &amp;ev) == <span class="hljs-number">-1</span>) &#123;<br>    perror(<span class="hljs-string">"epoll_ctl: listen_sock"</span>);<br>    <span class="hljs-built_in">exit</span>(EXIT_FAILURE);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>上面，我们就把句柄 11 放到这个池子里了，op（<code>EPOLL_CTL_ADD</code>）表明操作是增加、修改、删除，event 结构体可以指定监听事件类型，可读、可写。</p>
+<p>Linux 内核对于 epoll 池的内部实现就是用红黑树的结构体来管理这些注册进程来的句柄 fd。红黑树是一种平衡二叉树，时间复杂度为 O(log n)，就算这个池子就算不断的增删改，也能保持非常稳定的查找性能。这也是<strong>epoll 高效的第一个原因</strong>。</p>
+<p><strong>二：通过回调实现数据的快速感知</strong></p>
+<p> <code>epoll_ctl</code> 的内部实现中，除了把句柄结构用红黑树管理，另一个核心步骤就是设置 poll 回调。</p>
+<p><strong>思考来了：poll 回调是什么？怎么设置？</strong></p>
+<p>先说说 <code>file_operations-&gt;poll</code> 是什么？</p>
+<p>Linux 设计成一切皆是文件的架构，这个不是说说而已，而是随处可见。实现一个文件系统的时候，就要实现这个文件调用，这个结构体用 <code>struct file_operations</code> 来表示。这个结构体有非常多的函数，精简了一些，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> &#123;</span><br>    <span class="hljs-keyword">ssize_t</span> (*<span class="hljs-built_in">read</span>) (struct file *, <span class="hljs-keyword">char</span> __user *, <span class="hljs-keyword">size_t</span>, <span class="hljs-keyword">loff_t</span> *);<br>    <span class="hljs-keyword">ssize_t</span> (*<span class="hljs-built_in">write</span>) (struct file *, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> __user *, <span class="hljs-keyword">size_t</span>, <span class="hljs-keyword">loff_t</span> *);<br>    <span class="hljs-keyword">__poll_t</span> (*poll) (struct file *, struct poll_table_struct *);<br>    <span class="hljs-keyword">int</span> (*<span class="hljs-built_in">open</span>) (struct inode *, struct file *);<br>    <span class="hljs-keyword">int</span> (*fsync) (struct file *, <span class="hljs-keyword">loff_t</span>, <span class="hljs-keyword">loff_t</span>, <span class="hljs-keyword">int</span> datasync);<br>    <span class="hljs-comment">// ....</span><br>&#125;;<br></code></pre></div></td></tr></table></figure>
+
+<p>看到了 <code>read</code>，<code>write</code>，<code>open</code>，<code>fsync</code>，<code>poll</code> 等等，这些都是对文件的定制处理操作，<strong>对于文件的操作其实都是在这个框架内实现逻辑而已</strong>，比如 ext2 如果有对 <code>read/write</code> 做定制化，那么就会是 <code>ext2_read</code>，<code>ext2_write</code>，ext4 就会是 <code>ext4_read</code>，<code>ext4_write</code>。在 <code>open</code> 具体“文件”的时候会赋值对应文件系统的 <code>file_operations</code> 给到 file 结构体。</p>
+<p>那很容易知道 <code>read</code> 是文件系统定制 fd 读的行为调用，<code>write</code> 是文件系统定制 fd 写的行为调用，<code>file_operations-&gt;poll</code> 呢？</p>
+<p><strong>这个是定制监听事件的机制实现。通过 poll 机制让上层能直接告诉底层，我这个 fd 一旦读写就绪了，请底层硬件（比如网卡）回调的时候自动把这个 fd 相关的结构体放到指定队列中，并且唤醒操作系统。</strong></p>
+<p>举个例子：网卡收发包其实走的异步流程，操作系统把数据丢到一个指定地点，网卡不断的从这个指定地点掏数据处理。请求响应通过中断回调来处理，中断一般拆分成两部分：硬中断和软中断。<strong>poll 函数就是把这个软中断回来的路上再加点料，只要读写事件触发的时候，就会立马通知到上层，采用这种事件通知的形式就能把浪费的时间窗就完全消失了。</strong></p>
+<p><strong>这个 poll 事件回调机制则是 epoll 池高效最核心原理。epoll 池管理的句柄只能是支持了 <code>file_operations-&gt;poll</code> 的文件 fd。换句话说，如果一个“文件”所在的文件系统没有实现 poll 接口，那么就用不了 epoll 机制。</strong>在 <code>epoll_ctl</code> 的实现中，有一步是调用 <code>vfs_poll</code> ,这个里面就会有个判断，如果 fd 所在的文件系统的 <code>file_operations</code> 实现了 poll ，那么就会直接调用，如果没有，那么就会报告响应的错误码。</p>
+<figure class="highlight c++"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs c++"><span class="hljs-keyword">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-keyword">__poll_t</span> vfs_poll(struct file *file, struct poll_table_struct *pt)<br>&#123;<br>    <span class="hljs-keyword">if</span> (unlikely(!file-&gt;f_op-&gt;poll))<br>        <span class="hljs-keyword">return</span> DEFAULT_POLLMASK;<br>    <span class="hljs-keyword">return</span> file-&gt;f_op-&gt;poll(file, pt);<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>poll 调用里面究竟是实现了什么？</strong></p>
+<p>总结概括来说：挂了个钩子，设置了唤醒的回调路径。epoll 跟底层对接的回调函数是：<code>ep_poll_callback</code>，这个函数其实很简单，做两件事情：</p>
+<ol>
+<li>把事件就绪的 fd 对应的结构体放到一个特定的队列（就绪队列，ready list）；</li>
+<li>唤醒 epoll ，活来啦！</li>
+</ol>
+<p>当 fd 满足可读可写的时候就会经过层层回调，最终调用到这个回调函数，把<strong>对应 fd 的结构体</strong>放入就绪队列中，从而把 epoll 从 <code>epoll_wait</code> 出唤醒。*<em>这个对应结构体叫做 <code>epitem</code> *</em>，每个注册到 epoll 池的 fd 都会对应一个。</p>
+<p>那么就绪队列需要用很高级的数据结构吗？就绪队列就简单了，因为没有查找的需求了呀，只要是在就绪队列中的 epitem ，都是事件就绪的，必须处理的。<strong>所以就绪队列就是一个最简单的双指针链表</strong>。</p>
+<p>总结来说，<strong>epoll 之所以做到了高效，最关键的三点：</strong></p>
+<ol>
+<li><p>内部管理 fd 使用了高效的红黑树结构管理，做到了增删改之后性能的优化和平衡；</p>
+</li>
+<li><p>epoll 池添加 fd 的时候，调用 <code>file_operations-&gt;poll</code> ，把这个 fd 就绪之后的回调路径安排好。通过事件通知的形式，做到最高效的运行；</p>
+</li>
+</ol>
+<p>epoll 池核心的两个数据结构：红黑树和就绪列表。红黑树是为了应对用户的增删改需求，就绪列表是 fd 事件就绪之后放置的特殊地点，epoll 池只需要遍历这个就绪链表，就能给用户返回所有已经就绪的 fd 数组；</p>
 <p>对于 select 第一个缺点（每次调用select，都需要把 fd 集合从用户态拷贝到内核态），epoll的解决方案在 <code>epoll_ctl</code> 函数中。每次注册新的事件到 epoll 句柄中时（在 <code>epoll_ctl</code> 中指定 <code>EPOLL_CTL_ADD</code>），会把所有的 fd 拷贝进内核，而不是在 <code>epoll_wait</code> 的时候重复拷贝。epoll 保证了每个 fd 在整个过程中只会拷贝一次。</p>
 <p>对于第二个缺点（每次调用 select 都需要在内核遍历传递进来的所有 fd），epoll 的解决方案不像 select 或 poll 一样每次都把 current 轮流加入 fd 对应的设备等待队列中，而只在 <code>epoll_ctl</code> 时把 <code>current</code> 挂一遍（这一遍必不可少）并为每个 fd 指定一个回调函数，当设备就绪，唤醒等待队列上的等待者时，就会调用这个回调函数，而这个回调函数会把就绪的 fd 加入一个就绪链表。<code>epoll_wait</code> 的工作实际上就是在这个就绪链表中查看有没有就绪的 fd（利用 <code>schedule_timeout()</code> 实现睡一会，判断一会的效果，和 select 实现中的第7步是类似的）。</p>
 <p>对于第三个缺点，epoll 没有这个限制，它所支持的 FD 上限是最大可以打开文件的数目，这个数字一般远大于 2048,举个例子,在1GB 内存的机器上大约是10万左右，具体数目可以 <code>cat /proc/sys/fs/file-max</code> 察看,一般来说这个数目和系统内存关系很大。</p>
@@ -1741,6 +1786,19 @@
 <p><code>epoll</code>仅适用于 Linux OS。</p>
 <p><code>epoll</code>比<code>select</code>和<code>poll</code>更加灵活而且没有描述符数量限制。</p>
 <p><code>epoll</code>对多线程编程更有友好，一个线程调用了<code>epoll_wait()</code>另一个线程关闭了同一个描述符也不会产生像<code>select</code>和<code>poll</code>的不确定情况。</p>
+<h5 id="哪些-fd-可以用-epoll-来管理？"><a href="#哪些-fd-可以用-epoll-来管理？" class="headerlink" title="哪些 fd 可以用 epoll 来管理？"></a>哪些 fd 可以用 epoll 来管理？</h5><p>再来思考另外一个问题：由于并不是所有的 fd 对应的文件系统都实现了 poll 接口，所以自然并不是所有的 fd 都可以放进 epoll 池，那么有哪些文件系统的 file_operations 实现了 poll 接口？</p>
+<p><strong>首先说，类似 ext2，ext4，xfs 这种常规的文件系统是没有实现的</strong>，换句话说，这些<strong>最常见的、真的是文件的文件系统反倒是用不了 epoll 机制</strong>的。</p>
+<p><strong>那谁支持呢？</strong></p>
+<p>最常见的就是网络套接字：socket 。网络也是 epoll 池最常见的应用地点。Linux 下万物皆文件，socket 实现了一套 <code>socket_file_operations</code> 的逻辑（ net/socket.c ）：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs cpp"><span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">file_operations</span> <span class="hljs-title">socket_file_ops</span> = &#123;</span><br>    .read_iter =    sock_read_iter,<br>    .write_iter =   sock_write_iter,<br>    .poll =     sock_poll,<br>    <span class="hljs-comment">// ...</span><br>&#125;;<br></code></pre></div></td></tr></table></figure>
+
+<p>我们看到 socket 实现了 poll 调用，所以 socket fd 是天然可以放到 epoll 池管理的。</p>
+<p><strong>还有支持的吗？</strong></p>
+<p>有的，很多。其实 Linux 下还有两个很典型的 fd ，常常也会放到 epoll 池里。</p>
+<ul>
+<li>eventfd：eventfd 实现非常简单，故名思义就是专门用来做事件通知用的。使用系统调用 <code>eventfd</code> 创建，这种文件 fd 无法传输数据，只用来传输事件，常常用于生产消费者模式的事件实现；</li>
+<li>timerfd：这是一种定时器 fd，使用 <code>timerfd_create</code> 创建，到时间点触发可读事件；</li>
+</ul>
 <h5 id="工作模式"><a href="#工作模式" class="headerlink" title="工作模式"></a>工作模式</h5><p><code>epoll</code>的描述符事件有两种触发模式：<code>LT（level trigger）</code>和<code>ET（edge trigger）</code>。</p>
 <ol>
 <li><p><strong>LT</strong> 模式:当<code>epoll_wait()</code>检测到描述符事件到达时，将此事件通知进程，进程可以不立即处理该事件，下次调用<code>epoll_wait()</code>会再次通知进程。是默认的一种模式，并且同时支持<code>Blocking</code>和<code>No-Blocking</code>。</p>
@@ -1872,6 +1930,7 @@
 <p><a href="https://docs.microsoft.com/zh-tw/windows-hardware/drivers/gettingstarted/virtual-address-spaces?redirectedfrom=MSDN" target="_blank" rel="noopener">Virtual address spaces</a></p>
 <p><a href="https://juejin.im/post/6844903507594575886#heading-15" target="_blank" rel="noopener">虚拟内存的那点事儿</a></p>
 <p><a href="https://mp.weixin.qq.com/s/p7sqYBUZngMfU3xXf9TNWA" target="_blank" rel="noopener">Go语言高阶：调度器系列（1）起源</a></p>
+<p><a href="https://mp.weixin.qq.com/s/GEoG23wz2JfQQQ9MgoM8tg?forceh5=1" target="_blank" rel="noopener">深入理解 Linux 的 epoll 机制</a></p>
 </blockquote>
 
             </div>
@@ -1902,9 +1961,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2019/09/30/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93MySQL/">
+                      <a href="/2019/10/11/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93Redis/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">数据库MySQL</span>
+                        <span class="hidden-mobile">数据库Redis</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
