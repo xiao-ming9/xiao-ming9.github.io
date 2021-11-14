@@ -1,0 +1,649 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="Wechat:934933088">
+  <meta name="author" content="Silverming">
+  <meta name="keywords" content="">
+  
+  <title>Golang 常见问题 - Silverming</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+</head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Golang 常见问题">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-11-07 20:55" pubdate>
+        2021年11月7日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.9k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      25
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- LeanCloud 统计文章PV -->
+      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="leancloud-page-views"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Golang 常见问题</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2021年11月7日 晚上
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h1 id="Go-结构体是否可以比较，为什么？"><a href="#Go-结构体是否可以比较，为什么？" class="headerlink" title="Go 结构体是否可以比较，为什么？"></a>Go 结构体是否可以比较，为什么？</h1><p>Go 的结构体是否可以比较，需要视具体情况而定，在某些情况下是可以比较的，而某些情况下比较会不符合预期，甚至直接报错。</p>
+<p>先来看看几个例子：</p>
+<h2 id="例子一"><a href="#例子一" class="headerlink" title="例子一"></a>例子一</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Value <span class="hljs-keyword">struct</span> &#123;<br>    Name   <span class="hljs-keyword">string</span><br>    Gender <span class="hljs-keyword">string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    v1 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: <span class="hljs-string">"男"</span>&#125;<br>    v2 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: <span class="hljs-string">"男"</span>&#125;<br>    <span class="hljs-keyword">if</span> v1 == v2 &#123;<br>        fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br>    fmt.Println(<span class="hljs-string">"脑子没进煎鱼"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>声明了两个变量，分别是 v1 和 v2。其都是 <code>Value</code> 结构体的实例化，是同一个结构体的两个实例。</p>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs plain">脑子进煎鱼了<br></code></pre></div></td></tr></table></figure>
+
+<p>在这里，结构体是可比较的。</p>
+<h2 id="例子二"><a href="#例子二" class="headerlink" title="例子二"></a>例子二</h2><p>接下来继续改造上面的例子，在原本的结构体中增加了指针类型的引用。</p>
+<p>第二个例子如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Value <span class="hljs-keyword">struct</span> &#123;<br>    Name   <span class="hljs-keyword">string</span><br>    Gender *<span class="hljs-keyword">string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    v1 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: <span class="hljs-built_in">new</span>(<span class="hljs-keyword">string</span>)&#125;<br>    v2 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: <span class="hljs-built_in">new</span>(<span class="hljs-keyword">string</span>)&#125;<br>    <span class="hljs-keyword">if</span> v1 == v2 &#123;<br>        fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br>    fmt.Println(<span class="hljs-string">"脑子没进煎鱼"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这段程序输出的结果是：脑子没进煎鱼。</p>
+<h2 id="例子三"><a href="#例子三" class="headerlink" title="例子三"></a>例子三</h2><p>再尝试 string 数组类型：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Value <span class="hljs-keyword">struct</span> &#123;<br>    Name   <span class="hljs-keyword">string</span><br>    GoodAt []<span class="hljs-keyword">string</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    v1 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, GoodAt: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"炸"</span>, <span class="hljs-string">"煎"</span>, <span class="hljs-string">"蒸"</span>&#125;&#125;<br>    v2 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, GoodAt: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"炸"</span>, <span class="hljs-string">"煎"</span>, <span class="hljs-string">"蒸"</span>&#125;&#125;<br>    <span class="hljs-keyword">if</span> v1 == v2 &#123;<br>        fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br>    fmt.Println(<span class="hljs-string">"脑子没进煎鱼"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这里程序会直接报错：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs armasm"># command-line-arguments<br>./main.go:<span class="hljs-number">15</span>:<span class="hljs-number">8</span>: invalid operation: <span class="hljs-built_in">v1</span> == <span class="hljs-built_in">v2</span> (<span class="hljs-keyword">struct </span>containing []<span class="hljs-keyword">string </span>cannot <span class="hljs-keyword">be </span>compared)<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="例子四"><a href="#例子四" class="headerlink" title="例子四"></a>例子四</h2><p>那不同结构体，相同的值内容呢，能否进行比较？</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Value1 <span class="hljs-keyword">struct</span> &#123;<br>    Name <span class="hljs-keyword">string</span><br>&#125;<br><br><span class="hljs-keyword">type</span> Value2 <span class="hljs-keyword">struct</span> &#123;<br>    Name <span class="hljs-keyword">string</span><br>&#125;<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    v1 := Value1&#123;Name: <span class="hljs-string">"煎鱼"</span>&#125;<br>    v2 := Value2&#123;Name: <span class="hljs-string">"煎鱼"</span>&#125;<br>    <span class="hljs-keyword">if</span> v1 == v2 &#123;<br>        fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br>    fmt.Println(<span class="hljs-string">"脑子没进煎鱼"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>显然，这种情况是会直接报错：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs armasm"># command-line-arguments<br>./main.go:<span class="hljs-number">18</span>:<span class="hljs-number">8</span>: invalid operation: <span class="hljs-built_in">v1</span> == <span class="hljs-built_in">v2</span> (mismatched types Value1 <span class="hljs-keyword">and </span>Value2)<br></code></pre></div></td></tr></table></figure>
+
+<p>那是不是就完全没法比较了呢？并不，可以借助强制转换来实现：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">if</span> v1 == Value1(v2) &#123;<br>  fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>  <span class="hljs-keyword">return</span><br> &#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这样程序就会正常运行，且输出 “脑子进煎鱼了”。当然，若是不可比较类型，依然是不行的。</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>为什么 Go 结构体有的比较就是正常，有的就不行，甚至还直接报错了。难道是有什么 “潜规则” 吗？</p>
+<p>在 Go 语言中，Go 结构体有时候并不能直接比较，<strong>当其基本类型包含：slice、map、function 时，是不能比较的</strong>。若强行比较，就会导致出现例子中的直接报错的情况。</p>
+<p>而指针引用，其虽然都是 <code>new(string)</code>，从表象来看是一个东西，但其具体返回的地址是不一样的。</p>
+<p>因此若要比较，则需改为：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    gender := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">string</span>)<br>    v1 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: gender&#125;<br>    v2 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, Gender: gender&#125;<br>    ...<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这样就可以保证两者的比较。如果被迫无奈，被要求一定要用结构体比较怎么办？</p>
+<p>这时候可以使用反射方法 <code>reflect.DeepEqual</code>，如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    v1 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, GoodAt: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"炸"</span>, <span class="hljs-string">"煎"</span>, <span class="hljs-string">"蒸"</span>&#125;&#125;<br>    v2 := Value&#123;Name: <span class="hljs-string">"煎鱼"</span>, GoodAt: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"炸"</span>, <span class="hljs-string">"煎"</span>, <span class="hljs-string">"蒸"</span>&#125;&#125;<br>    <span class="hljs-keyword">if</span> reflect.DeepEqual(v1, v2) &#123;<br>        fmt.Println(<span class="hljs-string">"脑子进煎鱼了"</span>)<br>        <span class="hljs-keyword">return</span><br>    &#125;<br><br>    fmt.Println(<span class="hljs-string">"脑子没进煎鱼"</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="例子五"><a href="#例子五" class="headerlink" title="例子五"></a>例子五</h2><p>再看一种特殊的例子：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> People <span class="hljs-keyword">struct</span> &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> a := &amp;People&#123;&#125;<br> b := &amp;People&#123;&#125;<br> fmt.Println(a == b)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>这里的输出结果是： false。</p>
+<p>再稍加改造一下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> People <span class="hljs-keyword">struct</span> &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> a := &amp;People&#123;&#125;<br> b := &amp;People&#123;&#125;<br> fmt.Printf(<span class="hljs-string">"%p\n"</span>, a)<br> fmt.Printf(<span class="hljs-string">"%p\n"</span>, b)<br> fmt.Println(a == b)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>输出结果是：true。</p>
+<p>综合以上，总结的一个例子：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br> a := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br> b := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br> <span class="hljs-built_in">println</span>(a, b, a == b)<br><br> c := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br> d := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br> fmt.Println(c, d)<br> <span class="hljs-built_in">println</span>(c, d, c == d)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>输出的结果如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// a, b; a == b</span><br><span class="hljs-number">0xc00005cf57</span> <span class="hljs-number">0xc00005cf57</span> <span class="hljs-literal">false</span><br><br><span class="hljs-comment">// c, d</span><br>&amp;&#123;&#125; &amp;&#123;&#125;<br><span class="hljs-comment">// c, d, c == d</span><br><span class="hljs-number">0x118c370</span> <span class="hljs-number">0x118c370</span> <span class="hljs-literal">true</span><br></code></pre></div></td></tr></table></figure>
+
+<p>第一段代码的结果是 false，第二段的结果是 true，且可以看到内存地址指向的完全一样，也就是排除了输出后变量内存指向改变导致的原因。</p>
+<p>进一步来看，似乎是 <code>fmt.Print</code> 方法导致的，但一个标准库里的输出方法，会导致这种奇怪的问题？</p>
+<p>这里其实跟内存的逃逸有关，对例子进行逃逸分析：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// 源代码结构</span><br>$ cat -n main.<span class="hljs-keyword">go</span><br>     <span class="hljs-number">5</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>     <span class="hljs-number">6</span>  a := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br>     <span class="hljs-number">7</span>  b := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br>     <span class="hljs-number">8</span>  <span class="hljs-built_in">println</span>(a, b, a == b)<br>     <span class="hljs-number">9</span> <br>    <span class="hljs-number">10</span>  c := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br>    <span class="hljs-number">11</span>  d := <span class="hljs-built_in">new</span>(<span class="hljs-keyword">struct</span>&#123;&#125;)<br>    <span class="hljs-number">12</span>  fmt.Println(c, d)<br>    <span class="hljs-number">13</span>  <span class="hljs-built_in">println</span>(c, d, c == d)<br>    <span class="hljs-number">14</span> &#125;<br><br><span class="hljs-comment">// 进行逃逸分析</span><br>$ <span class="hljs-keyword">go</span> run -gcflags=<span class="hljs-string">"-m -l"</span> main.<span class="hljs-keyword">go</span><br># command-line-arguments<br>./main.<span class="hljs-keyword">go</span>:<span class="hljs-number">6</span>:<span class="hljs-number">10</span>: a does not escape<br>./main.<span class="hljs-keyword">go</span>:<span class="hljs-number">7</span>:<span class="hljs-number">10</span>: b does not escape<br>./main.<span class="hljs-keyword">go</span>:<span class="hljs-number">10</span>:<span class="hljs-number">10</span>: c escapes to heap<br>./main.<span class="hljs-keyword">go</span>:<span class="hljs-number">11</span>:<span class="hljs-number">10</span>: d escapes to heap<br>./main.<span class="hljs-keyword">go</span>:<span class="hljs-number">12</span>:<span class="hljs-number">13</span>: ... argument does not escape<br></code></pre></div></td></tr></table></figure>
+
+<p>通过分析可得知变量 a, b 均是分配在栈中，而变量 c, d 分配在堆中。</p>
+<p>其关键原因是因为调用了 <code>fmt.Println</code> 方法，<strong>该方法内部是涉及到大量的反射相关方法的调用，会造成逃逸行为</strong>，也就是分配到堆上。</p>
+<h3 id="关注第一个细节，就是-“为什么逃逸后，两个空-struct-会是相等的？"><a href="#关注第一个细节，就是-“为什么逃逸后，两个空-struct-会是相等的？" class="headerlink" title="关注第一个细节，就是 “为什么逃逸后，两个空 struct 会是相等的？"></a>关注第一个细节，就是 “为什么逃逸后，两个空 struct 会是相等的？</h3><p>这里主要与 Go runtime 的一个优化细节有关，如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// runtime/malloc.go</span><br><span class="hljs-keyword">var</span> zerobase <span class="hljs-keyword">uintptr</span><br></code></pre></div></td></tr></table></figure>
+
+<p>变量 <code>zerobase</code> 是所有 0 字节分配的基础地址。更进一步来讲，就是空（0字节）的在进行了逃逸分析后，往堆分配的都会指向 <code>zerobase</code> 这一个地址。</p>
+<p>所以空 struct 在逃逸后本质上指向了 <code>zerobase</code>，其两者比较就是相等的，返回了 true。</p>
+<h3 id="为什么没逃逸不相等"><a href="#为什么没逃逸不相等" class="headerlink" title="为什么没逃逸不相等"></a>为什么没逃逸不相等</h3><p>关注第二个细节，就是 “为什么没逃逸前，两个空 struct 比较不相等？”。</p>
+<p>这里其实是 Golang 团队有意而为之：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs livecodeserver">This is <span class="hljs-keyword">an</span> intentional language choice <span class="hljs-built_in">to</span> give implementations flexibility <span class="hljs-keyword">in</span> how they handle pointers <span class="hljs-built_in">to</span> <span class="hljs-literal">zero</span>-sized objects. If every pointer <span class="hljs-built_in">to</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">zero</span>-sized object were required <span class="hljs-built_in">to</span> be different, <span class="hljs-keyword">then</span> <span class="hljs-keyword">each</span> allocation <span class="hljs-keyword">of</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">zero</span>-sized object would have <span class="hljs-built_in">to</span> allocate <span class="hljs-keyword">at</span> least <span class="hljs-literal">one</span> <span class="hljs-keyword">byte</span>. If every pointer <span class="hljs-built_in">to</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">zero</span>-sized object were required <span class="hljs-built_in">to</span> be <span class="hljs-keyword">the</span> same, <span class="hljs-keyword">it</span> would be different <span class="hljs-built_in">to</span> handle taking <span class="hljs-keyword">the</span> address <span class="hljs-keyword">of</span> <span class="hljs-keyword">a</span> <span class="hljs-literal">zero</span>-sized field <span class="hljs-keyword">within</span> <span class="hljs-keyword">a</span> larger struct.<br><br>Pointers <span class="hljs-built_in">to</span> distinct <span class="hljs-literal">zero</span>-size variables may <span class="hljs-keyword">or</span> may <span class="hljs-keyword">not</span> be equal.<br></code></pre></div></td></tr></table></figure>
+
+<p>因此 Go 团队这番操作，与 Go map 的随机性如出一辙，避免大家对这类逻辑的直接依赖，是值得思考的。</p>
+<p>而在没逃逸的场景下，两个空 struct 的比较动作，你以为是真的在比较。实际上已经在代码优化阶段被直接优化掉，转为了 false。</p>
+<p>因此，虽然在代码上看上去是 <code>==</code> 在做比较，实际上结果是 <code>a == b</code> 时就直接转为了 false，比都不需要比了。</p>
+<p>既然我们知道了他是在代码优化阶段被优化的，那么相对的，知道了原理的我们也可以借助在 go 编译运行时的 gcflags 指令，让他不优化。</p>
+<p>在运行前面的例子时，执行 <code>-gcflags=&quot;-N -l&quot;</code> 指令：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs yaml"><span class="hljs-string">$</span> <span class="hljs-string">go</span> <span class="hljs-string">run</span> <span class="hljs-string">-gcflags="-N</span> <span class="hljs-string">-l"</span> <span class="hljs-string">main.go</span> <br><span class="hljs-number">0xc000092f06</span> <span class="hljs-number">0xc000092f06</span> <span class="hljs-literal">true</span><br><span class="hljs-string">&amp;&#123;&#125;</span> <span class="hljs-string">&amp;&#123;&#125;</span><br><span class="hljs-number">0x118c370</span> <span class="hljs-number">0x118c370</span> <span class="hljs-literal">true</span><br></code></pre></div></td></tr></table></figure>
+
+<p>这时候，两个比较的结果都是 true 了。</p>
+<p><strong>参考文档</strong>：</p>
+<blockquote>
+<p><a href="https://mp.weixin.qq.com/s/HScH6nm3xf4POXVk774jUA" target="_blank" rel="noopener">手撕 Go 面试官：Go 结构体是否可以比较，为什么？</a></p>
+<p><a href="https://mp.weixin.qq.com/s/QnMOwYUANdydbiM8yGznHA" target="_blank" rel="noopener">用 Go struct 不能犯的一个低级错误！</a></p>
+</blockquote>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
+                    
+                      <a class="hover-with-bg" href="/tags/go/">go</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/10/16/%E4%BD%BF%E7%94%A8channel%E5%AF%BC%E8%87%B4%E7%9A%84%E6%AD%BB%E9%94%81%E5%92%8C%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98/">
+                        <span class="hidden-mobile">使用 channel 导致的死锁和内存泄漏问题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                  
+                
+                
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- LeanCloud 统计PV -->
+        <span id="leancloud-site-pv-container" style="display: none">
+            总访问量 
+            <span id="leancloud-site-pv"></span>
+             次
+          </span>
+      
+      
+        <!-- LeanCloud 统计UV -->
+        <span id="leancloud-site-uv-container" style="display: none">
+            总访客数 
+            <span id="leancloud-site-uv"></span>
+             人
+          </span>
+      
+
+    
+  </div>
+
+
+  
+  <!-- 备案信息 -->
+  <div class="beian">
+    <span>
+      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+        粤ICP备18114217号
+      </a>
+    </span>
+    
+      
+        <span>
+          <a
+            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
+            rel="nofollow noopener"
+            class="beian-police"
+            target="_blank"
+          >
+            
+              <span style="visibility: hidden; width: 0">|</span>
+              <img src="/img/police_beian.png" alt="police-icon"/>
+            
+            <span>粤ICP备18114217号-1</span>
+          </a>
+        </span>
+      
+    
+  </div>
+
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  <script defer src="/js/leancloud.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    <!-- Baidu Analytics -->
+    <script defer>
+      var _hmt = _hmt || [];
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
+  
+
+  
+    <!-- Google Analytics -->
+    <script defer>
+      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
+      ga.l = +new Date;
+      ga('create', 'G-M2RT7SDT3L', 'auto');
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+  
+
+  
+    <!-- Google gtag.js -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
+    <script defer>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-M2RT7SDT3L');
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

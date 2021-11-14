@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
 
 
 
@@ -183,7 +183,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      25.6k 字
+      26.6k 字
     </span>
   
 
@@ -193,7 +193,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      338
+      354
        分钟
     </span>
   
@@ -235,7 +235,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年11月7日 下午
+                  本文最后更新于：2021年11月14日 晚上
                 
               </p>
             
@@ -1114,6 +1114,48 @@
 <li>时间复杂度：O(1)。由于映射表的长度是固定的，且这 13 字符中的每个字符的出现次数均不会超过 3，因此循环次数有一个确定的上限。对于本题给出的数据范围，循环次数不会超过 15 次。</li>
 <li>空间复杂度：O(1)。</li>
 </ul>
+<h1 id="52-电话号码的字母组合"><a href="#52-电话号码的字母组合" class="headerlink" title="52. 电话号码的字母组合"></a>52. 电话号码的字母组合</h1><blockquote>
+<p>Leetcode 17 题</p>
+</blockquote>
+<p>给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按任意顺序返回。</p>
+<p>给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E6%89%8B%E6%9C%BA9%E9%94%AE%E5%AD%97%E6%AF%8D.png" alt="手机9键字母"></p>
+<p>示例 1：</p>
+<figure class="highlight ada"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ada">输入：<span class="hljs-keyword">digits</span> = <span class="hljs-string">"23"</span><br>输出：[<span class="hljs-string">"ad"</span>,<span class="hljs-string">"ae"</span>,<span class="hljs-string">"af"</span>,<span class="hljs-string">"bd"</span>,<span class="hljs-string">"be"</span>,<span class="hljs-string">"bf"</span>,<span class="hljs-string">"cd"</span>,<span class="hljs-string">"ce"</span>,<span class="hljs-string">"cf"</span>]<br></code></pre></div></td></tr></table></figure>
+
+<p>示例 2：</p>
+<figure class="highlight ada"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ada">输入：<span class="hljs-keyword">digits</span> = <span class="hljs-string">""</span><br>输出：[]<br></code></pre></div></td></tr></table></figure>
+
+<p>示例 3：</p>
+<figure class="highlight ada"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ada">输入：<span class="hljs-keyword">digits</span> = <span class="hljs-string">"2"</span><br>输出：[<span class="hljs-string">"a"</span>,<span class="hljs-string">"b"</span>,<span class="hljs-string">"c"</span>]<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="解题思路-7"><a href="#解题思路-7" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题在一看到<strong>要求拿到全部组合</strong>的时候，就应该联想到广度优先和深度优先这两种遍历的思路。</p>
+<p>深度优先的解法就是通过递归来进行，而广度优先则是借助于队列来实现。</p>
+<h2 id="代码实现-7"><a href="#代码实现-7" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> phoneMap <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span> = <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span>&#123;<br>	<span class="hljs-string">"2"</span>: <span class="hljs-string">"abc"</span>,<br>	<span class="hljs-string">"3"</span>: <span class="hljs-string">"def"</span>,<br>	<span class="hljs-string">"4"</span>: <span class="hljs-string">"ghi"</span>,<br>	<span class="hljs-string">"5"</span>: <span class="hljs-string">"jkl"</span>,<br>	<span class="hljs-string">"6"</span>: <span class="hljs-string">"mno"</span>,<br>	<span class="hljs-string">"7"</span>: <span class="hljs-string">"pqrs"</span>,<br>	<span class="hljs-string">"8"</span>: <span class="hljs-string">"tuv"</span>,<br>	<span class="hljs-string">"9"</span>: <span class="hljs-string">"wxyz"</span>,<br>&#125;<br><br><span class="hljs-keyword">var</span> results []<span class="hljs-keyword">string</span><br><span class="hljs-comment">// 深度优先</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">letterCombinations1</span><span class="hljs-params">(digits <span class="hljs-keyword">string</span>)</span> []<span class="hljs-title">string</span></span> &#123;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(digits) == <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> []<span class="hljs-keyword">string</span>&#123;&#125;<br>	&#125;<br>	results = []<span class="hljs-keyword">string</span>&#123;&#125;<br>	recursion(digits,<span class="hljs-number">0</span>,<span class="hljs-string">""</span>)<br>	<span class="hljs-keyword">return</span> results<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">recursion</span><span class="hljs-params">(digits <span class="hljs-keyword">string</span>, index <span class="hljs-keyword">int</span>, currentResult <span class="hljs-keyword">string</span>)</span></span> &#123;<br>	<span class="hljs-keyword">if</span> index == <span class="hljs-built_in">len</span>(digits) &#123;<br>		results = <span class="hljs-built_in">append</span>(results, currentResult)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	currentNum := <span class="hljs-keyword">string</span>(digits[index])<br>	chars := phoneMap[currentNum]<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(chars); i++ &#123;<br>		recursion(digits, index+<span class="hljs-number">1</span>, currentResult+<span class="hljs-keyword">string</span>(chars[i]))<br>	&#125;<br>	<span class="hljs-keyword">return</span><br>&#125;<br><br><span class="hljs-comment">// 广度优先</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">letterCombinations2</span><span class="hljs-params">(digits <span class="hljs-keyword">string</span>)</span> []<span class="hljs-title">string</span></span> &#123;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(digits) == <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">return</span> []<span class="hljs-keyword">string</span>&#123;&#125;<br>	<br>	resultQueue  := []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">""</span>&#125;<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(digits); i++ &#123;<br>		currentNum := <span class="hljs-keyword">string</span>(digits[i])<br>		chars := phoneMap[currentNum]<br>		currentQueueLen := <span class="hljs-built_in">len</span>(resultQueue)<br>		<span class="hljs-keyword">for</span> j := <span class="hljs-number">0</span>; j &lt; currentQueueLen; j++ &#123;<br>			tmpResult := resultQueue[<span class="hljs-number">0</span>]<br>			resultQueue = resultQueue[<span class="hljs-number">1</span>:]<br>			<span class="hljs-keyword">for</span> k := <span class="hljs-number">0</span>; k &lt; <span class="hljs-built_in">len</span>(chars); k++ &#123;<br>				resultQueue = <span class="hljs-built_in">append</span>(resultQueue,tmpResult + <span class="hljs-keyword">string</span>(chars[k]))<br>			&#125;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> resultQueue<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<h1 id="53-四数之和"><a href="#53-四数之和" class="headerlink" title="53. 四数之和"></a>53. 四数之和</h1><blockquote>
+<p>leetcode 第 18 题</p>
+</blockquote>
+<p>给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。请找出并返回满足下述全部条件且不重复的四元组 <code>[nums[a], nums[b], nums[c], nums[d]]</code> （若两个四元组元素一一对应，则认为两个四元组重复）：</p>
+<ul>
+<li><code>0 &lt;= a, b, c, d &lt; n</code></li>
+<li><code>a、b、c 和 d 互不相同</code></li>
+<li><code>nums[a] + nums[b] + nums[c] + nums[d] == target</code></li>
+</ul>
+<p>示例 1：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">输入：nums = [<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">-2</span>,<span class="hljs-number">2</span>], target = <span class="hljs-number">0</span><br>输出：[[<span class="hljs-number">-2</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>],[<span class="hljs-number">-2</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">2</span>],[<span class="hljs-number">-1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>]]<br></code></pre></div></td></tr></table></figure>
+
+<p>示例 2：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">输入：nums = [<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>], target = <span class="hljs-number">8</span><br>输出：[[<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>,<span class="hljs-number">2</span>]]<br></code></pre></div></td></tr></table></figure>
+
+<h2 id="解题思路-8"><a href="#解题思路-8" class="headerlink" title="解题思路"></a>解题思路</h2><p>这道题的思路跟三数之和类似，也是采用排序加双指针的方式来解题，不同在于其外层有两个循环，因为是四个数的和。</p>
+<h2 id="代码实现-8"><a href="#代码实现-8" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fourSum</span><span class="hljs-params">(nums []<span class="hljs-keyword">int</span>, target <span class="hljs-keyword">int</span>)</span> [][]<span class="hljs-title">int</span></span> &#123;<br>	<span class="hljs-keyword">var</span> ret [][]<span class="hljs-keyword">int</span><br>	sort.Ints(nums)<br>	n := <span class="hljs-built_in">len</span>(nums)<br><br>	<span class="hljs-comment">// 第一重循环</span><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; n<span class="hljs-number">-3</span> &amp;&amp; nums[i]+nums[i+<span class="hljs-number">1</span>]+nums[i+<span class="hljs-number">2</span>]+nums[i+<span class="hljs-number">3</span>] &lt;= target; i++ &#123;<br>		<span class="hljs-keyword">if</span> i &gt; <span class="hljs-number">0</span> &amp;&amp; nums[i] == nums[i<span class="hljs-number">-1</span>] || nums[i]+nums[n<span class="hljs-number">-3</span>]+nums[n<span class="hljs-number">-2</span>]+nums[n<span class="hljs-number">-1</span>] &lt; target &#123;<br>			<span class="hljs-keyword">continue</span><br>		&#125;<br>		<span class="hljs-comment">// 第二重循环</span><br>		<span class="hljs-keyword">for</span> j := i + <span class="hljs-number">1</span>; j &lt; n<span class="hljs-number">-2</span> &amp;&amp; nums[i]+nums[j]+nums[j+<span class="hljs-number">1</span>]+nums[j+<span class="hljs-number">2</span>] &lt;= target; j++ &#123;<br>			<span class="hljs-keyword">if</span> j &gt; i+<span class="hljs-number">1</span> &amp;&amp; nums[j] == nums[j<span class="hljs-number">-1</span>] || nums[i]+nums[j]+nums[n<span class="hljs-number">-2</span>]+nums[n<span class="hljs-number">-1</span>] &lt; target &#123;<br>				<span class="hljs-keyword">continue</span><br>			&#125;<br>			<span class="hljs-comment">// 左指针</span><br>			<span class="hljs-keyword">for</span> lp := j + <span class="hljs-number">1</span>; lp &lt; n<span class="hljs-number">-1</span> &amp;&amp; nums[i]+nums[j]+nums[lp]+nums[lp+<span class="hljs-number">1</span>] &lt;= target; lp++ &#123;<br>				<span class="hljs-keyword">if</span> lp &gt; j+<span class="hljs-number">1</span> &amp;&amp; nums[lp] == nums[lp<span class="hljs-number">-1</span>] || nums[i]+nums[j]+nums[lp]+nums[n<span class="hljs-number">-1</span>] &lt; target &#123;<br>					<span class="hljs-keyword">continue</span><br>				&#125;<br>				rp := n - <span class="hljs-number">1</span> <span class="hljs-comment">// 右指针</span><br>				<span class="hljs-keyword">for</span> rp &gt; lp &amp;&amp; (nums[i]+nums[j]+nums[lp]+nums[rp] &gt; target) &#123;<br>					rp--<br>				&#125;<br>				<span class="hljs-keyword">if</span> lp == rp &#123;<br>					<span class="hljs-keyword">break</span><br>				&#125;<br>				<span class="hljs-keyword">if</span> nums[i]+nums[j]+nums[lp]+nums[rp] == target &#123;<br>					ret = <span class="hljs-built_in">append</span>(ret, []<span class="hljs-keyword">int</span>&#123;nums[i], nums[j], nums[lp], nums[rp]&#125;)<br>				&#125;<br>			&#125;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> ret<br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p><strong>复杂度分析</strong></p>
+<ul>
+<li>时间复杂度：<code>O(n^3)</code>，其中 n 是数组的长度。排序的时间复杂度是 <code>O(nlogn)</code>，枚举四元组的时间复杂度是 O<em>(</em>n3)，因此总时间复杂度为 O(n^3+n log n)=<em>O</em>(n^3)。</li>
+<li>空间复杂度：O<em>(log*n)，其中 n 是数组的长度。空间复杂度主要取决于排序额外使用的空间。此外排序修改了输入数组 nums，实际情况中不一定允许，因此也可以看成使用了一个额外的数组存储了数组 nums 的副本并排序，空间复杂度为 O</em>(*n)。</li>
+</ul>
 <p><strong>参考内容</strong></p>
 <blockquote>
 <p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a><br><a href="https://blog.csdn.net/CleverCode/article/details/81743736" target="_blank" rel="noopener">100G 数据，只有 100M 内存，怎么排序</a><br><a href="https://blog.csdn.net/u014106566/article/details/101224875" target="_blank" rel="noopener">求比n小的一个数，使其各位数的乘积最大</a><br><a href="https://www.nowcoder.com/discuss/383652?type=all&order=time&pos=&page=1" target="_blank" rel="noopener">牛客网——腾讯WXG后端一面面经</a><br><a href="https://blog.csdn.net/You_are_my_dream/article/details/55005158" target="_blank" rel="noopener">完全二叉树的叶子节点总数问题</a><br><a href="https://www.cnblogs.com/kubidemanong/p/10834993.html" target="_blank" rel="noopener">【面试被虐】说说游戏中的敏感词过滤是如何实现的？</a> </p>
@@ -1446,20 +1488,5 @@
 <script  src="/js/boot.js" ></script>
 
 
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
