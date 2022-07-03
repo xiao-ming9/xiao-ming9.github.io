@@ -1,246 +1,279 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="gomock 是 Go 官方的模拟框架，可以与 go 的 test 很好的集成。在实际项目中，当需要进行单元测试时，往往会有很多的依赖项，有些依赖可能还没有办法直接进行创建，例如数据库连接，文件 I&#x2F;O 等。此时通过使用 go mock 可以模拟依赖项，简化测试。">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gomock 使用">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;06&#x2F;29&#x2F;gomock%20%E4%BD%BF%E7%94%A8&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="gomock 是 Go 官方的模拟框架，可以与 go 的 test 很好的集成。在实际项目中，当需要进行单元测试时，往往会有很多的依赖项，有些依赖可能还没有办法直接进行创建，例如数据库连接，文件 I&#x2F;O 等。此时通过使用 go mock 可以模拟依赖项，简化测试。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20mock%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+<meta property="og:updated_time" content="2021-07-03T02:24:44.473Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20mock%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>gomock 使用 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="gomock 是 Go 官方的模拟框架，可以与 go 的 test 很好的集成。在实际项目中，当需要进行单元测试时，往往会有很多的依赖项，有些依赖可能还没有办法直接进行创建，例如数据库连接，文件 I/O 等。此时通过使用 go mock 可以模拟依赖项，简化测试。">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>gomock 使用 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="gomock 使用">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gomock 使用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-29 09:41:52" itemprop="dateCreated datePublished" datetime="2021-06-29T09:41:52+08:00">2021-06-29</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-06-29 09:41" pubdate>
-        2021年6月29日 上午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      2.6k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      35
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-03 10:24:44" itemprop="dateModified" datetime="2021-07-03T10:24:44+08:00">2021-07-03</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">gomock 使用</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年7月3日 上午
-                
-              </p>
-            
-            <div class="markdown-body">
-              <p>gomock 是 Go 官方的模拟框架，可以与 go 的 test 很好的集成。在实际项目中，当需要进行单元测试时，往往会有很多的依赖项，有些依赖可能还没有办法直接进行创建，例如数据库连接，文件 I/O 等。此时通过使用 go mock 可以模拟依赖项，简化测试。</p>
+      
+        <p>gomock 是 Go 官方的模拟框架，可以与 go 的 test 很好的集成。在实际项目中，当需要进行单元测试时，往往会有很多的依赖项，有些依赖可能还没有办法直接进行创建，例如数据库连接，文件 I/O 等。此时通过使用 go mock 可以模拟依赖项，简化测试。</p>
 <a id="more"></a>
 
 <h1 id="mock-的用处"><a href="#mock-的用处" class="headerlink" title="mock 的用处"></a>mock 的用处</h1><p>mock 测试可以支持 io 类型的测试，比如：数据库，网络API请求，文件访问等。mock 测试还可以做为未开发服务的模拟、服务压力测试支持、对未知复杂的服务进行模拟，比如开发阶段我们依赖的服务还没有开发好，那么就可以使用 mock 方法来模拟一个服务，模拟的这个服务接收的参数和返回的参数和规划设计的服务是一致的，那我们就可以直接使用这个模拟的服务来协助开发测试了；再比如要对服务进行压力测试，这个时候我们就要把服务依赖的网络，数据等服务进行模拟，不然得到的结果不纯粹。总结一下，有以下几种情况下使用 mock 会比较好：</p>
@@ -251,16 +284,16 @@
 <li>依赖的内部函数非常复杂，要构造数据非常不方便，这也是一种</li>
 </ol>
 <p>mock 测试，简单来说就是通过对服务或者函数发送设计好的参数，并且通过构造注入期望返回的数据来方便以上几种测试开发。</p>
-<h1 id="gomock-安装"><a href="#gomock-安装" class="headerlink" title="gomock 安装"></a>gomock 安装</h1><figure class="highlight vim"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs vim"><span class="hljs-keyword">go</span> <span class="hljs-built_in">get</span> -<span class="hljs-keyword">u</span> github.<span class="hljs-keyword">com</span>/golang/mock/gomock<br><span class="hljs-keyword">go</span> install github.<span class="hljs-keyword">com</span>/golang/mock/mockgen<br></code></pre></div></td></tr></table></figure>
-
-<p>在上面首先安装了 go mock 的依赖包，然后安装了 mockgen 代码生成工具，用于生成 mock 代码，该工具会被安装在 <code>go/bin</code> 目录下。</p>
+<h1 id="gomock-安装"><a href="#gomock-安装" class="headerlink" title="gomock 安装"></a>gomock 安装</h1><pre><code>go get -u github.com/golang/mock/gomock
+go install github.com/golang/mock/mockgen</code></pre><p>在上面首先安装了 go mock 的依赖包，然后安装了 mockgen 代码生成工具，用于生成 mock 代码，该工具会被安装在 <code>go/bin</code> 目录下。</p>
 <h1 id="gomock-使用"><a href="#gomock-使用" class="headerlink" title="gomock 使用"></a>gomock 使用</h1><p>使用 mockgen 命令时，支持两种代码生成方式。</p>
 <p>一种是 <code>source</code> 指定的方式，这种方式从源文件生成 mock 接口：</p>
-<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">mockgen -source=foo.go [other options]<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="shell">mockgen -source=foo.go [other options]</code></pre>
 <p>另外一种是 <code>reflect</code> 方式，可以通过反射生成代码，这种方式需要传递两个非标志参数来启动：导入路径 <code>import</code> 和逗号分割的需要进行 mock 的接口列表：</p>
-<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">mockgen database/sql/driver Conn,Driver<br><span class="hljs-meta"><br>#</span><span class="bash"> Convenient <span class="hljs-keyword">for</span> `go:generate`.</span><br>mockgen . Conn,Driver<br></code></pre></div></td></tr></table></figure>
+<pre><code class="shell">mockgen database/sql/driver Conn,Driver
 
+# Convenient for `go:generate`.
+mockgen . Conn,Driver</code></pre>
 <p>可以使用 <code>.</code> 表示当前路径下的包。</p>
 <h2 id="mockgen-的相关参数"><a href="#mockgen-的相关参数" class="headerlink" title="mockgen 的相关参数"></a>mockgen 的相关参数</h2><p>mockgen 的用途在于为需要模拟数据的接口生成模拟数据代码，它具有以下参数：</p>
 <ul>
@@ -280,20 +313,106 @@
 <h2 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h2><p>首先代码目录结构如下：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%20mock%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png" alt="go mock目录结构"></p>
 <p><code>male.go</code> 的代码如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> person<br><br><span class="hljs-comment">// 这里假设 Male 是与数据库交互的部分</span><br><span class="hljs-keyword">type</span> Male <span class="hljs-keyword">interface</span> &#123;<br>	Get(id <span class="hljs-keyword">int64</span>) error<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package person
 
+// 这里假设 Male 是与数据库交互的部分
+type Male interface {
+    Get(id int64) error
+}</code></pre>
 <p><code>user.go</code> 的代码如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> user<br><br><span class="hljs-keyword">import</span> <span class="hljs-string">"MockTest/person"</span><br><br><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	Person person.Male<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewUser</span><span class="hljs-params">(p person.Male)</span> *<span class="hljs-title">User</span></span> &#123;<br>	<span class="hljs-keyword">return</span> &amp;User&#123;Person: p&#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(u *User)</span> <span class="hljs-title">GetUserInfo</span><span class="hljs-params">(id <span class="hljs-keyword">int64</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>	<span class="hljs-keyword">return</span> u.Person.Get(id)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package user
 
+import &quot;MockTest/person&quot;
+
+type User struct {
+    Person person.Male
+}
+
+func NewUser(p person.Male) *User {
+    return &amp;User{Person: p}
+}
+
+func (u *User) GetUserInfo(id int64) error {
+    return u.Person.Get(id)
+}</code></pre>
 <p>首先通过 mockgen 生成 mock 代码：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">mockgen -source=./person/male.<span class="hljs-keyword">go</span> -destination=./mock/male_mock.<span class="hljs-keyword">go</span> -<span class="hljs-keyword">package</span>=mock<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">mockgen -source=./person/male.go -destination=./mock/male_mock.go -package=mock</code></pre>
 <p>生成的 <code>male_mock.go</code> 代码如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// Code generated by MockGen. DO NOT EDIT.</span><br><span class="hljs-comment">// Source: ./person/male.go</span><br><br><span class="hljs-comment">// Package mock is a generated GoMock package.</span><br><span class="hljs-keyword">package</span> mock<br><br><span class="hljs-keyword">import</span> (<br>	reflect <span class="hljs-string">"reflect"</span><br><br>	gomock <span class="hljs-string">"github.com/golang/mock/gomock"</span><br>)<br><br><span class="hljs-comment">// MockMale is a mock of Male interface.</span><br><span class="hljs-keyword">type</span> MockMale <span class="hljs-keyword">struct</span> &#123;<br>	ctrl     *gomock.Controller<br>	recorder *MockMaleMockRecorder<br>&#125;<br><br><span class="hljs-comment">// MockMaleMockRecorder is the mock recorder for MockMale.</span><br><span class="hljs-keyword">type</span> MockMaleMockRecorder <span class="hljs-keyword">struct</span> &#123;<br>	mock *MockMale<br>&#125;<br><br><span class="hljs-comment">// NewMockMale creates a new mock instance.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">NewMockMale</span><span class="hljs-params">(ctrl *gomock.Controller)</span> *<span class="hljs-title">MockMale</span></span> &#123;<br>	mock := &amp;MockMale&#123;ctrl: ctrl&#125;<br>	mock.recorder = &amp;MockMaleMockRecorder&#123;mock&#125;<br>	<span class="hljs-keyword">return</span> mock<br>&#125;<br><br><span class="hljs-comment">// EXPECT returns an object that allows the caller to indicate expected use.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *MockMale)</span> <span class="hljs-title">EXPECT</span><span class="hljs-params">()</span> *<span class="hljs-title">MockMaleMockRecorder</span></span> &#123;<br>	<span class="hljs-keyword">return</span> m.recorder<br>&#125;<br><br><span class="hljs-comment">// Get mocks base method.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(m *MockMale)</span> <span class="hljs-title">Get</span><span class="hljs-params">(id <span class="hljs-keyword">int64</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>	m.ctrl.T.Helper()<br>	ret := m.ctrl.Call(m, <span class="hljs-string">"Get"</span>, id)<br>	ret0, _ := ret[<span class="hljs-number">0</span>].(error)<br>	<span class="hljs-keyword">return</span> ret0<br>&#125;<br><br><span class="hljs-comment">// Get indicates an expected call of Get.</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(mr *MockMaleMockRecorder)</span> <span class="hljs-title">Get</span><span class="hljs-params">(id <span class="hljs-keyword">interface</span>&#123;&#125;)</span> *<span class="hljs-title">gomock</span>.<span class="hljs-title">Call</span></span> &#123;<br>	mr.mock.ctrl.T.Helper()<br>	<span class="hljs-keyword">return</span> mr.mock.ctrl.RecordCallWithMethodType(mr.mock, <span class="hljs-string">"Get"</span>, reflect.TypeOf((*MockMale)(<span class="hljs-literal">nil</span>).Get), id)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// Code generated by MockGen. DO NOT EDIT.
+// Source: ./person/male.go
 
+// Package mock is a generated GoMock package.
+package mock
+
+import (
+    reflect &quot;reflect&quot;
+
+    gomock &quot;github.com/golang/mock/gomock&quot;
+)
+
+// MockMale is a mock of Male interface.
+type MockMale struct {
+    ctrl     *gomock.Controller
+    recorder *MockMaleMockRecorder
+}
+
+// MockMaleMockRecorder is the mock recorder for MockMale.
+type MockMaleMockRecorder struct {
+    mock *MockMale
+}
+
+// NewMockMale creates a new mock instance.
+func NewMockMale(ctrl *gomock.Controller) *MockMale {
+    mock := &amp;MockMale{ctrl: ctrl}
+    mock.recorder = &amp;MockMaleMockRecorder{mock}
+    return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockMale) EXPECT() *MockMaleMockRecorder {
+    return m.recorder
+}
+
+// Get mocks base method.
+func (m *MockMale) Get(id int64) error {
+    m.ctrl.T.Helper()
+    ret := m.ctrl.Call(m, &quot;Get&quot;, id)
+    ret0, _ := ret[0].(error)
+    return ret0
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockMaleMockRecorder) Get(id interface{}) *gomock.Call {
+    mr.mock.ctrl.T.Helper()
+    return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, &quot;Get&quot;, reflect.TypeOf((*MockMale)(nil).Get), id)
+}</code></pre>
 <p>可以看到生成的文件已经实现了上面 Male 中定义的接口，接下来就可以进行测试文件的编写：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> user<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"MockTest/mock"</span><br>	<span class="hljs-string">"errors"</span><br>	<span class="hljs-string">"github.com/golang/mock/gomock"</span><br>	<span class="hljs-string">"testing"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestUser_GetUserInfo</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	ctl := gomock.NewController(t)<br>	<span class="hljs-comment">// go version 1.14+ &amp;&amp; mockgen version 1.5.0+ 可以不用手动释放</span><br>	<span class="hljs-comment">//defer ctl.Finish()</span><br><br>	<span class="hljs-keyword">var</span> id <span class="hljs-keyword">int64</span> = <span class="hljs-number">1</span><br>	mockMale := mock.NewMockMale(ctl)<br>	gomock.InOrder(<br>		mockMale.EXPECT().Get(id).Return(errors.New(<span class="hljs-string">"test error"</span>)),<br>	)<br><br>	user := NewUser(mockMale)<br>	err := user.GetUserInfo(id)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		t.Errorf(<span class="hljs-string">"user.GetUserInfo err: %v"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package user
 
+import (
+    &quot;MockTest/mock&quot;
+    &quot;errors&quot;
+    &quot;github.com/golang/mock/gomock&quot;
+    &quot;testing&quot;
+)
+
+func TestUser_GetUserInfo(t *testing.T) {
+    ctl := gomock.NewController(t)
+    // go version 1.14+ &amp;&amp; mockgen version 1.5.0+ 可以不用手动释放
+    //defer ctl.Finish()
+
+    var id int64 = 1
+    mockMale := mock.NewMockMale(ctl)
+    gomock.InOrder(
+        mockMale.EXPECT().Get(id).Return(errors.New(&quot;test error&quot;)),
+    )
+
+    user := NewUser(mockMale)
+    err := user.GetUserInfo(id)
+    if err != nil {
+        t.Errorf(&quot;user.GetUserInfo err: %v&quot;, err)
+    }
+}</code></pre>
 <p>上面代码相关的解析如下：</p>
 <ul>
 <li><p><code>gomock.NewController</code>：返回 <code>gomock.Controller</code>,它代表 mock 生态系统中的顶级控件，定义了 mock 对象的范围,生命周期和期待值，另外它在多个 goroutine 中是安全的。</p>
@@ -330,18 +449,89 @@
 <li>通过 <code>After</code> 关键字来实现保序</li>
 <li>通过 <code>InOrder</code> 关键字来实现保序</li>
 </ol>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">call := mockpeople.EXPECT().GetName().Return(<span class="hljs-string">"helight1"</span>)<br>mockpeople.EXPECT().GetName().Return(<span class="hljs-string">"helight"</span>).After(call)   <br>gomock.InOrder(<br>  mockpeople.EXPECT().GetName().Return(<span class="hljs-string">"helight"</span>)<br>)<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">call := mockpeople.EXPECT().GetName().Return(&quot;helight1&quot;)
+mockpeople.EXPECT().GetName().Return(&quot;helight&quot;).After(call)   
+gomock.InOrder(
+  mockpeople.EXPECT().GetName().Return(&quot;helight&quot;)
+)</code></pre>
+<h1 id="详细使用示例"><a href="#详细使用示例" class="headerlink" title="详细使用示例"></a>详细使用示例</h1><h2 id="设置函数的返回值"><a href="#设置函数的返回值" class="headerlink" title="设置函数的返回值"></a>设置函数的返回值</h2><pre><code class="go">// 静态设置返回值
+func TestReturn(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
 
-<h1 id="详细使用示例"><a href="#详细使用示例" class="headerlink" title="详细使用示例"></a>详细使用示例</h1><h2 id="设置函数的返回值"><a href="#设置函数的返回值" class="headerlink" title="设置函数的返回值"></a>设置函数的返回值</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// 静态设置返回值</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestReturn</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	ctrl := gomock.NewController(t)<br>	<span class="hljs-keyword">defer</span> ctrl.Finish()<br><br>	repo := NewMockUserRepository(ctrl)<br>	<span class="hljs-comment">// 期望FindOne(1)返回张三用户</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">1</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"张三"</span>&#125;, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-comment">// 期望FindOne(2)返回李四用户</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">2</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"李四"</span>&#125;, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-comment">// 期望给FindOne(3)返回找不到用户的错误</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">3</span>).Return(<span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">"user not found"</span>))<br>	<span class="hljs-comment">// 验证一下结果</span><br>	log.Println(repo.FindOne(<span class="hljs-number">1</span>)) <span class="hljs-comment">// 这是张三</span><br>	log.Println(repo.FindOne(<span class="hljs-number">2</span>)) <span class="hljs-comment">// 这是李四</span><br>	log.Println(repo.FindOne(<span class="hljs-number">3</span>)) <span class="hljs-comment">// user not found</span><br>	log.Println(repo.FindOne(<span class="hljs-number">4</span>)) <span class="hljs-comment">//没有设置4的返回值，却执行了调用，测试不通过</span><br>&#125;<br><span class="hljs-comment">// 动态设置返回值</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestReturnDynamic</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	ctrl := gomock.NewController(t)<br>	<span class="hljs-keyword">defer</span> ctrl.Finish()<br>	repo := NewMockUserRepository(ctrl)<br>	<span class="hljs-comment">// 常用方法之一：DoAndReturn()，动态设置返回值 </span><br>	repo.EXPECT().FindOne(gomock.Any()).DoAndReturn(<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(i <span class="hljs-keyword">int</span>)</span> <span class="hljs-params">(*User,error)</span></span> &#123;<br>		<span class="hljs-keyword">if</span> i == <span class="hljs-number">0</span> &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">"user not found"</span>)<br>		&#125;<br>		<span class="hljs-keyword">if</span> i &lt; <span class="hljs-number">100</span> &#123;<br>			<span class="hljs-keyword">return</span> &amp;User&#123;<br>				Name:<span class="hljs-string">"小于100"</span>,<br>			&#125;, <span class="hljs-literal">nil</span><br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-keyword">return</span> &amp;User&#123;<br>				Name:<span class="hljs-string">"大于等于100"</span>,<br>			&#125;, <span class="hljs-literal">nil</span><br>		&#125;<br>	&#125;)<br>	log.Println(repo.FindOne(<span class="hljs-number">120</span>))<br>	<span class="hljs-comment">//log.Println(repo.FindOne(66))</span><br>	<span class="hljs-comment">//log.Println(repo.FindOne(0))</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+    repo := NewMockUserRepository(ctrl)
+    // 期望FindOne(1)返回张三用户
+    repo.EXPECT().FindOne(1).Return(&amp;User{Name: &quot;张三&quot;}, nil)
+    // 期望FindOne(2)返回李四用户
+    repo.EXPECT().FindOne(2).Return(&amp;User{Name: &quot;李四&quot;}, nil)
+    // 期望给FindOne(3)返回找不到用户的错误
+    repo.EXPECT().FindOne(3).Return(nil, errors.New(&quot;user not found&quot;))
+    // 验证一下结果
+    log.Println(repo.FindOne(1)) // 这是张三
+    log.Println(repo.FindOne(2)) // 这是李四
+    log.Println(repo.FindOne(3)) // user not found
+    log.Println(repo.FindOne(4)) //没有设置4的返回值，却执行了调用，测试不通过
+}
+// 动态设置返回值
+func TestReturnDynamic(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    repo := NewMockUserRepository(ctrl)
+    // 常用方法之一：DoAndReturn()，动态设置返回值 
+    repo.EXPECT().FindOne(gomock.Any()).DoAndReturn(func(i int) (*User,error) {
+        if i == 0 {
+            return nil, errors.New(&quot;user not found&quot;)
+        }
+        if i &lt; 100 {
+            return &amp;User{
+                Name:&quot;小于100&quot;,
+            }, nil
+        } else {
+            return &amp;User{
+                Name:&quot;大于等于100&quot;,
+            }, nil
+        }
+    })
+    log.Println(repo.FindOne(120))
+    //log.Println(repo.FindOne(66))
+    //log.Println(repo.FindOne(0))
+}</code></pre>
+<h2 id="调用次数检测"><a href="#调用次数检测" class="headerlink" title="调用次数检测"></a>调用次数检测</h2><pre><code class="go">func TestTimes(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
 
-<h2 id="调用次数检测"><a href="#调用次数检测" class="headerlink" title="调用次数检测"></a>调用次数检测</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestTimes</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	ctrl := gomock.NewController(t)<br>	<span class="hljs-keyword">defer</span> ctrl.Finish()<br><br>	repo := NewMockUserRepository(ctrl)<br>	<span class="hljs-comment">// 默认期望调用一次</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">1</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"张三"</span>&#125;, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-comment">// 期望调用2次</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">2</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"李四"</span>&#125;, <span class="hljs-literal">nil</span>).Times(<span class="hljs-number">2</span>)<br>	<span class="hljs-comment">// 调用多少次可以,包括0次</span><br>	repo.EXPECT().FindOne(<span class="hljs-number">3</span>).Return(<span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">"user not found"</span>)).AnyTimes()<br><br>	<span class="hljs-comment">// 验证一下结果</span><br>	log.Println(repo.FindOne(<span class="hljs-number">1</span>)) <span class="hljs-comment">// 这是张三</span><br>	log.Println(repo.FindOne(<span class="hljs-number">2</span>)) <span class="hljs-comment">// 这是李四</span><br>	log.Println(repo.FindOne(<span class="hljs-number">2</span>)) <span class="hljs-comment">// FindOne(2) 需调用两次,注释本行代码将导致测试不通过</span><br>	log.Println(repo.FindOne(<span class="hljs-number">3</span>)) <span class="hljs-comment">// user not found, 不限调用次数，注释掉本行也能通过测试</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+    repo := NewMockUserRepository(ctrl)
+    // 默认期望调用一次
+    repo.EXPECT().FindOne(1).Return(&amp;User{Name: &quot;张三&quot;}, nil)
+    // 期望调用2次
+    repo.EXPECT().FindOne(2).Return(&amp;User{Name: &quot;李四&quot;}, nil).Times(2)
+    // 调用多少次可以,包括0次
+    repo.EXPECT().FindOne(3).Return(nil, errors.New(&quot;user not found&quot;)).AnyTimes()
 
-<h2 id="调用顺序检测"><a href="#调用顺序检测" class="headerlink" title="调用顺序检测"></a>调用顺序检测</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestOrder</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	ctrl := gomock.NewController(t)<br>	<span class="hljs-keyword">defer</span> ctrl.Finish()<br>	repo := NewMockUserRepository(ctrl)<br>	o1 := repo.EXPECT().FindOne(<span class="hljs-number">1</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"张三"</span>&#125;, <span class="hljs-literal">nil</span>)<br>	o2 := repo.EXPECT().FindOne(<span class="hljs-number">2</span>).Return(&amp;User&#123;Name: <span class="hljs-string">"李四"</span>&#125;, <span class="hljs-literal">nil</span>)<br>	o3 := repo.EXPECT().FindOne(<span class="hljs-number">3</span>).Return(<span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">"user not found"</span>))<br>	gomock.InOrder(o1, o2, o3) <span class="hljs-comment">//设置调用顺序</span><br>	<span class="hljs-comment">// 按顺序调用，验证一下结果</span><br>	log.Println(repo.FindOne(<span class="hljs-number">1</span>)) <span class="hljs-comment">// 这是张三</span><br>	log.Println(repo.FindOne(<span class="hljs-number">2</span>)) <span class="hljs-comment">// 这是李四</span><br>	log.Println(repo.FindOne(<span class="hljs-number">3</span>)) <span class="hljs-comment">// user not found</span><br>	<br>	<span class="hljs-comment">// 如果我们调整了调用顺序，将导致测试不通过：</span><br>	<span class="hljs-comment">// log.Println(repo.FindOne(2)) // 这是李四</span><br>	<span class="hljs-comment">// log.Println(repo.FindOne(1)) // 这是张三</span><br>	<span class="hljs-comment">// log.Println(repo.FindOne(3)) // user not found</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+    // 验证一下结果
+    log.Println(repo.FindOne(1)) // 这是张三
+    log.Println(repo.FindOne(2)) // 这是李四
+    log.Println(repo.FindOne(2)) // FindOne(2) 需调用两次,注释本行代码将导致测试不通过
+    log.Println(repo.FindOne(3)) // user not found, 不限调用次数，注释掉本行也能通过测试
+}</code></pre>
+<h2 id="调用顺序检测"><a href="#调用顺序检测" class="headerlink" title="调用顺序检测"></a>调用顺序检测</h2><pre><code class="go">func TestOrder(t *testing.T) {
+    ctrl := gomock.NewController(t)
+    defer ctrl.Finish()
+    repo := NewMockUserRepository(ctrl)
+    o1 := repo.EXPECT().FindOne(1).Return(&amp;User{Name: &quot;张三&quot;}, nil)
+    o2 := repo.EXPECT().FindOne(2).Return(&amp;User{Name: &quot;李四&quot;}, nil)
+    o3 := repo.EXPECT().FindOne(3).Return(nil, errors.New(&quot;user not found&quot;))
+    gomock.InOrder(o1, o2, o3) //设置调用顺序
+    // 按顺序调用，验证一下结果
+    log.Println(repo.FindOne(1)) // 这是张三
+    log.Println(repo.FindOne(2)) // 这是李四
+    log.Println(repo.FindOne(3)) // user not found
 
-
-
-
-
+    // 如果我们调整了调用顺序，将导致测试不通过：
+    // log.Println(repo.FindOne(2)) // 这是李四
+    // log.Println(repo.FindOne(1)) // 这是张三
+    // log.Println(repo.FindOne(3)) // user not found
+}</code></pre>
 <p><strong>参考文章</strong>：</p>
 <blockquote>
 <p><a href="https://mojotv.cn/2018/12/26/golang-gomock-unit-test" target="_blank" rel="noopener">Go进阶06:怎么使用Gomock进行单元测试</a></p>
@@ -350,228 +540,199 @@
 <p><a href="https://juejin.cn/post/6844903853532381198" target="_blank" rel="noopener">搞定Go单元测试（二）—— mock框架(gomock)</a></p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/go/">go</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">go template 库（模板）</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/">
-                        <span class="hidden-mobile">go 常用关键字的原理及设计</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/" rel="prev" title="go 常用关键字的原理及设计">
+      <i class="fa fa-chevron-left"></i> go 常用关键字的原理及设计
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/" rel="next" title="go template 库（模板）">
+      go template 库（模板） <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#mock-的用处"><span class="nav-number">1.</span> <span class="nav-text">mock 的用处</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gomock-安装"><span class="nav-number">2.</span> <span class="nav-text">gomock 安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gomock-使用"><span class="nav-number">3.</span> <span class="nav-text">gomock 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#mockgen-的相关参数"><span class="nav-number">3.1.</span> <span class="nav-text">mockgen 的相关参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mockgen工作模式适用场景"><span class="nav-number">3.2.</span> <span class="nav-text">mockgen工作模式适用场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用示例"><span class="nav-number">3.3.</span> <span class="nav-text">使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mock-常用方法"><span class="nav-number">3.4.</span> <span class="nav-text">mock 常用方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指定调用的顺序"><span class="nav-number">3.5.</span> <span class="nav-text">指定调用的顺序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#详细使用示例"><span class="nav-number">4.</span> <span class="nav-text">详细使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置函数的返回值"><span class="nav-number">4.1.</span> <span class="nav-text">设置函数的返回值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用次数检测"><span class="nav-number">4.2.</span> <span class="nav-text">调用次数检测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用顺序检测"><span class="nav-number">4.3.</span> <span class="nav-text">调用顺序检测</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -579,41 +740,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -627,68 +756,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

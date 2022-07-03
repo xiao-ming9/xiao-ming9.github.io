@@ -1,249 +1,277 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="该规范来自腾讯开源的代码规范中，项目地址为：https:&#x2F;&#x2F;github.com&#x2F;Tencent&#x2F;secguide 该项目涵盖了 Go、Java、JS、nodejs、C&#x2F;C++、python 等一系列代码规范，这里只记录 Go 部分。">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="腾讯开源 go 代码规范">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;06&#x2F;14&#x2F;%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="该规范来自腾讯开源的代码规范中，项目地址为：https:&#x2F;&#x2F;github.com&#x2F;Tencent&#x2F;secguide 该项目涵盖了 Go、Java、JS、nodejs、C&#x2F;C++、python 等一系列代码规范，这里只记录 Go 部分。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-06-20T02:22:29.862Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>腾讯开源 go 代码规范 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="
-该规范来自腾讯开源的代码规范中，项目地址为：https://github.com/Tencent/secguide
-该项目涵盖了 Go、Java、JS、nodejs、C/C++、python 等一系列代码规范，这里只记录 Go 部分。
-">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>腾讯开源 go 代码规范 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="腾讯开源 go 代码规范">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          腾讯开源 go 代码规范
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-14 15:07:04" itemprop="dateCreated datePublished" datetime="2021-06-14T15:07:04+08:00">2021-06-14</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-06-14 15:07" pubdate>
-        2021年6月14日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      5.7k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      81
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-20 10:22:29" itemprop="dateModified" datetime="2021-06-20T10:22:29+08:00">2021-06-20</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">腾讯开源 go 代码规范</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年6月20日 上午
-                
-              </p>
-            
-            <div class="markdown-body">
-              <blockquote>
+      
+        <blockquote>
 <p>该规范来自腾讯开源的代码规范中，项目地址为：<a href="https://github.com/Tencent/secguide" target="_blank" rel="noopener">https://github.com/Tencent/secguide</a></p>
 <p>该项目涵盖了 Go、Java、JS、nodejs、C/C++、python 等一系列代码规范，这里只记录 Go 部分。</p>
 </blockquote>
@@ -252,13 +280,89 @@
 <h1 id="通用类"><a href="#通用类" class="headerlink" title="通用类"></a>通用类</h1><h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><h3 id="【必须】切片长度校验"><a href="#【必须】切片长度校验" class="headerlink" title="【必须】切片长度校验"></a>【必须】切片长度校验</h3><ul>
 <li>在对 slice 进行操作时，必须判断长度是否合法，防止程序 panic</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: 未判断 data 的长度，可导致 index out of range</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">decode</span><span class="hljs-params">(data []<span class="hljs-keyword">byte</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br>	<span class="hljs-keyword">if</span> data[<span class="hljs-number">0</span>] == <span class="hljs-string">'F'</span> &amp;&amp; data[<span class="hljs-number">1</span>] == <span class="hljs-string">'U'</span> &amp;&amp; data[<span class="hljs-number">2</span>] == <span class="hljs-string">'Z'</span> &amp;&amp; data[<span class="hljs-number">3</span>] == <span class="hljs-string">'Z'</span> &amp;&amp; data[<span class="hljs-number">4</span>] == <span class="hljs-string">'E'</span> &amp;&amp; data[<span class="hljs-number">5</span>] == <span class="hljs-string">'R'</span> &#123;<br>		fmt.Println(<span class="hljs-string">"Bad"</span>)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>&#125;<br><br><span class="hljs-comment">// bad: slice bounds out of range</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">var</span> slice = []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>&#125;<br>	fmt.Println(slice[:<span class="hljs-number">10</span>])<br>&#125;<br><br><span class="hljs-comment">// good: 使用data前应判断长度是否合法</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">decode</span><span class="hljs-params">(data []<span class="hljs-keyword">byte</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(data) == <span class="hljs-number">6</span> &#123;<br>		<span class="hljs-keyword">if</span> data[<span class="hljs-number">0</span>] == <span class="hljs-string">'F'</span> &amp;&amp; data[<span class="hljs-number">1</span>] == <span class="hljs-string">'U'</span> &amp;&amp; data[<span class="hljs-number">2</span>] == <span class="hljs-string">'Z'</span> &amp;&amp; data[<span class="hljs-number">3</span>] == <span class="hljs-string">'Z'</span> &amp;&amp; data[<span class="hljs-number">4</span>] == <span class="hljs-string">'E'</span> &amp;&amp; data[<span class="hljs-number">5</span>] == <span class="hljs-string">'R'</span> &#123;<br>			fmt.Println(<span class="hljs-string">"Good"</span>)<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad: 未判断 data 的长度，可导致 index out of range
+func decode(data []byte) bool {
+    if data[0] == &#39;F&#39; &amp;&amp; data[1] == &#39;U&#39; &amp;&amp; data[2] == &#39;Z&#39; &amp;&amp; data[3] == &#39;Z&#39; &amp;&amp; data[4] == &#39;E&#39; &amp;&amp; data[5] == &#39;R&#39; {
+        fmt.Println(&quot;Bad&quot;)
+        return true
+    }
+    return false
+}
 
+// bad: slice bounds out of range
+func foo() {
+    var slice = []int{0, 1, 2, 3, 4, 5, 6}
+    fmt.Println(slice[:10])
+}
+
+// good: 使用data前应判断长度是否合法
+func decode(data []byte) bool {
+    if len(data) == 6 {
+        if data[0] == &#39;F&#39; &amp;&amp; data[1] == &#39;U&#39; &amp;&amp; data[2] == &#39;Z&#39; &amp;&amp; data[3] == &#39;Z&#39; &amp;&amp; data[4] == &#39;E&#39; &amp;&amp; data[5] == &#39;R&#39; {
+            fmt.Println(&quot;Good&quot;)
+            return true
+        }
+    }
+    return false
+}</code></pre>
 <h3 id="【必须】nil-指针判断"><a href="#【必须】nil-指针判断" class="headerlink" title="【必须】nil 指针判断"></a>【必须】nil 指针判断</h3><ul>
 <li>进行指针操作时，必须判断该指针是否为 nil，防止程序 panic，尤其在进行结构体 Unmarshal 时</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Packet <span class="hljs-keyword">struct</span> &#123;<br>	PackeyType    <span class="hljs-keyword">uint8</span><br>	PackeyVersion <span class="hljs-keyword">uint8</span><br>	Data          *Data<br>&#125;<br><br><span class="hljs-keyword">type</span> Data <span class="hljs-keyword">struct</span> &#123;<br>	Stat <span class="hljs-keyword">uint8</span><br>	Len  <span class="hljs-keyword">uint8</span><br>	Buf  [<span class="hljs-number">8</span>]<span class="hljs-keyword">byte</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(p *Packet)</span> <span class="hljs-title">UnmarshalBinary</span><span class="hljs-params">(b []<span class="hljs-keyword">byte</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(b) &lt; <span class="hljs-number">2</span> &#123;<br>		<span class="hljs-keyword">return</span> io.EOF<br>	&#125;<br><br>	p.PackeyType = b[<span class="hljs-number">0</span>]<br>	p.PackeyVersion = b[<span class="hljs-number">1</span>]<br><br>	<span class="hljs-comment">// 若长度等于2，那么不会new Data</span><br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(b) &gt; <span class="hljs-number">2</span> &#123;<br>		p.Data = <span class="hljs-built_in">new</span>(Data)<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// bad: 未判断指针是否为nil</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	packet := <span class="hljs-built_in">new</span>(Packet)<br>	data := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">byte</span>, <span class="hljs-number">2</span>)<br>	<span class="hljs-keyword">if</span> err := packet.UnmarshalBinary(data); err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(<span class="hljs-string">"Failed to unmarshal packet"</span>)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	fmt.Printf(<span class="hljs-string">"Stat: %v\n"</span>, packet.Data.Stat)<br>&#125;<br><br><span class="hljs-comment">// good: 判断Data指针是否为nil</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	packet := <span class="hljs-built_in">new</span>(Packet)<br>	data := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">byte</span>, <span class="hljs-number">2</span>)<br><br>	<span class="hljs-keyword">if</span> err := packet.UnmarshalBinary(data); err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(<span class="hljs-string">"Failed to unmarshal packet"</span>)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	<span class="hljs-keyword">if</span> packet.Data == <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	fmt.Printf(<span class="hljs-string">"Stat: %v\n"</span>, packet.Data.Stat)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">type Packet struct {
+    PackeyType    uint8
+    PackeyVersion uint8
+    Data          *Data
+}
 
+type Data struct {
+    Stat uint8
+    Len  uint8
+    Buf  [8]byte
+}
+
+func (p *Packet) UnmarshalBinary(b []byte) error {
+    if len(b) &lt; 2 {
+        return io.EOF
+    }
+
+    p.PackeyType = b[0]
+    p.PackeyVersion = b[1]
+
+    // 若长度等于2，那么不会new Data
+    if len(b) &gt; 2 {
+        p.Data = new(Data)
+    }
+    return nil
+}
+
+// bad: 未判断指针是否为nil
+func main() {
+    packet := new(Packet)
+    data := make([]byte, 2)
+    if err := packet.UnmarshalBinary(data); err != nil {
+        fmt.Println(&quot;Failed to unmarshal packet&quot;)
+        return
+    }
+
+    fmt.Printf(&quot;Stat: %v\n&quot;, packet.Data.Stat)
+}
+
+// good: 判断Data指针是否为nil
+func main() {
+    packet := new(Packet)
+    data := make([]byte, 2)
+
+    if err := packet.UnmarshalBinary(data); err != nil {
+        fmt.Println(&quot;Failed to unmarshal packet&quot;)
+        return
+    }
+
+    if packet.Data == nil {
+        return
+    }
+
+    fmt.Printf(&quot;Stat: %v\n&quot;, packet.Data.Stat)
+}</code></pre>
 <h3 id="【必须】整数安全"><a href="#【必须】整数安全" class="headerlink" title="【必须】整数安全"></a>【必须】整数安全</h3><ul>
 <li>在进行数字运算操作时，需要做好长度限制，防止外部输入运算导致异常：<ul>
 <li>确保无符号整数运算时不会反转</li>
@@ -274,64 +378,289 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: 未限制长度，导致整数溢出</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">overflow</span><span class="hljs-params">(numControlByUser <span class="hljs-keyword">int32</span>)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> numInt <span class="hljs-keyword">int32</span> = <span class="hljs-number">0</span><br>	numInt = numControlByUser + <span class="hljs-number">1</span><br>	<span class="hljs-comment">// 对长度限制不当，导致整数溢出</span><br>	fmt.Printf(<span class="hljs-string">"%d\n"</span>, numInt)<br>	<span class="hljs-comment">// 使用numInt，可能导致其他错误</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	overflow(<span class="hljs-number">2147483647</span>)<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">overflow</span><span class="hljs-params">(numControlByUser <span class="hljs-keyword">int32</span>)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> numInt <span class="hljs-keyword">int32</span> = <span class="hljs-number">0</span><br>	numInt = numControlByUser + <span class="hljs-number">1</span><br>	<span class="hljs-keyword">if</span> numInt &lt; <span class="hljs-number">0</span> &#123;<br>		fmt.Println(<span class="hljs-string">"integer overflow"</span>)<br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	fmt.Println(<span class="hljs-string">"integer ok"</span>)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	overflow(<span class="hljs-number">2147483647</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad: 未限制长度，导致整数溢出
+func overflow(numControlByUser int32) {
+    var numInt int32 = 0
+    numInt = numControlByUser + 1
+    // 对长度限制不当，导致整数溢出
+    fmt.Printf(&quot;%d\n&quot;, numInt)
+    // 使用numInt，可能导致其他错误
+}
 
+func main() {
+    overflow(2147483647)
+}
+
+// good
+func overflow(numControlByUser int32) {
+    var numInt int32 = 0
+    numInt = numControlByUser + 1
+    if numInt &lt; 0 {
+        fmt.Println(&quot;integer overflow&quot;)
+        return
+    }
+    fmt.Println(&quot;integer ok&quot;)
+}
+
+func main() {
+    overflow(2147483647)
+}</code></pre>
 <h3 id="【必须】make-分配长度验证"><a href="#【必须】make-分配长度验证" class="headerlink" title="【必须】make 分配长度验证"></a>【必须】make 分配长度验证</h3><ul>
 <li>在进行 make 分配内存时，需要对外部可控的长度进行校验，防止程序 panic。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">parse</span><span class="hljs-params">(lenControlByUser <span class="hljs-keyword">int</span>, data []<span class="hljs-keyword">byte</span>)</span></span> &#123;<br>	size := lenControlByUser<br>	<span class="hljs-comment">// 对外部传入的size，进行长度判断以免导致panic</span><br>	buffer := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">byte</span>, size)<br>	<span class="hljs-built_in">copy</span>(buffer, data)<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">parse</span><span class="hljs-params">(lenControlByUser <span class="hljs-keyword">int</span>, data []<span class="hljs-keyword">byte</span>)</span> <span class="hljs-params">([]<span class="hljs-keyword">byte</span>, error)</span></span> &#123;<br>	size := lenControlByUser<br>	<span class="hljs-comment">// 限制外部可控的长度大小范围</span><br>	<span class="hljs-keyword">if</span> size &gt; <span class="hljs-number">64</span>*<span class="hljs-number">1024</span>*<span class="hljs-number">1024</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, errors.New(<span class="hljs-string">"value too large"</span>)<br>	&#125;<br>	buffer := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">byte</span>, size)<br>	<span class="hljs-built_in">copy</span>(buffer, data)<br>	<span class="hljs-keyword">return</span> buffer, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func parse(lenControlByUser int, data []byte) {
+    size := lenControlByUser
+    // 对外部传入的size，进行长度判断以免导致panic
+    buffer := make([]byte, size)
+    copy(buffer, data)
+}
 
+// good
+func parse(lenControlByUser int, data []byte) ([]byte, error) {
+    size := lenControlByUser
+    // 限制外部可控的长度大小范围
+    if size &gt; 64*1024*1024 {
+        return nil, errors.New(&quot;value too large&quot;)
+    }
+    buffer := make([]byte, size)
+    copy(buffer, data)
+    return buffer, nil
+}</code></pre>
 <h3 id="【必须】禁止-SetFinalizer-和指针循环引用同时使用"><a href="#【必须】禁止-SetFinalizer-和指针循环引用同时使用" class="headerlink" title="【必须】禁止 SetFinalizer 和指针循环引用同时使用"></a>【必须】禁止 SetFinalizer 和指针循环引用同时使用</h3><ul>
 <li>当一个对象从被 GC 选中到移除内存之前，<code>runtime.SetFinalizer()</code> 都不会执行，即使程序正常结束或者发生错误。由指针构成的“循环引用”虽然能被 GC 正确处理，但由于无法确定 Finalizer 依赖顺序，从而无法调用 <code>runtime.SetFinalizer()</code>，导致目标对象无法变成可达状态，从而造成内存无法被回收。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">var</span> a, b Data<br>    <span class="hljs-comment">// 指针循环引用</span><br>	a.o = &amp;b<br>	b.o = &amp;a<br><br>	<span class="hljs-comment">// 指针循环引用，SetFinalizer() 无法正常调用</span><br>	runtime.SetFinalizer(&amp;a, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(d *Data)</span></span> &#123;<br>		fmt.Printf(<span class="hljs-string">"a %p final.\n"</span>, d)<br>	&#125;)<br>	runtime.SetFinalizer(&amp;b, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(d *Data)</span></span> &#123;<br>		fmt.Printf(<span class="hljs-string">"b %p final.\n"</span>, d)<br>	&#125;)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">for</span> &#123;<br>		foo()<br>		time.Sleep(time.Millisecond)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func foo() {
+    var a, b Data
+    // 指针循环引用
+    a.o = &amp;b
+    b.o = &amp;a
 
+    // 指针循环引用，SetFinalizer() 无法正常调用
+    runtime.SetFinalizer(&amp;a, func(d *Data) {
+        fmt.Printf(&quot;a %p final.\n&quot;, d)
+    })
+    runtime.SetFinalizer(&amp;b, func(d *Data) {
+        fmt.Printf(&quot;b %p final.\n&quot;, d)
+    })
+}
+
+func main() {
+    for {
+        foo()
+        time.Sleep(time.Millisecond)
+    }
+}</code></pre>
 <h3 id="【必须】禁止重复释放-channel"><a href="#【必须】禁止重复释放-channel" class="headerlink" title="【必须】禁止重复释放 channel"></a>【必须】禁止重复释放 channel</h3><ul>
 <li>重复释放一般存在于异常流程判断中，如果恶意攻击者构造出异常条件使程序重复释放 channel，则会触发运行时恐慌，从而造成 DoS 攻击。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">(c <span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span></span> &#123;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(c)<br>	err := processBusiness()<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		c &lt;- <span class="hljs-number">0</span><br>		<span class="hljs-built_in">close</span>(c) <span class="hljs-comment">// 重复释放 channel</span><br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	c &lt;- <span class="hljs-number">1</span><br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">(c <span class="hljs-keyword">chan</span> <span class="hljs-keyword">int</span>)</span></span> &#123;<br>	<span class="hljs-keyword">defer</span> <span class="hljs-built_in">close</span>(c) <span class="hljs-comment">// 使用 defer 延迟关闭 channel</span><br>	err := processBusiness()<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		c &lt;- <span class="hljs-number">0</span><br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	c &lt;- <span class="hljs-number">1</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func foo(c chan int) {
+    defer close(c)
+    err := processBusiness()
+    if err != nil {
+        c &lt;- 0
+        close(c) // 重复释放 channel
+        return
+    }
+    c &lt;- 1
+}
 
+// good
+func foo(c chan int) {
+    defer close(c) // 使用 defer 延迟关闭 channel
+    err := processBusiness()
+    if err != nil {
+        c &lt;- 0
+        return
+    }
+    c &lt;- 1
+}</code></pre>
 <h3 id="【必须】确保每个协程都能退出"><a href="#【必须】确保每个协程都能退出" class="headerlink" title="【必须】确保每个协程都能退出"></a>【必须】确保每个协程都能退出</h3><ul>
 <li>启动一个协程就会做一个入栈操作，在系统不退出的情况下，协程也没有设置退出条件，则相当于协程失去了控制，它占用的资源无法回收，可能会导致内存泄露。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: 协程没有设置退出条件</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">doWaiter</span><span class="hljs-params">(name <span class="hljs-keyword">string</span>, second <span class="hljs-keyword">int</span>)</span></span> &#123;<br>	<span class="hljs-keyword">for</span> &#123;<br>		time.Sleep(time.Duration(second) * time.Second)<br>		fmt.Println(name, <span class="hljs-string">" is ready!"</span>)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">// bad: 协程没有设置退出条件
+func doWaiter(name string, second int) {
+    for {
+        time.Sleep(time.Duration(second) * time.Second)
+        fmt.Println(name, &quot; is ready!&quot;)
+    }
+}</code></pre>
 <h3 id="【推荐】不使用unsafe包"><a href="#【推荐】不使用unsafe包" class="headerlink" title="【推荐】不使用unsafe包"></a>【推荐】不使用unsafe包</h3><ul>
 <li>由于 unsafe 包绕过了 Golang 的内存安全原则，一般来说使用该库是不安全的，可导致内存破坏，尽量避免使用该包。若必须要使用 unsafe 操作指针，必须做好安全校验。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: 通过 unsafe 操作原始指针</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">unsafePointer</span><span class="hljs-params">()</span></span> &#123;<br>	b := <span class="hljs-built_in">make</span>([]<span class="hljs-keyword">byte</span>, <span class="hljs-number">1</span>)<br>	foo := (*<span class="hljs-keyword">int</span>)(unsafe.Pointer(<span class="hljs-keyword">uintptr</span>(unsafe.Pointer(&amp;b[<span class="hljs-number">0</span>])) + <span class="hljs-keyword">uintptr</span>(<span class="hljs-number">0xfffffffe</span>)))<br>	fmt.Print(*foo + <span class="hljs-number">1</span>)<br>&#125;<br><br><span class="hljs-comment">// [signal SIGSEGV: segmentation violation code=0x1 addr=0xc100068f55 pc=0x49142b]</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad: 通过 unsafe 操作原始指针
+func unsafePointer() {
+    b := make([]byte, 1)
+    foo := (*int)(unsafe.Pointer(uintptr(unsafe.Pointer(&amp;b[0])) + uintptr(0xfffffffe)))
+    fmt.Print(*foo + 1)
+}
 
+// [signal SIGSEGV: segmentation violation code=0x1 addr=0xc100068f55 pc=0x49142b]</code></pre>
 <h3 id="【推荐】不使用-slice-作为函数入参"><a href="#【推荐】不使用-slice-作为函数入参" class="headerlink" title="【推荐】不使用 slice 作为函数入参"></a>【推荐】不使用 slice 作为函数入参</h3><ul>
 <li>slice 是引用类型，在作为函数入参时采用的是地址传递，对 slice 的修改也会影响原始数据</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: slice 作为函数入参时是地址传递</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">modify</span><span class="hljs-params">(array []<span class="hljs-keyword">int</span>)</span></span> &#123;<br>	array[<span class="hljs-number">0</span>] = <span class="hljs-number">10</span> <span class="hljs-comment">// 对入参 slice 的元素修改会影响原始数据</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	array := []<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;<br><br>	modify(array)<br>	fmt.Println(array) <span class="hljs-comment">// output：[10 2 3 4 5]</span><br>&#125;<br><br><span class="hljs-comment">// good: 函数使用数组作为入参，而不是 slice</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">modify</span><span class="hljs-params">(array [5]<span class="hljs-keyword">int</span>)</span></span> &#123;<br>	array[<span class="hljs-number">0</span>] = <span class="hljs-number">10</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-comment">// 传入数组，注意数组与slice的区别</span><br>	array := [<span class="hljs-number">5</span>]<span class="hljs-keyword">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>&#125;<br><br>	modify(array)<br>	fmt.Println(array)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad: slice 作为函数入参时是地址传递
+func modify(array []int) {
+    array[0] = 10 // 对入参 slice 的元素修改会影响原始数据
+}
 
+func main() {
+    array := []int{1, 2, 3, 4, 5}
+
+    modify(array)
+    fmt.Println(array) // output：[10 2 3 4 5]
+}
+
+// good: 函数使用数组作为入参，而不是 slice
+func modify(array [5]int) {
+    array[0] = 10
+}
+
+func main() {
+    // 传入数组，注意数组与slice的区别
+    array := [5]int{1, 2, 3, 4, 5}
+
+    modify(array)
+    fmt.Println(array)
+}</code></pre>
 <h2 id="文件操作"><a href="#文件操作" class="headerlink" title="文件操作"></a>文件操作</h2><h3 id="【必须】-路径穿越检查"><a href="#【必须】-路径穿越检查" class="headerlink" title="【必须】 路径穿越检查"></a>【必须】 路径穿越检查</h3><ul>
 <li>在进行文件操作时，如果对外部传入的文件名未做限制，可能导致任意文件读取或者任意文件写入，严重可能导致代码执行。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad: 任意文件读取</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	path := r.URL.Query()[<span class="hljs-string">"path"</span>][<span class="hljs-number">0</span>]<br><br>	<span class="hljs-comment">// 未过滤文件路径，可能导致任意文件读取</span><br>	data, _ := ioutil.ReadFile(path)<br>	w.Write(data)<br><br>	<span class="hljs-comment">// 对外部传入的文件名变量，还需要验证是否存在 ../ 等路径穿越的文件名</span><br>	data, _ = ioutil.ReadFile(filepath.Join(<span class="hljs-string">"/home/user/"</span>, path))<br>	w.Write(data)<br>&#125;<br><br><span class="hljs-comment">// bad: 任意文件写入</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">unzip</span><span class="hljs-params">(f <span class="hljs-keyword">string</span>)</span></span> &#123;<br>	r, _ := zip.OpenReader(f)<br>	<span class="hljs-keyword">for</span> _, f := <span class="hljs-keyword">range</span> r.File &#123;<br>		p, _ := filepath.Abs(f.Name)<br>		<span class="hljs-comment">// 未验证压缩文件名，可能导致 ../ 等路径穿越，任意文件路径写入</span><br>		ioutil.WriteFile(p, []<span class="hljs-keyword">byte</span>(<span class="hljs-string">"present"</span>), <span class="hljs-number">0640</span>)<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// good: 检查压缩的文件名是否包含 .. 路径穿越特征字符，防止任意写入</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">unzipGood</span><span class="hljs-params">(f <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br>	r, err := zip.OpenReader(f)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(<span class="hljs-string">"read zip file fail"</span>)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>	&#125;<br>	<span class="hljs-keyword">for</span> _, f := <span class="hljs-keyword">range</span> r.File &#123;<br>		<span class="hljs-keyword">if</span> !strings.Contains(f.Name, <span class="hljs-string">".."</span>) &#123;<br>			p, _ := filepath.Abs(f.Name)<br>			ioutil.WriteFile(p, []<span class="hljs-keyword">byte</span>(<span class="hljs-string">"present"</span>), <span class="hljs-number">0640</span>)<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad: 任意文件读取
+func handler(w http.ResponseWriter, r *http.Request) {
+    path := r.URL.Query()[&quot;path&quot;][0]
 
+    // 未过滤文件路径，可能导致任意文件读取
+    data, _ := ioutil.ReadFile(path)
+    w.Write(data)
+
+    // 对外部传入的文件名变量，还需要验证是否存在 ../ 等路径穿越的文件名
+    data, _ = ioutil.ReadFile(filepath.Join(&quot;/home/user/&quot;, path))
+    w.Write(data)
+}
+
+// bad: 任意文件写入
+func unzip(f string) {
+    r, _ := zip.OpenReader(f)
+    for _, f := range r.File {
+        p, _ := filepath.Abs(f.Name)
+        // 未验证压缩文件名，可能导致 ../ 等路径穿越，任意文件路径写入
+        ioutil.WriteFile(p, []byte(&quot;present&quot;), 0640)
+    }
+}
+
+// good: 检查压缩的文件名是否包含 .. 路径穿越特征字符，防止任意写入
+func unzipGood(f string) bool {
+    r, err := zip.OpenReader(f)
+    if err != nil {
+        fmt.Println(&quot;read zip file fail&quot;)
+        return false
+    }
+    for _, f := range r.File {
+        if !strings.Contains(f.Name, &quot;..&quot;) {
+            p, _ := filepath.Abs(f.Name)
+            ioutil.WriteFile(p, []byte(&quot;present&quot;), 0640)
+        } else {
+            return false
+        }
+    }
+    return true
+}</code></pre>
 <h3 id="【必须】-文件访问权限"><a href="#【必须】-文件访问权限" class="headerlink" title="【必须】 文件访问权限"></a>【必须】 文件访问权限</h3><ul>
 <li>根据创建文件的敏感性设置不同级别的访问权限，以防止敏感数据被任意权限用户读取。例如，设置文件权限为：<code>-rw-r-----</code></li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">ioutil.WriteFile(p, []<span class="hljs-keyword">byte</span>(<span class="hljs-string">"present"</span>), <span class="hljs-number">0640</span>)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">ioutil.WriteFile(p, []byte(&quot;present&quot;), 0640)</code></pre>
 <h2 id="系统接口"><a href="#系统接口" class="headerlink" title="系统接口"></a>系统接口</h2><h3 id="【必须】命令执行检查"><a href="#【必须】命令执行检查" class="headerlink" title="【必须】命令执行检查"></a>【必须】命令执行检查</h3><ul>
 <li>使用 <code>exec.Command</code>、<code>exec.CommandContext</code>、<code>syscall.StartProcess</code>、<code>os.StartProcess</code> 等函数时，第一个参数（path）直接取外部输入值时，应使用白名单限定可执行的命令范围，不允许传入 <code>bash</code>、<code>cmd</code>、<code>sh</code> 等命令；</li>
 <li>使用<code>exec.Command</code>、<code>exec.CommandContext</code> 等函数时，通过 <code>bash</code>、<code>cmd</code>、<code>sh</code> 等创建shell，-c 后的参数（arg）拼接外部输入，应过滤  \n $ &amp; ; | ‘ “ ( ) ` 等潜在恶意字符；</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">foo</span><span class="hljs-params">()</span></span> &#123;<br>	userInputedVal := <span class="hljs-string">"&amp;&amp; echo 'hello'"</span> <span class="hljs-comment">// 假设外部传入该变量值</span><br>	cmdName := <span class="hljs-string">"ping "</span> + userInputedVal<br><br>	<span class="hljs-comment">// 未判断外部输入是否存在命令注入字符，结合 sh 可造成命令注入</span><br>	cmd := exec.Command(<span class="hljs-string">"sh"</span>, <span class="hljs-string">"-c"</span>, cmdName)<br>	output, _ := cmd.CombinedOutput()<br>	fmt.Println(<span class="hljs-keyword">string</span>(output))<br><br>	cmdName := <span class="hljs-string">"ls"</span><br>	<span class="hljs-comment">// 未判断外部输入是否是预期命令</span><br>	cmd := exec.Command(cmdName)<br>	output, _ := cmd.CombinedOutput()<br>	fmt.Println(<span class="hljs-keyword">string</span>(output))<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">checkIllegal</span><span class="hljs-params">(cmdName <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br>	<span class="hljs-keyword">if</span> strings.Contains(cmdName, <span class="hljs-string">"&amp;"</span>) || strings.Contains(cmdName, <span class="hljs-string">"|"</span>) || strings.Contains(cmdName, <span class="hljs-string">";"</span>) ||<br>		strings.Contains(cmdName, <span class="hljs-string">"$"</span>) || strings.Contains(cmdName, <span class="hljs-string">"'"</span>) || strings.Contains(cmdName, <span class="hljs-string">"`"</span>) ||<br>		strings.Contains(cmdName, <span class="hljs-string">"("</span>) || strings.Contains(cmdName, <span class="hljs-string">")"</span>) || strings.Contains(cmdName, <span class="hljs-string">"\""</span>) &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	userInputedVal := <span class="hljs-string">"&amp;&amp; echo 'hello'"</span><br>	cmdName := <span class="hljs-string">"ping "</span> + userInputedVal<br><br>	<span class="hljs-keyword">if</span> checkIllegal(cmdName) &#123; <span class="hljs-comment">// 检查传给sh的命令是否有特殊字符</span><br>		<span class="hljs-keyword">return</span> <span class="hljs-comment">// 存在特殊字符直接return</span><br>	&#125;<br><br>	cmd := exec.Command(<span class="hljs-string">"sh"</span>, <span class="hljs-string">"-c"</span>, cmdName)<br>	output, _ := cmd.CombinedOutput()<br>	fmt.Println(<span class="hljs-keyword">string</span>(output))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func foo() {
+    userInputedVal := &quot;&amp;&amp; echo &#39;hello&#39;&quot; // 假设外部传入该变量值
+    cmdName := &quot;ping &quot; + userInputedVal
 
+    // 未判断外部输入是否存在命令注入字符，结合 sh 可造成命令注入
+    cmd := exec.Command(&quot;sh&quot;, &quot;-c&quot;, cmdName)
+    output, _ := cmd.CombinedOutput()
+    fmt.Println(string(output))
+
+    cmdName := &quot;ls&quot;
+    // 未判断外部输入是否是预期命令
+    cmd := exec.Command(cmdName)
+    output, _ := cmd.CombinedOutput()
+    fmt.Println(string(output))
+}
+
+// good
+func checkIllegal(cmdName string) bool {
+    if strings.Contains(cmdName, &quot;&amp;&quot;) || strings.Contains(cmdName, &quot;|&quot;) || strings.Contains(cmdName, &quot;;&quot;) ||
+        strings.Contains(cmdName, &quot;$&quot;) || strings.Contains(cmdName, &quot;&#39;&quot;) || strings.Contains(cmdName, &quot;`&quot;) ||
+        strings.Contains(cmdName, &quot;(&quot;) || strings.Contains(cmdName, &quot;)&quot;) || strings.Contains(cmdName, &quot;\&quot;&quot;) {
+        return true
+    }
+    return false
+}
+
+func main() {
+    userInputedVal := &quot;&amp;&amp; echo &#39;hello&#39;&quot;
+    cmdName := &quot;ping &quot; + userInputedVal
+
+    if checkIllegal(cmdName) { // 检查传给sh的命令是否有特殊字符
+        return // 存在特殊字符直接return
+    }
+
+    cmd := exec.Command(&quot;sh&quot;, &quot;-c&quot;, cmdName)
+    output, _ := cmd.CombinedOutput()
+    fmt.Println(string(output))
+}</code></pre>
 <h2 id="通信安全"><a href="#通信安全" class="headerlink" title="通信安全"></a>通信安全</h2><h3 id="【必须】网络通信采用-TLS-方式"><a href="#【必须】网络通信采用-TLS-方式" class="headerlink" title="【必须】网络通信采用 TLS 方式"></a>【必须】网络通信采用 TLS 方式</h3><ul>
 <li>明文传输的通信协议目前已被验证存在较大安全风险，被中间人劫持后可能导致许多安全风险，因此必须采用至少 TLS 的安全通信方式保证通信安全，例如 gRPC/Websocket 都使用 TLS1.3。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	http.HandleFunc(<span class="hljs-string">"/"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;<br>		w.Header().Add(<span class="hljs-string">"Strict-Transport-Security"</span>, <span class="hljs-string">"max-age=63072000; includeSubDomains"</span>)<br>		w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"This is an example server.\n"</span>))<br>	&#125;)<br><br>	<span class="hljs-comment">// 服务器配置证书与私钥</span><br>	log.Fatal(http.ListenAndServeTLS(<span class="hljs-string">":443"</span>, <span class="hljs-string">"yourCert.pem"</span>, <span class="hljs-string">"yourKey.pem"</span>, <span class="hljs-literal">nil</span>))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// good
+func main() {
+    http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, req *http.Request) {
+        w.Header().Add(&quot;Strict-Transport-Security&quot;, &quot;max-age=63072000; includeSubDomains&quot;)
+        w.Write([]byte(&quot;This is an example server.\n&quot;))
+    })
 
+    // 服务器配置证书与私钥
+    log.Fatal(http.ListenAndServeTLS(&quot;:443&quot;, &quot;yourCert.pem&quot;, &quot;yourKey.pem&quot;, nil))
+}</code></pre>
 <h3 id="【推荐】TLS-启用证书验证"><a href="#【推荐】TLS-启用证书验证" class="headerlink" title="【推荐】TLS 启用证书验证"></a>【推荐】TLS 启用证书验证</h3><ul>
 <li>TLS 证书应当是有效的、未过期的，且配置正确的域名，生产环境的服务端应启用证书验证。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"crypto/tls"</span><br>	<span class="hljs-string">"net/http"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">doAuthReq</span><span class="hljs-params">(authReq *http.Request)</span> *<span class="hljs-title">http</span>.<span class="hljs-title">Response</span></span> &#123;<br>	tr := &amp;http.Transport&#123;<br>		TLSClientConfig: &amp;tls.Config&#123;InsecureSkipVerify: <span class="hljs-literal">true</span>&#125;,<br>	&#125;<br>	client := &amp;http.Client&#123;Transport: tr&#125;<br>	res, _ := client.Do(authReq)<br>	<span class="hljs-keyword">return</span> res<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"crypto/tls"</span><br>	<span class="hljs-string">"net/http"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">doAuthReq</span><span class="hljs-params">(authReq *http.Request)</span> *<span class="hljs-title">http</span>.<span class="hljs-title">Response</span></span> &#123;<br>	tr := &amp;http.Transport&#123;<br>		TLSClientConfig: &amp;tls.Config&#123;InsecureSkipVerify: <span class="hljs-literal">false</span>&#125;,<br>	&#125;<br>	client := &amp;http.Client&#123;Transport: tr&#125;<br>	res, _ := client.Do(authReq)<br>	<span class="hljs-keyword">return</span> res<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+import (
+    &quot;crypto/tls&quot;
+    &quot;net/http&quot;
+)
 
+func doAuthReq(authReq *http.Request) *http.Response {
+    tr := &amp;http.Transport{
+        TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: true},
+    }
+    client := &amp;http.Client{Transport: tr}
+    res, _ := client.Do(authReq)
+    return res
+}
+
+// good
+import (
+    &quot;crypto/tls&quot;
+    &quot;net/http&quot;
+)
+
+func doAuthReq(authReq *http.Request) *http.Response {
+    tr := &amp;http.Transport{
+        TLSClientConfig: &amp;tls.Config{InsecureSkipVerify: false},
+    }
+    client := &amp;http.Client{Transport: tr}
+    res, _ := client.Do(authReq)
+    return res
+}
+</code></pre>
 <h2 id="敏感数据保护"><a href="#敏感数据保护" class="headerlink" title="敏感数据保护"></a>敏感数据保护</h2><h3 id="【必须】敏感信息访问"><a href="#【必须】敏感信息访问" class="headerlink" title="【必须】敏感信息访问"></a>【必须】敏感信息访问</h3><ul>
 <li>禁止将敏感信息硬编码在程序中，既可能会将敏感信息暴露给攻击者，也会增加代码管理和维护的难度</li>
 <li>使用配置中心系统统一托管密钥等敏感信息</li>
@@ -341,8 +670,32 @@
 <li>不能在日志保存密码（包括明文密码和密文密码）、密钥和其它敏感信息</li>
 <li>对于必须输出的敏感信息，必须进行合理脱敏展示</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">serve</span><span class="hljs-params">()</span></span> &#123;<br>	http.HandleFunc(<span class="hljs-string">"/register"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>		r.ParseForm()<br>		user := r.Form.Get(<span class="hljs-string">"user"</span>)<br>		pw := r.Form.Get(<span class="hljs-string">"password"</span>)<br><br>		log.Printf(<span class="hljs-string">"Registering new user %s with password %s.\n"</span>, user, pw)<br>	&#125;)<br>	http.ListenAndServe(<span class="hljs-string">":80"</span>, <span class="hljs-literal">nil</span>)<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">serve1</span><span class="hljs-params">()</span></span> &#123;<br>	http.HandleFunc(<span class="hljs-string">"/register"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>		r.ParseForm()<br>		user := r.Form.Get(<span class="hljs-string">"user"</span>)<br>		pw := r.Form.Get(<span class="hljs-string">"password"</span>)<br><br>		log.Printf(<span class="hljs-string">"Registering new user %s.\n"</span>, user)<br><br>		<span class="hljs-comment">// ...</span><br>		use(pw)<br>	&#125;)<br>	http.ListenAndServe(<span class="hljs-string">":80"</span>, <span class="hljs-literal">nil</span>)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func serve() {
+    http.HandleFunc(&quot;/register&quot;, func(w http.ResponseWriter, r *http.Request) {
+        r.ParseForm()
+        user := r.Form.Get(&quot;user&quot;)
+        pw := r.Form.Get(&quot;password&quot;)
 
+        log.Printf(&quot;Registering new user %s with password %s.\n&quot;, user, pw)
+    })
+    http.ListenAndServe(&quot;:80&quot;, nil)
+}
+
+// good
+func serve1() {
+    http.HandleFunc(&quot;/register&quot;, func(w http.ResponseWriter, r *http.Request) {
+        r.ParseForm()
+        user := r.Form.Get(&quot;user&quot;)
+        pw := r.Form.Get(&quot;password&quot;)
+
+        log.Printf(&quot;Registering new user %s.\n&quot;, user)
+
+        // ...
+        use(pw)
+    })
+    http.ListenAndServe(&quot;:80&quot;, nil)
+}</code></pre>
 <ul>
 <li>避免通过GET方法、代码注释、自动填充、缓存等方式泄露敏感信息</li>
 </ul>
@@ -354,26 +707,58 @@
 <h3 id="【必须】异常处理和日志记录"><a href="#【必须】异常处理和日志记录" class="headerlink" title="【必须】异常处理和日志记录"></a>【必须】异常处理和日志记录</h3><ul>
 <li>应合理使用 panic、recover、defer 处理系统异常，避免出错信息输出到前端</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">if</span> r := <span class="hljs-built_in">recover</span>(); r != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(<span class="hljs-string">"Recovered in start()"</span>)<br>	&#125;<br>&#125;()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">defer func () {
+    if r := recover(); r != nil {
+        fmt.Println(&quot;Recovered in start()&quot;)
+    }
+}()</code></pre>
 <ul>
 <li>对外环境禁止开启 debug 模式，或将程序运行日志输出到前端</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br>dlv --listen=:<span class="hljs-number">2345</span> --headless=<span class="hljs-literal">true</span> --api-version=<span class="hljs-number">2</span> debug test.<span class="hljs-keyword">go</span><br><span class="hljs-comment">// good</span><br>dlv debug test.<span class="hljs-keyword">go</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">// bad
+dlv --listen=:2345 --headless=true --api-version=2 debug test.go
+// good
+dlv debug test.go</code></pre>
 <h2 id="加密解密"><a href="#加密解密" class="headerlink" title="加密解密"></a>加密解密</h2><h3 id="【必须】不得硬编码密码-密钥"><a href="#【必须】不得硬编码密码-密钥" class="headerlink" title="【必须】不得硬编码密码/密钥"></a>【必须】不得硬编码密码/密钥</h3><ul>
 <li>在进行用户登陆，加解密算法等操作时，不得在代码里硬编码密钥或密码，可通过变换算法或者配置等方式设置密码或者密钥。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-keyword">const</span> (<br>	user     = <span class="hljs-string">"dbuser"</span><br>	password = <span class="hljs-string">"s3cretp4ssword"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">connect</span><span class="hljs-params">()</span> *<span class="hljs-title">sql</span>.<span class="hljs-title">DB</span></span> &#123;<br>	connStr := fmt.Sprintf(<span class="hljs-string">"postgres://%s:%s@localhost/pqgotest"</span>, user, password)<br>	db, err := sql.Open(<span class="hljs-string">"postgres"</span>, connStr)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> db<br>&#125;<br><br><span class="hljs-comment">// bad</span><br><span class="hljs-keyword">var</span> (<br>	commonkey = []<span class="hljs-keyword">byte</span>(<span class="hljs-string">"0123456789abcdef"</span>)<br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">AesEncrypt</span><span class="hljs-params">(plaintext <span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>	block, err := aes.NewCipher(commonkey)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">""</span>, err<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+const (
+    user     = &quot;dbuser&quot;
+    password = &quot;s3cretp4ssword&quot;
+)
 
+func connect() *sql.DB {
+    connStr := fmt.Sprintf(&quot;postgres://%s:%s@localhost/pqgotest&quot;, user, password)
+    db, err := sql.Open(&quot;postgres&quot;, connStr)
+    if err != nil {
+        return nil
+    }
+    return db
+}
+
+// bad
+var (
+    commonkey = []byte(&quot;0123456789abcdef&quot;)
+)
+
+func AesEncrypt(plaintext string) (string, error) {
+    block, err := aes.NewCipher(commonkey)
+    if err != nil {
+        return &quot;&quot;, err
+    }
+}</code></pre>
 <h3 id="【必须】密钥存储安全"><a href="#【必须】密钥存储安全" class="headerlink" title="【必须】密钥存储安全"></a>【必须】密钥存储安全</h3><ul>
 <li>在使用对称密码算法时，需要保护好加密密钥。当算法涉及敏感、业务数据时，可通过非对称算法协商加密密钥。其他较为不敏感的数据加密，可以通过变换算法等方式保护密钥。</li>
 </ul>
 <h3 id="【推荐】不使用弱密码算法"><a href="#【推荐】不使用弱密码算法" class="headerlink" title="【推荐】不使用弱密码算法"></a>【推荐】不使用弱密码算法</h3><ul>
 <li>在使用加密算法时，不建议使用加密强度较弱的算法。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br>crypto/des，crypto/md5，crypto/sha1，crypto/rc4等。<br><br><span class="hljs-comment">// good</span><br>crypto/rsa，crypto/aes等。<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+crypto/des，crypto/md5，crypto/sha1，crypto/rc4等。
 
+// good
+crypto/rsa，crypto/aes等。</code></pre>
 <h2 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h2><h3 id="【推荐】使用-regexp-进行正则表达式匹配"><a href="#【推荐】使用-regexp-进行正则表达式匹配" class="headerlink" title="【推荐】使用 regexp 进行正则表达式匹配"></a>【推荐】使用 regexp 进行正则表达式匹配</h3><ul>
 <li>正则表达式编写不恰当可被用于DoS攻击，造成服务不可用，推荐使用 regexp 包进行正则表达式匹配。regexp 保证了线性时间性能和优雅的失败：对解析器、编译器和执行引擎都进行了内存限制。但 regexp 不支持以下正则表达式特性，如业务依赖这些特性，则 regexp 不适合使用。<ul>
 <li>回溯引用 <a href="https://www.regular-expressions.info/backref.html" target="_blank" rel="noopener">Backreferences</a></li>
@@ -381,28 +766,90 @@
 </ul>
 </li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br>matched, err := regexp.MatchString(<span class="hljs-string">`a.b`</span>, <span class="hljs-string">"aaxbb"</span>)<br>fmt.Println(matched) <span class="hljs-comment">// true</span><br>fmt.Println(err)     <span class="hljs-comment">// nil</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">// good
+matched, err := regexp.MatchString(`a.b`, &quot;aaxbb&quot;)
+fmt.Println(matched) // true
+fmt.Println(err)     // nil</code></pre>
 <h1 id="后台类"><a href="#后台类" class="headerlink" title="后台类"></a>后台类</h1><h2 id="输入校验"><a href="#输入校验" class="headerlink" title="输入校验"></a>输入校验</h2><h3 id="【必须】按类型进行数据校验"><a href="#【必须】按类型进行数据校验" class="headerlink" title="【必须】按类型进行数据校验"></a>【必须】按类型进行数据校验</h3><ul>
 <li>所有外部输入的参数，应使用 <code>validator</code> 进行白名单校验，校验内容包括但不限于数据长度、数据范围、数据类型与格式，校验不通过的应当拒绝。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"github.com/go-playground/validator/v10"</span><br>)<br><br><span class="hljs-keyword">var</span> validate *validator.Validate<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">validateVariable</span><span class="hljs-params">()</span></span> &#123;<br>	myEmail := <span class="hljs-string">"abc@tencent.com"</span><br>	errs := validate.Var(myEmail, <span class="hljs-string">"required,email"</span>)<br>	<span class="hljs-keyword">if</span> errs != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(errs)<br>		<span class="hljs-keyword">return</span><br>		<span class="hljs-comment">//停止执行</span><br>	&#125;<br>	<span class="hljs-comment">// 验证通过，继续执行</span><br>	...<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	validate = validator.New()<br>	validateVariable()<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// good
+import (
+    &quot;fmt&quot;
+    &quot;github.com/go-playground/validator/v10&quot;
+)
 
+var validate *validator.Validate
+
+func validateVariable() {
+    myEmail := &quot;abc@tencent.com&quot;
+    errs := validate.Var(myEmail, &quot;required,email&quot;)
+    if errs != nil {
+        fmt.Println(errs)
+        return
+        //停止执行
+    }
+    // 验证通过，继续执行
+    ...
+}
+
+func main() {
+    validate = validator.New()
+    validateVariable()
+}</code></pre>
 <ul>
 <li>无法通过白名单校验的应使用 <code>html.EscapeString</code>、<code>text/template</code> 或 <code>bluemonday</code> 对 <code>&lt;, &gt;, &amp;, &#39;,&quot;</code> 等字符进行过滤或编码。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"text/template"</span><br>)<br><br><span class="hljs-comment">// TestHTMLEscapeString HTML 特殊字符转义</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">(inputValue <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;<br>	escapedResult := template.HTMLEscapeString(inputValue)<br>	<span class="hljs-keyword">return</span> escapedResult<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;text/template&quot;
+)
 
+// TestHTMLEscapeString HTML 特殊字符转义
+func main(inputValue string) string {
+    escapedResult := template.HTMLEscapeString(inputValue)
+    return escapedResult
+}</code></pre>
 <h2 id="SQL操作"><a href="#SQL操作" class="headerlink" title="SQL操作"></a>SQL操作</h2><h3 id="【必须】SQL语句默认使用预编译并绑定变量"><a href="#【必须】SQL语句默认使用预编译并绑定变量" class="headerlink" title="【必须】SQL语句默认使用预编译并绑定变量"></a>【必须】SQL语句默认使用预编译并绑定变量</h3><ul>
 <li>使用 <code>database/sql</code> 的 prepare、Query 或使用 GORM 等 ORM 执行 SQL 操作</li>
 </ul>
-<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql">import (<br>	"github.com/jinzhu/gorm"<br>	_ "github.com/jinzhu/gorm/dialects/sqlite"<br>)<br><br>type Product struct &#123;<br>	gorm.Model<br>	Code  string<br>	Price uint<br>&#125;<br><br>...<br>var product Product<br>...<br>db.First(&amp;product, 1)<br></code></pre></div></td></tr></table></figure>
+<pre><code class="sql">import (
+    &quot;github.com/jinzhu/gorm&quot;
+    _ &quot;github.com/jinzhu/gorm/dialects/sqlite&quot;
+)
 
+type Product struct {
+    gorm.Model
+    Code  string
+    Price uint
+}
+
+...
+var product Product
+...
+db.First(&amp;product, 1)
+</code></pre>
 <ul>
 <li>使用参数化查询，禁止拼接 SQL 语句，另外对于传入参数用于 order by 或表名的需要通过校验</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"database/sql"</span><br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"net/http"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(db *sql.DB, req *http.Request)</span></span> &#123;<br>	q := fmt.Sprintf(<span class="hljs-string">"SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='%s' ORDER BY PRICE"</span>,<br>		req.URL.Query()[<span class="hljs-string">"category"</span>])<br>	db.Query(q)<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handlerGood</span><span class="hljs-params">(db *sql.DB, req *http.Request)</span></span> &#123;<br>	<span class="hljs-comment">// 使用?占位符</span><br>	q := <span class="hljs-string">"SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY='?' ORDER BY PRICE"</span><br>	db.Query(q, req.URL.Query()[<span class="hljs-string">"category"</span>])<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+import (
+    &quot;database/sql&quot;
+    &quot;fmt&quot;
+    &quot;net/http&quot;
+)
 
+func handler(db *sql.DB, req *http.Request) {
+    q := fmt.Sprintf(&quot;SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY=&#39;%s&#39; ORDER BY PRICE&quot;,
+        req.URL.Query()[&quot;category&quot;])
+    db.Query(q)
+}
+
+// good
+func handlerGood(db *sql.DB, req *http.Request) {
+    // 使用?占位符
+    q := &quot;SELECT ITEM,PRICE FROM PRODUCT WHERE ITEM_CATEGORY=&#39;?&#39; ORDER BY PRICE&quot;
+    db.Query(q, req.URL.Query()[&quot;category&quot;])
+}</code></pre>
 <h2 id="网络请求"><a href="#网络请求" class="headerlink" title="网络请求"></a>网络请求</h2><h3 id="【必须】资源请求过滤验证"><a href="#【必须】资源请求过滤验证" class="headerlink" title="【必须】资源请求过滤验证"></a>【必须】资源请求过滤验证</h3><ul>
 <li><p>使用 <code>&quot;net/http&quot;</code> 下的方法 <code>http.Get(url)</code>、<code>http.Post(url, contentType, body)</code>、<code>http.Head(url)</code>、<code>http.PostForm(url, data)</code>、<code>http.Do(req)</code> 时，如变量值外部可控（指从参数中动态获取），应对请求目标进行严格的安全校验。</p>
 </li>
@@ -415,7 +862,11 @@
 <li><p>第 3 步、解析 HOST，获取 HOST 指向的 IP 地址转换成 Long 型</p>
 </li>
 <li><p>第 4 步、检查 IP 地址是否为内网 IP，网段有：</p>
-  <figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// 以RFC定义的专有网络为例，如有自定义私有网段亦应加入禁止访问列表。</span><br><span class="hljs-number">10.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>/<span class="hljs-number">8</span><br><span class="hljs-number">172.16</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>/<span class="hljs-number">12</span><br><span class="hljs-number">192.168</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>/<span class="hljs-number">16</span><br><span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>/<span class="hljs-number">8</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">  // 以RFC定义的专有网络为例，如有自定义私有网段亦应加入禁止访问列表。
+  10.0.0.0/8
+  172.16.0.0/12
+  192.168.0.0/16
+  127.0.0.0/8</code></pre>
 </li>
 <li><p>第 5 步、请求 URL</p>
 </li>
@@ -426,18 +877,97 @@
 <li><p>官方库 <code>encoding/xml</code> 不支持外部实体引用，使用该库可避免 xxe 漏洞</p>
 </li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"encoding/xml"</span><br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"os"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">type</span> Person <span class="hljs-keyword">struct</span> &#123;<br>		XMLName  xml.Name <span class="hljs-string">`xml:"person"`</span><br>		Id       <span class="hljs-keyword">int</span>      <span class="hljs-string">`xml:"id,attr"`</span><br>		UserName <span class="hljs-keyword">string</span>   <span class="hljs-string">`xml:"name&gt;first"`</span><br>		Comment  <span class="hljs-keyword">string</span>   <span class="hljs-string">`xml:",comment"`</span><br>	&#125;<br><br>	v := &amp;Person&#123;Id: <span class="hljs-number">13</span>, UserName: <span class="hljs-string">"John"</span>&#125;<br>	v.Comment = <span class="hljs-string">" Need more details. "</span><br><br>	enc := xml.NewEncoder(os.Stdout)<br>	enc.Indent(<span class="hljs-string">"  "</span>, <span class="hljs-string">"    "</span>)<br>	<span class="hljs-keyword">if</span> err := enc.Encode(v); err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Printf(<span class="hljs-string">"error: %v\n"</span>, err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;encoding/xml&quot;
+    &quot;fmt&quot;
+    &quot;os&quot;
+)
 
+func main() {
+    type Person struct {
+        XMLName  xml.Name `xml:&quot;person&quot;`
+        Id       int      `xml:&quot;id,attr&quot;`
+        UserName string   `xml:&quot;name&gt;first&quot;`
+        Comment  string   `xml:&quot;,comment&quot;`
+    }
+
+    v := &amp;Person{Id: 13, UserName: &quot;John&quot;}
+    v.Comment = &quot; Need more details. &quot;
+
+    enc := xml.NewEncoder(os.Stdout)
+    enc.Indent(&quot;  &quot;, &quot;    &quot;)
+    if err := enc.Encode(v); err != nil {
+        fmt.Printf(&quot;error: %v\n&quot;, err)
+    }
+}</code></pre>
 <h2 id="服务器端渲染"><a href="#服务器端渲染" class="headerlink" title="服务器端渲染"></a>服务器端渲染</h2><h3 id="【必须】模板渲染过滤验证"><a href="#【必须】模板渲染过滤验证" class="headerlink" title="【必须】模板渲染过滤验证"></a>【必须】模板渲染过滤验证</h3><ul>
 <li>使用 <code>text/template</code> 或者 <code>html/template</code> 渲染模板时禁止将外部输入参数引入模板，或仅允许引入白名单内字符。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	r.ParseForm()<br>	x := r.Form.Get(<span class="hljs-string">"name"</span>)<br><br>	<span class="hljs-keyword">var</span> tmpl = <span class="hljs-string">`&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;<br>    &lt;form action="/" method="post"&gt;<br>        First name:&lt;br&gt;<br>    &lt;input type="text" name="name" value=""&gt;<br>    &lt;input type="submit" value="Submit"&gt;<br>    &lt;/form&gt;&lt;p&gt;`</span> + x + <span class="hljs-string">` &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;`</span><br><br>	t := template.New(<span class="hljs-string">"main"</span>)<br>	t, _ = t.Parse(tmpl)<br>	t.Execute(w, <span class="hljs-string">"Hello"</span>)<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"github.com/go-playground/validator/v10"</span><br>)<br><br><span class="hljs-keyword">var</span> validate *validator.Validate<br>validate = validator.New()<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">validateVariable</span><span class="hljs-params">(val)</span></span> &#123;<br>	errs := validate.Var(val, <span class="hljs-string">"gte=1,lte=100"</span>) <span class="hljs-comment">// 限制必须是1-100的正整数</span><br>	<span class="hljs-keyword">if</span> errs != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(errs)<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	r.ParseForm()<br>	x := r.Form.Get(<span class="hljs-string">"name"</span>)<br><br>	<span class="hljs-keyword">if</span> validateVariable(x) &#123;<br>		<span class="hljs-keyword">var</span> tmpl = <span class="hljs-string">`&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;<br>            &lt;form action="/" method="post"&gt;<br>            First name:&lt;br&gt;<br>            &lt;input type="text" name="name" value=""&gt;<br>            &lt;input type="submit" value="Submit"&gt;<br>            &lt;/form&gt;&lt;p&gt;`</span> + x + <span class="hljs-string">` &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;`</span><br>		t := template.New(<span class="hljs-string">"main"</span>)<br>		t, _ = t.Parse(tmpl)<br>		t.Execute(w, <span class="hljs-string">"Hello"</span>)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-comment">// ...</span><br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func handler(w http.ResponseWriter, r *http.Request) {
+    r.ParseForm()
+    x := r.Form.Get(&quot;name&quot;)
 
+    var tmpl = `&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;
+    &lt;form action=&quot;/&quot; method=&quot;post&quot;&gt;
+        First name:&lt;br&gt;
+    &lt;input type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot;&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+    &lt;/form&gt;&lt;p&gt;` + x + ` &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;`
+
+    t := template.New(&quot;main&quot;)
+    t, _ = t.Parse(tmpl)
+    t.Execute(w, &quot;Hello&quot;)
+}
+
+// good
+import (
+    &quot;fmt&quot;
+    &quot;github.com/go-playground/validator/v10&quot;
+)
+
+var validate *validator.Validate
+validate = validator.New()
+
+func validateVariable(val) {
+    errs := validate.Var(val, &quot;gte=1,lte=100&quot;) // 限制必须是1-100的正整数
+    if errs != nil {
+        fmt.Println(errs)
+        return false
+    }
+    return true
+}
+
+func handler(w http.ResponseWriter, r *http.Request) {
+    r.ParseForm()
+    x := r.Form.Get(&quot;name&quot;)
+
+    if validateVariable(x) {
+        var tmpl = `&lt;!DOCTYPE html&gt;&lt;html&gt;&lt;body&gt;
+            &lt;form action=&quot;/&quot; method=&quot;post&quot;&gt;
+            First name:&lt;br&gt;
+            &lt;input type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot;&gt;
+            &lt;input type=&quot;submit&quot; value=&quot;Submit&quot;&gt;
+            &lt;/form&gt;&lt;p&gt;` + x + ` &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;`
+        t := template.New(&quot;main&quot;)
+        t, _ = t.Parse(tmpl)
+        t.Execute(w, &quot;Hello&quot;)
+    } else {
+        // ...
+    }
+}</code></pre>
 <h2 id="Web跨域"><a href="#Web跨域" class="headerlink" title="Web跨域"></a>Web跨域</h2><h3 id="【必须】跨域资源共享CORS限制请求来源"><a href="#【必须】跨域资源共享CORS限制请求来源" class="headerlink" title="【必须】跨域资源共享CORS限制请求来源"></a>【必须】跨域资源共享CORS限制请求来源</h3><ul>
 <li>CORS 请求保护不当可导致敏感信息泄漏，因此应当严格设置 <code>Access-Control-Allow-Origin</code> 使用同源策略进行保护。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br>c := cors.New(cors.Options&#123;<br>	AllowedOrigins:   []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"http://qq.com"</span>, <span class="hljs-string">"https://qq.com"</span>&#125;,<br>	AllowCredentials: <span class="hljs-literal">true</span>,<br>	Debug:            <span class="hljs-literal">false</span>,<br>&#125;)<br><br><span class="hljs-comment">// 引入中间件</span><br>handler = c.Handler(handler)<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// good
+c := cors.New(cors.Options{
+    AllowedOrigins:   []string{&quot;http://qq.com&quot;, &quot;https://qq.com&quot;},
+    AllowCredentials: true,
+    Debug:            false,
+})
 
+// 引入中间件
+handler = c.Handler(handler)</code></pre>
 <h2 id="响应输出"><a href="#响应输出" class="headerlink" title="响应输出"></a>响应输出</h2><h3 id="【必须】设置正确的HTTP响应包类型"><a href="#【必须】设置正确的HTTP响应包类型" class="headerlink" title="【必须】设置正确的HTTP响应包类型"></a>【必须】设置正确的HTTP响应包类型</h3><ul>
 <li>响应头 Content-Type 与实际响应内容，应保持一致。如：API 响应数据类型是 json，则响应头使用 <code>application/json</code>；若为 xml，则设置为 <code>text/xml</code>。</li>
 </ul>
@@ -451,396 +981,416 @@
 <h3 id="【必须】外部输入拼接到-response-页面前进行编码处理"><a href="#【必须】外部输入拼接到-response-页面前进行编码处理" class="headerlink" title="【必须】外部输入拼接到 response 页面前进行编码处理"></a>【必须】外部输入拼接到 response 页面前进行编码处理</h3><ul>
 <li>直出 html 页面或使用模板生成 html 页面的，推荐使用 <code>text/template</code> 自动编码，或者使用 <code>html.EscapeString</code> 或 <code>text/template</code> 对 <code>&lt;, &gt;, &amp;, &#39;,&quot;</code> 等字符进行编码。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"html/template"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">outtemplate</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	param1 := r.URL.Query().Get(<span class="hljs-string">"param1"</span>)<br>	tmpl := template.New(<span class="hljs-string">"hello"</span>)<br>	tmpl, _ = tmpl.Parse(<span class="hljs-string">`&#123;&#123;define "T"&#125;&#125;&#123;&#123;.&#125;&#125;&#123;&#123;end&#125;&#125;`</span>)<br>	tmpl.ExecuteTemplate(w, <span class="hljs-string">"T"</span>, param1)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;html/template&quot;
+)
 
+func outtemplate(w http.ResponseWriter, r *http.Request) {
+    param1 := r.URL.Query().Get(&quot;param1&quot;)
+    tmpl := template.New(&quot;hello&quot;)
+    tmpl, _ = tmpl.Parse(`{{define "T"}}{{.}}{{end}}`)
+    tmpl.ExecuteTemplate(w, &quot;T&quot;, param1)
+}</code></pre>
 <h2 id="会话管理"><a href="#会话管理" class="headerlink" title="会话管理"></a>会话管理</h2><h3 id="【必须】安全维护session信息"><a href="#【必须】安全维护session信息" class="headerlink" title="【必须】安全维护session信息"></a>【必须】安全维护session信息</h3><ul>
 <li>用户登录时应重新生成 session，退出登录后应清理 session。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"github.com/gorilla/handlers"</span><br>	<span class="hljs-string">"github.com/gorilla/mux"</span><br>	<span class="hljs-string">"net/http"</span><br>)<br><br><span class="hljs-comment">// 创建cookie</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">setToken</span><span class="hljs-params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;<br>	expireToken := time.Now().Add(time.Minute * <span class="hljs-number">30</span>).Unix()<br>	expireCookie := time.Now().Add(time.Minute * <span class="hljs-number">30</span>)<br><br>	<span class="hljs-comment">//...</span><br><br>	cookie := http.Cookie&#123;<br>		Name:     <span class="hljs-string">"Auth"</span>,<br>		Value:    signedToken,<br>		Expires:  expireCookie, <span class="hljs-comment">// 过期失效</span><br>		HttpOnly: <span class="hljs-literal">true</span>,<br>		Path:     <span class="hljs-string">"/"</span>,<br>		Domain:   <span class="hljs-string">"127.0.0.1"</span>,<br>		Secure:   <span class="hljs-literal">true</span>,<br>	&#125;<br><br>	http.SetCookie(res, &amp;cookie)<br>	http.Redirect(res, req, <span class="hljs-string">"/profile"</span>, <span class="hljs-number">307</span>)<br>&#125;<br><br><span class="hljs-comment">// 删除cookie</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">logout</span><span class="hljs-params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;<br>	deleteCookie := http.Cookie&#123;<br>		Name:    <span class="hljs-string">"Auth"</span>,<br>		Value:   <span class="hljs-string">"none"</span>,<br>		Expires: time.Now(),<br>	&#125;<br>	http.SetCookie(res, &amp;deleteCookie)<br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;github.com/gorilla/handlers&quot;
+    &quot;github.com/gorilla/mux&quot;
+    &quot;net/http&quot;
+)
 
+// 创建cookie
+func setToken(res http.ResponseWriter, req *http.Request) {
+    expireToken := time.Now().Add(time.Minute * 30).Unix()
+    expireCookie := time.Now().Add(time.Minute * 30)
+
+    //...
+
+    cookie := http.Cookie{
+        Name:     &quot;Auth&quot;,
+        Value:    signedToken,
+        Expires:  expireCookie, // 过期失效
+        HttpOnly: true,
+        Path:     &quot;/&quot;,
+        Domain:   &quot;127.0.0.1&quot;,
+        Secure:   true,
+    }
+
+    http.SetCookie(res, &amp;cookie)
+    http.Redirect(res, req, &quot;/profile&quot;, 307)
+}
+
+// 删除cookie
+func logout(res http.ResponseWriter, req *http.Request) {
+    deleteCookie := http.Cookie{
+        Name:    &quot;Auth&quot;,
+        Value:   &quot;none&quot;,
+        Expires: time.Now(),
+    }
+    http.SetCookie(res, &amp;deleteCookie)
+    return
+}</code></pre>
 <h3 id="【必须】CSRF防护"><a href="#【必须】CSRF防护" class="headerlink" title="【必须】CSRF防护"></a>【必须】CSRF防护</h3><ul>
 <li>涉及系统敏感操作或可读取敏感信息的接口应校验 <code>Referer</code> 或添加 <code>csrf_token</code>。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"github.com/gorilla/csrf"</span><br>	<span class="hljs-string">"github.com/gorilla/mux"</span><br>	<span class="hljs-string">"net/http"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	r := mux.NewRouter()<br>	r.HandleFunc(<span class="hljs-string">"/signup"</span>, ShowSignupForm)<br>	r.HandleFunc(<span class="hljs-string">"/signup/post"</span>, SubmitSignupForm)<br>	<span class="hljs-comment">// 使用 csrf_token 验证</span><br>	http.ListenAndServe(<span class="hljs-string">":8000"</span>,<br>		csrf.Protect([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"32-byte-long-auth-key"</span>))(r))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// good
+import (
+    &quot;github.com/gorilla/csrf&quot;
+    &quot;github.com/gorilla/mux&quot;
+    &quot;net/http&quot;
+)
 
+func main() {
+    r := mux.NewRouter()
+    r.HandleFunc(&quot;/signup&quot;, ShowSignupForm)
+    r.HandleFunc(&quot;/signup/post&quot;, SubmitSignupForm)
+    // 使用 csrf_token 验证
+    http.ListenAndServe(&quot;:8000&quot;,
+        csrf.Protect([]byte(&quot;32-byte-long-auth-key&quot;))(r))
+}</code></pre>
 <h2 id="访问控制"><a href="#访问控制" class="headerlink" title="访问控制"></a>访问控制</h2><h3 id="【必须】默认鉴权"><a href="#【必须】默认鉴权" class="headerlink" title="【必须】默认鉴权"></a>【必须】默认鉴权</h3><ul>
 <li><p>除非资源完全可对外开放，否则系统默认进行身份认证，使用白名单的方式放开不需要认证的接口或页面。</p>
 </li>
 <li><p>根据资源的机密程度和用户角色，以最小权限原则，设置不同级别的权限，如完全公开、登录可读、登录可写、特定用户可读、特定用户可写等</p>
 </li>
 <li><p>涉及用户自身相关的数据的读写必须验证登录态用户身份及其权限，避免越权操作</p>
-  <figure class="highlight sql"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sql"><span class="hljs-comment">-- 伪代码</span><br><span class="hljs-keyword">select</span> <span class="hljs-keyword">id</span> <span class="hljs-keyword">from</span> <span class="hljs-keyword">table</span> <span class="hljs-keyword">where</span> <span class="hljs-keyword">id</span>=:<span class="hljs-keyword">id</span> <span class="hljs-keyword">and</span> userid=session.userid<br></code></pre></div></td></tr></table></figure>
-</li>
+<pre><code>  -- 伪代码
+  select id from table where id=:id and userid=session.userid</code></pre></li>
 <li><p>没有独立账号体系的外网服务使用 <code>QQ</code> 或 <code>微信</code> 登录，内网服务使用 <code>统一登录服务</code> 登录，其他使用账号密码登录的服务需要增加验证码等二次验证</p>
 </li>
 </ul>
 <h2 id="并发保护"><a href="#并发保护" class="headerlink" title="并发保护"></a>并发保护</h2><h3 id="【必须】禁止在闭包中直接调用循环变量"><a href="#【必须】禁止在闭包中直接调用循环变量" class="headerlink" title="【必须】禁止在闭包中直接调用循环变量"></a>【必须】禁止在闭包中直接调用循环变量</h3><ul>
 <li>在循环中启动协程，当协程中使用到了循环的索引值，由于多个协程同时使用同一个变量会产生数据竞争，造成执行结果异常。</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	runtime.GOMAXPROCS(runtime.NumCPU())<br>	<span class="hljs-keyword">var</span> group sync.WaitGroup<br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++ &#123;<br>		group.Add(<span class="hljs-number">1</span>)<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			<span class="hljs-keyword">defer</span> group.Done()<br>			fmt.Printf(<span class="hljs-string">"%-2d"</span>, i) <span class="hljs-comment">// 这里打印的i不是所期望的</span><br>		&#125;()<br>	&#125;<br>	group.Wait()<br>&#125;<br><br><span class="hljs-comment">// good</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	runtime.GOMAXPROCS(runtime.NumCPU())<br>	<span class="hljs-keyword">var</span> group sync.WaitGroup<br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">5</span>; i++ &#123;<br>		group.Add(<span class="hljs-number">1</span>)<br>		<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(j <span class="hljs-keyword">int</span>)</span></span> &#123;<br>			<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>				<span class="hljs-keyword">if</span> r := <span class="hljs-built_in">recover</span>(); r != <span class="hljs-literal">nil</span> &#123;<br>					fmt.Println(<span class="hljs-string">"Recovered in start()"</span>)<br>				&#125;<br>				group.Done()<br>			&#125;()<br>			fmt.Printf(<span class="hljs-string">"%-2d"</span>, j) <span class="hljs-comment">// 闭包内部使用局部变量</span><br>		&#125;(i) <span class="hljs-comment">// 把循环变量显式地传给协程</span><br>	&#125;<br>	group.Wait()<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// bad
+func main() {
+    runtime.GOMAXPROCS(runtime.NumCPU())
+    var group sync.WaitGroup
 
+    for i := 0; i &lt; 5; i++ {
+        group.Add(1)
+        go func() {
+            defer group.Done()
+            fmt.Printf(&quot;%-2d&quot;, i) // 这里打印的i不是所期望的
+        }()
+    }
+    group.Wait()
+}
+
+// good
+func main() {
+    runtime.GOMAXPROCS(runtime.NumCPU())
+    var group sync.WaitGroup
+
+    for i := 0; i &lt; 5; i++ {
+        group.Add(1)
+        go func(j int) {
+            defer func() {
+                if r := recover(); r != nil {
+                    fmt.Println(&quot;Recovered in start()&quot;)
+                }
+                group.Done()
+            }()
+            fmt.Printf(&quot;%-2d&quot;, j) // 闭包内部使用局部变量
+        }(i) // 把循环变量显式地传给协程
+    }
+    group.Wait()
+}</code></pre>
 <h3 id="【必须】禁止并发写map"><a href="#【必须】禁止并发写map" class="headerlink" title="【必须】禁止并发写map"></a>【必须】禁止并发写map</h3><ul>
 <li>并发写 map 容易造成程序崩溃并异常退出，建议加锁保护</li>
 </ul>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// bad</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	m := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)<br>	<span class="hljs-comment">// 并发读写</span><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			_ = m[<span class="hljs-number">1</span>]<br>		&#125;<br>	&#125;()<br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		<span class="hljs-keyword">for</span> &#123;<br>			m[<span class="hljs-number">2</span>] = <span class="hljs-number">1</span><br>		&#125;<br>	&#125;()<br>	<span class="hljs-keyword">select</span> &#123;&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
-<h3 id="【必须】确保并发安全"><a href="#【必须】确保并发安全" class="headerlink" title="【必须】确保并发安全"></a>【必须】确保并发安全</h3><p>敏感操作如果未作并发安全限制，可导致数据读写异常，造成业务逻辑限制被绕过。可通过同步锁或者原子操作进行防护。</p>
-<h4 id="通过同步锁共享内存"><a href="#通过同步锁共享内存" class="headerlink" title="通过同步锁共享内存"></a>通过同步锁共享内存</h4><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br><span class="hljs-keyword">var</span> count <span class="hljs-keyword">int</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Count</span><span class="hljs-params">(lock *sync.Mutex)</span></span> &#123;<br>	lock.Lock() <span class="hljs-comment">// 加写锁</span><br>	count++<br>	fmt.Println(count)<br>	lock.Unlock() <span class="hljs-comment">// 解写锁，任何一个Lock()或RLock()均需要保证对应有Unlock()或RUnlock()</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	lock := &amp;sync.Mutex&#123;&#125;<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ &#123;<br>		<span class="hljs-keyword">go</span> Count(lock) <span class="hljs-comment">// 传递指针是为了防止函数内的锁和调用锁不一致</span><br>	&#125;<br>	<span class="hljs-keyword">for</span> &#123;<br>		lock.Lock()<br>		c := count<br>		lock.Unlock()<br>		runtime.Gosched() <span class="hljs-comment">// 交出时间片给协程</span><br>		<span class="hljs-keyword">if</span> c &gt; <span class="hljs-number">10</span> &#123;<br>			<span class="hljs-keyword">break</span><br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
-<h4 id="使用-sync-atomic-执行原子操作"><a href="#使用-sync-atomic-执行原子操作" class="headerlink" title="使用 sync/atomic 执行原子操作"></a>使用 <code>sync/atomic</code> 执行原子操作</h4><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// good</span><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"sync"</span><br>	<span class="hljs-string">"sync/atomic"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	<span class="hljs-keyword">type</span> Map <span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span><br>	<span class="hljs-keyword">var</span> m atomic.Value<br>	m.Store(<span class="hljs-built_in">make</span>(Map))<br>	<span class="hljs-keyword">var</span> mu sync.Mutex <span class="hljs-comment">// used only by writers</span><br>	read := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(key <span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(val <span class="hljs-keyword">string</span>)</span></span> &#123;<br>		m1 := m.Load().(Map)<br>		<span class="hljs-keyword">return</span> m1[key]<br>	&#125;<br>	insert := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(key, val <span class="hljs-keyword">string</span>)</span></span> &#123;<br>		mu.Lock() <span class="hljs-comment">// 与潜在写入同步</span><br>		<span class="hljs-keyword">defer</span> mu.Unlock()<br>		m1 := m.Load().(Map) <span class="hljs-comment">// 导入struct当前数据</span><br>		m2 := <span class="hljs-built_in">make</span>(Map)      <span class="hljs-comment">// 创建新值</span><br>		<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> m1 &#123;<br>			m2[k] = v<br>		&#125;<br>		m2[key] = val<br>		m.Store(m2) <span class="hljs-comment">// 用新的替代当前对象</span><br>	&#125;<br>	_, _ = read, insert<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/go/">go</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">go 常用关键字的原理及设计</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/06/09/go%E4%B9%8Bvalidator%E5%BA%93/">
-                        <span class="hidden-mobile">go 之 validator 库</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
-  
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
-    </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
-  </div>
-
-
-  
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
+<pre><code class="go">// bad
+func main() {
+    m := make(map[int]int)
+    // 并发读写
+    go func() {
+        for {
+            _ = m[1]
         }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    }()
+    go func() {
+        for {
+            m[2] = 1
+        }
+    }()
+    select {}
+}</code></pre>
+<h3 id="【必须】确保并发安全"><a href="#【必须】确保并发安全" class="headerlink" title="【必须】确保并发安全"></a>【必须】确保并发安全</h3><p>敏感操作如果未作并发安全限制，可导致数据读写异常，造成业务逻辑限制被绕过。可通过同步锁或者原子操作进行防护。</p>
+<h4 id="通过同步锁共享内存"><a href="#通过同步锁共享内存" class="headerlink" title="通过同步锁共享内存"></a>通过同步锁共享内存</h4><pre><code class="go">// good
+var count int
+
+func Count(lock *sync.Mutex) {
+    lock.Lock() // 加写锁
+    count++
+    fmt.Println(count)
+    lock.Unlock() // 解写锁，任何一个Lock()或RLock()均需要保证对应有Unlock()或RUnlock()
+}
+
+func main() {
+    lock := &amp;sync.Mutex{}
+    for i := 0; i &lt; 10; i++ {
+        go Count(lock) // 传递指针是为了防止函数内的锁和调用锁不一致
+    }
+    for {
+        lock.Lock()
+        c := count
+        lock.Unlock()
+        runtime.Gosched() // 交出时间片给协程
+        if c &gt; 10 {
+            break
+        }
+    }
+}</code></pre>
+<h4 id="使用-sync-atomic-执行原子操作"><a href="#使用-sync-atomic-执行原子操作" class="headerlink" title="使用 sync/atomic 执行原子操作"></a>使用 <code>sync/atomic</code> 执行原子操作</h4><pre><code class="go">// good
+import (
+    &quot;sync&quot;
+    &quot;sync/atomic&quot;
+)
+
+func main() {
+    type Map map[string]string
+    var m atomic.Value
+    m.Store(make(Map))
+    var mu sync.Mutex // used only by writers
+    read := func(key string) (val string) {
+        m1 := m.Load().(Map)
+        return m1[key]
+    }
+    insert := func(key, val string) {
+        mu.Lock() // 与潜在写入同步
+        defer mu.Unlock()
+        m1 := m.Load().(Map) // 导入struct当前数据
+        m2 := make(Map)      // 创建新值
+        for k, v := range m1 {
+            m2[k] = v
+        }
+        m2[key] = val
+        m.Store(m2) // 用新的替代当前对象
+    }
+    _, _ = read, insert
+}</code></pre>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/09/go%E4%B9%8Bvalidator%E5%BA%93/" rel="prev" title="go 之 validator 库">
+      <i class="fa fa-chevron-left"></i> go 之 validator 库
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/" rel="next" title="go 常用关键字的原理及设计">
+      go 常用关键字的原理及设计 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#通用类"><span class="nav-number">1.</span> <span class="nav-text">通用类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#内存管理"><span class="nav-number">1.1.</span> <span class="nav-text">内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】切片长度校验"><span class="nav-number">1.1.1.</span> <span class="nav-text">【必须】切片长度校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】nil-指针判断"><span class="nav-number">1.1.2.</span> <span class="nav-text">【必须】nil 指针判断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】整数安全"><span class="nav-number">1.1.3.</span> <span class="nav-text">【必须】整数安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】make-分配长度验证"><span class="nav-number">1.1.4.</span> <span class="nav-text">【必须】make 分配长度验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】禁止-SetFinalizer-和指针循环引用同时使用"><span class="nav-number">1.1.5.</span> <span class="nav-text">【必须】禁止 SetFinalizer 和指针循环引用同时使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】禁止重复释放-channel"><span class="nav-number">1.1.6.</span> <span class="nav-text">【必须】禁止重复释放 channel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】确保每个协程都能退出"><span class="nav-number">1.1.7.</span> <span class="nav-text">【必须】确保每个协程都能退出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【推荐】不使用unsafe包"><span class="nav-number">1.1.8.</span> <span class="nav-text">【推荐】不使用unsafe包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【推荐】不使用-slice-作为函数入参"><span class="nav-number">1.1.9.</span> <span class="nav-text">【推荐】不使用 slice 作为函数入参</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件操作"><span class="nav-number">1.2.</span> <span class="nav-text">文件操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】-路径穿越检查"><span class="nav-number">1.2.1.</span> <span class="nav-text">【必须】 路径穿越检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】-文件访问权限"><span class="nav-number">1.2.2.</span> <span class="nav-text">【必须】 文件访问权限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#系统接口"><span class="nav-number">1.3.</span> <span class="nav-text">系统接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】命令执行检查"><span class="nav-number">1.3.1.</span> <span class="nav-text">【必须】命令执行检查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通信安全"><span class="nav-number">1.4.</span> <span class="nav-text">通信安全</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】网络通信采用-TLS-方式"><span class="nav-number">1.4.1.</span> <span class="nav-text">【必须】网络通信采用 TLS 方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【推荐】TLS-启用证书验证"><span class="nav-number">1.4.2.</span> <span class="nav-text">【推荐】TLS 启用证书验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#敏感数据保护"><span class="nav-number">1.5.</span> <span class="nav-text">敏感数据保护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】敏感信息访问"><span class="nav-number">1.5.1.</span> <span class="nav-text">【必须】敏感信息访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】敏感数据输出"><span class="nav-number">1.5.2.</span> <span class="nav-text">【必须】敏感数据输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】敏感数据存储"><span class="nav-number">1.5.3.</span> <span class="nav-text">【必须】敏感数据存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】异常处理和日志记录"><span class="nav-number">1.5.4.</span> <span class="nav-text">【必须】异常处理和日志记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#加密解密"><span class="nav-number">1.6.</span> <span class="nav-text">加密解密</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】不得硬编码密码-密钥"><span class="nav-number">1.6.1.</span> <span class="nav-text">【必须】不得硬编码密码/密钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】密钥存储安全"><span class="nav-number">1.6.2.</span> <span class="nav-text">【必须】密钥存储安全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【推荐】不使用弱密码算法"><span class="nav-number">1.6.3.</span> <span class="nav-text">【推荐】不使用弱密码算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#正则表达式"><span class="nav-number">1.7.</span> <span class="nav-text">正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【推荐】使用-regexp-进行正则表达式匹配"><span class="nav-number">1.7.1.</span> <span class="nav-text">【推荐】使用 regexp 进行正则表达式匹配</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后台类"><span class="nav-number">2.</span> <span class="nav-text">后台类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#输入校验"><span class="nav-number">2.1.</span> <span class="nav-text">输入校验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】按类型进行数据校验"><span class="nav-number">2.1.1.</span> <span class="nav-text">【必须】按类型进行数据校验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL操作"><span class="nav-number">2.2.</span> <span class="nav-text">SQL操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】SQL语句默认使用预编译并绑定变量"><span class="nav-number">2.2.1.</span> <span class="nav-text">【必须】SQL语句默认使用预编译并绑定变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络请求"><span class="nav-number">2.3.</span> <span class="nav-text">网络请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】资源请求过滤验证"><span class="nav-number">2.3.1.</span> <span class="nav-text">【必须】资源请求过滤验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务器端渲染"><span class="nav-number">2.4.</span> <span class="nav-text">服务器端渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】模板渲染过滤验证"><span class="nav-number">2.4.1.</span> <span class="nav-text">【必须】模板渲染过滤验证</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Web跨域"><span class="nav-number">2.5.</span> <span class="nav-text">Web跨域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】跨域资源共享CORS限制请求来源"><span class="nav-number">2.5.1.</span> <span class="nav-text">【必须】跨域资源共享CORS限制请求来源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#响应输出"><span class="nav-number">2.6.</span> <span class="nav-text">响应输出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】设置正确的HTTP响应包类型"><span class="nav-number">2.6.1.</span> <span class="nav-text">【必须】设置正确的HTTP响应包类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】添加安全响应头"><span class="nav-number">2.6.2.</span> <span class="nav-text">【必须】添加安全响应头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】外部输入拼接到-HTTP-响应头中需进行过滤"><span class="nav-number">2.6.3.</span> <span class="nav-text">【必须】外部输入拼接到 HTTP 响应头中需进行过滤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】外部输入拼接到-response-页面前进行编码处理"><span class="nav-number">2.6.4.</span> <span class="nav-text">【必须】外部输入拼接到 response 页面前进行编码处理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#会话管理"><span class="nav-number">2.7.</span> <span class="nav-text">会话管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】安全维护session信息"><span class="nav-number">2.7.1.</span> <span class="nav-text">【必须】安全维护session信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】CSRF防护"><span class="nav-number">2.7.2.</span> <span class="nav-text">【必须】CSRF防护</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问控制"><span class="nav-number">2.8.</span> <span class="nav-text">访问控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】默认鉴权"><span class="nav-number">2.8.1.</span> <span class="nav-text">【必须】默认鉴权</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发保护"><span class="nav-number">2.9.</span> <span class="nav-text">并发保护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】禁止在闭包中直接调用循环变量"><span class="nav-number">2.9.1.</span> <span class="nav-text">【必须】禁止在闭包中直接调用循环变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】禁止并发写map"><span class="nav-number">2.9.2.</span> <span class="nav-text">【必须】禁止并发写map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#【必须】确保并发安全"><span class="nav-number">2.9.3.</span> <span class="nav-text">【必须】确保并发安全</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#通过同步锁共享内存"><span class="nav-number">2.9.3.1.</span> <span class="nav-text">通过同步锁共享内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用-sync-atomic-执行原子操作"><span class="nav-number">2.9.3.2.</span> <span class="nav-text">使用 sync/atomic 执行原子操作</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#null"><span class="nav-number">2.9.4.</span> <span class="nav-text"></span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
 </body>
 </html>

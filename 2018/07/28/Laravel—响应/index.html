@@ -1,255 +1,303 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="响应所有路由、控制器处理完业务逻辑之后都会返回一个发送到用户浏览器的响应，Laravel提供多种不同的方式来获取响应,将数组转化为JSON响应 字符串 &amp;amp; 数组直接在函数中使用return返回，框架会自动将字符串转换为一个完整的HTTP响应 Route::get(&amp;#39;&#x2F;&amp;#39;,function() {     return &amp;#39;Hello World&amp;#39;; });">
+<meta name="keywords" content="Laravel,php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel—响应">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;28&#x2F;Laravel%E2%80%94%E5%93%8D%E5%BA%94&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="响应所有路由、控制器处理完业务逻辑之后都会返回一个发送到用户浏览器的响应，Laravel提供多种不同的方式来获取响应,将数组转化为JSON响应 字符串 &amp;amp; 数组直接在函数中使用return返回，框架会自动将字符串转换为一个完整的HTTP响应 Route::get(&amp;#39;&#x2F;&amp;#39;,function() {     return &amp;#39;Hello World&amp;#39;; });">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:39:35.065Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/28/Laravel%E2%80%94%E5%93%8D%E5%BA%94/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Laravel—响应 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="响应所有路由、控制器处理完业务逻辑之后都会返回一个发送到用户浏览器的响应，Laravel提供多种不同的方式来获取响应,将数组转化为JSON响应
-字符串 &amp;amp; 数组直接在函数中使用return返回，框架会自动将字符串转换为一个完整的HTTP响应
-123456789Route::get(&#39;/&#39;,function()&amp;#123;    return &#39;Hello World&#39;;&amp;#125;);Ro">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Laravel—响应 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Laravel—响应">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/28/Laravel%E2%80%94%E5%93%8D%E5%BA%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel—响应
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-28 07:40:36" itemprop="dateCreated datePublished" datetime="2018-07-28T07:40:36+08:00">2018-07-28</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2018-07-28 07:40" pubdate>
-        2018年7月28日 早上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      13
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:39:35" itemprop="dateModified" datetime="2020-12-01T18:39:35+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Laravel—响应</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="响应"><a href="#响应" class="headerlink" title="响应"></a>响应</h1><p>所有路由、控制器处理完业务逻辑之后都会返回一个发送到用户浏览器的响应，Laravel提供多种不同的方式来获取响应,将数组转化为JSON响应</p>
+      
+        <h1 id="响应"><a href="#响应" class="headerlink" title="响应"></a>响应</h1><p>所有路由、控制器处理完业务逻辑之后都会返回一个发送到用户浏览器的响应，Laravel提供多种不同的方式来获取响应,将数组转化为JSON响应</p>
 <h2 id="字符串-amp-数组"><a href="#字符串-amp-数组" class="headerlink" title="字符串 &amp; 数组"></a>字符串 &amp; 数组</h2><p>直接在函数中使用<code>return</code>返回，框架会自动将字符串转换为一个完整的HTTP响应</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Route::get(<span class="hljs-string">'/'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span><br></span>&#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">'Hello World'</span>;<br>&#125;);<br><br>Route::get(<span class="hljs-string">'/'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span><br></span>&#123;<br>    <span class="hljs-keyword">return</span> [<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>];<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Route::get(&#39;/&#39;,function()
+{
+    return &#39;Hello World&#39;;
+});
+
+Route::get(&#39;/&#39;,function()
+{
+    return [1,2,3];
+});</code></pre>
 <a id="more"></a>
 <h2 id="Response类"><a href="#Response类" class="headerlink" title="Response类"></a>Response类</h2><p>返回一个完整的response实例允许自定义响应的HTTP状态码和头信息，Response实例继承自<code>Symfony\Component\HttpFoundation\Response</code>基类，该类提供了一系列方法用于创建HTTP响应  </p>
 <h3 id="添加响应头"><a href="#添加响应头" class="headerlink" title="添加响应头"></a>添加响应头</h3><p><code>header</code>方法添加一系列响应头，也可以通过<code>withHeaders</code>方法指定头信息组添加到响应</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><br><span class="hljs-keyword">return</span> response($content)<br>    -&gt;header(<span class="hljs-string">'Content-Type'</span>,$type)<br>    -&gt;header(<span class="hljs-string">'X-Header-One'</span>,<span class="hljs-string">'Header Value'</span>)<br>    -&gt;header(<span class="hljs-string">'X-Header-Two'</span>,<span class="hljs-string">'Header Value'</span>);<br><br><span class="hljs-comment">//使用数组形式</span><br><span class="hljs-keyword">return</span> response($content)<br>    -&gt;withHeaders([<br>        <span class="hljs-string">'Content-Type'</span> =&gt; $type,<br>        <span class="hljs-string">'X-Header-One'</span> =&gt; <span class="hljs-string">'Header Value'</span>,<br>        <span class="hljs-string">'X-Header-Two'</span> =&gt; <span class="hljs-string">'Header Value'</span>,<br>    ]);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">
+return response($content)
+    -&gt;header(&#39;Content-Type&#39;,$type)
+    -&gt;header(&#39;X-Header-One&#39;,&#39;Header Value&#39;)
+    -&gt;header(&#39;X-Header-Two&#39;,&#39;Header Value&#39;);
 
+//使用数组形式
+return response($content)
+    -&gt;withHeaders([
+        &#39;Content-Type&#39; =&gt; $type,
+        &#39;X-Header-One&#39; =&gt; &#39;Header Value&#39;,
+        &#39;X-Header-Two&#39; =&gt; &#39;Header Value&#39;,
+    ]);</code></pre>
 <h3 id="添加Cookie到响应"><a href="#添加Cookie到响应" class="headerlink" title="添加Cookie到响应"></a>添加Cookie到响应</h3><p><code>cookie</code>方法生成Cookie并添加到响应实例</p>
 <blockquote>
 <p>return response-&gt;cookie(‘name’,’value’,$minutes);  </p>
@@ -259,12 +307,36 @@
 <p>Cookie::queue(‘author’,’value’,’minutes’);  </p>
 </blockquote>
 <h3 id="Cookie加密"><a href="#Cookie加密" class="headerlink" title="Cookie加密"></a>Cookie加密</h3><p>默认情况下，Laravel框架生成的Cookie都经过了加密的签名，以免在客户端被篡改。可以通过<code>app\Http\Middleware\EnctryptCookies</code>提供的<code>$except</code>属性取消特定的Cookie加密  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Middleware</span>;<br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Cookie</span>\<span class="hljs-title">Middleware</span>\<span class="hljs-title">EncryptCookies</span> <span class="hljs-title">as</span> <span class="hljs-title">Middleware</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EncryptCookies</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Middleware</span><br></span>&#123;<br>    <span class="hljs-comment">/**<br>     * The names of the cookies that should not be encrypted.<br>     *<br>     * <span class="hljs-doctag">@var</span> array<br>     */</span><br>    <span class="hljs-keyword">protected</span> $except = [<br>        <span class="hljs-comment">//’cookie_name',</span><br>    ];<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Cookie\Middleware\EncryptCookies as Middleware;
+
+class EncryptCookies extends Middleware
+{
+    /**
+     * The names of the cookies that should not be encrypted.
+     *
+     * @var array
+     */
+    protected $except = [
+        //’cookie_name&#39;,
+    ];
+}
+</code></pre>
 <h2 id="重定向"><a href="#重定向" class="headerlink" title="重定向"></a>重定向</h2><p>重定向响应是<code>Illuminate\Http\RedirectResponse</code>类的实例，包含了必要的头信息将用户重定向到另一个URL  </p>
 <h3 id="使用辅助函数"><a href="#使用辅助函数" class="headerlink" title="使用辅助函数"></a>使用辅助函数</h3><p><code>redirect</code>函数可以重定向到指定的地址  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Route::get(<span class="hljs-string">'login'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span><br></span>&#123;<br>    <span class="hljs-keyword">return</span> redirect(<span class="hljs-string">'home'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Route::get(&#39;login&#39;,function()
+{
+    return redirect(&#39;home&#39;);
+});</code></pre>
 <p><code>back</code>函数返回到前一个URL</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Route::post(<span class="hljs-string">'user/profile'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span><br></span>&#123;<br>    <span class="hljs-comment">//返回上一个页面并自动在表单中填入已填信息</span><br>    <span class="hljs-keyword">return</span> back()-&gt;withInput();<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Route::post(&#39;user/profile&#39;,function()
+{
+    //返回上一个页面并自动在表单中填入已填信息
+    return back()-&gt;withInput();
+});</code></pre>
 <h3 id="重定向到命名路由"><a href="#重定向到命名路由" class="headerlink" title="重定向到命名路由"></a>重定向到命名路由</h3><p>如果调用不带参数的<code>redirect</code>方法，会返回一个<code>Illuminate\Routing\Redirector</code>实例，然后可以使用<code>Redirector</code>实例上的所有方法，<code>route</code>方法可以重定向到指定的路由,如果路由有参数，可以将其作为第二个参数传递到<code>route</code>方法  </p>
 <blockquote>
 <p>return redirect()-&gt;route(‘login’,[‘id’=&gt;1]);  </p>
@@ -278,242 +350,228 @@
 <p>return redirect()-&gt;away(‘<a href="http://xiao-ming9.github.io&#39;" target="_blank" rel="noopener">http://xiao-ming9.github.io&#39;</a>);  </p>
 </blockquote>
 <h2 id="视图响应"><a href="#视图响应" class="headerlink" title="视图响应"></a>视图响应</h2><p><code>view</code>方法能够返回视图，也可以使用全局辅助函数<code>view</code></p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()<br>       -&gt;view(<span class="hljs-string">'hello'</span>,$data,<span class="hljs-number">200</span>);<br>       -&gt;header(<span class="hljs-string">'Content-&gt;Type'</span>,$type);<br><br><span class="hljs-comment">//全局辅助函数</span><br>Route::get(<span class="hljs-string">'/view/response'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span></span>&#123;<br>    <span class="hljs-keyword">return</span> view(<span class="hljs-string">'hello'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">return response()
+       -&gt;view(&#39;hello&#39;,$data,200);
+       -&gt;header(&#39;Content-&gt;Type&#39;,$type);
+
+//全局辅助函数
+Route::get(&#39;/view/response&#39;,function(){
+    return view(&#39;hello&#39;);
+});</code></pre>
 <h2 id="JSON响应"><a href="#JSON响应" class="headerlink" title="JSON响应"></a>JSON响应</h2><p><code>json</code>方法会自动将Content-Type头设置为<code>application/json</code>，并使用PHP函数将给定数组转化为JSON格式数据：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()-&gt;json([<br>    <span class="hljs-string">'name'</span>=&gt;<span class="hljs-string">'Abigail'</span>,<br>    <span class="hljs-string">'state'</span>=&gt;<span class="hljs-string">'CA'</span><br>]);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">return response()-&gt;json([
+    &#39;name&#39;=&gt;&#39;Abigail&#39;,
+    &#39;state&#39;=&gt;&#39;CA&#39;
+]);</code></pre>
 <p>如果想要创建一个JSONP响应，可以在<code>json</code>方法之后调用<code>withCallback</code>方法</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()<br>        -&gt;json([<span class="hljs-string">'name'</span>=&gt;<span class="hljs-string">'Abigail'</span>,<span class="hljs-string">'state'</span> =&gt;<span class="hljs-string">'CA'</span>])<br>        -&gt;withCallback($request-&gt;input(<span class="hljs-string">'callback'</span>));<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">return response()
+        -&gt;json([&#39;name&#39;=&gt;&#39;Abigail&#39;,&#39;state&#39; =&gt;&#39;CA&#39;])
+        -&gt;withCallback($request-&gt;input(&#39;callback&#39;));</code></pre>
 <p>也可以直接使用<code>jsonp</code>方法：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()<br>        -&gt;jsonp($request-&gt;input(<span class="hljs-string">'callback'</span>),<br>        [<span class="hljs-string">'name'</span>=&gt;<span class="hljs-string">'Abigail'</span>,<span class="hljs-string">'state'</span>=&gt;<span class="hljs-string">'CA'</span>]);<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="php">return response()
+        -&gt;jsonp($request-&gt;input(&#39;callback&#39;),
+        [&#39;name&#39;=&gt;&#39;Abigail&#39;,&#39;state&#39;=&gt;&#39;CA&#39;]);</code></pre>
 <h2 id="文件下载"><a href="#文件下载" class="headerlink" title="文件下载"></a>文件下载</h2><p><code>download</code>方法用于生成用户浏览器下载给定路径文件的响应，第一参数为<strong>文件，可以使用相对路径(相对于public中的index.php）或绝对路径</strong>，第二第三参数可选，第二个参数为<strong>自定义文件名</strong>，第三个参数为<strong>HTTP头信息</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()-&gt;download($pathFile);<br><span class="hljs-keyword">return</span> response()-&gt;download($pathFile,$name,$headers);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">return response()-&gt;download($pathFile);
+return response()-&gt;download($pathFile,$name,$headers);</code></pre>
 <h2 id="文件响应"><a href="#文件响应" class="headerlink" title="文件响应"></a>文件响应</h2><p><code>file</code>方法可用于直接在用户浏览器显示文件，，接受文件路径作为第一个参数，头信息作为第二个参数</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">return</span> response()-&gt;file($pathToFile);<br><span class="hljs-keyword">return</span> response()-&gt;file($pathToFile,$headers);<br></code></pre></div></td></tr></table></figure>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Laravel/">Laravel</a>
-                    
-                      <a class="hover-with-bg" href="/tags/php/">php</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2018/07/28/Laravel%E2%80%94blade%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E-%E8%A7%86%E5%9B%BE/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Laravel—视图、Blade模板引擎</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2018/07/27/Laravel%E2%80%94%E8%AF%B7%E6%B1%82/">
-                        <span class="hidden-mobile">Laravel—请求</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+<pre><code class="php">return response()-&gt;file($pathToFile);
+return response()-&gt;file($pathToFile,$headers);</code></pre>
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/27/Laravel%E2%80%94%E8%AF%B7%E6%B1%82/" rel="prev" title="Laravel—请求">
+      <i class="fa fa-chevron-left"></i> Laravel—请求
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/28/Laravel%E2%80%94blade%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E-%E8%A7%86%E5%9B%BE/" rel="next" title="Laravel—视图、Blade模板引擎">
+      Laravel—视图、Blade模板引擎 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#响应"><span class="nav-number">1.</span> <span class="nav-text">响应</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串-amp-数组"><span class="nav-number">1.1.</span> <span class="nav-text">字符串 &amp; 数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Response类"><span class="nav-number">1.2.</span> <span class="nav-text">Response类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#添加响应头"><span class="nav-number">1.2.1.</span> <span class="nav-text">添加响应头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加Cookie到响应"><span class="nav-number">1.2.2.</span> <span class="nav-text">添加Cookie到响应</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cookie加密"><span class="nav-number">1.2.3.</span> <span class="nav-text">Cookie加密</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重定向"><span class="nav-number">1.3.</span> <span class="nav-text">重定向</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用辅助函数"><span class="nav-number">1.3.1.</span> <span class="nav-text">使用辅助函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重定向到命名路由"><span class="nav-number">1.3.2.</span> <span class="nav-text">重定向到命名路由</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重定向到控制器动作"><span class="nav-number">1.3.3.</span> <span class="nav-text">重定向到控制器动作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重定向到外部域名"><span class="nav-number">1.3.4.</span> <span class="nav-text">重定向到外部域名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视图响应"><span class="nav-number">1.4.</span> <span class="nav-text">视图响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON响应"><span class="nav-number">1.5.</span> <span class="nav-text">JSON响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件下载"><span class="nav-number">1.6.</span> <span class="nav-text">文件下载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件响应"><span class="nav-number">1.7.</span> <span class="nav-text">文件响应</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -521,41 +579,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -569,68 +595,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

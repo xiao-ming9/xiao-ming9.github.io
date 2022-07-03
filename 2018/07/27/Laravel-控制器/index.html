@@ -1,257 +1,303 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="控制器用于组织管理相对复杂的业务逻辑处理的一个类，存放在app&#x2F;Http&#x2F;Controllers目录下   定义控制器在Laravel目录下，使用Artisan命令会在app&#x2F;Http&#x2F;Controllers目录下创建一个控制器UserController.php  php artisan make:controller UserController    所有的Laravel控制器都继承控制器基">
+<meta name="keywords" content="Laravel,php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laravel—控制器">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;27&#x2F;Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="控制器用于组织管理相对复杂的业务逻辑处理的一个类，存放在app&#x2F;Http&#x2F;Controllers目录下   定义控制器在Laravel目录下，使用Artisan命令会在app&#x2F;Http&#x2F;Controllers目录下创建一个控制器UserController.php  php artisan make:controller UserController    所有的Laravel控制器都继承控制器基">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:38:55.199Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Laravel—控制器 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="控制器用于组织管理相对复杂的业务逻辑处理的一个类，存放在app/Http/Controllers目录下  
-定义控制器在Laravel目录下，使用Artisan命令会在app/Http/Controllers目录下创建一个控制器UserController.php
-
-php artisan make:controller UserController  
-
-所有的Laravel控制器都继承控制器基">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Laravel—控制器 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Laravel—控制器">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/27/Laravel-%E6%8E%A7%E5%88%B6%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Laravel—控制器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-27 07:26:04" itemprop="dateCreated datePublished" datetime="2018-07-27T07:26:04+08:00">2018-07-27</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2018-07-27 07:26" pubdate>
-        2018年7月27日 早上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.2k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      16
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:38:55" itemprop="dateModified" datetime="2020-12-01T18:38:55+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>4 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Laravel—控制器</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h1><p>用于组织管理相对复杂的业务逻辑处理的一个类，存放在<code>app/Http/Controllers</code>目录下  </p>
+      
+        <h1 id="控制器"><a href="#控制器" class="headerlink" title="控制器"></a>控制器</h1><p>用于组织管理相对复杂的业务逻辑处理的一个类，存放在<code>app/Http/Controllers</code>目录下  </p>
 <h2 id="定义控制器"><a href="#定义控制器" class="headerlink" title="定义控制器"></a>定义控制器</h2><p>在Laravel目录下，使用Artisan命令会在<code>app/Http/Controllers</code>目录下创建一个控制器<code>UserController.php</code></p>
 <blockquote>
 <p>php artisan make:controller UserController  </p>
 </blockquote>
 <p>所有的Laravel控制器都继承控制器基类<code>App\Http\Controllers\Controller</code></p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>;<br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Request</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span><br></span>&#123;<br>    <span class="hljs-comment">/*在这里添加相应的代码*/</span><br>    <span class="hljs-comment">/**<br>     * 为指定用户显示详情<br>     * <br>     * <span class="hljs-doctag">@param</span> int $id<br>     * <span class="hljs-doctag">@return</span> Response<br>     * <span class="hljs-doctag">@author</span> blog<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show</span><span class="hljs-params">($id)</span><br>    </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">'the user_id is'</span> . $id; <br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    /*在这里添加相应的代码*/
+    /**
+     * 为指定用户显示详情
+     * 
+     * @param int $id
+     * @return Response
+     * @author blog
+     */
+    public function show($id)
+    {
+        return &#39;the user_id is&#39; . $id; 
+    }
+}</code></pre>
 <a id="more"></a>
 <p>用以下方法定义指向该控制器的路由：</p>
 <blockquote>
@@ -259,27 +305,176 @@ php artisan make:controller UserController
 </blockquote>
 <p>如果一个请求匹配到上面路由的URI，就会调用UserController里面的<strong>show</strong>方法执行  </p>
 <h2 id="单动作控制器"><a href="#单动作控制器" class="headerlink" title="单动作控制器"></a>单动作控制器</h2><p>定义一个只处理一个动作的控制器，可以在这个控制器中定义<code>__invoke</code>,当为这个控制器注册路由的时候，不需要指定方法，PHP会<strong>自动调用__invoke()方法</strong></p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>;<br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Request</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ShowProfile</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span><br></span>&#123;<br>    <span class="hljs-comment">/*在这里添加相应的代码*/</span><br>    <br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__invoke</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">'自动调用函数'</span>;<br>    &#125;<br>&#125;<br><br><br><span class="hljs-comment">//路由调用方法：</span><br>Route::get(<span class="hljs-string">'user'</span>,<span class="hljs-string">'ShowProfile'</span>);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class ShowProfile extends Controller
+{
+    /*在这里添加相应的代码*/
+
+    public function __invoke()
+    {
+        return &#39;自动调用函数&#39;;
+    }
+}
+
+
+//路由调用方法：
+Route::get(&#39;user&#39;,&#39;ShowProfile&#39;);</code></pre>
 <h2 id="控制器中间件"><a href="#控制器中间件" class="headerlink" title="控制器中间件"></a>控制器中间件</h2><p>中间件可以分配给控制器路由：</p>
 <blockquote>
 <p>Route::get(‘user’,‘UserController@show’)-&gt;middleware(‘token’);  </p>
 </blockquote>
 <p>还可以直接把中间件放在控制器的<strong>构造函数</strong>中，这样该中间件对所有控制器都生效</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>;<br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Request</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserController</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span><br></span>&#123;<br>    <span class="hljs-comment">//在这里添加相应的代码</span><br>    <br>    <span class="hljs-comment">//构造函数</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">__construct</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-comment">//对所有函数都生效</span><br>        this-&gt;middleware(<span class="hljs-string">'token'</span>);<br>        <span class="hljs-comment">//只对show方法生效</span><br>        this-&gt;middleware(<span class="hljs-string">'handle'</span>)-&gt;only(<span class="hljs-string">'show'</span>);<br>        <span class="hljs-comment">//对除show以外的所与方法生效</span><br>        this-&gt;middleware(<span class="hljs-string">'handle'</span>)-&gt;expect(<span class="hljs-string">'show'</span>);<br>        <span class="hljs-comment">//以数组形式指定多个控制器方法</span><br>        this-&gt;middleware(<span class="hljs-string">'auth'</span>)-&gt;only/expect([<span class="hljs-string">'show'</span>,<span class="hljs-string">'index'</span>]);<br>    &#125;<br>    <span class="hljs-comment">/**<br>     * 为指定用户显示详情<br>     * <br>     * <span class="hljs-doctag">@param</span> int $id<br>     * <span class="hljs-doctag">@return</span> Response<br>     * <span class="hljs-doctag">@author</span> blog<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show</span><span class="hljs-params">($id)</span><br>    </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">'the user_id is'</span> . $id; <br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * <br>     * <br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-comment">//代码</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class UserController extends Controller
+{
+    //在这里添加相应的代码
+
+    //构造函数
+    public function __construct()
+    {
+        //对所有函数都生效
+        this-&gt;middleware(&#39;token&#39;);
+        //只对show方法生效
+        this-&gt;middleware(&#39;handle&#39;)-&gt;only(&#39;show&#39;);
+        //对除show以外的所与方法生效
+        this-&gt;middleware(&#39;handle&#39;)-&gt;expect(&#39;show&#39;);
+        //以数组形式指定多个控制器方法
+        this-&gt;middleware(&#39;auth&#39;)-&gt;only/expect([&#39;show&#39;,&#39;index&#39;]);
+    }
+    /**
+     * 为指定用户显示详情
+     * 
+     * @param int $id
+     * @return Response
+     * @author blog
+     */
+    public function show($id)
+    {
+        return &#39;the user_id is&#39; . $id; 
+    }
+
+    /**
+     * 
+     * 
+     */
+    public function index()
+    {
+        //代码
+    }
+}</code></pre>
 <p>还可以使用闭包注册中间件，即在控制器中直接定义相应的中间件，不需要先创建中间件</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">$this</span>-&gt;middleware(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">($request,$nest)</span></span>&#123;<br>    <span class="hljs-comment">//...</span><br><br>    <span class="hljs-keyword">return</span> $next($request);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">$this-&gt;middleware(function ($request,$nest){
+    //...
+
+    return $next($request);
+});</code></pre>
 <h2 id="资源控制器"><a href="#资源控制器" class="headerlink" title="资源控制器"></a>资源控制器</h2><p>也称为RESTful控制器，可以根据相应的URL调用控制器的相应函数进行处理,使用以下指令创建资源控制器</p>
 <blockquote>
 <p>php artisan make:controller PostController –resource  </p>
 </blockquote>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">namespace</span> <span class="hljs-title">App</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Controllers</span>;<br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Http</span>\<span class="hljs-title">Request</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PostControlle</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Controller</span><br></span>&#123;<br>    <span class="hljs-comment">/**<br>     * Display a listing of the resource.<br>     *<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">index</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Show the form for creating a new resource.<br>     *<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">create</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Store a newly created resource in storage.<br>     *<br>     * <span class="hljs-doctag">@param</span>  \Illuminate\Http\Request  $request<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">store</span><span class="hljs-params">(Request $request)</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Display the specified resource.<br>     *<br>     * <span class="hljs-doctag">@param</span>  int  $id<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">show</span><span class="hljs-params">($id)</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Show the form for editing the specified resource.<br>     *<br>     * <span class="hljs-doctag">@param</span>  int  $id<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">edit</span><span class="hljs-params">($id)</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Update the specified resource in storage.<br>     *<br>     * <span class="hljs-doctag">@param</span>  \Illuminate\Http\Request  $request<br>     * <span class="hljs-doctag">@param</span>  int  $id<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">update</span><span class="hljs-params">(Request $request, $id)</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Remove the specified resource from storage.<br>     *<br>     * <span class="hljs-doctag">@param</span>  int  $id<br>     * <span class="hljs-doctag">@return</span> \Illuminate\Http\Response<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">destroy</span><span class="hljs-params">($id)</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class PostControlle extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}</code></pre>
 <p>在路由器中通过使用<code>resource</code>方法为控制器注册路由</p>
 <blockquote>
 <p>Route::resource(‘foos’,’PostController’)  </p>
 </blockquote>
 <p>对于<code>localhost/foos/</code>后面跟不同的动作，控制器会自动调用不同的参数进行处理<br>还可以通过一个数组传入<code>resource</code>方法的方式一次性创建多个资源控制器</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Route::resources([<br>    <span class="hljs-string">'posts'</span>=&gt;<span class="hljs-string">'PostController'</span>,<br>    <span class="hljs-string">'photos'</span>=&gt;<span class="hljs-string">'PhotoController'</span><br>]);<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="php">Route::resources([
+    &#39;posts&#39;=&gt;&#39;PostController&#39;,
+    &#39;photos&#39;=&gt;&#39;PhotoController&#39;
+]);</code></pre>
 <p><strong>资源控制器处理的动作</strong>  </p>
 <table>
 <thead>
@@ -334,11 +529,35 @@ php artisan make:controller UserController
 </tr>
 </tbody></table>
 <p><strong>对于PUT、PATCH、DELETE请求要用伪造表单的方法</strong></p>
-<figure class="highlight html"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">action</span>=<span class="hljs-string">"/foos/bar"</span> <span class="hljs-attr">metho</span>=<span class="hljs-string">"POST"</span>&gt;</span><br>    @method('PUT/DELETE/PATCH)<br>    @csrf<br><span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="html">&lt;form action=&quot;/foos/bar&quot; metho=&quot;POST&quot;&gt;
+    @method(&#39;PUT/DELETE/PATCH)
+    @csrf
+&lt;/form&gt;</code></pre>
 <h3 id="部分资源控制器"><a href="#部分资源控制器" class="headerlink" title="部分资源控制器"></a>部分资源控制器</h3><p>声明资源路由时可以指定该路由处理的动作子集：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Route::resouce(<span class="hljs-string">'poos'</span>,<span class="hljs-string">'PostController'</span>,[<span class="hljs-string">'only'</span>=&gt;<br>    [<span class="hljs-string">'index'</span>,<span class="hljs-string">'show'</span>]<br>]);<br><br>Route::resouce(<span class="hljs-string">'poos'</span>,<span class="hljs-string">'PostController'</span>,[<span class="hljs-string">'except'</span>]=&gt;<br>    [<span class="hljs-string">'create'</span>,<span class="hljs-string">'store'</span>,<span class="hljs-string">'update'</span>,<span class="hljs-string">'destroy'</span>]<br>);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Route::resouce(&#39;poos&#39;,&#39;PostController&#39;,[&#39;only&#39;=&gt;
+    [&#39;index&#39;,&#39;show&#39;]
+]);
+
+Route::resouce(&#39;poos&#39;,&#39;PostController&#39;,[&#39;except&#39;]=&gt;
+    [&#39;create&#39;,&#39;store&#39;,&#39;update&#39;,&#39;destroy&#39;]
+);</code></pre>
 <h2 id="更改资源控制器中的函数名称"><a href="#更改资源控制器中的函数名称" class="headerlink" title="更改资源控制器中的函数名称"></a>更改资源控制器中的函数名称</h2><p>即本地化资源URI，如果要自定义资源控制器的函数名称，可以在<code>AppserviceProvider</code>的<code>boot</code>方法中实现,使用<code>Route::resourceVerbs</code>方法</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AppServiceProvider</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">ServiceProvider</span><br></span>&#123;<br>    <span class="hljs-comment">/**<br>     * Bootstrap any application services.<br>     *<br>     * <span class="hljs-doctag">@return</span> void<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">boot</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        <span class="hljs-comment">//</span><br>       <br>       Route::resourceVerbs([<br>           <span class="hljs-string">'create'</span> =&gt; <span class="hljs-string">'xinzeng'</span>,<br>           <span class="hljs-string">'edit'</span>=&gt; <span class="hljs-string">'bianji'</span>,<br>       ]);<br>    &#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        //
+
+       Route::resourceVerbs([
+           &#39;create&#39; =&gt; &#39;xinzeng&#39;,
+           &#39;edit&#39;=&gt; &#39;bianji&#39;,
+       ]);
+    }</code></pre>
 <h2 id="路由缓存"><a href="#路由缓存" class="headerlink" title="路由缓存"></a>路由缓存</h2><p>路由缓存可以加快路由注册速度，使用以下指令生成路由缓存：</p>
 <blockquote>
 <p>php artisan route:cache  </p>
@@ -348,230 +567,200 @@ php artisan make:controller UserController
 <p>php artisan route:clear</p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Laravel/">Laravel</a>
-                    
-                      <a class="hover-with-bg" href="/tags/php/">php</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2018/07/27/Laravel%E2%80%94%E8%AF%B7%E6%B1%82/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Laravel—请求</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2018/07/26/Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6/">
-                        <span class="hidden-mobile">Laravel—中间件</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/26/Laravel-%E4%B8%AD%E9%97%B4%E4%BB%B6/" rel="prev" title="Laravel—中间件">
+      <i class="fa fa-chevron-left"></i> Laravel—中间件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/27/Laravel%E2%80%94%E8%AF%B7%E6%B1%82/" rel="next" title="Laravel—请求">
+      Laravel—请求 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#控制器"><span class="nav-number">1.</span> <span class="nav-text">控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义控制器"><span class="nav-number">1.1.</span> <span class="nav-text">定义控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单动作控制器"><span class="nav-number">1.2.</span> <span class="nav-text">单动作控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制器中间件"><span class="nav-number">1.3.</span> <span class="nav-text">控制器中间件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源控制器"><span class="nav-number">1.4.</span> <span class="nav-text">资源控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#部分资源控制器"><span class="nav-number">1.4.1.</span> <span class="nav-text">部分资源控制器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更改资源控制器中的函数名称"><span class="nav-number">1.5.</span> <span class="nav-text">更改资源控制器中的函数名称</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#路由缓存"><span class="nav-number">1.6.</span> <span class="nav-text">路由缓存</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -579,41 +768,9 @@ php artisan make:controller UserController
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -627,68 +784,10 @@ php artisan make:controller UserController
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

@@ -1,262 +1,311 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
-  
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
   <meta name="description" content="validator 库用于对数据进行校验。在 Web 开发中，对用户传过来的数据我们都需要进行严格校验，防止用户的恶意请求。例如日期格式，用户年龄，性别等必须是正常的值，不能随意设置。使用 validdator 库可以很方便的进行很多的校验，避免自己编写大量的格式检验代码。">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go 之 validator 库">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;06&#x2F;09&#x2F;go%E4%B9%8Bvalidator%E5%BA%93&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="validator 库用于对数据进行校验。在 Web 开发中，对用户传过来的数据我们都需要进行严格校验，防止用户的恶意请求。例如日期格式，用户年龄，性别等必须是正常的值，不能随意设置。使用 validdator 库可以很方便的进行很多的校验，避免自己编写大量的格式检验代码。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-06-13T08:54:51.553Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/06/09/go%E4%B9%8Bvalidator%E5%BA%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>go 之 validator 库 | Silverming</title>
   
-  <title>go 之 validator 库 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="go 之 validator 库">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/09/go%E4%B9%8Bvalidator%E5%BA%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          go 之 validator 库
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-09 17:10:54" itemprop="dateCreated datePublished" datetime="2021-06-09T17:10:54+08:00">2021-06-09</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-06-09 17:10" pubdate>
-        2021年6月9日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      3.9k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      52
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-13 16:54:51" itemprop="dateModified" datetime="2021-06-13T16:54:51+08:00">2021-06-13</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>10 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">go 之 validator 库</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年6月13日 下午
-                
-              </p>
-            
-            <div class="markdown-body">
-              <p>validator 库用于对数据进行校验。在 Web 开发中，对用户传过来的数据我们都需要进行严格校验，防止用户的恶意请求。例如日期格式，用户年龄，性别等必须是正常的值，不能随意设置。使用 validdator 库可以很方便的进行很多的校验，避免自己编写大量的格式检验代码。</p>
+      
+        <p>validator 库用于对数据进行校验。在 Web 开发中，对用户传过来的数据我们都需要进行严格校验，防止用户的恶意请求。例如日期格式，用户年龄，性别等必须是正常的值，不能随意设置。使用 validdator 库可以很方便的进行很多的校验，避免自己编写大量的格式检验代码。</p>
 <a id="more"></a>
 
 <h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>使用如下命令进行安装：</p>
-<figure class="highlight vim"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs vim"><span class="hljs-keyword">go</span> <span class="hljs-built_in">get</span> github.<span class="hljs-keyword">com</span>/<span class="hljs-keyword">go</span>-playground/validator<br></code></pre></div></td></tr></table></figure>
+<pre><code>go get github.com/go-playground/validator</code></pre><p>在项目中导入包：</p>
+<pre><code>import &quot;github.com/go-playground/validator&quot;</code></pre><h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><pre><code class="go">package main
 
-<p>在项目中导入包：</p>
-<figure class="highlight xl"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xl"><span class="hljs-keyword">import</span> <span class="hljs-string">"github.com/go-playground/validator"</span><br></code></pre></div></td></tr></table></figure>
+import (
+&quot;fmt&quot;
+&quot;github.com/go-playground/validator&quot;
+)
 
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br><span class="hljs-string">"fmt"</span><br><span class="hljs-string">"github.com/go-playground/validator"</span><br>)<br><br><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	Name <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"min=6,max=10"`</span><br>	Age  <span class="hljs-keyword">int</span>    <span class="hljs-string">`validate:"min=1,max=100"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	validate := validator.New()<br><br>	u1 := User&#123;Name: <span class="hljs-string">"lidajun"</span>, Age: <span class="hljs-number">18</span>&#125;<br>	err := validate.Struct(u1)<br>	fmt.Println(err)<br><br>	u2 := User&#123;Name: <span class="hljs-string">"dj"</span>, Age: <span class="hljs-number">101</span>&#125;<br>	err = validate.Struct(u2)<br>	fmt.Println(err)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+type User struct {
+    Name string `validate:&quot;min=6,max=10&quot;`
+    Age  int    `validate:&quot;min=1,max=100&quot;`
+}
 
+func main() {
+    validate := validator.New()
+
+    u1 := User{Name: &quot;lidajun&quot;, Age: 18}
+    err := validate.Struct(u1)
+    fmt.Println(err)
+
+    u2 := User{Name: &quot;dj&quot;, Age: 101}
+    err = validate.Struct(u2)
+    fmt.Println(err)
+}
+</code></pre>
 <p><code>validator</code> 在结构体标签（<code>struct tag</code>）中定义字段的<strong>约束</strong>。使用 <code>validator</code> 验证数据之前，需要调用 <code>validator.New()</code> 创建一个<strong>验证器</strong>，这个验证器可以指定选项、添加自定义约束，然后通过调用它的 <code>Struct()</code> 方法来验证各种结构对象的字段是否符合定义的约束。</p>
 <p>在上面代码中，我们定义了一个结构体 <code>User</code>，<code>User</code> 有名称 <code>Name</code> 字段和年龄 <code>Age</code> 字段。通过 <code>min</code> 和 <code>max</code> 约束，我们设置 <code>Name</code> 的字符串长度为 <code>[6,10]</code> 之间，<code>Age</code> 的范围为 <code>[1,100]</code>。</p>
 <p>第一个对象 <code>Name</code> 和 <code>Age</code> 字段都满足约束，故 <code>Struct()</code> 方法返回 <code>nil</code> 错误。第二个对象的 <code>Name</code> 字段值为 <code>dj</code>，长度 2，小于最小值 <code>min</code>，<code>Age</code> 字段值为 101，大于最大值 <code>max</code>，故返回错误：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas">&lt;nil&gt;<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Name'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Name'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'min'</span> tag<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Age'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Age'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'max'</span> tag<br></code></pre></div></td></tr></table></figure>
-
-<p>错误信息比较好理解，<code>User.Name</code> 违反了 <code>min</code> 约束，<code>User.Age</code> 违反了 <code>max</code> 约束，一眼就能看出问题所在。</p>
+<pre><code>&lt;nil&gt;
+Key: &#39;User.Name&#39; Error:Field validation for &#39;Name&#39; failed on the &#39;min&#39; tag
+Key: &#39;User.Age&#39; Error:Field validation for &#39;Age&#39; failed on the &#39;max&#39; tag</code></pre><p>错误信息比较好理解，<code>User.Name</code> 违反了 <code>min</code> 约束，<code>User.Age</code> 违反了 <code>max</code> 约束，一眼就能看出问题所在。</p>
 <p>注意：<strong>字符串长度</strong>和<strong>数值的范围</strong>都可以通过 <code>min</code> 和 <code>max</code> 来约束。</p>
 <h1 id="约束"><a href="#约束" class="headerlink" title="约束"></a>约束</h1><p>validator 提供了丰富的约束供我们使用。下面罗列出了一些常用的约束，其他详细的介绍可以查看官方文档：<a href="https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme" target="_blank" rel="noopener">Package validator</a></p>
 <h2 id="范围约束"><a href="#范围约束" class="headerlink" title="范围约束"></a>范围约束</h2><p>上面已经看到了使用 <code>min</code> 和 <code>max</code> 来约束字符串的长度或数值的范围，下面再介绍其它的范围约束。范围约束的字段类型有以下几种：</p>
@@ -279,8 +328,36 @@
 <li><code>oneof</code>：只能是列举出的值其中一个，这些值必须是数值或字符串，以空格分隔，如果字符串中有空格，将字符串用单引号包围，例如 <code>oneof=red green</code>。</li>
 </ul>
 <p>大部分还是比较直观的，通过一个例子看看其中几个约束如何使用：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"github.com/go-playground/validator"</span><br>	<span class="hljs-string">"time"</span><br>)<br><br><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>	Name    <span class="hljs-keyword">string</span>    <span class="hljs-string">`validate:"ne=admin"`</span><br>	Age     <span class="hljs-keyword">int</span>       <span class="hljs-string">`validate:"gte=18"`</span><br>	Sex     <span class="hljs-keyword">string</span>    <span class="hljs-string">`validate:"oneof=male female"`</span><br>	RegTime time.Time <span class="hljs-string">`validate:"lte"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	validate := validator.New()<br><br>	u1 := User&#123;Name: <span class="hljs-string">"dj"</span>, Age: <span class="hljs-number">18</span>, Sex: <span class="hljs-string">"male"</span>, RegTime: time.Now().UTC()&#125;<br>	err := validate.Struct(u1)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(err)<br>	&#125;<br><br>	u2 := User&#123;Name: <span class="hljs-string">"admin"</span>, Age: <span class="hljs-number">15</span>, Sex: <span class="hljs-string">"none"</span>, RegTime: time.Now().UTC().Add(<span class="hljs-number">1</span> * time.Hour)&#125;<br>	err = validate.Struct(u2)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		fmt.Println(err)<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package main
 
+import (
+    &quot;fmt&quot;
+    &quot;github.com/go-playground/validator&quot;
+    &quot;time&quot;
+)
+
+type User struct {
+    Name    string    `validate:&quot;ne=admin&quot;`
+    Age     int       `validate:&quot;gte=18&quot;`
+    Sex     string    `validate:&quot;oneof=male female&quot;`
+    RegTime time.Time `validate:&quot;lte&quot;`
+}
+
+func main() {
+    validate := validator.New()
+
+    u1 := User{Name: &quot;dj&quot;, Age: 18, Sex: &quot;male&quot;, RegTime: time.Now().UTC()}
+    err := validate.Struct(u1)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    u2 := User{Name: &quot;admin&quot;, Age: 15, Sex: &quot;none&quot;, RegTime: time.Now().UTC().Add(1 * time.Hour)}
+    err = validate.Struct(u2)
+    if err != nil {
+        fmt.Println(err)
+    }
+}</code></pre>
 <p>上面例子中，定义了 <code>User</code> 对象，为它的 4 个字段分别设置了约束：</p>
 <ul>
 <li><code>Name</code>：字符串不能是 <code>admin</code>；</li>
@@ -289,19 +366,68 @@
 <li><code>RegTime</code>：注册时间必须小于当前的 UTC 时间，<strong>注意如果字段类型是<code>time.Time</code>，使用<code>gt/gte/lt/lte</code>等约束时不用指定参数值，默认与当前的 UTC 时间比较</strong>。</li>
 </ul>
 <p>同样地，第一个对象的字段都是合法的，校验通过。第二个对象的 4 个字段都非法，通过输出信息很好定错误位置：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas"><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Name'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Name'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'ne'</span> tag<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Age'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Age'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'gte'</span> tag<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Sex'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Sex'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'oneof'</span> tag<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.RegTime'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'RegTime'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'lte'</span> tag<br></code></pre></div></td></tr></table></figure>
+<pre><code>Key: &#39;User.Name&#39; Error:Field validation for &#39;Name&#39; failed on the &#39;ne&#39; tag
+Key: &#39;User.Age&#39; Error:Field validation for &#39;Age&#39; failed on the &#39;gte&#39; tag
+Key: &#39;User.Sex&#39; Error:Field validation for &#39;Sex&#39; failed on the &#39;oneof&#39; tag
+Key: &#39;User.RegTime&#39; Error:Field validation for &#39;RegTime&#39; failed on the &#39;lte&#39; tag</code></pre><h2 id="字段约束与跨字段约束"><a href="#字段约束与跨字段约束" class="headerlink" title="字段约束与跨字段约束"></a>字段约束与跨字段约束</h2><p>validator 允许定义跨字段的约束，即该字段与其他字段之间的关系。这种约束实际上分为两种，一种是参数字段就是同一个结构中的平级字段，另一种是参数字段为结构中其他字段的字段。约束语法很简单，要想使用上面的约束语义，只需要稍微修改一下。例如<strong>相等约束</strong>（<code>eq</code>），如果是约束同一个结构中的字段，则在后面添加一个 <code>field</code>，使用 <code>eqfield</code> 定义字段间的相等约束。如果是更深层次的字段，在 <code>field</code> 之前还需要加上 <code>cs</code>（可以理解为<code>cross-struct</code>），<code>eq</code> 就变为 <code>eqcsfield</code>。它们的参数值都是需要比较的字段名，内层的还需要加上字段的类型：</p>
+<pre><code class="go">eqfield=ConfirmPassword
+eqcsfield=InnerStructField.Field</code></pre>
+<pre><code class="go">type RegisterForm struct {
+  Name      string `validate:&quot;min=2&quot;`
+  Age       int    `validate:&quot;min=18&quot;`
+  Password  string `validate:&quot;min=10&quot;`
+  Password2 string `validate:&quot;eqfield=Password&quot;`
+}
 
-<h2 id="字段约束与跨字段约束"><a href="#字段约束与跨字段约束" class="headerlink" title="字段约束与跨字段约束"></a>字段约束与跨字段约束</h2><p>validator 允许定义跨字段的约束，即该字段与其他字段之间的关系。这种约束实际上分为两种，一种是参数字段就是同一个结构中的平级字段，另一种是参数字段为结构中其他字段的字段。约束语法很简单，要想使用上面的约束语义，只需要稍微修改一下。例如<strong>相等约束</strong>（<code>eq</code>），如果是约束同一个结构中的字段，则在后面添加一个 <code>field</code>，使用 <code>eqfield</code> 定义字段间的相等约束。如果是更深层次的字段，在 <code>field</code> 之前还需要加上 <code>cs</code>（可以理解为<code>cross-struct</code>），<code>eq</code> 就变为 <code>eqcsfield</code>。它们的参数值都是需要比较的字段名，内层的还需要加上字段的类型：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">eqfield=ConfirmPassword<br>eqcsfield=InnerStructField.Field<br></code></pre></div></td></tr></table></figure>
+func main() {
+  validate := validator.New()
 
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> RegisterForm <span class="hljs-keyword">struct</span> &#123;<br>  Name      <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"min=2"`</span><br>  Age       <span class="hljs-keyword">int</span>    <span class="hljs-string">`validate:"min=18"`</span><br>  Password  <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"min=10"`</span><br>  Password2 <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"eqfield=Password"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br><br>  f1 := RegisterForm&#123;<br>    Name:      <span class="hljs-string">"dj"</span>,<br>    Age:       <span class="hljs-number">18</span>,<br>    Password:  <span class="hljs-string">"1234567890"</span>,<br>    Password2: <span class="hljs-string">"1234567890"</span>,<br>  &#125;<br>  err := validate.Struct(f1)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br><br>  f2 := RegisterForm&#123;<br>    Name:      <span class="hljs-string">"dj"</span>,<br>    Age:       <span class="hljs-number">18</span>,<br>    Password:  <span class="hljs-string">"1234567890"</span>,<br>    Password2: <span class="hljs-string">"123"</span>,<br>  &#125;<br>  err = validate.Struct(f2)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+  f1 := RegisterForm{
+    Name:      &quot;dj&quot;,
+    Age:       18,
+    Password:  &quot;1234567890&quot;,
+    Password2: &quot;1234567890&quot;,
+  }
+  err := validate.Struct(f1)
+  if err != nil {
+    fmt.Println(err)
+  }
 
+  f2 := RegisterForm{
+    Name:      &quot;dj&quot;,
+    Age:       18,
+    Password:  &quot;1234567890&quot;,
+    Password2: &quot;123&quot;,
+  }
+  err = validate.Struct(f2)
+  if err != nil {
+    fmt.Println(err)
+  }
+}</code></pre>
 <p>我们定义了一个简单的注册表单结构，使用<code>eqfield</code>约束其两次输入的密码必须相等。第一个对象满足约束，第二个对象两次密码明显不等。程序输出：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas"><span class="hljs-meta">Key</span>: <span class="hljs-string">'RegisterForm.Password2'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Password2'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'eqfield'</span> tag<br></code></pre></div></td></tr></table></figure>
+<pre><code>Key: &#39;RegisterForm.Password2&#39; Error:Field validation for &#39;Password2&#39; failed on the &#39;eqfield&#39; tag</code></pre><p>对于跨字段的约束，示例如下：</p>
+<pre><code class="go">type Inner struct {
+    StartDate time.Time
+}
 
-<p>对于跨字段的约束，示例如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Inner <span class="hljs-keyword">struct</span> &#123;<br>	StartDate time.Time<br>&#125;<br><br><span class="hljs-keyword">type</span> Outer <span class="hljs-keyword">struct</span> &#123;<br>	InnerStructField *Inner<br>	CreatedAt time.Time      <span class="hljs-string">`validate:"ltecsfield=InnerStructField.StartDate"`</span> <span class="hljs-comment">//跨字段的约束</span><br>&#125;<br><br>now := time.Now()<br><br>inner := &amp;Inner&#123;<br>	StartDate: now,<br>&#125;<br><br>outer := &amp;Outer&#123;<br>	InnerStructField: inner,<br>	CreatedAt: now,<br>&#125;<br><br>errs := validate.Struct(outer)<br></code></pre></div></td></tr></table></figure>
+type Outer struct {
+    InnerStructField *Inner
+    CreatedAt time.Time      `validate:&quot;ltecsfield=InnerStructField.StartDate&quot;` //跨字段的约束
+}
 
+now := time.Now()
+
+inner := &amp;Inner{
+    StartDate: now,
+}
+
+outer := &amp;Outer{
+    InnerStructField: inner,
+    CreatedAt: now,
+}
+
+errs := validate.Struct(outer)
+</code></pre>
 <h2 id="字符串约束"><a href="#字符串约束" class="headerlink" title="字符串约束"></a>字符串约束</h2><p><code>validator</code>中关于字符串的约束有很多，这里介绍几个：</p>
 <ul>
 <li><code>contains</code>：包含参数子串，例如<code>contains=email</code>；</li>
@@ -314,8 +440,26 @@
 <li><code>endswith</code>：以参数子串为后缀，例如<code>endswith=bye</code>。</li>
 </ul>
 <p>看示例：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>  Name <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"containsrune=☻"`</span><br>  Age  <span class="hljs-keyword">int</span>    <span class="hljs-string">`validate:"min=18"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br><br>  u1 := User&#123;<span class="hljs-string">"d☻j"</span>, <span class="hljs-number">18</span>&#125;<br>  err := validate.Struct(u1)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br><br>  u2 := User&#123;<span class="hljs-string">"dj"</span>, <span class="hljs-number">18</span>&#125;<br>  err = validate.Struct(u2)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">type User struct {
+  Name string `validate:&quot;containsrune=☻&quot;`
+  Age  int    `validate:&quot;min=18&quot;`
+}
 
+func main() {
+  validate := validator.New()
+
+  u1 := User{&quot;d☻j&quot;, 18}
+  err := validate.Struct(u1)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  u2 := User{&quot;dj&quot;, 18}
+  err = validate.Struct(u2)
+  if err != nil {
+    fmt.Println(err)
+  }
+}</code></pre>
 <p>限制 <code>Name</code> 字段必须包含 UNICODE 字符 <code>☻</code></p>
 <h2 id="唯一性约束"><a href="#唯一性约束" class="headerlink" title="唯一性约束"></a>唯一性约束</h2><p>使用 <code>unqiue</code> 来指定唯一性约束，对不同类型的处理如下：</p>
 <ul>
@@ -324,34 +468,93 @@
 <li>对于元素类型为结构体的切片，<code>unique</code> 约束结构体对象的某个字段不重复，通过 <code>unqiue=field</code> 指定这个字段名。</li>
 </ul>
 <p>例如：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>  Name    <span class="hljs-keyword">string</span>   <span class="hljs-string">`validate:"min=2"`</span><br>  Age     <span class="hljs-keyword">int</span>      <span class="hljs-string">`validate:"min=18"`</span><br>  Hobbies []<span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"unique"`</span><br>  Friends []User   <span class="hljs-string">`validate:"unique=Name"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br><br>  f1 := User&#123;<br>    Name: <span class="hljs-string">"dj2"</span>,<br>    Age:  <span class="hljs-number">18</span>,<br>  &#125;<br>  f2 := User&#123;<br>    Name: <span class="hljs-string">"dj3"</span>,<br>    Age:  <span class="hljs-number">18</span>,<br>  &#125;<br><br>  u1 := User&#123;<br>    Name:    <span class="hljs-string">"dj"</span>,<br>    Age:     <span class="hljs-number">18</span>,<br>    Hobbies: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"pingpong"</span>, <span class="hljs-string">"chess"</span>, <span class="hljs-string">"programming"</span>&#125;,<br>    Friends: []User&#123;f1, f2&#125;,<br>  &#125;<br>  err := validate.Struct(u1)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br><br>  u2 := User&#123;<br>    Name:    <span class="hljs-string">"dj"</span>,<br>    Age:     <span class="hljs-number">18</span>,<br>    Hobbies: []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"programming"</span>, <span class="hljs-string">"programming"</span>&#125;,<br>    Friends: []User&#123;f1, f1&#125;,<br>  &#125;<br>  err = validate.Struct(u2)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">type User struct {
+  Name    string   `validate:&quot;min=2&quot;`
+  Age     int      `validate:&quot;min=18&quot;`
+  Hobbies []string `validate:&quot;unique&quot;`
+  Friends []User   `validate:&quot;unique=Name&quot;`
+}
 
+func main() {
+  validate := validator.New()
+
+  f1 := User{
+    Name: &quot;dj2&quot;,
+    Age:  18,
+  }
+  f2 := User{
+    Name: &quot;dj3&quot;,
+    Age:  18,
+  }
+
+  u1 := User{
+    Name:    &quot;dj&quot;,
+    Age:     18,
+    Hobbies: []string{&quot;pingpong&quot;, &quot;chess&quot;, &quot;programming&quot;},
+    Friends: []User{f1, f2},
+  }
+  err := validate.Struct(u1)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  u2 := User{
+    Name:    &quot;dj&quot;,
+    Age:     18,
+    Hobbies: []string{&quot;programming&quot;, &quot;programming&quot;},
+    Friends: []User{f1, f1},
+  }
+  err = validate.Struct(u2)
+  if err != nil {
+    fmt.Println(err)
+  }
+}</code></pre>
 <p>代码中限制爱好 <code>Hobbies</code> 中不能有重复元素，好友 <code>Friends</code> 的各个元素不能有同样的名字 <code>Name</code>。第一个对象满足约束，第二个对象的 <code>Hobbies</code> 字段包含了重复的 <code>&quot;programming&quot;</code>，<code>Friends</code> 字段中两个元素的 <code>Name</code> 字段都是 <code>dj2</code>。程序输出：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas"><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Hobbies'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Hobbies'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'unique'</span> tag<br><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Friends'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Friends'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'unique'</span> tag<br></code></pre></div></td></tr></table></figure>
+<pre><code>Key: &#39;User.Hobbies&#39; Error:Field validation for &#39;Hobbies&#39; failed on the &#39;unique&#39; tag
+Key: &#39;User.Friends&#39; Error:Field validation for &#39;Friends&#39; failed on the &#39;unique&#39; tag</code></pre><h2 id="邮件"><a href="#邮件" class="headerlink" title="邮件"></a>邮件</h2><p>通过 <code>email</code> 限制字段必须是邮件格式：</p>
+<pre><code class="go">type User struct {
+  Name  string `validate:&quot;min=2&quot;`
+  Age   int    `validate:&quot;min=18&quot;`
+  Email string `validate:&quot;email&quot;`
+}
 
-<h2 id="邮件"><a href="#邮件" class="headerlink" title="邮件"></a>邮件</h2><p>通过 <code>email</code> 限制字段必须是邮件格式：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> User <span class="hljs-keyword">struct</span> &#123;<br>  Name  <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"min=2"`</span><br>  Age   <span class="hljs-keyword">int</span>    <span class="hljs-string">`validate:"min=18"`</span><br>  Email <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"email"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br><br>  u1 := User&#123;<br>    Name:  <span class="hljs-string">"dj"</span>,<br>    Age:   <span class="hljs-number">18</span>,<br>    Email: <span class="hljs-string">"dj@example.com"</span>,<br>  &#125;<br>  err := validate.Struct(u1)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br><br>  u2 := User&#123;<br>    Name:  <span class="hljs-string">"dj"</span>,<br>    Age:   <span class="hljs-number">18</span>,<br>    Email: <span class="hljs-string">"djexample.com"</span>,<br>  &#125;<br>  err = validate.Struct(u2)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+func main() {
+  validate := validator.New()
 
+  u1 := User{
+    Name:  &quot;dj&quot;,
+    Age:   18,
+    Email: &quot;dj@example.com&quot;,
+  }
+  err := validate.Struct(u1)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  u2 := User{
+    Name:  &quot;dj&quot;,
+    Age:   18,
+    Email: &quot;djexample.com&quot;,
+  }
+  err = validate.Struct(u2)
+  if err != nil {
+    fmt.Println(err)
+  }
+}</code></pre>
 <p>上面我们约束 <code>Email</code> 字段必须是邮件的格式，第一个对象满足约束，第二个对象不满足，程序输出：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas"><span class="hljs-meta">Key</span>: <span class="hljs-string">'User.Email'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Email'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'email'</span> tag<br></code></pre></div></td></tr></table></figure>
-
-<h2 id="分割约束（Dive）"><a href="#分割约束（Dive）" class="headerlink" title="分割约束（Dive）"></a>分割约束（Dive）</h2><p><code>dive</code> 标签用于在切片、数组和 map 中分割约束规则的层次级别，它还可以与 <code>keys</code> ,<code>endkeys</code> 标签配合使用。</p>
+<pre><code>Key: &#39;User.Email&#39; Error:Field validation for &#39;Email&#39; failed on the &#39;email&#39; tag</code></pre><h2 id="分割约束（Dive）"><a href="#分割约束（Dive）" class="headerlink" title="分割约束（Dive）"></a>分割约束（Dive）</h2><p><code>dive</code> 标签用于在切片、数组和 map 中分割约束规则的层次级别，它还可以与 <code>keys</code> ,<code>endkeys</code> 标签配合使用。</p>
 <p>示例一：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">[][]<span class="hljs-keyword">string</span> with validation tag <span class="hljs-string">"gt=0,dive,len=1,dive,required"</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">[][]string with validation tag &quot;gt=0,dive,len=1,dive,required&quot;</code></pre>
 <p>在示例一中，<code>gt=0</code> 将用于约束 <code>[]</code>，而 <code>len=1</code> 将用于约束 <code>[]stirng</code>，<code>required</code> 便签将用于约束 <code>string</code>。</p>
 <p>示例二：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">[][]<span class="hljs-keyword">string</span> with validation tag <span class="hljs-string">"gt=0,dive,dive,required"</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">[][]string with validation tag &quot;gt=0,dive,dive,required&quot;</code></pre>
 <p>在示例二中，<code>gt=0</code> 将用于约束 <code>[]</code>，<code>[]stirng</code> 将跳过约束，而 <code>required</code> 用于约束 <code>string</code>。</p>
 <h3 id="keys-和-endkeys"><a href="#keys-和-endkeys" class="headerlink" title="keys 和 endkeys"></a>keys 和 endkeys</h3><p><code>keys</code> 和 <code>endkeys</code> 搭配 <code>dive</code>  标签一起使用，作用于 map 数据类型，表示当前约束是针对 map 的 key 而不是 value。</p>
 <p>示例一：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">map</span>[<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span> with validation tag <span class="hljs-string">"gt=0,dive,keys,eg=1|eq=2,endkeys,required"</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">map[string]string with validation tag &quot;gt=0,dive,keys,eg=1|eq=2,endkeys,required&quot;</code></pre>
 <p>示例一中，<code>gt=0</code> 作用于 map 本身，<code>eg=1|eq=2</code> 作用于 map 的键，<code>required</code>  则是作用于 map 的值。</p>
 <p>示例二：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">map</span>[[<span class="hljs-number">2</span>]<span class="hljs-keyword">string</span>]<span class="hljs-keyword">string</span> with validation tag <span class="hljs-string">"gt=0,dive,keys,dive,eq=1|eq=2,endkeys,required"</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">map[[2]string]string with validation tag &quot;gt=0,dive,keys,dive,eq=1|eq=2,endkeys,required&quot;</code></pre>
 <p>示例二中，<code>gt=0</code> 将作用于 map 本身，<code>eq=1|eq=2</code> 将作用于 map 的键数组中的每一个值，即 <code>[2]string</code> 数组中的每一个值，<code>required</code> 则是作用于 map 的值。</p>
 <h2 id="特殊约束"><a href="#特殊约束" class="headerlink" title="特殊约束"></a>特殊约束</h2><p>有一些比较特殊的约束：</p>
 <ul>
@@ -362,36 +565,108 @@
 </ul>
 <h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>validator 提供了大量的、各个方面的、丰富的约束，如 <code>ASCII/UNICODE</code> 字母、数字、十六进制、十六进制颜色值、大小写、RBG 颜色值，HSL 颜色值、HSLA 颜色值、JSON 格式、文件路径、URL、base64 编码串、ip 地址、ipv4、ipv6、UUID、经纬度等等等等等等等等等等等。可以自行在<a href="https://pkg.go.dev/github.com/go-playground/validator/v10#section-readme" target="_blank" rel="noopener">官方文档</a>查阅。</p>
 <h2 id="自定义约束"><a href="#自定义约束" class="headerlink" title="自定义约束"></a>自定义约束</h2><p>除了使用 <code>validator</code> 提供的约束外，还可以定义自己的约束。例如现在有个奇葩的需求，产品同学要求用户必须使用回文串作为用户名，我们可以自定义这个约束：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> RegisterForm <span class="hljs-keyword">struct</span> &#123;<br>  Name <span class="hljs-keyword">string</span> <span class="hljs-string">`validate:"palindrome"`</span><br>  Age  <span class="hljs-keyword">int</span>    <span class="hljs-string">`validate:"min=18"`</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">reverseString</span><span class="hljs-params">(s <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">string</span></span> &#123;<br>  runes := []<span class="hljs-keyword">rune</span>(s)<br>  <span class="hljs-keyword">for</span> from, to := <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(runes)<span class="hljs-number">-1</span>; from &lt; to; from, to = from+<span class="hljs-number">1</span>, to<span class="hljs-number">-1</span> &#123;<br>    runes[from], runes[to] = runes[to], runes[from]<br>  &#125;<br><br>  <span class="hljs-keyword">return</span> <span class="hljs-keyword">string</span>(runes)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CheckPalindrome</span><span class="hljs-params">(fl validator.FieldLevel)</span> <span class="hljs-title">bool</span></span> &#123;<br>  value := fl.Field().String()<br>  <span class="hljs-keyword">return</span> value == reverseString(value)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br>  validate.RegisterValidation(<span class="hljs-string">"palindrome"</span>, CheckPalindrome)<br><br>  f1 := RegisterForm&#123;<br>    Name: <span class="hljs-string">"djd"</span>,<br>    Age:  <span class="hljs-number">18</span>,<br>  &#125;<br>  err := validate.Struct(f1)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br><br>  f2 := RegisterForm&#123;<br>    Name: <span class="hljs-string">"dj"</span>,<br>    Age:  <span class="hljs-number">18</span>,<br>  &#125;<br>  err = validate.Struct(f2)<br>  <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>    fmt.Println(err)<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">type RegisterForm struct {
+  Name string `validate:&quot;palindrome&quot;`
+  Age  int    `validate:&quot;min=18&quot;`
+}
 
+func reverseString(s string) string {
+  runes := []rune(s)
+  for from, to := 0, len(runes)-1; from &lt; to; from, to = from+1, to-1 {
+    runes[from], runes[to] = runes[to], runes[from]
+  }
+
+  return string(runes)
+}
+
+func CheckPalindrome(fl validator.FieldLevel) bool {
+  value := fl.Field().String()
+  return value == reverseString(value)
+}
+
+func main() {
+  validate := validator.New()
+  validate.RegisterValidation(&quot;palindrome&quot;, CheckPalindrome)
+
+  f1 := RegisterForm{
+    Name: &quot;djd&quot;,
+    Age:  18,
+  }
+  err := validate.Struct(f1)
+  if err != nil {
+    fmt.Println(err)
+  }
+
+  f2 := RegisterForm{
+    Name: &quot;dj&quot;,
+    Age:  18,
+  }
+  err = validate.Struct(f2)
+  if err != nil {
+    fmt.Println(err)
+  }
+}</code></pre>
 <p>首先定义一个类型为 <code>func (validator.FieldLevel) bool</code> 的函数检查约束是否满足，可以通过 <code>FieldLevel</code> 取出要检查的字段的信息。然后，调用验证器的 <code>RegisterValidation()</code> 方法将该约束注册到指定的名字上。最后我们就可以在结构体中使用该约束。上面程序中，第二个对象不满足约束<code>palindrome</code>，输出：</p>
-<figure class="highlight sas"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs sas"><span class="hljs-meta">Key</span>: <span class="hljs-string">'RegisterForm.Name'</span> <span class="hljs-meta">Error</span>:Field validation for <span class="hljs-string">'Name'</span> failed <span class="hljs-meta">on</span> the <span class="hljs-string">'palindrome'</span> tag<br></code></pre></div></td></tr></table></figure>
-
-<h1 id="相关方法"><a href="#相关方法" class="headerlink" title="相关方法"></a>相关方法</h1><p>validator 提供了校验的相关方法，主要有以下几个：</p>
-<h2 id="Struct-方法"><a href="#Struct-方法" class="headerlink" title="Struct 方法"></a>Struct 方法</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *Validate)</span> <span class="hljs-title">Struct</span><span class="hljs-params">(s <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">error</span></span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code>Key: &#39;RegisterForm.Name&#39; Error:Field validation for &#39;Name&#39; failed on the &#39;palindrome&#39; tag</code></pre><h1 id="相关方法"><a href="#相关方法" class="headerlink" title="相关方法"></a>相关方法</h1><p>validator 提供了校验的相关方法，主要有以下几个：</p>
+<h2 id="Struct-方法"><a href="#Struct-方法" class="headerlink" title="Struct 方法"></a>Struct 方法</h2><pre><code class="go">func (v *Validate) Struct(s interface{}) error</code></pre>
 <p>这是最常见的方法，它对传入的参数 s 进行校验，对于传入的错误值，它返回 <code>InvalidValidationError</code>，否则返回 <code>nil</code> 或 <code>ValidationErrors</code> 作为错误。</p>
-<h2 id="StructExcept-方法"><a href="#StructExcept-方法" class="headerlink" title="StructExcept 方法"></a>StructExcept 方法</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *Validate)</span> <span class="hljs-title">StructExcept</span><span class="hljs-params">(s <span class="hljs-keyword">interface</span>&#123;&#125;, fields ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-title">error</span></span><br></code></pre></div></td></tr></table></figure>
-
+<h2 id="StructExcept-方法"><a href="#StructExcept-方法" class="headerlink" title="StructExcept 方法"></a>StructExcept 方法</h2><pre><code class="go">func (v *Validate) StructExcept(s interface{}, fields ...string) error</code></pre>
 <p>该方法将会校验除了 <code>fields</code> 提供的字段外的所有 struct 中的选项，对于 <code>fields</code> 的提供，可以相对于提供的结构以命名空间方式提供字段，即 <code>NestedStruct.Field</code> 或 <code>NestedArrayField[0].Struct.Name</code> 这样的方式。</p>
-<h2 id="StructFiltered-方法"><a href="#StructFiltered-方法" class="headerlink" title="StructFiltered 方法"></a>StructFiltered 方法</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *Validate)</span> <span class="hljs-title">StructFiltered</span><span class="hljs-params">(s <span class="hljs-keyword">interface</span>&#123;&#125;, fn FilterFunc)</span> <span class="hljs-title">error</span></span><br></code></pre></div></td></tr></table></figure>
-
+<h2 id="StructFiltered-方法"><a href="#StructFiltered-方法" class="headerlink" title="StructFiltered 方法"></a>StructFiltered 方法</h2><pre><code class="go">func (v *Validate) StructFiltered(s interface{}, fn FilterFunc) error</code></pre>
 <p>该方法接受一个函数 <code>fn</code> ，该函数的返回值为 bool 类型，通过该函数来对结构体 s 进行校验。</p>
-<h2 id="StructPartial-方法"><a href="#StructPartial-方法" class="headerlink" title="StructPartial 方法"></a>StructPartial 方法</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *Validate)</span> <span class="hljs-title">StructPartial</span><span class="hljs-params">(s <span class="hljs-keyword">interface</span>&#123;&#125;, fields ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-title">error</span></span><br></code></pre></div></td></tr></table></figure>
-
+<h2 id="StructPartial-方法"><a href="#StructPartial-方法" class="headerlink" title="StructPartial 方法"></a>StructPartial 方法</h2><pre><code class="go">func (v *Validate) StructPartial(s interface{}, fields ...string) error</code></pre>
 <p>该方法只校验 <code>fields</code>  指定的字段，忽略所有其他字段。可以以相对于提供的结构的命名空间方式提供字段，例如：<code>NestedStruct.Field</code> 或 <code>NestedArrayField[0].Struct.Name</code>。</p>
-<h2 id="Var-方法"><a href="#Var-方法" class="headerlink" title="Var 方法"></a>Var 方法</h2><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(v *Validate)</span> <span class="hljs-title">Var</span><span class="hljs-params">(field <span class="hljs-keyword">interface</span>&#123;&#125;, tag <span class="hljs-keyword">string</span>)</span> <span class="hljs-title">error</span></span><br></code></pre></div></td></tr></table></figure>
-
+<h2 id="Var-方法"><a href="#Var-方法" class="headerlink" title="Var 方法"></a>Var 方法</h2><pre><code class="go">func (v *Validate) Var(field interface{}, tag string) error</code></pre>
 <p>该方法接收一个变量和一个 <code>tag</code> 参数，例如：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> i <span class="hljs-keyword">int</span><br>validate.Var(i, <span class="hljs-string">"gt=1,lt=10"</span>)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">var i int
+validate.Var(i, &quot;gt=1,lt=10&quot;)</code></pre>
 <h2 id="VarWithValue-方法"><a href="#VarWithValue-方法" class="headerlink" title="VarWithValue 方法"></a>VarWithValue 方法</h2><p>在一些很简单的情况下，我们仅仅想对两个变量进行比较，如果每次都要先定义结构和 <code>tag</code> 就太繁琐了。<code>validator</code> 提供了 <code>VarWithValue()</code> 方法，只需要传入要验证的两个变量和约束即可：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  name1 := <span class="hljs-string">"dj"</span><br>  name2 := <span class="hljs-string">"dj2"</span><br><br>  validate := validator.New()<br>  fmt.Println(validate.VarWithValue(name1, name2, <span class="hljs-string">"eqfield"</span>))<br><br>  fmt.Println(validate.VarWithValue(name1, name2, <span class="hljs-string">"nefield"</span>))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func main() {
+  name1 := &quot;dj&quot;
+  name2 := &quot;dj2&quot;
 
+  validate := validator.New()
+  fmt.Println(validate.VarWithValue(name1, name2, &quot;eqfield&quot;))
+
+  fmt.Println(validate.VarWithValue(name1, name2, &quot;nefield&quot;))
+}</code></pre>
 <h1 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h1><p>在上面的例子中，校验失败时仅仅只是输出返回的错误。其实，validator 可以进行更精准的处理。validator 返回的错误实际上只有两种，一种是参数错误，一种是校验错误。</p>
 <p>参数错误时，返回 <code>InvalidValidationError</code> 类型；校验错误时返回 <code>ValidationErrors</code>，它们都实现了 <code>error</code> 接口。而且 <code>ValidationErrors</code> 是一个错误切片，它保存了每个字段违反的每个约束信息：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-comment">// InvalidValidationError 描述了传递给 “Struct”、“StructExcept”、“StructPartial”或 “Field” 的无效参数</span><br><span class="hljs-keyword">type</span> InvalidValidationError <span class="hljs-keyword">struct</span> &#123;<br>	Type reflect.Type<br>&#125;<br><br><span class="hljs-comment">// Error returns InvalidValidationError message</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(e *InvalidValidationError)</span> <span class="hljs-title">Error</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> &#123;<br><br>	<span class="hljs-keyword">if</span> e.Type == <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">"validator: (nil)"</span><br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-string">"validator: (nil "</span> + e.Type.String() + <span class="hljs-string">")"</span><br>&#125;<br><br><span class="hljs-comment">// ValidationErrors is an array of FieldError's</span><br><span class="hljs-comment">// for use in custom error messages post validation.</span><br><span class="hljs-keyword">type</span> ValidationErrors []FieldError<br><br><span class="hljs-comment">// 错误旨在用于开发 + 调试，而不是生产错误消息。 它允许 ValidationErrors 订阅 Error 接口。 创建特定于您的应用程序的错误消息的所有信息都包含在 ValidationErrors 数组中的 FieldError 中</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(ve ValidationErrors)</span> <span class="hljs-title">Error</span><span class="hljs-params">()</span> <span class="hljs-title">string</span></span> &#123;<br><br>	buff := bytes.NewBufferString(<span class="hljs-string">""</span>)<br><br>	<span class="hljs-keyword">var</span> fe *fieldError<br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(ve); i++ &#123;<br><br>		fe = ve[i].(*fieldError)<br>		buff.WriteString(fe.Error())<br>		buff.WriteString(<span class="hljs-string">"\n"</span>)<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> strings.TrimSpace(buff.String())<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">// InvalidValidationError 描述了传递给 “Struct”、“StructExcept”、“StructPartial”或 “Field” 的无效参数
+type InvalidValidationError struct {
+    Type reflect.Type
+}
 
+// Error returns InvalidValidationError message
+func (e *InvalidValidationError) Error() string {
+
+    if e.Type == nil {
+        return &quot;validator: (nil)&quot;
+    }
+
+    return &quot;validator: (nil &quot; + e.Type.String() + &quot;)&quot;
+}
+
+// ValidationErrors is an array of FieldError&#39;s
+// for use in custom error messages post validation.
+type ValidationErrors []FieldError
+
+// 错误旨在用于开发 + 调试，而不是生产错误消息。 它允许 ValidationErrors 订阅 Error 接口。 创建特定于您的应用程序的错误消息的所有信息都包含在 ValidationErrors 数组中的 FieldError 中
+func (ve ValidationErrors) Error() string {
+
+    buff := bytes.NewBufferString(&quot;&quot;)
+
+    var fe *fieldError
+
+    for i := 0; i &lt; len(ve); i++ {
+
+        fe = ve[i].(*fieldError)
+        buff.WriteString(fe.Error())
+        buff.WriteString(&quot;\n&quot;)
+    }
+
+    return strings.TrimSpace(buff.String())
+}</code></pre>
 <p>所以 <code>validator</code> 校验返回的结果只有 3 种情况：</p>
 <ul>
 <li><code>nil</code>：没有错误；</li>
@@ -399,12 +674,32 @@
 <li><code>ValidationErrors</code>：字段违反约束。</li>
 </ul>
 <p>我们可以在程序中判断 <code>err != nil</code> 时，依次将 <code>err</code> 转换为 <code>InvalidValidationError</code> 和 <code>ValidationErrors</code> 以获取更详细的信息：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">processErr</span><span class="hljs-params">(err error)</span></span> &#123;<br>  <span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> &#123;<br>    <span class="hljs-keyword">return</span><br>  &#125;<br><br>  invalid, ok := err.(*validator.InvalidValidationError)<br>  <span class="hljs-keyword">if</span> ok &#123;<br>    fmt.Println(<span class="hljs-string">"param error:"</span>, invalid)<br>    <span class="hljs-keyword">return</span><br>  &#125;<br><br>  validationErrs := err.(validator.ValidationErrors)<br>  <span class="hljs-keyword">for</span> _, validationErr := <span class="hljs-keyword">range</span> validationErrs &#123;<br>    fmt.Println(validationErr)<br>  &#125;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>  validate := validator.New()<br><br>  err := validate.Struct(<span class="hljs-number">1</span>)<br>  processErr(err)<br><br>  err = validate.VarWithValue(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-string">"eqfield"</span>)<br>  processErr(err)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func processErr(err error) {
+  if err == nil {
+    return
+  }
 
+  invalid, ok := err.(*validator.InvalidValidationError)
+  if ok {
+    fmt.Println(&quot;param error:&quot;, invalid)
+    return
+  }
 
+  validationErrs := err.(validator.ValidationErrors)
+  for _, validationErr := range validationErrs {
+    fmt.Println(validationErr)
+  }
+}
 
+func main() {
+  validate := validator.New()
 
+  err := validate.Struct(1)
+  processErr(err)
 
+  err = validate.VarWithValue(1, 2, &quot;eqfield&quot;)
+  processErr(err)
+}</code></pre>
 <p><strong>参考文章</strong>：</p>
 <blockquote>
 <p><a href="https://darjun.github.io/2020/04/04/godailylib/validator/" target="_blank" rel="noopener">Go 每日一库之 validator</a></p>
@@ -413,228 +708,199 @@
 <p><a href="https://jiajunhuang.com/articles/2020_04_10-golang_validator.md.html" target="_blank" rel="noopener">Golang validator使用教程</a></p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/go/">go</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">腾讯开源 go 代码规范</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/05/04/MySQL%E5%AE%9E%E6%88%98%E6%80%BB%E7%BB%93/">
-                        <span class="hidden-mobile">MySQL 实战总结</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/04/MySQL%E5%AE%9E%E6%88%98%E6%80%BB%E7%BB%93/" rel="prev" title="MySQL 实战总结">
+      <i class="fa fa-chevron-left"></i> MySQL 实战总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" rel="next" title="腾讯开源 go 代码规范">
+      腾讯开源 go 代码规范 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用"><span class="nav-number">1.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#示例"><span class="nav-number">1.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#约束"><span class="nav-number">2.</span> <span class="nav-text">约束</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#范围约束"><span class="nav-number">2.1.</span> <span class="nav-text">范围约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字段约束与跨字段约束"><span class="nav-number">2.2.</span> <span class="nav-text">字段约束与跨字段约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串约束"><span class="nav-number">2.3.</span> <span class="nav-text">字符串约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#唯一性约束"><span class="nav-number">2.4.</span> <span class="nav-text">唯一性约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#邮件"><span class="nav-number">2.5.</span> <span class="nav-text">邮件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分割约束（Dive）"><span class="nav-number">2.6.</span> <span class="nav-text">分割约束（Dive）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#keys-和-endkeys"><span class="nav-number">2.6.1.</span> <span class="nav-text">keys 和 endkeys</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特殊约束"><span class="nav-number">2.7.</span> <span class="nav-text">特殊约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">2.8.</span> <span class="nav-text">其他</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义约束"><span class="nav-number">2.9.</span> <span class="nav-text">自定义约束</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相关方法"><span class="nav-number">3.</span> <span class="nav-text">相关方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Struct-方法"><span class="nav-number">3.1.</span> <span class="nav-text">Struct 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StructExcept-方法"><span class="nav-number">3.2.</span> <span class="nav-text">StructExcept 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StructFiltered-方法"><span class="nav-number">3.3.</span> <span class="nav-text">StructFiltered 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StructPartial-方法"><span class="nav-number">3.4.</span> <span class="nav-text">StructPartial 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Var-方法"><span class="nav-number">3.5.</span> <span class="nav-text">Var 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#VarWithValue-方法"><span class="nav-number">3.6.</span> <span class="nav-text">VarWithValue 方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#错误处理"><span class="nav-number">4.</span> <span class="nav-text">错误处理</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -642,41 +908,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -690,68 +924,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

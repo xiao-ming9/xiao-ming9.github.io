@@ -1,250 +1,277 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="数据库迁移即数据库的版本控制，这种机制允许团队编辑并共享数据库表的结构，迁移通常使用Laravel的schema构建器结对，Schema门面提供了与数据库系统相关的创建和操纵表的支持   生成迁移使用Artisan命令make:migration就可以创建一个新的迁移    php artisan make:migration create_users_table（自定义表名）">
+<meta name="keywords" content="Laravel,php">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Larevel—数据库迁移">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2018&#x2F;07&#x2F;29&#x2F;Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="数据库迁移即数据库的版本控制，这种机制允许团队编辑并共享数据库表的结构，迁移通常使用Laravel的schema构建器结对，Schema门面提供了与数据库系统相关的创建和操纵表的支持   生成迁移使用Artisan命令make:migration就可以创建一个新的迁移    php artisan make:migration create_users_table（自定义表名）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:39:27.736Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2018/07/29/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Larevel—数据库迁移 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="数据库迁移即数据库的版本控制，这种机制允许团队编辑并共享数据库表的结构，迁移通常使用Laravel的schema构建器结对，Schema门面提供了与数据库系统相关的创建和操纵表的支持  
-生成迁移使用Artisan命令make:migration就可以创建一个新的迁移  
-
-php artisan make:migration create_users_table（自定义表名）  
-">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Larevel—数据库迁移 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Larevel—数据库迁移">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/07/29/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%81%E7%A7%BB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Larevel—数据库迁移
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-07-29 21:31:41" itemprop="dateCreated datePublished" datetime="2018-07-29T21:31:41+08:00">2018-07-29</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2018-07-29 21:31" pubdate>
-        2018年7月29日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      2.8k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      35
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:39:27" itemprop="dateModified" datetime="2020-12-01T18:39:27+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Larevel—数据库迁移</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h1><p>即数据库的版本控制，这种机制允许团队编辑并共享数据库表的结构，迁移通常使用Laravel的<code>schema</code>构建器结对，<code>Schema</code>门面提供了与数据库系统相关的创建和操纵表的支持  </p>
+      
+        <h1 id="数据库迁移"><a href="#数据库迁移" class="headerlink" title="数据库迁移"></a>数据库迁移</h1><p>即数据库的版本控制，这种机制允许团队编辑并共享数据库表的结构，迁移通常使用Laravel的<code>schema</code>构建器结对，<code>Schema</code>门面提供了与数据库系统相关的创建和操纵表的支持  </p>
 <h2 id="生成迁移"><a href="#生成迁移" class="headerlink" title="生成迁移"></a>生成迁移</h2><p>使用Artisan命令<code>make:migration</code>就可以创建一个新的迁移  </p>
 <blockquote>
 <p>php artisan make:migration create_users_table（自定义表名）  </p>
@@ -257,7 +284,38 @@ php artisan make:migration create_users_table（自定义表名）
 </blockquote>
 <p><code>make migration --path</code>可以指定生成迁移文件的目录，提供的目录应该位于应用根目录  </p>
 <h2 id="迁移结构"><a href="#迁移结构" class="headerlink" title="迁移结构"></a>迁移结构</h2><p>生成的结构：  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Support</span>\<span class="hljs-title">Facades</span>\<span class="hljs-title">Schema</span>;<br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Schema</span>\<span class="hljs-title">Blueprint</span>;<br><span class="hljs-keyword">use</span> <span class="hljs-title">Illuminate</span>\<span class="hljs-title">Database</span>\<span class="hljs-title">Migrations</span>\<span class="hljs-title">Migration</span>;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CreateUsersTable</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Migration</span><br></span>&#123;<br>    <span class="hljs-comment">/**<br>     * Run the migrations.<br>     *<br>     * <span class="hljs-doctag">@return</span> void<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">up</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        Schema::table(<span class="hljs-string">'users'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Blueprint $table)</span> </span>&#123;<br>            <span class="hljs-comment">//</span><br>        &#125;);<br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     * Reverse the migrations.<br>     *<br>     * <span class="hljs-doctag">@return</span> void<br>     */</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">down</span><span class="hljs-params">()</span><br>    </span>&#123;<br>        Schema::table(<span class="hljs-string">'users'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(Blueprint $table)</span> </span>&#123;<br>            <span class="hljs-comment">//</span><br>        &#125;);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">&lt;?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateUsersTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table(&#39;users&#39;, function (Blueprint $table) {
+            //
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table(&#39;users&#39;, function (Blueprint $table) {
+            //
+        });
+    }
+}</code></pre>
 <p>迁移类包含两个方法：<code>up</code>，<code>down</code>。<code>up</code>方法用于新增表，列或者索引到数据库，而<code>down</code>方法就是up的逆操作,这两个方法都可以使用Schema构建器来创建和修改表  </p>
 <h2 id="运行迁移"><a href="#运行迁移" class="headerlink" title="运行迁移"></a>运行迁移</h2><p>要运行应用中所有未执行的迁移，可以使用 Artisan 命令提供的 migrate 方法：</p>
 <blockquote>
@@ -276,7 +334,10 @@ php artisan make:migration create_users_table（自定义表名）
 <p>php artisan migrate:reset  </p>
 </blockquote>
 <h3 id="在单个命令中回滚-amp-迁移"><a href="#在单个命令中回滚-amp-迁移" class="headerlink" title="在单个命令中回滚 &amp; 迁移"></a>在单个命令中回滚 &amp; 迁移</h3><p><code>migrate:refresh</code>命令将会先回滚所有数据库迁移，然后运行<code>migrate</code>命令。这个命令可以有效的重建整个数据库：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">php artisan migrate:refresh<br><br><span class="hljs-comment">// 重建数据库并填充数据...</span><br>php artisan migrate:refresh --seed<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">php artisan migrate:refresh
+
+// 重建数据库并填充数据...
+php artisan migrate:refresh --seed</code></pre>
 <p>也可以回滚或重建指定数量的迁移 —— 通过<code>refresh</code>命令提供的<code>step</code>选项，例如，下面的命令将会回滚或重建最后五条迁移：</p>
 <blockquote>
 <p>php artisan migrate:refresh –step=5  </p>
@@ -286,11 +347,23 @@ php artisan make:migration create_users_table（自定义表名）
 <p>php artisan migrate:fresh<br>php artisan migrate:fresh –seed  </p>
 </blockquote>
 <h2 id="数据表操作"><a href="#数据表操作" class="headerlink" title="数据表操作"></a>数据表操作</h2><h3 id="创建表"><a href="#创建表" class="headerlink" title="创建表"></a>创建表</h3><p><code>Schema</code>门面上的<code>create</code>方法用于创建新的数据表，接受两个参数，第一个是表名，第二个是获取用于定义新表的<code>Blueprint</code>对象的<strong>闭包</strong>  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::create(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    $table-&gt;increment(<span class="hljs-string">'id'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::create(&#39;users&#39;,function(Blueprint $table)
+{
+    $table-&gt;increment(&#39;id&#39;);
+});</code></pre>
 <h3 id="检查表-列是否存在"><a href="#检查表-列是否存在" class="headerlink" title="检查表/列是否存在"></a>检查表/列是否存在</h3><p><code>hasTable</code>,<code>hasColumn</code>方法检查表或列是否存在：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-keyword">if</span>(Schema::hasTable(<span class="hljs-string">'users'</span>))&#123;<br>    <span class="hljs-comment">//</span><br>&#125;<br><span class="hljs-keyword">if</span>(Schema::hasColumn(<span class="hljs-string">'age'</span>,<span class="hljs-string">'name'</span>))&#123;<br>    <span class="hljs-comment">//</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">if(Schema::hasTable(&#39;users&#39;)){
+    //
+}
+if(Schema::hasColumn(&#39;age&#39;,&#39;name&#39;)){
+    //
+}</code></pre>
 <h3 id="数据库连接-amp-表选项"><a href="#数据库连接-amp-表选项" class="headerlink" title="数据库连接&amp;表选项"></a>数据库连接&amp;表选项</h3><p>如果要在一个不是默认数据库的数据库上进行表结构操作，可以使用<code>connection</code>方法：</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::connection(<span class="hljs-string">'foo'</span>)<br>               -&gt;create(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br>               </span>&#123;<br>                   $table-&gt;increment(<span class="hljs-string">'id'</span>);<br>               &#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::connection(&#39;foo&#39;)
+               -&gt;create(&#39;users&#39;,function(Blueprint $table)
+               {
+                   $table-&gt;increment(&#39;id&#39;);
+               });</code></pre>
 <p>要设置表的存储引擎、字符编码等选项，可以在Schema构建器上使用如下命令：  </p>
 <table>
 <thead>
@@ -325,7 +398,9 @@ php artisan make:migration create_users_table（自定义表名）
 <p>Schema::drop(‘users’);<br>Schema::dropIfExists(‘users’);  </p>
 </blockquote>
 <h2 id="字段操作"><a href="#字段操作" class="headerlink" title="字段操作"></a>字段操作</h2><h3 id="创建数据列"><a href="#创建数据列" class="headerlink" title="创建数据列"></a>创建数据列</h3><p>Schema门面上的<code>table</code>方法接收两个参数：表名和获取用于添加列到表的<code>Blueprint</code>实例的闭包</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::table(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span></span>&#123;<br>    $table-&gt;string(<span class="hljs-string">'email'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::table(&#39;users&#39;,function(Blueprint $table){
+    $table-&gt;string(&#39;email&#39;);
+});</code></pre>
 <p><strong>可用的数据列类型</strong>  </p>
 <table>
 <thead>
@@ -561,8 +636,10 @@ php artisan make:migration create_users_table（自定义表名）
 </tbody></table>
 <p><strong>列修改器</strong>  </p>
 <p>在添加列的时候，还可以使用一些其他的列“修改器”，如：<code>nullable</code>允许列为空</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::table(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    $table-&gt;string(<span class="hljs-string">'email'</span>)-&gt;unllable();<br>&#125;);<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="php">Schema::table(&#39;users&#39;,function(Blueprint $table)
+{
+    $table-&gt;string(&#39;email&#39;)-&gt;unllable();
+});</code></pre>
 <p>可用的列修改器列表：  </p>
 <table>
 <thead>
@@ -625,13 +702,25 @@ php artisan make:migration create_users_table（自定义表名）
 <p>composer require doctrine/dbal  </p>
 </blockquote>
 <p><strong>更新数据列</strong><br><code>change</code>方法用于修改已存在的列为新类型，或者修改列的属性  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::table(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    <span class="hljs-comment">//将name列尺寸从25增加到50且为varchar类型</span><br>    $table-&gt;string(<span class="hljs-string">'name'</span>,<span class="hljs-number">50</span>)-&gt;change();<br>    <span class="hljs-comment">//将该列修改成允许为空</span><br>    $table-&gt;string(<span class="hljs-string">'name'</span>,<span class="hljs-number">50</span>)-&gt;nullable()-&gt;change();<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::table(&#39;users&#39;,function(Blueprint $table)
+{
+    //将name列尺寸从25增加到50且为varchar类型
+    $table-&gt;string(&#39;name&#39;,50)-&gt;change();
+    //将该列修改成允许为空
+    $table-&gt;string(&#39;name&#39;,50)-&gt;nullable()-&gt;change();
+});</code></pre>
 <p><strong>重命名列</strong>  </p>
 <p><code>renameColumn</code>方法用于重命名一个列（使用之前需要<strong>添加doctrine/dbal依赖，并运行composer update命令</strong>）  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::table(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    $table-&gt;renameColumn(<span class="hljs-string">'form'</span>,<span class="hljs-string">'to'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::table(&#39;users&#39;,function(Blueprint $table)
+{
+    $table-&gt;renameColumn(&#39;form&#39;,&#39;to&#39;);
+});</code></pre>
 <p><strong>删除数据列</strong>  </p>
 <p><code>dropColumn</code>方法用于删除一个列，同样需要<code>doctrine/dbal</code>依赖</p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">Schema::table(<span class="hljs-string">'users'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    $table-&gt;dropColumn([<span class="hljs-string">'votes'</span>,<span class="hljs-string">'avatar'</span>,<span class="hljs-string">'location'</span>]);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">Schema::table(&#39;users&#39;,function(Blueprint $table)
+{
+    $table-&gt;dropColumn([&#39;votes&#39;,&#39;avatar&#39;,&#39;location&#39;]);
+});</code></pre>
 <h2 id="索引操作"><a href="#索引操作" class="headerlink" title="索引操作"></a>索引操作</h2><h3 id="创建索引"><a href="#创建索引" class="headerlink" title="创建索引"></a>创建索引</h3><p><code>unique</code>方法用于创建唯一值索引<br>两种方法：</p>
 <blockquote>
 <p>$table-&gt;string(‘email’)-&gt;unique();<br>$table-&gt;unique(‘email’)  </p>
@@ -699,9 +788,16 @@ php artisan make:migration create_users_table（自定义表名）
 </tr>
 </tbody></table>
 <h3 id="外键约束"><a href="#外键约束" class="headerlink" title="外键约束"></a>外键约束</h3><p><code>foreign</code>，<code>reference</code>，<code>on</code>方法用于设置外键约束  </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php"><span class="hljs-comment">//在posts表中定义一个引用usee表id列的user_id列</span><br>Schema::table(<span class="hljs-string">'posts'</span>,<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(Blueprint $table)</span><br></span>&#123;<br>    $table-&gt;integer(<span class="hljs-string">'user_id'</span>)-&gt;unsigned();<br>    $table-&gt;foreign(<span class="hljs-string">'user_id'</span>)-&gt;reference(<span class="hljs-string">'id'</span>)-&gt;on(<span class="hljs-string">'users'</span>);<br>&#125;);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">//在posts表中定义一个引用usee表id列的user_id列
+Schema::table(&#39;posts&#39;,function(Blueprint $table)
+{
+    $table-&gt;integer(&#39;user_id&#39;)-&gt;unsigned();
+    $table-&gt;foreign(&#39;user_id&#39;)-&gt;reference(&#39;id&#39;)-&gt;on(&#39;users&#39;);
+});</code></pre>
 <p>还可以为约束的“on delete”,”on update”属性指定期望的动作： </p>
-<figure class="highlight php"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs php">$table-&gt;foreign(<span class="hljs-string">'user_id'</span>)<br>      -&gt;reference(<span class="hljs-string">'id'</span>)-&gt;on(<span class="hljs-string">'users'</span>)<br>      -&gt;onDelete(<span class="hljs-string">'cascade'</span>);<br></code></pre></div></td></tr></table></figure>
+<pre><code class="php">$table-&gt;foreign(&#39;user_id&#39;)
+      -&gt;reference(&#39;id&#39;)-&gt;on(&#39;users&#39;)
+      -&gt;onDelete(&#39;cascade&#39;);</code></pre>
 <p><code>dropForeign</code>方法用于删除一个外键，外键约束和索引使用同样的命名规则：**连接表名、外键名、_foreign/_index后缀：</p>
 <blockquote>
 <p>$table-&gt;dropForeign(‘posts_user_id_foreign’);  </p>
@@ -717,230 +813,200 @@ php artisan make:migration create_users_table（自定义表名）
 <li>在本地生成新的表结构后，使用<code>php artisan migrate:refresh</code>重新生成本地表结构  </li>
 </ol>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/Laravel/">Laravel</a>
-                    
-                      <a class="hover-with-bg" href="/tags/php/">php</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2018/07/30/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A1%AB%E5%85%85%E5%8F%8A%E8%87%AA%E5%AE%9A%E4%B9%89/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Laravel—数据库填充及设置自定义</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2018/07/29/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C/">
-                        <span class="hidden-mobile">Laravel—数据库操作</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+              <a href="/tags/php/" rel="tag"># php</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/07/29/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E6%93%8D%E4%BD%9C/" rel="prev" title="Laravel—数据库操作">
+      <i class="fa fa-chevron-left"></i> Laravel—数据库操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/07/30/Laravel%E2%80%94%E6%95%B0%E6%8D%AE%E5%BA%93%E5%A1%AB%E5%85%85%E5%8F%8A%E8%87%AA%E5%AE%9A%E4%B9%89/" rel="next" title="Laravel—数据库填充及设置自定义">
+      Laravel—数据库填充及设置自定义 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据库迁移"><span class="nav-number">1.</span> <span class="nav-text">数据库迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#生成迁移"><span class="nav-number">1.1.</span> <span class="nav-text">生成迁移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#迁移结构"><span class="nav-number">1.2.</span> <span class="nav-text">迁移结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行迁移"><span class="nav-number">1.3.</span> <span class="nav-text">运行迁移</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#回滚迁移"><span class="nav-number">1.4.</span> <span class="nav-text">回滚迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在单个命令中回滚-amp-迁移"><span class="nav-number">1.4.1.</span> <span class="nav-text">在单个命令中回滚 &amp; 迁移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除所有表-amp-迁移"><span class="nav-number">1.4.2.</span> <span class="nav-text">删除所有表 &amp; 迁移</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据表操作"><span class="nav-number">1.5.</span> <span class="nav-text">数据表操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建表"><span class="nav-number">1.5.1.</span> <span class="nav-text">创建表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#检查表-列是否存在"><span class="nav-number">1.5.2.</span> <span class="nav-text">检查表/列是否存在</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据库连接-amp-表选项"><span class="nav-number">1.5.3.</span> <span class="nav-text">数据库连接&amp;表选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重命名-删除表"><span class="nav-number">1.5.4.</span> <span class="nav-text">重命名/删除表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字段操作"><span class="nav-number">1.6.</span> <span class="nav-text">字段操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建数据列"><span class="nav-number">1.6.1.</span> <span class="nav-text">创建数据列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#修改数据列"><span class="nav-number">1.6.2.</span> <span class="nav-text">修改数据列</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引操作"><span class="nav-number">1.7.</span> <span class="nav-text">索引操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建索引"><span class="nav-number">1.7.1.</span> <span class="nav-text">创建索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除索引"><span class="nav-number">1.7.2.</span> <span class="nav-text">删除索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#外键约束"><span class="nav-number">1.7.3.</span> <span class="nav-text">外键约束</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用数据库迁移的流程："><span class="nav-number">2.</span> <span class="nav-text">使用数据库迁移的流程：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -948,41 +1014,9 @@ php artisan make:migration create_users_table（自定义表名）
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -996,68 +1030,10 @@ php artisan make:migration create_users_table（自定义表名）
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

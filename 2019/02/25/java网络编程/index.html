@@ -1,478 +1,934 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="TCP协议原理案例package inet;  import java.io.*; import java.net.ServerSocket; import java.net.Socket;  &#x2F;**  * 服务器端  *&#x2F;  public class EchoServeDemo {     public static void main(String[] args){         &#x2F;&#x2F;创建一">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="java网络编程">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;02&#x2F;25&#x2F;java%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="TCP协议原理案例package inet;  import java.io.*; import java.net.ServerSocket; import java.net.Socket;  &#x2F;**  * 服务器端  *&#x2F;  public class EchoServeDemo {     public static void main(String[] args){         &#x2F;&#x2F;创建一">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:38:01.698Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/02/25/java%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>java网络编程 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="TCP协议原理案例1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071package inet;import java.io.*;import java.net.ServerSocket">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>java网络编程 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
-</nav>
+</div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="java网络编程">
-              
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/02/25/java%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          java网络编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-25 15:44:17" itemprop="dateCreated datePublished" datetime="2019-02-25T15:44:17+08:00">2019-02-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:38:01" itemprop="dateModified" datetime="2020-12-01T18:38:01+08:00">2020-12-01</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
             </span>
 
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-02-25 15:44" pubdate>
-        2019年2月25日 下午
-      </time>
-    </span>
-  
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="TCP协议原理案例"><a href="#TCP协议原理案例" class="headerlink" title="TCP协议原理案例"></a>TCP协议原理案例</h1><pre><code class="java">package inet;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+/**
+ * 服务器端
+ */
+
+public class EchoServeDemo {
+    public static void main(String[] args){
+        //创建一个服务器端的Socket(0-1024)一般不用，因为是一些其他公司产品的端口
+        try {
+            ServerSocket server = new ServerSocket(6666);
+            System.out.println(&quot;服务器已启动，等待客户端的连接...&quot;);
+
+            //等待客户端连接，会造成阻塞，如果客户端连接成功，立即返回一个Socket对象
+            Socket socket = server.accept();
+            System.out.println(&quot;客户端连接成功&quot;+server.getInetAddress().getHostName());
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+            );
+            //通过输入流读取网络数据
+            String info = br.readLine();
+            System.out.println(info);
+            //获取输出流，向客户端返回消息
+            PrintStream ps = new PrintStream(
+                    new BufferedOutputStream(socket.getOutputStream()));
+            ps.println(&quot;echo &quot;+info);
+            ps.flush();
+            //关闭
+            ps.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+package inet;
+
+import java.io.*;
+import java.net.Socket;
+
+/**
+ * 客户端
+ */
+public class EchoClientDemo {
+    public static void main(String[] args) {
+        //创建一个socket对象，指定要连接的服务器
+        try {
+            Socket socket = new Socket(&quot;localhost&quot;,6666);
+            //获取socket的输入项
+            PrintStream ps = new PrintStream(
+                    new BufferedOutputStream(socket.getOutputStream()));
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream()));
+            ps.println(&quot;hello,my name is xiaoming.&quot;);
+            ps.flush();
+            //读取服务器返回的数据
+            String info = br.readLine();
+            System.out.println(info);
+            ps.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+<a id="more"></a>
+<h1 id="服务器同时处理多个客户端实例"><a href="#服务器同时处理多个客户端实例" class="headerlink" title="服务器同时处理多个客户端实例"></a>服务器同时处理多个客户端实例</h1><pre><code class="java">package inet;
+
+import com.sun.source.tree.NewArrayTree;
+
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+//服务器同时处理多个客户端实例
+public class MultiServeDemo {
+    public static void main(String[] args) {
+        ExecutorService es = Executors.newFixedThreadPool(3);//通过线程控制多个客户端
+        System.out.println(&quot;服务器已启动，等待客户端链接...&quot;);
+        try {
+            ServerSocket server = new ServerSocket(6666);
+            while(true){
+                Socket socket = server.accept();
+                System.out.println(socket.getInetAddress().getHostName());
+                MyRunnable mr = new MyRunnable(socket);
+                es.execute(mr);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+/**
+ * 用来处理客户端请求的线程
+ */
+class MyRunnable implements Runnable{
+    private Socket socket;
+
+    public MyRunnable(Socket socket){
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintStream ps = new PrintStream(new BufferedOutputStream(socket.getOutputStream()));
+            String info = br.readLine();
+            System.out.println(info);
+            ps.println(&quot;收到，返回给你信息&quot;+info);
+            ps.flush();
+            ps.close();
+            br.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}</code></pre>
+<h1 id="即时聊天案例"><a href="#即时聊天案例" class="headerlink" title="即时聊天案例"></a>即时聊天案例</h1><p><strong>相关类</strong></p>
+<pre><code class="java">package communication;
+
+import java.io.Serializable;
+
+/**
+ * 消息包，需要进行对象流处理，所以要继承Serializable标记接口
+ */
+public class Message implements Serializable {
+
+    private String from;//消息来源
+    private String to;//消息发送目的地
+    private String info;//消息内容
+    private int type;//消息内容
+
+    public Message() {
+    }
+
+    public Message(String from, String to, String info, int type) {
+        this.from = from;
+        this.to = to;
+        this.info = info;
+        this.type = type;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+}
+
+public class MessageType {
+    public static final int TYPE_LOGIN = 0x01;
+    public static final int TYPE__SEND = 0X02;
+}
+</code></pre>
+<p><strong>服务器端</strong></p>
+<pre><code class="java">package communication;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * 服务器端
+ */
+public class Server {
+    public static void main(String[] args) {
+        //保存客户端处理的线程
+        Vector&lt;UserThread&gt; vector = new Vector&lt;&gt;();
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        //创建服务器端的Socket
+        try {
+            ServerSocket server = new ServerSocket(8888);
+            System.out.println(&quot;服务器已启动，等待客户端连接...&quot;);
+
+            while(true){
+                Socket socket = server.accept();
+                UserThread user = new UserThread(socket, vector);
+                executor.execute(user);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+/**
+ * 用户线程
+ */
+class UserThread implements Runnable{
+    private String name;
+    private Socket socket;
+    Vector&lt;UserThread&gt; vector;
+    private ObjectInputStream ois;
+    private ObjectOutputStream oos;
+    private boolean flag=true;
+
+    public UserThread(){
+
+    }
+    public UserThread(Socket socket,Vector&lt;UserThread&gt; vector){
+        this.socket = socket;
+        this.vector = vector;
+        vector.add(this);
+    }
+    @Override
+    public void run() {
+        System.out.println(&quot;客户端已连接&quot;+socket.getInetAddress().getHostName());
+        try {
+            ois = new ObjectInputStream(socket.getInputStream());
+            oos = new ObjectOutputStream(socket.getOutputStream());
+
+            while(flag){
+                Message msg = (Message)ois.readObject();
+                int type = msg.getType();
+                switch (type){
+                    case MessageType.TYPE_LOGIN:
+                        name = msg.getFrom();
+                        msg.setInfo(&quot;欢迎你（来自服务器）&quot;+name);
+                        oos.writeObject(msg);
+                        break;
+
+                    case MessageType.TYPE__SEND:
+                        String to = msg.getTo();
+                        UserThread ur;
+                        int size = vector.size();
+                        for (int i = 0; i &lt; size; i++) {
+                            ur = vector.get(i);
+                            if(to.equals(ur.name)&amp;&amp; ur!=this){
+                                ur.oos.writeObject(msg);
+                                break;
+                            }
+                        }
+                        break;
+                }
+            }
+            ois.close();
+            oos.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<p><strong>用户端</strong></p>
+<pre><code class="java">package communication;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class Client {
+    public static void main(String[] args) {
+        ExecutorService es = Executors.newSingleThreadExecutor();
+        Scanner input  = new Scanner(System.in);
+        try {
+            Socket socket = new Socket(&quot;localhost&quot;,8888);
+            System.out.println(&quot;连接服务器成功&quot;);
+
+            //构建对象传输流
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+
+            //向服务器发送登录信息
+            System.out.println(&quot;请输入登录用户名：&quot;);
+            String name = input.nextLine();
+            Message msg = new Message(name,null,null,MessageType.TYPE_LOGIN);
+            oos.writeObject(msg);
+            //接收服务器消息
+            msg = (Message)ois.readObject();
+            System.out.println(msg.getFrom()+&#39;:&#39;+ msg.getInfo());
+
+            //启动读取消息的线程
+            es.execute(new ReadInfoThread(ois));
+            //使用主线程发送消息
+            boolean flag = true;
+            while (flag){
+                msg = new Message();
+                System.out.println(&quot;请输入要发送的用户：&quot;);
+                msg.setTo(input.nextLine());
+                msg.setFrom(name);
+                System.out.println(&quot;INFO:&quot;);
+                msg.setInfo(input.nextLine());
+                msg.setType(MessageType.TYPE__SEND);
+                oos.writeObject(msg);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+//接收消息的线程
+class ReadInfoThread implements Runnable{
+    private boolean flag=true;
+    private ObjectInputStream in;
+
+    public ReadInfoThread(ObjectInputStream in){
+        this.in = in;
+    }
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    @Override
+    public void run() {
+        try{
+            while(flag){
+                Message message = (Message)in.readObject();
+                System.out.println(message.getFrom()+&quot;对我说&quot;+message.getInfo());
+            }
+            if(in!=null){
+                in.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<h1 id="UDP协议示例"><a href="#UDP协议示例" class="headerlink" title="UDP协议示例"></a>UDP协议示例</h1><pre><code class="java">/**
+*服务器端
+*/
+package inet;
+
+import java.io.IOException;
+import java.net.*;
+
+public class UDPServerDemo {
+    public static void main(String[] args) {
+        String info = &quot;这是一个UDP数据报&quot;;
+        byte[] bytes = info.getBytes();
+
+        try {
+            DatagramPacket dp = new DatagramPacket(
+                    bytes,//数据包数据
+                    0,//起始位置
+                    bytes.length,//读取数据长度
+                    InetAddress.getByName(&quot;127.0.0.1&quot;),//目标地址
+                    8000);//目标地址端口号
+            DatagramSocket server = new DatagramSocket(5000);//服务器的端口
+            server.send(dp);//发送数据报
+            server.close();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+
+package inet;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.SocketException;
+/**
+* 客户端
+*/
+public class UDPClientDemo {
+    public static void main(String[] args) {
+        byte[] bytes = new byte[1024];
+        DatagramPacket dp = new DatagramPacket(bytes,bytes.length);
+        try {
+            DatagramSocket socket = new DatagramSocket(8000);
+            System.out.println(&quot;数据接收中...&quot;);
+            socket.receive(dp);//接受数据
+            String s = new String(dp.getData(),0,dp.getLength());
+            System.out.println(s);
+            socket.close();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+<h1 id="URL"><a href="#URL" class="headerlink" title="URL"></a>URL</h1><pre><code class="java">package inet;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+public class URLDemo {
+    public static void main(String[] args) {
+        try {
+            URL url = new URL(&quot;http://qiniu.xiaoming.net.cn/files/2019-01-17%2015-26-01%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png&quot;);
+            URLConnection urlConnection = url.openConnection();
+            BufferedInputStream br = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedOutputStream bo = new BufferedOutputStream(new FileOutputStream(&quot;/home/xiaoming/下载/xxx.jpg&quot;));
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while((len = br.read(bytes))!= -1){
+                bo.write(bytes,0,len);
+                bo.flush();
+            }
+            bo.close();
+            br.close();
+            System.out.println(&quot;下载成功！&quot;);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+</code></pre>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
 </div>
 
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.7k 字
-    </span>
-  
 
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      29
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
           </div>
 
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/02/18/java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/" rel="prev" title="java多线程与并发">
+      <i class="fa fa-chevron-left"></i> java多线程与并发
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/27/%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%86%85%E7%9C%81/" rel="next" title="java反射与内省">
+      java反射与内省 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
           
+
         </div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    
-      
-
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">java网络编程</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="TCP协议原理案例"><a href="#TCP协议原理案例" class="headerlink" title="TCP协议原理案例"></a>TCP协议原理案例</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> java.io.*;<br><span class="hljs-keyword">import</span> java.net.ServerSocket;<br><span class="hljs-keyword">import</span> java.net.Socket;<br><br><span class="hljs-comment">/**<br> * 服务器端<br> */</span><br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EchoServeDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span></span>&#123;<br>        <span class="hljs-comment">//创建一个服务器端的Socket(0-1024)一般不用，因为是一些其他公司产品的端口</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            ServerSocket server = <span class="hljs-keyword">new</span> ServerSocket(<span class="hljs-number">6666</span>);<br>            System.out.println(<span class="hljs-string">"服务器已启动，等待客户端的连接..."</span>);<br><br>            <span class="hljs-comment">//等待客户端连接，会造成阻塞，如果客户端连接成功，立即返回一个Socket对象</span><br>            Socket socket = server.accept();<br>            System.out.println(<span class="hljs-string">"客户端连接成功"</span>+server.getInetAddress().getHostName());<br>            BufferedReader br = <span class="hljs-keyword">new</span> BufferedReader(<br>                    <span class="hljs-keyword">new</span> InputStreamReader(socket.getInputStream())<br>            );<br>            <span class="hljs-comment">//通过输入流读取网络数据</span><br>            String info = br.readLine();<br>            System.out.println(info);<br>            <span class="hljs-comment">//获取输出流，向客户端返回消息</span><br>            PrintStream ps = <span class="hljs-keyword">new</span> PrintStream(<br>                    <span class="hljs-keyword">new</span> BufferedOutputStream(socket.getOutputStream()));<br>            ps.println(<span class="hljs-string">"echo "</span>+info);<br>            ps.flush();<br>            <span class="hljs-comment">//关闭</span><br>            ps.close();<br>            br.close();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br><br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> java.io.*;<br><span class="hljs-keyword">import</span> java.net.Socket;<br><br><span class="hljs-comment">/**<br> * 客户端<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EchoClientDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-comment">//创建一个socket对象，指定要连接的服务器</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            Socket socket = <span class="hljs-keyword">new</span> Socket(<span class="hljs-string">"localhost"</span>,<span class="hljs-number">6666</span>);<br>            <span class="hljs-comment">//获取socket的输入项</span><br>            PrintStream ps = <span class="hljs-keyword">new</span> PrintStream(<br>                    <span class="hljs-keyword">new</span> BufferedOutputStream(socket.getOutputStream()));<br>            BufferedReader br = <span class="hljs-keyword">new</span> BufferedReader(<br>                    <span class="hljs-keyword">new</span> InputStreamReader(socket.getInputStream()));<br>            ps.println(<span class="hljs-string">"hello,my name is xiaoming."</span>);<br>            ps.flush();<br>            <span class="hljs-comment">//读取服务器返回的数据</span><br>            String info = br.readLine();<br>            System.out.println(info);<br>            ps.close();<br>            br.close();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<a id="more"></a>
-<h1 id="服务器同时处理多个客户端实例"><a href="#服务器同时处理多个客户端实例" class="headerlink" title="服务器同时处理多个客户端实例"></a>服务器同时处理多个客户端实例</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> com.sun.source.tree.NewArrayTree;<br><br><span class="hljs-keyword">import</span> java.io.*;<br><span class="hljs-keyword">import</span> java.net.ServerSocket;<br><span class="hljs-keyword">import</span> java.net.Socket;<br><span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;<br><span class="hljs-keyword">import</span> java.util.concurrent.Executors;<br><br><span class="hljs-comment">//服务器同时处理多个客户端实例</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MultiServeDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        ExecutorService es = Executors.newFixedThreadPool(<span class="hljs-number">3</span>);<span class="hljs-comment">//通过线程控制多个客户端</span><br>        System.out.println(<span class="hljs-string">"服务器已启动，等待客户端链接..."</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>            ServerSocket server = <span class="hljs-keyword">new</span> ServerSocket(<span class="hljs-number">6666</span>);<br>            <span class="hljs-keyword">while</span>(<span class="hljs-keyword">true</span>)&#123;<br>                Socket socket = server.accept();<br>                System.out.println(socket.getInetAddress().getHostName());<br>                MyRunnable mr = <span class="hljs-keyword">new</span> MyRunnable(socket);<br>                es.execute(mr);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br><br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/**<br> * 用来处理客户端请求的线程<br> */</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyRunnable</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span></span>&#123;<br>    <span class="hljs-keyword">private</span> Socket socket;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">MyRunnable</span><span class="hljs-params">(Socket socket)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.socket = socket;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            BufferedReader br = <span class="hljs-keyword">new</span> BufferedReader(<span class="hljs-keyword">new</span> InputStreamReader(socket.getInputStream()));<br>            PrintStream ps = <span class="hljs-keyword">new</span> PrintStream(<span class="hljs-keyword">new</span> BufferedOutputStream(socket.getOutputStream()));<br>            String info = br.readLine();<br>            System.out.println(info);<br>            ps.println(<span class="hljs-string">"收到，返回给你信息"</span>+info);<br>            ps.flush();<br>            ps.close();<br>            br.close();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="即时聊天案例"><a href="#即时聊天案例" class="headerlink" title="即时聊天案例"></a>即时聊天案例</h1><p><strong>相关类</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> communication;<br><br><span class="hljs-keyword">import</span> java.io.Serializable;<br><br><span class="hljs-comment">/**<br> * 消息包，需要进行对象流处理，所以要继承Serializable标记接口<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> String from;<span class="hljs-comment">//消息来源</span><br>    <span class="hljs-keyword">private</span> String to;<span class="hljs-comment">//消息发送目的地</span><br>    <span class="hljs-keyword">private</span> String info;<span class="hljs-comment">//消息内容</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> type;<span class="hljs-comment">//消息内容</span><br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Message</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Message</span><span class="hljs-params">(String from, String to, String info, <span class="hljs-keyword">int</span> type)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.from = from;<br>        <span class="hljs-keyword">this</span>.to = to;<br>        <span class="hljs-keyword">this</span>.info = info;<br>        <span class="hljs-keyword">this</span>.type = type;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getFrom</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> from;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setFrom</span><span class="hljs-params">(String from)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.from = from;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getTo</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> to;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setTo</span><span class="hljs-params">(String to)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.to = to;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getInfo</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> info;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setInfo</span><span class="hljs-params">(String info)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.info = info;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getType</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> type;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setType</span><span class="hljs-params">(<span class="hljs-keyword">int</span> type)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.type = type;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MessageType</span> </span>&#123;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> TYPE_LOGIN = <span class="hljs-number">0x01</span>;<br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> TYPE__SEND = <span class="hljs-number">0X02</span>;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<p><strong>服务器端</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> communication;<br><br><span class="hljs-keyword">import</span> java.io.BufferedReader;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.ObjectInputStream;<br><span class="hljs-keyword">import</span> java.io.ObjectOutputStream;<br><span class="hljs-keyword">import</span> java.net.ServerSocket;<br><span class="hljs-keyword">import</span> java.net.Socket;<br><span class="hljs-keyword">import</span> java.util.Vector;<br><span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;<br><span class="hljs-keyword">import</span> java.util.concurrent.Executors;<br><br><span class="hljs-comment">/**<br> * 服务器端<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Server</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-comment">//保存客户端处理的线程</span><br>        Vector&lt;UserThread&gt; vector = <span class="hljs-keyword">new</span> Vector&lt;&gt;();<br>        ExecutorService executor = Executors.newFixedThreadPool(<span class="hljs-number">10</span>);<br><br>        <span class="hljs-comment">//创建服务器端的Socket</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            ServerSocket server = <span class="hljs-keyword">new</span> ServerSocket(<span class="hljs-number">8888</span>);<br>            System.out.println(<span class="hljs-string">"服务器已启动，等待客户端连接..."</span>);<br><br>            <span class="hljs-keyword">while</span>(<span class="hljs-keyword">true</span>)&#123;<br>                Socket socket = server.accept();<br>                UserThread user = <span class="hljs-keyword">new</span> UserThread(socket, vector);<br>                executor.execute(user);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/**<br> * 用户线程<br> */</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserThread</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span></span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br>    <span class="hljs-keyword">private</span> Socket socket;<br>    Vector&lt;UserThread&gt; vector;<br>    <span class="hljs-keyword">private</span> ObjectInputStream ois;<br>    <span class="hljs-keyword">private</span> ObjectOutputStream oos;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> flag=<span class="hljs-keyword">true</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserThread</span><span class="hljs-params">()</span></span>&#123;<br><br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">UserThread</span><span class="hljs-params">(Socket socket,Vector&lt;UserThread&gt; vector)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.socket = socket;<br>        <span class="hljs-keyword">this</span>.vector = vector;<br>        vector.add(<span class="hljs-keyword">this</span>);<br>    &#125;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">"客户端已连接"</span>+socket.getInetAddress().getHostName());<br>        <span class="hljs-keyword">try</span> &#123;<br>            ois = <span class="hljs-keyword">new</span> ObjectInputStream(socket.getInputStream());<br>            oos = <span class="hljs-keyword">new</span> ObjectOutputStream(socket.getOutputStream());<br><br>            <span class="hljs-keyword">while</span>(flag)&#123;<br>                Message msg = (Message)ois.readObject();<br>                <span class="hljs-keyword">int</span> type = msg.getType();<br>                <span class="hljs-keyword">switch</span> (type)&#123;<br>                    <span class="hljs-keyword">case</span> MessageType.TYPE_LOGIN:<br>                        name = msg.getFrom();<br>                        msg.setInfo(<span class="hljs-string">"欢迎你（来自服务器）"</span>+name);<br>                        oos.writeObject(msg);<br>                        <span class="hljs-keyword">break</span>;<br><br>                    <span class="hljs-keyword">case</span> MessageType.TYPE__SEND:<br>                        String to = msg.getTo();<br>                        UserThread ur;<br>                        <span class="hljs-keyword">int</span> size = vector.size();<br>                        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; size; i++) &#123;<br>                            ur = vector.get(i);<br>                            <span class="hljs-keyword">if</span>(to.equals(ur.name)&amp;&amp; ur!=<span class="hljs-keyword">this</span>)&#123;<br>                                ur.oos.writeObject(msg);<br>                                <span class="hljs-keyword">break</span>;<br>                            &#125;<br>                        &#125;<br>                        <span class="hljs-keyword">break</span>;<br>                &#125;<br>            &#125;<br>            ois.close();<br>            oos.close();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException | ClassNotFoundException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<p><strong>用户端</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> communication;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.ObjectInputStream;<br><span class="hljs-keyword">import</span> java.io.ObjectOutputStream;<br><span class="hljs-keyword">import</span> java.net.Socket;<br><span class="hljs-keyword">import</span> java.util.Scanner;<br><span class="hljs-keyword">import</span> java.util.concurrent.ExecutorService;<br><span class="hljs-keyword">import</span> java.util.concurrent.Executors;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Client</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        ExecutorService es = Executors.newSingleThreadExecutor();<br>        Scanner input  = <span class="hljs-keyword">new</span> Scanner(System.in);<br>        <span class="hljs-keyword">try</span> &#123;<br>            Socket socket = <span class="hljs-keyword">new</span> Socket(<span class="hljs-string">"localhost"</span>,<span class="hljs-number">8888</span>);<br>            System.out.println(<span class="hljs-string">"连接服务器成功"</span>);<br><br>            <span class="hljs-comment">//构建对象传输流</span><br>            ObjectOutputStream oos = <span class="hljs-keyword">new</span> ObjectOutputStream(socket.getOutputStream());<br>            ObjectInputStream ois = <span class="hljs-keyword">new</span> ObjectInputStream(socket.getInputStream());<br><br>            <span class="hljs-comment">//向服务器发送登录信息</span><br>            System.out.println(<span class="hljs-string">"请输入登录用户名："</span>);<br>            String name = input.nextLine();<br>            Message msg = <span class="hljs-keyword">new</span> Message(name,<span class="hljs-keyword">null</span>,<span class="hljs-keyword">null</span>,MessageType.TYPE_LOGIN);<br>            oos.writeObject(msg);<br>            <span class="hljs-comment">//接收服务器消息</span><br>            msg = (Message)ois.readObject();<br>            System.out.println(msg.getFrom()+<span class="hljs-string">':'</span>+ msg.getInfo());<br><br>            <span class="hljs-comment">//启动读取消息的线程</span><br>            es.execute(<span class="hljs-keyword">new</span> ReadInfoThread(ois));<br>            <span class="hljs-comment">//使用主线程发送消息</span><br>            <span class="hljs-keyword">boolean</span> flag = <span class="hljs-keyword">true</span>;<br>            <span class="hljs-keyword">while</span> (flag)&#123;<br>                msg = <span class="hljs-keyword">new</span> Message();<br>                System.out.println(<span class="hljs-string">"请输入要发送的用户："</span>);<br>                msg.setTo(input.nextLine());<br>                msg.setFrom(name);<br>                System.out.println(<span class="hljs-string">"INFO:"</span>);<br>                msg.setInfo(input.nextLine());<br>                msg.setType(MessageType.TYPE__SEND);<br>                oos.writeObject(msg);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException | ClassNotFoundException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//接收消息的线程</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReadInfoThread</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Runnable</span></span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">boolean</span> flag=<span class="hljs-keyword">true</span>;<br>    <span class="hljs-keyword">private</span> ObjectInputStream in;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ReadInfoThread</span><span class="hljs-params">(ObjectInputStream in)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.in = in;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setFlag</span><span class="hljs-params">(<span class="hljs-keyword">boolean</span> flag)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.flag = flag;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">try</span>&#123;<br>            <span class="hljs-keyword">while</span>(flag)&#123;<br>                Message message = (Message)in.readObject();<br>                System.out.println(message.getFrom()+<span class="hljs-string">"对我说"</span>+message.getInfo());<br>            &#125;<br>            <span class="hljs-keyword">if</span>(in!=<span class="hljs-keyword">null</span>)&#123;<br>                in.close();<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="UDP协议示例"><a href="#UDP协议示例" class="headerlink" title="UDP协议示例"></a>UDP协议示例</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**<br>*服务器端<br>*/</span><br><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.net.*;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UDPServerDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        String info = <span class="hljs-string">"这是一个UDP数据报"</span>;<br>        <span class="hljs-keyword">byte</span>[] bytes = info.getBytes();<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            DatagramPacket dp = <span class="hljs-keyword">new</span> DatagramPacket(<br>                    bytes,<span class="hljs-comment">//数据包数据</span><br>                    <span class="hljs-number">0</span>,<span class="hljs-comment">//起始位置</span><br>                    bytes.length,<span class="hljs-comment">//读取数据长度</span><br>                    InetAddress.getByName(<span class="hljs-string">"127.0.0.1"</span>),<span class="hljs-comment">//目标地址</span><br>                    <span class="hljs-number">8000</span>);<span class="hljs-comment">//目标地址端口号</span><br>            DatagramSocket server = <span class="hljs-keyword">new</span> DatagramSocket(<span class="hljs-number">5000</span>);<span class="hljs-comment">//服务器的端口</span><br>            server.send(dp);<span class="hljs-comment">//发送数据报</span><br>            server.close();<br>        &#125; <span class="hljs-keyword">catch</span> (UnknownHostException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">catch</span> (SocketException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br><br>    &#125;<br>&#125;<br><br><br><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.net.DatagramPacket;<br><span class="hljs-keyword">import</span> java.net.DatagramSocket;<br><span class="hljs-keyword">import</span> java.net.SocketException;<br><span class="hljs-comment">/**<br>* 客户端<br>*/</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UDPClientDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>        DatagramPacket dp = <span class="hljs-keyword">new</span> DatagramPacket(bytes,bytes.length);<br>        <span class="hljs-keyword">try</span> &#123;<br>            DatagramSocket socket = <span class="hljs-keyword">new</span> DatagramSocket(<span class="hljs-number">8000</span>);<br>            System.out.println(<span class="hljs-string">"数据接收中..."</span>);<br>            socket.receive(dp);<span class="hljs-comment">//接受数据</span><br>            String s = <span class="hljs-keyword">new</span> String(dp.getData(),<span class="hljs-number">0</span>,dp.getLength());<br>            System.out.println(s);<br>            socket.close();<br>        &#125; <span class="hljs-keyword">catch</span> (SocketException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="URL"><a href="#URL" class="headerlink" title="URL"></a>URL</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> inet;<br><br><span class="hljs-keyword">import</span> java.io.*;<br><span class="hljs-keyword">import</span> java.net.MalformedURLException;<br><span class="hljs-keyword">import</span> java.net.URL;<br><span class="hljs-keyword">import</span> java.net.URLConnection;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">URLDemo</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            URL url = <span class="hljs-keyword">new</span> URL(<span class="hljs-string">"http://qiniu.xiaoming.net.cn/files/2019-01-17%2015-26-01%20%E7%9A%84%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE.png"</span>);<br>            URLConnection urlConnection = url.openConnection();<br>            BufferedInputStream br = <span class="hljs-keyword">new</span> BufferedInputStream(urlConnection.getInputStream());<br>            BufferedOutputStream bo = <span class="hljs-keyword">new</span> BufferedOutputStream(<span class="hljs-keyword">new</span> FileOutputStream(<span class="hljs-string">"/home/xiaoming/下载/xxx.jpg"</span>));<br>            <span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>            <span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">while</span>((len = br.read(bytes))!= -<span class="hljs-number">1</span>)&#123;<br>                bo.write(bytes,<span class="hljs-number">0</span>,len);<br>                bo.flush();<br>            &#125;<br>            bo.close();<br>            br.close();<br>            System.out.println(<span class="hljs-string">"下载成功！"</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (MalformedURLException e) &#123;<br>            e.printStackTrace();<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/02/27/%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%86%85%E7%9C%81/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">java反射与内省</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/02/18/java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E4%B8%8E%E5%B9%B6%E5%8F%91/">
-                        <span class="hidden-mobile">java多线程与并发</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+          
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
   </div>
 
+  <aside class="sidebar">
+    <div class="sidebar-inner">
 
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP协议原理案例"><span class="nav-number">1.</span> <span class="nav-text">TCP协议原理案例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务器同时处理多个客户端实例"><span class="nav-number">2.</span> <span class="nav-text">服务器同时处理多个客户端实例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#即时聊天案例"><span class="nav-number">3.</span> <span class="nav-text">即时聊天案例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#UDP协议示例"><span class="nav-number">4.</span> <span class="nav-text">UDP协议示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#URL"><span class="nav-number">5.</span> <span class="nav-text">URL</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -480,41 +936,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -528,68 +952,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

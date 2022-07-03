@@ -1,247 +1,277 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。 单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
+<meta name="keywords" content="go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Go 如何进行单元测试">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;07&#x2F;25&#x2F;Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。 单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-08-29T08:23:35.013Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Go 如何进行单元测试 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。
-单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Go 如何进行单元测试 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Go 如何进行单元测试">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Go 如何进行单元测试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-07-25 20:11:50" itemprop="dateCreated datePublished" datetime="2021-07-25T20:11:50+08:00">2021-07-25</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-07-25 20:11" pubdate>
-        2021年7月25日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      4.9k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      69
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-08-29 16:23:35" itemprop="dateModified" datetime="2021-08-29T16:23:35+08:00">2021-08-29</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>16k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Go 如何进行单元测试</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年8月29日 下午
-                
-              </p>
-            
-            <div class="markdown-body">
-              <p>之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。</p>
+      
+        <p>之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。</p>
 <h1 id="单元测试的含义"><a href="#单元测试的含义" class="headerlink" title="单元测试的含义"></a>单元测试的含义</h1><p>单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。</p>
 <a id="more"></a>
 
@@ -255,13 +285,25 @@
 <p>如果测试用例过多，可以新建一个 <code>testdata</code> 目录存放我们的测试数据，go 对于命名为 testdata 的目录会自动忽略，具体例子可以参考 <code>/usr/local/go/src/net/dnsclient_unix_test.go</code> 中对于 <code>hosts</code> 文件的读取。</p>
 <h2 id="GoConvey"><a href="#GoConvey" class="headerlink" title="GoConvey"></a>GoConvey</h2><p>对于比较复杂的代码，比如说带有逻辑判断，嵌套等等，单独使用 testing 包，各种 <code>t.Errorf</code> 会显得比较混乱，可读性和可维护性都会比价差，所以对于多个分支层次的测试可以使用 goconvey 包。</p>
 <p>GoConvey 包易于使用(只有Convey和So两个函数)，与 testing 包可以直接配合，并且输出的测试结果更加可读，还提供了 WebUI 可视化页面，使用样例如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>    <span class="hljs-string">"testing"</span><br>    . <span class="hljs-string">"github.com/smartystreets/goconvey/convey"</span><br>)<br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestXXXX</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>  	Convey(<span class="hljs-string">"this is the first convey"</span>,t <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>    		x:=<span class="hljs-number">1</span><br>    		Convey(<span class="hljs-string">"this is the second convey"</span>,t,<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span>&#123;<br>      			x++<br>      			Convey(<span class="hljs-string">"this is the last convey"</span>,t,<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span>&#123;<br>        				So(x,ShouldEqual,<span class="hljs-number">2</span>)<br>      			&#125;)<br>    		&#125;)<br>  	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">import (
+    &quot;testing&quot;
+    . &quot;github.com/smartystreets/goconvey/convey&quot;
+)
+func TestXXXX(t *testing.T) {
+      Convey(&quot;this is the first convey&quot;,t func() {
+            x:=1
+            Convey(&quot;this is the second convey&quot;,t,func(){
+                  x++
+                  Convey(&quot;this is the last convey&quot;,t,func(){
+                        So(x,ShouldEqual,2)
+                  })
+            })
+      })
+}</code></pre>
 <p>每一个测试用例可以使用 Convey 函数进行包裹，convey 可以无限嵌套，用以体现测试用例之间的层级关系。使用 Convey 推荐的做法是：一个测试函数最外层只有一个 Convey，里面可以嵌套多层 Convey，同级的 Convey 表示不同条件下的测试场景。Convey 函数第一个参数为用例的描述，只有最外层的Convey第二个参数是测试函数的入参 <code>*testing.T</code>，第三个参数为用例判断函数(习惯使用闭包)，最后通过 So 函数完成断言判断即可。</p>
 <p>So 函数第一个参数为输入的值，第二个参数为断言条件，第三个参数为期望值，goconvey 包定义了大部分的基础断言条件，如果有需要，也可以自己定义。注意：<strong>层级相同的子 Convey 的执行策略是并行的，但是一个 Convey 下的子 So 执行是串行的</strong>。</p>
 <h3 id="Web-界面"><a href="#Web-界面" class="headerlink" title="Web 界面"></a>Web 界面</h3><p>GoConvey 不仅支持在命令行进行自动化编译测试，而且还支持在 Web 界面进行自动化编译测试。想要使用 GoConvey 的 Web 界面特性，需要在测试文件所在目录下执行 goconvey：</p>
-<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">goconvey<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="shell">goconvey</code></pre>
 <p>在 Web 界面中可以使用以下功能：</p>
 <ol>
 <li>可以设置界面主题</li>
@@ -288,17 +330,41 @@
 <p>对于原生的 testing 包生成的测试用例，使用的都是静态数据组成的数组，而实际的业务场景中，测试的函数往往还会调用其他的函数/结构体方法/接口等等，还有可能会使用到全局变量，这时候就需要对这些函数/结构体方法/接口/全局变量等进行 mock，也就是打桩。</p>
 <h2 id="GoStub"><a href="#GoStub" class="headerlink" title="GoStub"></a>GoStub</h2><p>GoStub 主要用来对全局变量、函数进行打桩。在日常使用中，<strong>主要用来对全局变量打桩</strong>。</p>
 <p>对全局变量打桩示例如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">stubs := gostub.Stub(&amp;num, <span class="hljs-number">150</span>)<br><span class="hljs-keyword">defer</span> stubs.Reset()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">stubs := gostub.Stub(&amp;num, 150)
+defer stubs.Reset()</code></pre>
 <p>stubs 是 GoStub 框架的函数接口 Stub 返回的对象，该对象有 Reset 操作，即将全局变量的值恢复为原值。</p>
 <h2 id="gomonkey-amp-monkey"><a href="#gomonkey-amp-monkey" class="headerlink" title="gomonkey &amp; monkey"></a>gomonkey &amp; monkey</h2><p>对于函数以及结构体成员方法，我们一般会使用 gomonkey/monkey 来进行 mock。</p>
 <h3 id="Monkey"><a href="#Monkey" class="headerlink" title="Monkey"></a>Monkey</h3><p>Monkey是Golang的一个猴子补丁（monkeypatching）框架，其通过运行时用汇编语句修改跳转的函数地址，来实现对一个函数/结构体成员方法的 mock。</p>
 <h4 id="对函数的-Mock"><a href="#对函数的-Mock" class="headerlink" title="对函数的 Mock"></a>对函数的 Mock</h4><p>因为这个工具包简单易用，这里直接贴 demo 代码：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>    <span class="hljs-string">"testing"</span><br>    . <span class="hljs-string">"github.com/smartystreets/goconvey/convey"</span><br>    . <span class="hljs-string">"github.com/bouk/monkey"</span><br>    <span class="hljs-string">"infra/osencap"</span><br>)<br><br><span class="hljs-keyword">const</span> any = <span class="hljs-string">"any"</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestExec</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>    Convey(<span class="hljs-string">"test has digit"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>        Convey(<span class="hljs-string">"for succ"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>            outputExpect := <span class="hljs-string">"xxx-vethName100-yyy"</span><br>            guard := Patch(osencap.Exec, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>                <span class="hljs-keyword">return</span> outputExpect, <span class="hljs-literal">nil</span><br>            &#125;)<br>            <span class="hljs-keyword">defer</span> guard.Unpatch()<br>            output, err := osencap.Exec(any, any)<br>            So(output, ShouldEqual, outputExpect)<br>            So(err, ShouldBeNil)<br>        &#125;)<br>    &#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;testing&quot;
+    . &quot;github.com/smartystreets/goconvey/convey&quot;
+    . &quot;github.com/bouk/monkey&quot;
+    &quot;infra/osencap&quot;
+)
 
+const any = &quot;any&quot;
+
+func TestExec(t *testing.T) {
+    Convey(&quot;test has digit&quot;, t, func() {
+        Convey(&quot;for succ&quot;, func() {
+            outputExpect := &quot;xxx-vethName100-yyy&quot;
+            guard := Patch(osencap.Exec, func(_ string, _ ...string) (string, error) {
+                return outputExpect, nil
+            })
+            defer guard.Unpatch()
+            output, err := osencap.Exec(any, any)
+            So(output, ShouldEqual, outputExpect)
+            So(err, ShouldBeNil)
+        })
+    })
+}</code></pre>
 <p><code>monkey.Patch(&lt;target function&gt;, &lt;replacement function&gt;)</code>函数可以实现对目的函数的替换，使用<code>monkey.Unpatch(&lt;target function&gt;)</code> 来恢复目的函数。</p>
-<h4 id="对结构体成员方法的-Mock"><a href="#对结构体成员方法的-Mock" class="headerlink" title="对结构体成员方法的 Mock"></a>对结构体成员方法的 Mock</h4><figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> e *Etcd<br>guard := PatchInstanceMethod(reflect.TypeOf(e), <span class="hljs-string">"Get"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *Etcd, _ <span class="hljs-keyword">string</span>)</span> []<span class="hljs-title">string</span></span> &#123;<br>    <span class="hljs-keyword">return</span> []<span class="hljs-keyword">string</span>&#123;<span class="hljs-string">"task1"</span>, <span class="hljs-string">"task5"</span>, <span class="hljs-string">"task8"</span>&#125;<br>&#125;)<br><span class="hljs-keyword">defer</span> guard.Unpatch()<br></code></pre></div></td></tr></table></figure>
-
+<h4 id="对结构体成员方法的-Mock"><a href="#对结构体成员方法的-Mock" class="headerlink" title="对结构体成员方法的 Mock"></a>对结构体成员方法的 Mock</h4><pre><code class="go">var e *Etcd
+guard := PatchInstanceMethod(reflect.TypeOf(e), &quot;Get&quot;, func(_ *Etcd, _ string) []string {
+    return []string{&quot;task1&quot;, &quot;task5&quot;, &quot;task8&quot;}
+})
+defer guard.Unpatch()</code></pre>
 <p>调用 <code>monkey.PatchInstanceMethod(&lt;type&gt;, &lt;name&gt;, &lt;replacement&gt;)</code> 函数可以实现对结构体成员方法的替换：</p>
 <ul>
 <li>第一个参数是 <code>reflect.TypeOf(实例)</code></li>
@@ -320,37 +386,441 @@
 <p>同样的，<strong>gomonkey 在内联的情况下也无法使用，同样需要添加参数 <code>go test -gcflags=all=-l</code> 来关闭内联</strong>。</p>
 <p>gomonkey 中定义的各种方法如下：</p>
 <h4 id="ApplyFunc-对外部函数-mock"><a href="#ApplyFunc-对外部函数-mock" class="headerlink" title="ApplyFunc 对外部函数 mock"></a>ApplyFunc 对外部函数 mock</h4><p>ApplyFunc 第一个参数是函数名，第二个参数是桩函数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"encoding/json"</span><br>	<span class="hljs-string">"testing"</span><br><br>	. <span class="hljs-string">"github.com/agiledragon/gomonkey/v2"</span><br>	<span class="hljs-string">"github.com/agiledragon/gomonkey/v2/test/fake"</span><br>	. <span class="hljs-string">"github.com/smartystreets/goconvey/convey"</span><br>)<br><br><span class="hljs-keyword">var</span> (<br>	outputExpect = <span class="hljs-string">"xxx-vethName100-yyy"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyFunc</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	Convey(<span class="hljs-string">"TestApplyFunc"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"one func for succ"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyFunc(fake.Exec, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> outputExpect, <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := fake.Exec(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, outputExpect)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"one func for fail"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyFunc(fake.Exec, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> <span class="hljs-string">""</span>, fake.ErrActual<br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := fake.Exec(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			So(output, ShouldEqual, <span class="hljs-string">""</span>)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"two funcs"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyFunc(fake.Exec, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> outputExpect, <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			patches.ApplyFunc(fake.Belong, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ []<span class="hljs-keyword">string</span>)</span> <span class="hljs-title">bool</span></span> &#123;<br>				<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>			&#125;)<br>			output, err := fake.Exec(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, outputExpect)<br>			flag := fake.Belong(<span class="hljs-string">""</span>, <span class="hljs-literal">nil</span>)<br>			So(flag, ShouldBeTrue)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"input and output param"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyFunc(json.Unmarshal, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(data []<span class="hljs-keyword">byte</span>, v <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">if</span> data == <span class="hljs-literal">nil</span> &#123;<br>					<span class="hljs-built_in">panic</span>(<span class="hljs-string">"input param is nil!"</span>)<br>				&#125;<br>				p := v.(*<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)<br>				*p = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)<br>				(*p)[<span class="hljs-number">1</span>] = <span class="hljs-number">2</span><br>				(*p)[<span class="hljs-number">2</span>] = <span class="hljs-number">4</span><br>				<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			<span class="hljs-keyword">var</span> m <span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span><br>			err := json.Unmarshal([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"123"</span>), &amp;m)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(m[<span class="hljs-number">1</span>], ShouldEqual, <span class="hljs-number">2</span>)<br>			So(m[<span class="hljs-number">2</span>], ShouldEqual, <span class="hljs-number">4</span>)<br>		&#125;)<br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">import (
+    &quot;encoding/json&quot;
+    &quot;testing&quot;
 
+    . &quot;github.com/agiledragon/gomonkey/v2&quot;
+    &quot;github.com/agiledragon/gomonkey/v2/test/fake&quot;
+    . &quot;github.com/smartystreets/goconvey/convey&quot;
+)
+
+var (
+    outputExpect = &quot;xxx-vethName100-yyy&quot;
+)
+
+func TestApplyFunc(t *testing.T) {
+    Convey(&quot;TestApplyFunc&quot;, t, func() {
+
+        Convey(&quot;one func for succ&quot;, func() {
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+                return outputExpect, nil
+            })
+            defer patches.Reset()
+            output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, outputExpect)
+        })
+
+        Convey(&quot;one func for fail&quot;, func() {
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+                return &quot;&quot;, fake.ErrActual
+            })
+            defer patches.Reset()
+            output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            So(output, ShouldEqual, &quot;&quot;)
+        })
+
+        Convey(&quot;two funcs&quot;, func() {
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+                return outputExpect, nil
+            })
+            defer patches.Reset()
+            patches.ApplyFunc(fake.Belong, func(_ string, _ []string) bool {
+                return true
+            })
+            output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, outputExpect)
+            flag := fake.Belong(&quot;&quot;, nil)
+            So(flag, ShouldBeTrue)
+        })
+
+        Convey(&quot;input and output param&quot;, func() {
+            patches := ApplyFunc(json.Unmarshal, func(data []byte, v interface{}) error {
+                if data == nil {
+                    panic(&quot;input param is nil!&quot;)
+                }
+                p := v.(*map[int]int)
+                *p = make(map[int]int)
+                (*p)[1] = 2
+                (*p)[2] = 4
+                return nil
+            })
+            defer patches.Reset()
+            var m map[int]int
+            err := json.Unmarshal([]byte(&quot;123&quot;), &amp;m)
+            So(err, ShouldEqual, nil)
+            So(m[1], ShouldEqual, 2)
+            So(m[2], ShouldEqual, 4)
+        })
+    })
+}</code></pre>
 <h4 id="ApplyMethod-对结构体方法-mock"><a href="#ApplyMethod-对结构体方法-mock" class="headerlink" title="ApplyMethod 对结构体方法 mock"></a>ApplyMethod 对结构体方法 mock</h4><p>ApplyMethod 第一个参数是目标类的指针变量的反射类型，第二个参数是字符串形式的方法名，第三个参数是桩函数。</p>
 <p>测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p><strong>使用 ApplyMethod 可以对非私有方法进行 mock</strong>，如果是私有的方法，gomonkey 通过反射是找不到的。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyMethod</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	slice := fake.NewSlice()<br>	<span class="hljs-keyword">var</span> s *fake.Slice<br>	Convey(<span class="hljs-string">"TestApplyMethod"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"for succ"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			err := slice.Add(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			patches := ApplyMethod(reflect.TypeOf(s), <span class="hljs-string">"Add"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *fake.Slice, _ <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			err = slice.Add(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			err = slice.Remove(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-built_in">len</span>(slice), ShouldEqual, <span class="hljs-number">0</span>)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"for already exist"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			err := slice.Add(<span class="hljs-number">2</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			patches := ApplyMethod(reflect.TypeOf(s), <span class="hljs-string">"Add"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *fake.Slice, _ <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">return</span> fake.ErrElemExsit<br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			err = slice.Add(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, fake.ErrElemExsit)<br>			err = slice.Remove(<span class="hljs-number">2</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-built_in">len</span>(slice), ShouldEqual, <span class="hljs-number">0</span>)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"two methods"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			err := slice.Add(<span class="hljs-number">3</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			<span class="hljs-keyword">defer</span> slice.Remove(<span class="hljs-number">3</span>)<br>			patches := ApplyMethod(reflect.TypeOf(s), <span class="hljs-string">"Add"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *fake.Slice, _ <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">return</span> fake.ErrElemExsit<br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			patches.ApplyMethod(reflect.TypeOf(s), <span class="hljs-string">"Remove"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *fake.Slice, _ <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">return</span> fake.ErrElemNotExsit<br>			&#125;)<br>			err = slice.Add(<span class="hljs-number">2</span>)<br>			So(err, ShouldEqual, fake.ErrElemExsit)<br>			err = slice.Remove(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, fake.ErrElemNotExsit)<br>			So(<span class="hljs-built_in">len</span>(slice), ShouldEqual, <span class="hljs-number">1</span>)<br>			So(slice[<span class="hljs-number">0</span>], ShouldEqual, <span class="hljs-number">3</span>)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"one func and one method"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			err := slice.Add(<span class="hljs-number">4</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			<span class="hljs-keyword">defer</span> slice.Remove(<span class="hljs-number">4</span>)<br>			patches := ApplyFunc(fake.Exec, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> outputExpect, <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			patches.ApplyMethod(reflect.TypeOf(s), <span class="hljs-string">"Remove"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ *fake.Slice, _ <span class="hljs-keyword">int</span>)</span> <span class="hljs-title">error</span></span> &#123;<br>				<span class="hljs-keyword">return</span> fake.ErrElemNotExsit<br>			&#125;)<br>			output, err := fake.Exec(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, outputExpect)<br>			err = slice.Remove(<span class="hljs-number">1</span>)<br>			So(err, ShouldEqual, fake.ErrElemNotExsit)<br>			So(<span class="hljs-built_in">len</span>(slice), ShouldEqual, <span class="hljs-number">1</span>)<br>			So(slice[<span class="hljs-number">0</span>], ShouldEqual, <span class="hljs-number">4</span>)<br>		&#125;)<br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func TestApplyMethod(t *testing.T) {
+    slice := fake.NewSlice()
+    var s *fake.Slice
+    Convey(&quot;TestApplyMethod&quot;, t, func() {
 
+        Convey(&quot;for succ&quot;, func() {
+            err := slice.Add(1)
+            So(err, ShouldEqual, nil)
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+                return nil
+            })
+            defer patches.Reset()
+            err = slice.Add(1)
+            So(err, ShouldEqual, nil)
+            err = slice.Remove(1)
+            So(err, ShouldEqual, nil)
+            So(len(slice), ShouldEqual, 0)
+        })
+
+        Convey(&quot;for already exist&quot;, func() {
+            err := slice.Add(2)
+            So(err, ShouldEqual, nil)
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+                return fake.ErrElemExsit
+            })
+            defer patches.Reset()
+            err = slice.Add(1)
+            So(err, ShouldEqual, fake.ErrElemExsit)
+            err = slice.Remove(2)
+            So(err, ShouldEqual, nil)
+            So(len(slice), ShouldEqual, 0)
+        })
+
+        Convey(&quot;two methods&quot;, func() {
+            err := slice.Add(3)
+            So(err, ShouldEqual, nil)
+            defer slice.Remove(3)
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+                return fake.ErrElemExsit
+            })
+            defer patches.Reset()
+            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error {
+                return fake.ErrElemNotExsit
+            })
+            err = slice.Add(2)
+            So(err, ShouldEqual, fake.ErrElemExsit)
+            err = slice.Remove(1)
+            So(err, ShouldEqual, fake.ErrElemNotExsit)
+            So(len(slice), ShouldEqual, 1)
+            So(slice[0], ShouldEqual, 3)
+        })
+
+        Convey(&quot;one func and one method&quot;, func() {
+            err := slice.Add(4)
+            So(err, ShouldEqual, nil)
+            defer slice.Remove(4)
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+                return outputExpect, nil
+            })
+            defer patches.Reset()
+            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error {
+                return fake.ErrElemNotExsit
+            })
+            output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, outputExpect)
+            err = slice.Remove(1)
+            So(err, ShouldEqual, fake.ErrElemNotExsit)
+            So(len(slice), ShouldEqual, 1)
+            So(slice[0], ShouldEqual, 4)
+        })
+    })
+}</code></pre>
 <h4 id="ApplyGlobalVar-对全局变量-mock"><a href="#ApplyGlobalVar-对全局变量-mock" class="headerlink" title="ApplyGlobalVar 对全局变量 mock"></a>ApplyGlobalVar 对全局变量 mock</h4><p>ApplyGlobalVar 第一个参数是全局变量的地址，第二个参数是全局变量的桩。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> num = <span class="hljs-number">10</span><br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyGlobalVar</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	Convey(<span class="hljs-string">"TestApplyGlobalVar"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"change"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyGlobalVar(&amp;num, <span class="hljs-number">150</span>)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			So(num, ShouldEqual, <span class="hljs-number">150</span>)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"recover"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			So(num, ShouldEqual, <span class="hljs-number">10</span>)<br>		&#125;)<br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">var num = 10
 
+func TestApplyGlobalVar(t *testing.T) {
+    Convey(&quot;TestApplyGlobalVar&quot;, t, func() {
+
+        Convey(&quot;change&quot;, func() {
+            patches := ApplyGlobalVar(&amp;num, 150)
+            defer patches.Reset()
+            So(num, ShouldEqual, 150)
+        })
+
+        Convey(&quot;recover&quot;, func() {
+            So(num, ShouldEqual, 10)
+        })
+    })
+}</code></pre>
 <h4 id="ApplyFuncVar-对函数变量-mock"><a href="#ApplyFuncVar-对函数变量-mock" class="headerlink" title="ApplyFuncVar 对函数变量 mock"></a>ApplyFuncVar 对函数变量 mock</h4><p>ApplyFuncVar 第一个参数是函数变量的地址，第二个参数是桩函数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p>假设函数变量如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> Marshal = <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(v <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-params">([]<span class="hljs-keyword">byte</span>, error)</span></span> &#123;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">var Marshal = func(v interface{}) ([]byte, error) {
+    return nil, nil
+}</code></pre>
+<pre><code class="go">func TestApplyFuncVar(t *testing.T) {
+    Convey(&quot;TestApplyFuncVar&quot;, t, func() {
 
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyFuncVar</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	Convey(<span class="hljs-string">"TestApplyFuncVar"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"for succ"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			str := <span class="hljs-string">"hello"</span><br>			patches := ApplyFuncVar(&amp;fake.Marshal, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-params">([]<span class="hljs-keyword">byte</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> []<span class="hljs-keyword">byte</span>(str), <span class="hljs-literal">nil</span><br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			bytes, err := fake.Marshal(<span class="hljs-literal">nil</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, str)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"for fail"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patches := ApplyFuncVar(&amp;fake.Marshal, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-params">([]<span class="hljs-keyword">byte</span>, error)</span></span> &#123;<br>				<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fake.ErrActual<br>			&#125;)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			_, err := fake.Marshal(<span class="hljs-literal">nil</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>		&#125;)<br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+        Convey(&quot;for succ&quot;, func() {
+            str := &quot;hello&quot;
+            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface{}) ([]byte, error) {
+                return []byte(str), nil
+            })
+            defer patches.Reset()
+            bytes, err := fake.Marshal(nil)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, str)
+        })
 
+        Convey(&quot;for fail&quot;, func() {
+            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface{}) ([]byte, error) {
+                return nil, fake.ErrActual
+            })
+            defer patches.Reset()
+            _, err := fake.Marshal(nil)
+            So(err, ShouldEqual, fake.ErrActual)
+        })
+    })
+}</code></pre>
 <h4 id="ApplyFuncSeq-构造多个测试用例对外部函数-mock"><a href="#ApplyFuncSeq-构造多个测试用例对外部函数-mock" class="headerlink" title="ApplyFuncSeq 构造多个测试用例对外部函数 mock"></a>ApplyFuncSeq 构造多个测试用例对外部函数 mock</h4><p>ApplyFuncSeq 第一个参数是函数名，第二个参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p>其中，第二个参数 OutputCell 的定义为：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">type</span> Params []<span class="hljs-keyword">interface</span>&#123;&#125;<br><span class="hljs-keyword">type</span> OutputCell <span class="hljs-keyword">struct</span> &#123;<br>    Values Params<br>    Times  <span class="hljs-keyword">int</span> <span class="hljs-comment">// 生效次数</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">type Params []interface{}
+type OutputCell struct {
+    Values Params
+    Times  int // 生效次数
+}</code></pre>
+<pre><code class="go">func TestApplyFuncSeq(t *testing.T) {
+    Convey(&quot;TestApplyFuncSeq&quot;, t, func() {
 
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyFuncSeq</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	Convey(<span class="hljs-string">"TestApplyFuncSeq"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"default times is 1"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			info2 := <span class="hljs-string">"hello golang"</span><br>			info3 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;info2, <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;info3, <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncSeq(fake.ReadLeaf, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br><br>			runtime.GC()<br><br>			output, err := fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info2)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info3)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"retry succ util the third times"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;<span class="hljs-string">""</span>, fake.ErrActual&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncSeq(fake.ReadLeaf, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"batch operations failed on the third time"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;<span class="hljs-string">""</span>, fake.ErrActual&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncSeq(fake.ReadLeaf, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = fake.ReadLeaf(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>		&#125;)<br><br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+        Convey(&quot;default times is 1&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            info2 := &quot;hello golang&quot;
+            info3 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{info1, nil}},
+                {Values: Params{info2, nil}},
+                {Values: Params{info3, nil}},
+            }
+            patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
+            defer patches.Reset()
 
+            runtime.GC()
+
+            output, err := fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info2)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info3)
+        })
+
+        Convey(&quot;retry succ util the third times&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            outputs := []OutputCell{
+                {Values: Params{&quot;&quot;, fake.ErrActual}, Times: 2},
+                {Values: Params{info1, nil}},
+            }
+            patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
+            defer patches.Reset()
+            output, err := fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+        })
+
+        Convey(&quot;batch operations failed on the third time&quot;, func() {
+            info1 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{info1, nil}, Times: 2},
+                {Values: Params{&quot;&quot;, fake.ErrActual}},
+            }
+            patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
+            defer patches.Reset()
+            output, err := fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = fake.ReadLeaf(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+        })
+
+    })
+}</code></pre>
 <h4 id="ApplyMethodSeq-构造多个测试用例对结构体方法-mock"><a href="#ApplyMethodSeq-构造多个测试用例对结构体方法-mock" class="headerlink" title="ApplyMethodSeq 构造多个测试用例对结构体方法 mock"></a>ApplyMethodSeq 构造多个测试用例对结构体方法 mock</h4><p>ApplyMethodSeq 第一个参数是目标类的指针变量的反射类型，第二个参数是字符串形式的方法名，第三参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyMethodSeq</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	e := &amp;fake.Etcd&#123;&#125;<br>	Convey(<span class="hljs-string">"TestApplyMethodSeq"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"default times is 1"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			info2 := <span class="hljs-string">"hello golang"</span><br>			info3 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;info2, <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;info3, <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyMethodSeq(reflect.TypeOf(e), <span class="hljs-string">"Retrieve"</span>, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info2)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info3)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"retry succ util the third times"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;<span class="hljs-string">""</span>, fake.ErrActual&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyMethodSeq(reflect.TypeOf(e), <span class="hljs-string">"Retrieve"</span>, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"batch operations failed on the third time"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;info1, <span class="hljs-literal">nil</span>&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;<span class="hljs-string">""</span>, fake.ErrActual&#125;&#125;,<br>			&#125;<br>			patches := ApplyMethodSeq(reflect.TypeOf(e), <span class="hljs-string">"Retrieve"</span>, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			output, err := e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, info1)<br>			output, err = e.Retrieve(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>		&#125;)<br><br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func TestApplyMethodSeq(t *testing.T) {
+    e := &amp;fake.Etcd{}
+    Convey(&quot;TestApplyMethodSeq&quot;, t, func() {
 
+        Convey(&quot;default times is 1&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            info2 := &quot;hello golang&quot;
+            info3 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{info1, nil}},
+                {Values: Params{info2, nil}},
+                {Values: Params{info3, nil}},
+            }
+            patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
+            defer patches.Reset()
+            output, err := e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info2)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info3)
+        })
+
+        Convey(&quot;retry succ util the third times&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            outputs := []OutputCell{
+                {Values: Params{&quot;&quot;, fake.ErrActual}, Times: 2},
+                {Values: Params{info1, nil}},
+            }
+            patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
+            defer patches.Reset()
+            output, err := e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+        })
+
+        Convey(&quot;batch operations failed on the third time&quot;, func() {
+            info1 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{info1, nil}, Times: 2},
+                {Values: Params{&quot;&quot;, fake.ErrActual}},
+            }
+            patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
+            defer patches.Reset()
+            output, err := e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, info1)
+            output, err = e.Retrieve(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+        })
+
+    })
+}</code></pre>
 <h4 id="ApplyFuncVarSeq-构造多个测试用例对函数变量-mock"><a href="#ApplyFuncVarSeq-构造多个测试用例对函数变量-mock" class="headerlink" title="ApplyFuncVarSeq 构造多个测试用例对函数变量 mock"></a>ApplyFuncVarSeq 构造多个测试用例对函数变量 mock</h4><p>ApplyFuncVarSeq 第一个参数是函数变量地址，第二个参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestApplyFuncVarSeq</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br>	Convey(<span class="hljs-string">"TestApplyFuncVarSeq"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"default times is 1"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			info2 := <span class="hljs-string">"hello golang"</span><br>			info3 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(info1), <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(info2), <span class="hljs-literal">nil</span>&#125;&#125;,<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(info3), <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			bytes, err := fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info1)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info2)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info3)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"retry succ util the third times"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello cpp"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(<span class="hljs-string">""</span>), fake.ErrActual&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(info1), <span class="hljs-literal">nil</span>&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			bytes, err := fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info1)<br>		&#125;)<br><br>		Convey(<span class="hljs-string">"batch operations failed on the third time"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			info1 := <span class="hljs-string">"hello gomonkey"</span><br>			outputs := []OutputCell&#123;<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(info1), <span class="hljs-literal">nil</span>&#125;, Times: <span class="hljs-number">2</span>&#125;,<br>				&#123;Values: Params&#123;[]<span class="hljs-keyword">byte</span>(<span class="hljs-string">""</span>), fake.ErrActual&#125;&#125;,<br>			&#125;<br>			patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			bytes, err := fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info1)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(<span class="hljs-keyword">string</span>(bytes), ShouldEqual, info1)<br>			bytes, err = fake.Marshal(<span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, fake.ErrActual)<br>		&#125;)<br><br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func TestApplyFuncVarSeq(t *testing.T) {
+    Convey(&quot;TestApplyFuncVarSeq&quot;, t, func() {
 
+        Convey(&quot;default times is 1&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            info2 := &quot;hello golang&quot;
+            info3 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{[]byte(info1), nil}},
+                {Values: Params{[]byte(info2), nil}},
+                {Values: Params{[]byte(info3), nil}},
+            }
+            patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
+            defer patches.Reset()
+            bytes, err := fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info1)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info2)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info3)
+        })
+
+        Convey(&quot;retry succ util the third times&quot;, func() {
+            info1 := &quot;hello cpp&quot;
+            outputs := []OutputCell{
+                {Values: Params{[]byte(&quot;&quot;), fake.ErrActual}, Times: 2},
+                {Values: Params{[]byte(info1), nil}},
+            }
+            patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
+            defer patches.Reset()
+            bytes, err := fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info1)
+        })
+
+        Convey(&quot;batch operations failed on the third time&quot;, func() {
+            info1 := &quot;hello gomonkey&quot;
+            outputs := []OutputCell{
+                {Values: Params{[]byte(info1), nil}, Times: 2},
+                {Values: Params{[]byte(&quot;&quot;), fake.ErrActual}},
+            }
+            patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
+            defer patches.Reset()
+            bytes, err := fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info1)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(string(bytes), ShouldEqual, info1)
+            bytes, err = fake.Marshal(&quot;&quot;)
+            So(err, ShouldEqual, fake.ErrActual)
+        })
+
+    })
+}</code></pre>
 <h4 id="NewPatches-用于表驱动场景"><a href="#NewPatches-用于表驱动场景" class="headerlink" title="NewPatches 用于表驱动场景"></a>NewPatches 用于表驱动场景</h4><p>NewPatches 是 patches 对象的显式构造函数，一般用于目标和桩的表驱动场景。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">TestPatchPair</span><span class="hljs-params">(t *testing.T)</span></span> &#123;<br><br>	Convey(<span class="hljs-string">"TestPatchPair"</span>, t, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br><br>		Convey(<span class="hljs-string">"TestPatchPair"</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>			patchPairs := [][<span class="hljs-number">2</span>]<span class="hljs-keyword">interface</span>&#123;&#125;&#123;<br>				&#123;<br>					fake.Exec,<br>					<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ <span class="hljs-keyword">string</span>, _ ...<span class="hljs-keyword">string</span>)</span> <span class="hljs-params">(<span class="hljs-keyword">string</span>, error)</span></span> &#123;<br>						<span class="hljs-keyword">return</span> outputExpect, <span class="hljs-literal">nil</span><br>					&#125;,<br>				&#125;,<br>				&#123;<br>					json.Unmarshal,<br>					<span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(_ []<span class="hljs-keyword">byte</span>, v <span class="hljs-keyword">interface</span>&#123;&#125;)</span> <span class="hljs-title">error</span></span> &#123;<br>						p := v.(*<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)<br>						*p = <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span>)<br>						(*p)[<span class="hljs-number">1</span>] = <span class="hljs-number">2</span><br>						(*p)[<span class="hljs-number">2</span>] = <span class="hljs-number">4</span><br>						<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>					&#125;,<br>				&#125;,<br>			&#125;<br>			patches := NewPatches()<br>			<span class="hljs-keyword">defer</span> patches.Reset()<br>			<span class="hljs-keyword">for</span> _, pair := <span class="hljs-keyword">range</span> patchPairs &#123;<br>				patches.ApplyFunc(pair[<span class="hljs-number">0</span>], pair[<span class="hljs-number">1</span>])<br>			&#125;<br><br>			output, err := fake.Exec(<span class="hljs-string">""</span>, <span class="hljs-string">""</span>)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(output, ShouldEqual, outputExpect)<br><br>			<span class="hljs-keyword">var</span> m <span class="hljs-keyword">map</span>[<span class="hljs-keyword">int</span>]<span class="hljs-keyword">int</span><br>			err = json.Unmarshal(<span class="hljs-literal">nil</span>, &amp;m)<br>			So(err, ShouldEqual, <span class="hljs-literal">nil</span>)<br>			So(m[<span class="hljs-number">1</span>], ShouldEqual, <span class="hljs-number">2</span>)<br>			So(m[<span class="hljs-number">2</span>], ShouldEqual, <span class="hljs-number">4</span>)<br>		&#125;)<br><br>	&#125;)<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func TestPatchPair(t *testing.T) {
 
+    Convey(&quot;TestPatchPair&quot;, t, func() {
+
+        Convey(&quot;TestPatchPair&quot;, func() {
+            patchPairs := [][2]interface{}{
+                {
+                    fake.Exec,
+                    func(_ string, _ ...string) (string, error) {
+                        return outputExpect, nil
+                    },
+                },
+                {
+                    json.Unmarshal,
+                    func(_ []byte, v interface{}) error {
+                        p := v.(*map[int]int)
+                        *p = make(map[int]int)
+                        (*p)[1] = 2
+                        (*p)[2] = 4
+                        return nil
+                    },
+                },
+            }
+            patches := NewPatches()
+            defer patches.Reset()
+            for _, pair := range patchPairs {
+                patches.ApplyFunc(pair[0], pair[1])
+            }
+
+            output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
+            So(err, ShouldEqual, nil)
+            So(output, ShouldEqual, outputExpect)
+
+            var m map[int]int
+            err = json.Unmarshal(nil, &amp;m)
+            So(err, ShouldEqual, nil)
+            So(m[1], ShouldEqual, 2)
+            So(m[2], ShouldEqual, 4)
+        })
+
+    })
+}</code></pre>
 <h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>使用 gomonkey 时还有一个需要注意的点就是，必须找到该方法对应的真实的结构体的方法，而不能因为嵌套了内部结构体就直接只用外部结构体来进行反射，这会导致 mock 失败。</p>
 <p>另外，使用 gomonkey 同样需要通过 <code>go test -gcflags=all=-l</code> 选项关闭内联。</p>
 <h2 id="gomock"><a href="#gomock" class="headerlink" title="gomock"></a>gomock</h2><p>对于接口方法，则使用 gomock 来进行 mock，go mock 是官方自带的接口gomock包，这个包完成对桩对象生命周期的管理，GoMock 还包含一个 mockgen 命令行工具，用来自动生成 interface 对应的 Mock 类源文件，具体使用见<a href="https://xiaoming.net.cn/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/" target="_blank" rel="noopener">gomock 使用</a></p>
@@ -361,12 +831,7 @@
 <li>对于接口的 mock 使用 gomock</li>
 </ol>
 <h2 id="查看单测覆盖率"><a href="#查看单测覆盖率" class="headerlink" title="查看单测覆盖率"></a>查看单测覆盖率</h2><p>通过以下命令可以将单测的覆盖情况：</p>
-<figure class="highlight shell"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs shell">go test -count=1 -v -coverprofile=c.out ./... -gcflags=all=-l &amp;&amp; go tool cover -html=c.out &amp;&amp; rm c.out<br></code></pre></div></td></tr></table></figure>
-
-
-
-
-
+<pre><code class="shell">go test -count=1 -v -coverprofile=c.out ./... -gcflags=all=-l &amp;&amp; go tool cover -html=c.out &amp;&amp; rm c.out</code></pre>
 <p><strong>参考文章</strong>：</p>
 <blockquote>
 <p><a href="https://www.jianshu.com/p/e3b2b1194830" target="_blank" rel="noopener">GoConvey框架使用指南</a></p>
@@ -376,228 +841,199 @@
 <p><a href="https://studygolang.com/articles/15034" target="_blank" rel="noopener">gomonkey 1.0 正式发布！</a></p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/go/">go</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/08/29/go%20http%E5%BA%93%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">ggo http 库 Connection reset by peer 解决</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/">
-                        <span class="hidden-mobile">go template 库（模板）</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/" rel="prev" title="go template 库（模板）">
+      <i class="fa fa-chevron-left"></i> go template 库（模板）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/08/29/go%20http%E5%BA%93%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="next" title="go http 库 Connection reset by peer 解决">
+      go http 库 Connection reset by peer 解决 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单元测试的含义"><span class="nav-number">1.</span> <span class="nav-text">单元测试的含义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何进行单元测试"><span class="nav-number">2.</span> <span class="nav-text">如何进行单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#testing-包"><span class="nav-number">2.1.</span> <span class="nav-text">testing 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoConvey"><span class="nav-number">2.2.</span> <span class="nav-text">GoConvey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Web-界面"><span class="nav-number">2.2.1.</span> <span class="nav-text">Web 界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Skip"><span class="nav-number">2.2.2.</span> <span class="nav-text">Skip</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoStub"><span class="nav-number">2.3.</span> <span class="nav-text">GoStub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomonkey-amp-monkey"><span class="nav-number">2.4.</span> <span class="nav-text">gomonkey &amp; monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monkey"><span class="nav-number">2.4.1.</span> <span class="nav-text">Monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对函数的-Mock"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">对函数的 Mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对结构体成员方法的-Mock"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">对结构体成员方法的 Mock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gomonkey"><span class="nav-number">2.4.2.</span> <span class="nav-text">gomonkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFunc-对外部函数-mock"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">ApplyFunc 对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethod-对结构体方法-mock"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">ApplyMethod 对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyGlobalVar-对全局变量-mock"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">ApplyGlobalVar 对全局变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVar-对函数变量-mock"><span class="nav-number">2.4.2.4.</span> <span class="nav-text">ApplyFuncVar 对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncSeq-构造多个测试用例对外部函数-mock"><span class="nav-number">2.4.2.5.</span> <span class="nav-text">ApplyFuncSeq 构造多个测试用例对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethodSeq-构造多个测试用例对结构体方法-mock"><span class="nav-number">2.4.2.6.</span> <span class="nav-text">ApplyMethodSeq 构造多个测试用例对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVarSeq-构造多个测试用例对函数变量-mock"><span class="nav-number">2.4.2.7.</span> <span class="nav-text">ApplyFuncVarSeq 构造多个测试用例对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NewPatches-用于表驱动场景"><span class="nav-number">2.4.2.8.</span> <span class="nav-text">NewPatches 用于表驱动场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意事项"><span class="nav-number">2.4.2.9.</span> <span class="nav-text">注意事项</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomock"><span class="nav-number">2.5.</span> <span class="nav-text">gomock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用总结"><span class="nav-number">2.6.</span> <span class="nav-text">使用总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看单测覆盖率"><span class="nav-number">2.7.</span> <span class="nav-text">查看单测覆盖率</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -605,41 +1041,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -653,68 +1057,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

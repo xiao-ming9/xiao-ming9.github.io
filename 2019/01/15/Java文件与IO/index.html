@@ -1,279 +1,1231 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="File类代表计算机各个文件,目录的抽象表现形式,可以实现文件的创建,删除等 import java.io.File; import java.io.FileFilter; import java.io.IOException; import java.text.DateFormat; import java.text.SimpleDateFormat; import java.util.Arra">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java文件与IO">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;01&#x2F;15&#x2F;Java%E6%96%87%E4%BB%B6%E4%B8%8EIO&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="File类代表计算机各个文件,目录的抽象表现形式,可以实现文件的创建,删除等 import java.io.File; import java.io.FileFilter; import java.io.IOException; import java.text.DateFormat; import java.text.SimpleDateFormat; import java.util.Arra">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:38:04.799Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/01/15/Java%E6%96%87%E4%BB%B6%E4%B8%8EIO/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Java文件与IO | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="File类代表计算机各个文件,目录的抽象表现形式,可以实现文件的创建,删除等
-1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980import jav">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Java文件与IO - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Java文件与IO">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/15/Java%E6%96%87%E4%BB%B6%E4%B8%8EIO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Java文件与IO
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-15 17:20:29" itemprop="dateCreated datePublished" datetime="2019-01-15T17:20:29+08:00">2019-01-15</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-01-15 17:20" pubdate>
-        2019年1月15日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      5.9k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      94
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:38:04" itemprop="dateModified" datetime="2020-12-01T18:38:04+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>26k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>24 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Java文件与IO</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="File类"><a href="#File类" class="headerlink" title="File类"></a>File类</h1><p>代表计算机各个文件,目录的抽象表现形式,可以实现文件的创建,删除等</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileFilter;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.text.DateFormat;<br><span class="hljs-keyword">import</span> java.text.SimpleDateFormat;<br><span class="hljs-keyword">import</span> java.util.Arrays;<br><span class="hljs-keyword">import</span> java.util.Date;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileDemo</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<span class="hljs-comment">//File类表示一个文件或目录</span><br>		<span class="hljs-comment">//指定在哪里创建</span><br>		<span class="hljs-comment">//第一种使用方法</span><br>		File f1 = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-comment">//第二种使用方法,使用类中的常量separator表示斜杠</span><br>		File f2 = <span class="hljs-keyword">new</span> File(File.separator+<span class="hljs-string">"home"</span><br>				+File.separator+<span class="hljs-string">"xiaoming"</span><br>				+File.separator+<span class="hljs-string">"音乐"</span>+File.separator<br>				+<span class="hljs-string">"java"</span>+File.separator+<span class="hljs-string">"tey.text"</span>);<br>		<span class="hljs-comment">//判断文件是否已经存在</span><br>		<span class="hljs-keyword">if</span>(!f1.exists()) &#123;<br>			<span class="hljs-keyword">try</span> &#123;<br>				f1.createNewFile();<span class="hljs-comment">//创建文件</span><br>				System.out.println(<span class="hljs-string">"文件创建成功"</span>);<br>			&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>				<span class="hljs-comment">// 基本上IO操作都报这个错误</span><br>				e.printStackTrace();<br>			&#125;<br>		&#125;<br>		<span class="hljs-comment">//判断对象是否是文件</span><br>		System.out.println(f1.isFile());<br>		<span class="hljs-comment">//判断该对象是否为文件夹</span><br>		System.out.println(f1.isDirectory());<br>		<br>		<span class="hljs-comment">//删除文件夹(前提文件夹里无文件)</span><br>		File f3 = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java"</span>);<br>		<span class="hljs-keyword">boolean</span> b = f3.delete();<br>		System.out.println(b);<br>		<br>		<span class="hljs-comment">//列出所有文件名,若是文件夹,则列出文件夹名</span><br>		String[] name = f3.list();<br>		System.out.println(Arrays.toString(name));<br>		<br>		<span class="hljs-comment">//列出当前目录下的所有文件,以file对象返回</span><br>		File[] f4 = f3.listFiles();<br>		<span class="hljs-keyword">for</span>(File f:f4) &#123;<br>			System.out.println(f.length());<br>			System.out.println(f.getName());<br>			System.out.println(f.getPath());<span class="hljs-comment">//相对路径</span><br>			System.out.println(f.getAbsolutePath());<span class="hljs-comment">//绝对路径</span><br>			System.out.println(f.isHidden());<span class="hljs-comment">//是否隐藏文件</span><br>			System.out.println(f.canRead());<br>			Date date = <span class="hljs-keyword">new</span> Date(f.lastModified());<span class="hljs-comment">//最后修改时间</span><br>			DateFormat df = <span class="hljs-keyword">new</span> SimpleDateFormat(<span class="hljs-string">"HH:mm:ss"</span>);<br>			System.out.println(df.format(date));<br>		&#125;<br>		<br>		<span class="hljs-comment">//创建文件夹</span><br>		File f5 = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java1"</span>);<br>		f5.mkdir();<br>		f5.mkdirs();<span class="hljs-comment">//一次性创建所有指定文件夹</span><br>		<br>		<span class="hljs-comment">//重命名与移动文件</span><br>		f5.renameTo(<span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/Text1"</span>));<br>		<br>		<span class="hljs-comment">//过滤器</span><br>		File[] files = f5.listFiles(<span class="hljs-keyword">new</span> FileFilter() &#123;<br>			<br>			<span class="hljs-comment">//从写此方法,用于查找出指定文件</span><br>			<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">accept</span><span class="hljs-params">(File pathname)</span> </span>&#123;<br>				<span class="hljs-keyword">return</span> pathname.getName().endsWith(<span class="hljs-string">".text"</span>);<br>			&#125;<br>		&#125;);<br>		<span class="hljs-comment">//第二种写法</span><br>		File[] files_s  = f5.listFiles((pathname)-&gt;pathname.getName().endsWith(<span class="hljs-string">".text"</span>));<br>		<span class="hljs-keyword">for</span>(File f:files) &#123;<br>			System.out.println(f.getName());<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+      
+        <h1 id="File类"><a href="#File类" class="headerlink" title="File类"></a>File类</h1><p>代表计算机各个文件,目录的抽象表现形式,可以实现文件的创建,删除等</p>
+<pre><code class="java">import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+
+public class FileDemo {
+    public static void main(String[] args) {
+        //File类表示一个文件或目录
+        //指定在哪里创建
+        //第一种使用方法
+        File f1 = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        //第二种使用方法,使用类中的常量separator表示斜杠
+        File f2 = new File(File.separator+&quot;home&quot;
+                +File.separator+&quot;xiaoming&quot;
+                +File.separator+&quot;音乐&quot;+File.separator
+                +&quot;java&quot;+File.separator+&quot;tey.text&quot;);
+        //判断文件是否已经存在
+        if(!f1.exists()) {
+            try {
+                f1.createNewFile();//创建文件
+                System.out.println(&quot;文件创建成功&quot;);
+            } catch (IOException e) {
+                // 基本上IO操作都报这个错误
+                e.printStackTrace();
+            }
+        }
+        //判断对象是否是文件
+        System.out.println(f1.isFile());
+        //判断该对象是否为文件夹
+        System.out.println(f1.isDirectory());
+
+        //删除文件夹(前提文件夹里无文件)
+        File f3 = new File(&quot;/home/xiaoming/音乐/java&quot;);
+        boolean b = f3.delete();
+        System.out.println(b);
+
+        //列出所有文件名,若是文件夹,则列出文件夹名
+        String[] name = f3.list();
+        System.out.println(Arrays.toString(name));
+
+        //列出当前目录下的所有文件,以file对象返回
+        File[] f4 = f3.listFiles();
+        for(File f:f4) {
+            System.out.println(f.length());
+            System.out.println(f.getName());
+            System.out.println(f.getPath());//相对路径
+            System.out.println(f.getAbsolutePath());//绝对路径
+            System.out.println(f.isHidden());//是否隐藏文件
+            System.out.println(f.canRead());
+            Date date = new Date(f.lastModified());//最后修改时间
+            DateFormat df = new SimpleDateFormat(&quot;HH:mm:ss&quot;);
+            System.out.println(df.format(date));
+        }
+
+        //创建文件夹
+        File f5 = new File(&quot;/home/xiaoming/音乐/java1&quot;);
+        f5.mkdir();
+        f5.mkdirs();//一次性创建所有指定文件夹
+
+        //重命名与移动文件
+        f5.renameTo(new File(&quot;/home/xiaoming/音乐/Text1&quot;));
+
+        //过滤器
+        File[] files = f5.listFiles(new FileFilter() {
+
+            //从写此方法,用于查找出指定文件
+            public boolean accept(File pathname) {
+                return pathname.getName().endsWith(&quot;.text&quot;);
+            }
+        });
+        //第二种写法
+        File[] files_s  = f5.listFiles((pathname)-&gt;pathname.getName().endsWith(&quot;.text&quot;));
+        for(File f:files) {
+            System.out.println(f.getName());
+        }
+    }
+}</code></pre>
 <a id="more"></a>
 <h1 id="字节输出-输入流"><a href="#字节输出-输入流" class="headerlink" title="字节输出,输入流"></a>字节输出,输入流</h1><p>输出输入是从程序的角度看的<br><code>OutputStream</code>,<code>InputStream</code>是所有类的超类,要向文件中进行操作,使用子类<code>FileOutputStream</code>,<code>FileInputStream</code><br><code>write</code>,<code>read</code>的具体实现都是一个字节一个字节进行读取的</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">IOStreamDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		out();<br>		in();<br>		<br>	&#125;<br>	<br>	<span class="hljs-comment">//文件输出流(写入文件)</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">out</span><span class="hljs-params">()</span> </span>&#123;<br>		<br>		<span class="hljs-comment">//确定目标文件</span><br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-comment">//构建一个文件输出流对象</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file,<span class="hljs-keyword">true</span>);<span class="hljs-comment">//第二个参数append默认为false,true时表示追加</span><br>			<br>			<span class="hljs-comment">//输出(写入)的内容</span><br>			String info = <span class="hljs-string">"小桥流水人家\n"</span>;<br>			<span class="hljs-comment">//把内容写入文件</span><br>			out.write(info.getBytes());<span class="hljs-comment">//write方法接收byte类型参数</span><br>			<span class="hljs-comment">//关闭流</span><br>			out.close();<br>			System.out.println(<span class="hljs-string">"输出成功!"</span>);<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-comment">//文件写入流(输出文件内容)</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">in</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-comment">//确定目标文件</span><br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-comment">//构建一个文件输入流对象</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			InputStream in = <span class="hljs-keyword">new</span> FileInputStream(file);<br>			<br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<span class="hljs-comment">//单数用中文会造成乱码,解决办法使用字符流</span><br>			StringBuilder buf = <span class="hljs-keyword">new</span> StringBuilder();<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<span class="hljs-comment">//表示每次读取的长度</span><br>			<span class="hljs-comment">//把数据读入数组中,并返回每次读取的字节数,当不等于-1时表示读取到数据,等于-1表示读取不到数据</span><br>			<span class="hljs-comment">/*<br>			 * @Return<br>			 * the total number of bytes read into the buffer, <br>			 * or -1 if there is no more data <br>			 * because the end of the stream has been reached.<br>			 */</span><br>			<span class="hljs-keyword">while</span>((len = in.read(bytes))!=-<span class="hljs-number">1</span>) &#123;<br>				<span class="hljs-comment">//根据读取到的字节数组,再转换为字符串内容,添加到StringBuilder中</span><br>				<span class="hljs-comment">//当读取的字符数多余字符数组大小时,新读的内容会自动替换掉从头已读的内容,但后面的原有已读内容任然保留,这时候需要加入len指定读取到的位置,避免最后读出的内容与前面重复</span><br>				buf.append(<span class="hljs-keyword">new</span> String(bytes,<span class="hljs-number">0</span>,len));<br>			&#125;<br>			<span class="hljs-comment">//打印内容</span><br>			System.out.println(buf);<br>			<span class="hljs-comment">//关闭输入流</span><br>			in.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class IOStreamDemo {
+
+    public static void main(String[] args) {
+        out();
+        in();
+
+    }
+
+    //文件输出流(写入文件)
+    private static void out() {
+
+        //确定目标文件
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        //构建一个文件输出流对象
+        try {
+            OutputStream out = new FileOutputStream(file,true);//第二个参数append默认为false,true时表示追加
+
+            //输出(写入)的内容
+            String info = &quot;小桥流水人家\n&quot;;
+            //把内容写入文件
+            out.write(info.getBytes());//write方法接收byte类型参数
+            //关闭流
+            out.close();
+            System.out.println(&quot;输出成功!&quot;);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //文件写入流(输出文件内容)
+    private static void in() {
+        //确定目标文件
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        //构建一个文件输入流对象
+        try {
+            InputStream in = new FileInputStream(file);
+
+            byte[] bytes = new byte[1024];//单数用中文会造成乱码,解决办法使用字符流
+            StringBuilder buf = new StringBuilder();
+            int len = -1;//表示每次读取的长度
+            //把数据读入数组中,并返回每次读取的字节数,当不等于-1时表示读取到数据,等于-1表示读取不到数据
+            /*
+             * @Return
+             * the total number of bytes read into the buffer, 
+             * or -1 if there is no more data 
+             * because the end of the stream has been reached.
+             */
+            while((len = in.read(bytes))!=-1) {
+                //根据读取到的字节数组,再转换为字符串内容,添加到StringBuilder中
+                //当读取的字符数多余字符数组大小时,新读的内容会自动替换掉从头已读的内容,但后面的原有已读内容任然保留,这时候需要加入len指定读取到的位置,避免最后读出的内容与前面重复
+                buf.append(new String(bytes,0,len));
+            }
+            //打印内容
+            System.out.println(buf);
+            //关闭输入流
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+}</code></pre>
 <h1 id="字符输出-输入流"><a href="#字符输出-输入流" class="headerlink" title="字符输出,输入流"></a>字符输出,输入流</h1><p>字符流的内部实现还是字节流<br>字符输出流:<code>Writer</code>,对文件的操作使用子类<code>FileWriter</code><br>字符输入流:<code>Reader</code>,对文件的操作使用子类<code>FileReader</code><br>每次操作都是一个字符<br>文件字符操作流会自带缓存,默认大小为1024字节,在缓存满或手动刷新或关闭流时会写入文件,但是字节操作流没有缓存,直接写入<br>一般操作非文本文件时,使用字节流,操作文本文件时,使用字符流</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileReader;<br><span class="hljs-keyword">import</span> java.io.FileWriter;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.Reader;<br><span class="hljs-keyword">import</span> java.io.Writer;<br><br><span class="hljs-comment">//字符流</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CharStreamDemo</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		out();<br>		in();<br>	&#125;<br><br>	<span class="hljs-comment">// 字符输出流</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">out</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			Writer out = <span class="hljs-keyword">new</span> FileWriter(file, <span class="hljs-keyword">true</span>);<br>			out.write(<span class="hljs-string">"小桥流水人家,古道西风瘦马\r\n"</span>);<br>			System.out.println(<span class="hljs-string">"写入文件成功"</span>);<br>			out.close();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">// 字符输入流</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">in</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br><br>		<span class="hljs-keyword">try</span> &#123;<br>			Reader in = <span class="hljs-keyword">new</span> FileReader(file);<br>			<span class="hljs-keyword">char</span>[] cs = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[<span class="hljs-number">5</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			StringBuilder buf = <span class="hljs-keyword">new</span> StringBuilder();<br>			<span class="hljs-keyword">while</span>((len = in.read(cs))!=-<span class="hljs-number">1</span>) &#123;<br>				buf.append(<span class="hljs-keyword">new</span> String(cs,<span class="hljs-number">0</span>,len));<br>			&#125;<br>			System.out.println(buf);<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+
+//字符流
+public class CharStreamDemo {
+    public static void main(String[] args) {
+        out();
+        in();
+    }
+
+    // 字符输出流
+    private static void out() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        try {
+            Writer out = new FileWriter(file, true);
+            out.write(&quot;小桥流水人家,古道西风瘦马\r\n&quot;);
+            System.out.println(&quot;写入文件成功&quot;);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // 字符输入流
+    private static void in() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+
+        try {
+            Reader in = new FileReader(file);
+            char[] cs = new char[5];
+            int len = -1;
+            StringBuilder buf = new StringBuilder();
+            while((len = in.read(cs))!=-1) {
+                buf.append(new String(cs,0,len));
+            }
+            System.out.println(buf);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
 <h1 id="字节字符转换流"><a href="#字节字符转换流" class="headerlink" title="字节字符转换流"></a>字节字符转换流</h1><p><code>OutputStreamWriter</code>:可以将输出的字符转换成字节流的输出形式<br><code>InputStreamReader</code>:可以将输入的字节流转化为字符形式的输入流</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.InputStreamReader;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><span class="hljs-keyword">import</span> java.io.OutputStreamWriter;<br><span class="hljs-keyword">import</span> java.io.Reader;<br><span class="hljs-keyword">import</span> java.io.Writer;<br><span class="hljs-keyword">import</span> java.nio.charset.Charset;<br><br><span class="hljs-comment">//字节字符转换流</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StreamChangeDemo</span> </span>&#123;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		InputStream in = <span class="hljs-keyword">null</span>;<br>		OutputStream out = <span class="hljs-keyword">null</span>;<br>		<span class="hljs-keyword">try</span> &#123;<br>			in = <span class="hljs-keyword">new</span> FileInputStream(file);<br>			out = <span class="hljs-keyword">new</span> FileOutputStream(file,<span class="hljs-keyword">true</span>);<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		read(in);<br>		write(out);<br>	&#125;<br>	<br>	<span class="hljs-comment">//输入流:字节转字符</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">read</span><span class="hljs-params">(InputStream in)</span> </span>&#123;<br>		<span class="hljs-comment">//将字节输入流转换成字符输入流,可以指定编码方法</span><br>		Reader reader = <span class="hljs-keyword">new</span> InputStreamReader(in,Charset.defaultCharset());<br>		<span class="hljs-keyword">char</span>[] cs = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[<span class="hljs-number">1024</span>];<br>		<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-keyword">while</span>((len = reader.read(cs)) != -<span class="hljs-number">1</span>) &#123;<br>				System.out.println(<span class="hljs-keyword">new</span> String(cs,<span class="hljs-number">0</span>,len));<br>			&#125;<br>			reader.close();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-comment">//输出流:字符转字节</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">write</span><span class="hljs-params">(OutputStream out)</span> </span>&#123;<br>		Writer writer = <span class="hljs-keyword">new</span> OutputStreamWriter(out);<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			writer.write(<span class="hljs-string">"新年快乐!!!"</span>);<br>			writer.close();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.Charset;
+
+//字节字符转换流
+public class StreamChangeDemo {
+
+    public static void main(String[] args) {
+
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = new FileInputStream(file);
+            out = new FileOutputStream(file,true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        read(in);
+        write(out);
+    }
+
+    //输入流:字节转字符
+    private static void read(InputStream in) {
+        //将字节输入流转换成字符输入流,可以指定编码方法
+        Reader reader = new InputStreamReader(in,Charset.defaultCharset());
+        char[] cs = new char[1024];
+        int len = -1;
+
+        try {
+            while((len = reader.read(cs)) != -1) {
+                System.out.println(new String(cs,0,len));
+            }
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //输出流:字符转字节
+    private static void write(OutputStream out) {
+        Writer writer = new OutputStreamWriter(out);
+
+        try {
+            writer.write(&quot;新年快乐!!!&quot;);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
 <h1 id="字节字符缓冲流"><a href="#字节字符缓冲流" class="headerlink" title="字节字符缓冲流"></a>字节字符缓冲流</h1><p>先将数据缓冲起来,再一起写入或者读取出来,提高效率<br><code>BufferedInputStream</code>,<code>BufferedOutputStream</code>为两个字节缓冲流的类<br>内部默认缓存大小为8KB,每次写入时存储到缓存中的byte数组,当数组存满时,会把数组中的数据写入文件,并且缓存下标归零<br><code>BufferedReader</code><br><code>BufferedWriter</code></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.BufferedInputStream;<br><span class="hljs-keyword">import</span> java.io.BufferedOutputStream;<br><span class="hljs-keyword">import</span> java.io.BufferedReader;<br><span class="hljs-keyword">import</span> java.io.BufferedWriter;<br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.FileReader;<br><span class="hljs-keyword">import</span> java.io.FileWriter;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><span class="hljs-keyword">import</span> java.io.Reader;<br><span class="hljs-keyword">import</span> java.io.Writer;<br><br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BufferStreamDemo</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		byteWriter();<br>		byteReader();<br>		<br>		charWriter();<br>		charReader();<br>	&#125;<br>	<br>	<span class="hljs-comment">//缓冲字节输出</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">byteWriter</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file,<span class="hljs-keyword">true</span>);<br>			<span class="hljs-comment">//构造一个字节缓冲流</span><br>			BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(out);<br>			String info = <span class="hljs-string">"枯藤老树昏鸦\r\n"</span>;<br>			bos.write(info.getBytes());<br>			bos.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-comment">//缓冲字节输入</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">byteReader</span><span class="hljs-params">()</span> </span>&#123;<br>		<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			InputStream in = <span class="hljs-keyword">new</span> FileInputStream(file);<br>			<span class="hljs-comment">//构造缓冲流</span><br>			BufferedInputStream bis = <span class="hljs-keyword">new</span> BufferedInputStream(in);<br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			<span class="hljs-keyword">while</span>((len = bis.read(bytes))!=-<span class="hljs-number">1</span>) &#123;<br>				System.out.println(<span class="hljs-keyword">new</span> String(bytes,<span class="hljs-number">0</span>,len));<br>			&#125;<br>			bis.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-comment">//缓冲字符输出</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">charWriter</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			Writer writer = <span class="hljs-keyword">new</span> FileWriter(file,<span class="hljs-keyword">true</span>);<br>			<span class="hljs-comment">//构造缓存器</span><br>			BufferedWriter bw = <span class="hljs-keyword">new</span> BufferedWriter(writer);<br>			bw.write(<span class="hljs-string">"夕阳西下\r\n"</span>);<br>			bw.flush();<br>			bw.close();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<span class="hljs-comment">//缓冲字符输入</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">charReader</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			Reader reader = <span class="hljs-keyword">new</span> FileReader(file);<br>			BufferedReader br = <span class="hljs-keyword">new</span> BufferedReader(reader);<br>			<span class="hljs-keyword">char</span>[] cs = <span class="hljs-keyword">new</span> <span class="hljs-keyword">char</span>[<span class="hljs-number">1024</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			<span class="hljs-keyword">while</span>((len=br.read(cs))!=-<span class="hljs-number">1</span>) &#123;<br>				System.out.println(<span class="hljs-keyword">new</span> String(cs,<span class="hljs-number">0</span>,len));<br>			&#125;<br>			br.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;	<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Writer;
+
+
+public class BufferStreamDemo {
+    public static void main(String[] args) {
+        byteWriter();
+        byteReader();
+
+        charWriter();
+        charReader();
+    }
+
+    //缓冲字节输出
+    private static void byteWriter() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+
+        try {
+            OutputStream out = new FileOutputStream(file,true);
+            //构造一个字节缓冲流
+            BufferedOutputStream bos = new BufferedOutputStream(out);
+            String info = &quot;枯藤老树昏鸦\r\n&quot;;
+            bos.write(info.getBytes());
+            bos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //缓冲字节输入
+    private static void byteReader() {
+
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+
+        try {
+            InputStream in = new FileInputStream(file);
+            //构造缓冲流
+            BufferedInputStream bis = new BufferedInputStream(in);
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while((len = bis.read(bytes))!=-1) {
+                System.out.println(new String(bytes,0,len));
+            }
+            bis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //缓冲字符输出
+    private static void charWriter() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        try {
+            Writer writer = new FileWriter(file,true);
+            //构造缓存器
+            BufferedWriter bw = new BufferedWriter(writer);
+            bw.write(&quot;夕阳西下\r\n&quot;);
+            bw.flush();
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    //缓冲字符输入
+    private static void charReader() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.text&quot;);
+        try {
+            Reader reader = new FileReader(file);
+            BufferedReader br = new BufferedReader(reader);
+            char[] cs = new char[1024];
+            int len = -1;
+            while((len=br.read(cs))!=-1) {
+                System.out.println(new String(cs,0,len));
+            }
+            br.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }    
+    }
+}
+</code></pre>
 <h1 id="打印流"><a href="#打印流" class="headerlink" title="打印流"></a>打印流</h1><p>便利输出<br><code>PrintStream</code><br><code>PrintWriter</code></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"xxxx"</span>);<br>OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file);<br>BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(out);<span class="hljs-comment">//加缓存</span><br>PrintStream ps = <span class="hljs-keyword">new</span> PrintStream(bos);<span class="hljs-comment">//增强打印流</span><br>ps.println(<span class="hljs-string">"xxxxx"</span>);<br>ps.close;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">File file = new File(&quot;xxxx&quot;);
+OutputStream out = new FileOutputStream(file);
+BufferedOutputStream bos = new BufferedOutputStream(out);//加缓存
+PrintStream ps = new PrintStream(bos);//增强打印流
+ps.println(&quot;xxxxx&quot;);
+ps.close;</code></pre>
 <h1 id="对象流和序列化"><a href="#对象流和序列化" class="headerlink" title="对象流和序列化"></a>对象流和序列化</h1><p>序列化:将对象的状态信息转化为可以存储或传输的形式<br>反序列化:将已经序列化的对象重新转换成对象的状态信息<br>对象流的两个类:<code>ObjectOutputStream</code>将java对象的基本数据类型和图形写入OutputStream,<code>ObjectInputStream</code>对写入ObjectOutputStream的基本数据和对象进行反序列化<br>需要序列化的情况:</p>
 <ol>
 <li>把对象保存到文件中</li>
-<li>对象需要在网络中传输时<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.Serializable;<br><br><span class="hljs-comment">//继承标记接口表示该类需要进行序列化,否则会报java.io.NotSerializableException错误</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dog</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span></span>&#123;<br><br>	<span class="hljs-comment">/**<br>	 * 定义版本号,防止两个不同对象因属性一样造成混乱<br>	 */</span><br>	<span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = <span class="hljs-number">1L</span>;<br>	<span class="hljs-keyword">private</span> String name;<br>	<span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> age;<br>	<span class="hljs-keyword">private</span> String sex;<br>	<span class="hljs-comment">//可以使用关键字transient声明一个变量在存储时不需要维持其具体值(默认0或null)</span><br>	<span class="hljs-keyword">private</span> <span class="hljs-keyword">transient</span> <span class="hljs-keyword">int</span> id;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Dog</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">super</span>();<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Dog</span><span class="hljs-params">(String name, <span class="hljs-keyword">int</span> age, String sex)</span> </span>&#123;<br>		<span class="hljs-keyword">super</span>();<br>		<span class="hljs-keyword">this</span>.name = name;<br>		<span class="hljs-keyword">this</span>.age = age;<br>		<span class="hljs-keyword">this</span>.sex = sex;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> name;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.name = name;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> age;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setAge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> age)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.age = age;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getSex</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> sex;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setSex</span><span class="hljs-params">(String sex)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.sex = sex;<br>	&#125;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">"Dog [name="</span> + name + <span class="hljs-string">", age="</span> + age + <span class="hljs-string">", sex="</span> + sex + <span class="hljs-string">", getName()="</span> + getName() + <span class="hljs-string">", getAge()="</span><br>				+ getAge() + <span class="hljs-string">", getSex()="</span> + getSex() + <span class="hljs-string">"]"</span>;<br>	&#125;<br><br>&#125;<br><br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.ObjectInputStream;<br><span class="hljs-keyword">import</span> java.io.ObjectOutputStream;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ObjectStreamDemo</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		writeObject();<br>		readObject();<br>	&#125;<br><br>	<span class="hljs-comment">//对象序列化</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">writeObject</span><span class="hljs-params">()</span> </span>&#123;<br>		Dog dog = <span class="hljs-keyword">new</span> Dog(<span class="hljs-string">"猪猪"</span>,<span class="hljs-number">6</span>,<span class="hljs-string">"girl"</span>);<br>		<span class="hljs-comment">//当要读取多个对象时,使用数组</span><br>		<span class="hljs-comment">//Dog[] dogs = &#123;dog1,dog2&#125;;</span><br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/ObjectStream.text"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file);<br>			ObjectOutputStream oos = <span class="hljs-keyword">new</span> ObjectOutputStream(out);<br>			oos.writeObject(dog);<span class="hljs-comment">//多个时改为dogs</span><br>			oos.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-comment">//对象反序列化</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">()</span> </span>&#123;<br>		Dog dog = <span class="hljs-keyword">new</span> Dog(<span class="hljs-string">"猪猪"</span>,<span class="hljs-number">6</span>,<span class="hljs-string">"girl"</span>);<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/ObjectStream.text"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			InputStream in = <span class="hljs-keyword">new</span> FileInputStream(file);<br>			ObjectInputStream ois= <span class="hljs-keyword">new</span> ObjectInputStream(in);<br>			Dog dog2 = (Dog)ois.readObject();<br>			<span class="hljs-comment">//多个时:Dog[] dog = (Dog[])ois.readObject();</span><br>			System.out.println(dog2);<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (ClassNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="字节数组流"><a href="#字节数组流" class="headerlink" title="字节数组流"></a>字节数组流</h1></li>
+<li>对象需要在网络中传输时<pre><code class="java">import java.io.Serializable;
+</code></pre>
+</li>
 </ol>
-<p>基于内存操作,内部维护着一个字节数组,可以利用流的读取机制来处理字符串<br>与文件操作无关,无需关闭<br><code>ByteArrayInputStream</code><br><code>ByteArrayOutputStream</code></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.ByteArrayInputStream;<br><span class="hljs-keyword">import</span> java.io.ByteArrayOutputStream;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ByteArrayStreamDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		byteArray();<br>	&#125;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">byteArray</span><span class="hljs-params">()</span> </span>&#123;<br>		<br>		String s = <span class="hljs-string">"123456789sljtiegrgGRGFRTGAFWER(*&amp;*^&amp;%%$@#)"</span>;<br>		ByteArrayInputStream bais = <span class="hljs-keyword">new</span> ByteArrayInputStream(s.getBytes());<br>		ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream();<br>		<span class="hljs-keyword">int</span> curr = -<span class="hljs-number">1</span>;<span class="hljs-comment">//每次读取的字节</span><br>		<span class="hljs-keyword">while</span>((curr = bais.read())!=-<span class="hljs-number">1</span>) &#123;<br>			<span class="hljs-keyword">if</span>((curr&gt;=<span class="hljs-number">65</span> &amp;&amp; curr&lt;=<span class="hljs-number">90</span>) || (curr&gt;=<span class="hljs-number">97</span> &amp;&amp; curr&lt;=<span class="hljs-number">122</span>)) &#123;<br>				baos.write(curr);<br>			&#125;<br>		&#125;<br>		<span class="hljs-comment">//此时无需关闭,因为字节数组流是基于内存的操作流</span><br>		System.out.println(baos.toString());<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="数据流"><a href="#数据流" class="headerlink" title="数据流"></a>数据流</h1><p>应用程序以与机器无关的方式从底层输出或输入java基本数据类型<br><code>DataInputStream</code><br><code>DataOutputStream</code></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.BufferedInputStream;<br><span class="hljs-keyword">import</span> java.io.BufferedOutputStream;<br><span class="hljs-keyword">import</span> java.io.DataInput;<br><span class="hljs-keyword">import</span> java.io.DataInputStream;<br><span class="hljs-keyword">import</span> java.io.DataOutputStream;<br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DataStreamDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		write();<br>		read();<br>	&#125;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">write</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.data"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file);<br>			BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(out);<br>			DataOutputStream dos = <span class="hljs-keyword">new</span> DataOutputStream(bos);<br>			dos.writeInt(<span class="hljs-number">15</span>);<span class="hljs-comment">//4个字节</span><br>			dos.writeByte(<span class="hljs-number">1</span>);<span class="hljs-comment">//写入1个字节</span><br>			dos.writeUTF(<span class="hljs-string">"花花卡"</span>);<br>			<br>			dos.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.data"</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			InputStream in = <span class="hljs-keyword">new</span> FileInputStream(file);<br>			BufferedInputStream bis = <span class="hljs-keyword">new</span> BufferedInputStream(in);<br>			DataInputStream dis = <span class="hljs-keyword">new</span> DataInputStream(bis);<br>			<span class="hljs-keyword">int</span> num = dis.readInt();<br>			<span class="hljs-keyword">byte</span> b = dis.readByte();<br>			String s =dis.readUTF();<br>			System.out.println(num+<span class="hljs-string">","</span>+b+<span class="hljs-string">","</span>+s);<br>			<br>			dis.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<p>//继承标记接口表示该类需要进行序列化,否则会报java.io.NotSerializableException错误<br>public class Dog implements Serializable{</p>
+<pre><code>/**
+ * 定义版本号,防止两个不同对象因属性一样造成混乱
+ */
+private static final long serialVersionUID = 1L;
+private String name;
+private int age;
+private String sex;
+//可以使用关键字transient声明一个变量在存储时不需要维持其具体值(默认0或null)
+private transient int id;
+public Dog() {
+    super();
+}
+
+public Dog(String name, int age, String sex) {
+    super();
+    this.name = name;
+    this.age = age;
+    this.sex = sex;
+}
+
+public String getName() {
+    return name;
+}
+
+public void setName(String name) {
+    this.name = name;
+}
+
+public int getAge() {
+    return age;
+}
+
+public void setAge(int age) {
+    this.age = age;
+}
+
+public String getSex() {
+    return sex;
+}
+
+public void setSex(String sex) {
+    this.sex = sex;
+}
+
+public String toString() {
+    return &quot;Dog [name=&quot; + name + &quot;, age=&quot; + age + &quot;, sex=&quot; + sex + &quot;, getName()=&quot; + getName() + &quot;, getAge()=&quot;
+            + getAge() + &quot;, getSex()=&quot; + getSex() + &quot;]&quot;;
+}</code></pre><p>}</p>
+<p>import java.io.File;<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;<br>import java.io.InputStream;<br>import java.io.ObjectInputStream;<br>import java.io.ObjectOutputStream;<br>import java.io.OutputStream;</p>
+<p>public class ObjectStreamDemo {<br>    public static void main(String[] args) {<br>        writeObject();<br>        readObject();<br>    }</p>
+<pre><code>//对象序列化
+public static void writeObject() {
+    Dog dog = new Dog(&quot;猪猪&quot;,6,&quot;girl&quot;);
+    //当要读取多个对象时,使用数组
+    //Dog[] dogs = {dog1,dog2};
+    File file = new File(&quot;/home/xiaoming/音乐/java/ObjectStream.text&quot;);
+    try {
+        OutputStream out = new FileOutputStream(file);
+        ObjectOutputStream oos = new ObjectOutputStream(out);
+        oos.writeObject(dog);//多个时改为dogs
+        oos.close();
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+//对象反序列化
+public static void readObject() {
+    Dog dog = new Dog(&quot;猪猪&quot;,6,&quot;girl&quot;);
+    File file = new File(&quot;/home/xiaoming/音乐/java/ObjectStream.text&quot;);
+    try {
+        InputStream in = new FileInputStream(file);
+        ObjectInputStream ois= new ObjectInputStream(in);
+        Dog dog2 = (Dog)ois.readObject();
+        //多个时:Dog[] dog = (Dog[])ois.readObject();
+        System.out.println(dog2);
+    } catch (FileNotFoundException e) {
+        e.printStackTrace();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+}</code></pre><p>}</p>
+<pre><code># 字节数组流  
+
+基于内存操作,内部维护着一个字节数组,可以利用流的读取机制来处理字符串
+与文件操作无关,无需关闭
+`ByteArrayInputStream`
+`ByteArrayOutputStream`
+```java
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+public class ByteArrayStreamDemo {
+
+    public static void main(String[] args) {
+        byteArray();
+    }
+
+    private static void byteArray() {
+
+        String s = &quot;123456789sljtiegrgGRGFRTGAFWER(*&amp;*^&amp;%%$@#)&quot;;
+        ByteArrayInputStream bais = new ByteArrayInputStream(s.getBytes());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int curr = -1;//每次读取的字节
+        while((curr = bais.read())!=-1) {
+            if((curr&gt;=65 &amp;&amp; curr&lt;=90) || (curr&gt;=97 &amp;&amp; curr&lt;=122)) {
+                baos.write(curr);
+            }
+        }
+        //此时无需关闭,因为字节数组流是基于内存的操作流
+        System.out.println(baos.toString());
+    }
+}
+</code></pre><h1 id="数据流"><a href="#数据流" class="headerlink" title="数据流"></a>数据流</h1><p>应用程序以与机器无关的方式从底层输出或输入java基本数据类型<br><code>DataInputStream</code><br><code>DataOutputStream</code></p>
+<pre><code class="java">import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class DataStreamDemo {
+
+    public static void main(String[] args) {
+        write();
+        read();
+    }
+
+    private static void write() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.data&quot;);
+        try {
+            OutputStream out = new FileOutputStream(file);
+            BufferedOutputStream bos = new BufferedOutputStream(out);
+            DataOutputStream dos = new DataOutputStream(bos);
+            dos.writeInt(15);//4个字节
+            dos.writeByte(1);//写入1个字节
+            dos.writeUTF(&quot;花花卡&quot;);
+
+            dos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void read() {
+        File file = new File(&quot;/home/xiaoming/音乐/java/vince.data&quot;);
+        try {
+            InputStream in = new FileInputStream(file);
+            BufferedInputStream bis = new BufferedInputStream(in);
+            DataInputStream dis = new DataInputStream(bis);
+            int num = dis.readInt();
+            byte b = dis.readByte();
+            String s =dis.readUTF();
+            System.out.println(num+&quot;,&quot;+b+&quot;,&quot;+s);
+
+            dis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
 <h1 id="文件分割与合并"><a href="#文件分割与合并" class="headerlink" title="文件分割与合并"></a>文件分割与合并</h1><p>合并流<code>SequenceInputStream</code></p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.BufferedInputStream;<br><span class="hljs-keyword">import</span> java.io.BufferedOutputStream;<br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.InputStream;<br><span class="hljs-keyword">import</span> java.io.SequenceInputStream;<br><span class="hljs-keyword">import</span> java.util.Enumeration;<br><span class="hljs-keyword">import</span> java.util.Vector;<br><br><span class="hljs-comment">/*<br> * 文件的分割和合并<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileDivisionMergeDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<span class="hljs-comment">//分割</span><br>		File file = <span class="hljs-keyword">new</span> File(<br>				<span class="hljs-string">"/media/M_fM__VM__GM_fM_!M_#/编程语言/Java/课程/千锋Java基础教程-Java基础（完结-217集）/千锋java基础教程：第10章 多线程与并发（12集）/第10章 多线程与并发_12_线程生命周期与线程池_小结.mp4"</span>);<br>		division(file, <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">10</span>);<br>		System.out.println(<span class="hljs-string">"分割成功"</span>);<br>		<br>		<span class="hljs-comment">//合并</span><br>		Vector&lt;InputStream&gt; v = <span class="hljs-keyword">new</span> Vector&lt;InputStream&gt;();<br>		<span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">59</span>;i++) &#123;<br>			<span class="hljs-keyword">try</span> &#123;<br>				InputStream in = <span class="hljs-keyword">new</span> FileInputStream(<span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/java/花花卡"</span> + i + <span class="hljs-string">".mp4"</span>));<br>				v.add(in);<br>			&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>				e.printStackTrace();<br>			&#125;<br>		&#125;<br>		Enumeration&lt;InputStream&gt; es = v.elements();<br>		merge(es);<br>	&#125;<br><br>	<span class="hljs-comment">/**<br>	 * 文件切割<br>	 * <br>	 * <span class="hljs-doctag">@param</span> file    要切割的文件<br>	 * <span class="hljs-doctag">@param</span> cutSite 切割后每份文件的大小<br>	 */</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">division</span><span class="hljs-params">(File targetFile, <span class="hljs-keyword">long</span> cutSize)</span> </span>&#123;<br><br>		<span class="hljs-keyword">if</span> (targetFile == <span class="hljs-keyword">null</span>)<br>			<span class="hljs-keyword">return</span>;<br>		<span class="hljs-comment">// 计算文件的总分割数</span><br>		<span class="hljs-keyword">int</span> num = (targetFile.length() % cutSize == <span class="hljs-number">0</span>) ? (<span class="hljs-keyword">int</span>) (targetFile.length() / cutSize)<br>				: (<span class="hljs-keyword">int</span>) ((targetFile.length() / cutSize) + <span class="hljs-number">1</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-comment">// 构造一个文件输入流</span><br>			BufferedInputStream in = <span class="hljs-keyword">new</span> BufferedInputStream(<span class="hljs-keyword">new</span> FileInputStream(targetFile));<br>			BufferedOutputStream out = <span class="hljs-keyword">null</span>;<br><br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">null</span>;<span class="hljs-comment">// 每次希望读取的最大字节数</span><br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<span class="hljs-comment">// 每次读取的字节数</span><br>			<span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span>;<span class="hljs-comment">// 每一个文件要读取的次数</span><br><br>			<span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">1</span>; i &lt; num; i++) &#123;<br>				out = <span class="hljs-keyword">new</span> BufferedOutputStream(<span class="hljs-keyword">new</span> FileOutputStream(<span class="hljs-string">"/home/xiaoming/音乐/java/花花卡"</span> + i + <span class="hljs-string">".mp4"</span>));<br><br>				<span class="hljs-keyword">if</span> (cutSize &lt;= <span class="hljs-number">1024</span>) &#123;<br>					bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[(<span class="hljs-keyword">int</span>) cutSize];<br>					count = <span class="hljs-number">1</span>;<br>				&#125; <span class="hljs-keyword">else</span> &#123;<br>					bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>					count = (<span class="hljs-keyword">int</span>) cutSize / <span class="hljs-number">1024</span>;<br>				&#125;<br><br>				<span class="hljs-comment">// 边读边写入,不然会刷新数组,写入不了</span><br>				<span class="hljs-comment">// 判断条件应该把读放在后面,防止多读一次</span><br>				<span class="hljs-keyword">while</span> (count &gt; <span class="hljs-number">0</span> &amp;&amp; (len = in.read(bytes)) != -<span class="hljs-number">1</span>) &#123;<br>					out.write(bytes);<br>					out.flush();<br>					count--;<br>				&#125;<br><br>				<span class="hljs-comment">// 如果余数不为零,数组不整除就需要多读一遍</span><br>				<span class="hljs-keyword">if</span> ((<span class="hljs-keyword">int</span>) cutSize % <span class="hljs-number">1024</span> != <span class="hljs-number">0</span>) &#123;<br>					bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[(<span class="hljs-keyword">int</span>) cutSize % <span class="hljs-number">1024</span>];<br>					len = in.read(bytes);<br>					out.write(bytes, <span class="hljs-number">0</span>, len);<br>					out.flush();<br>				&#125;<br>				out.close();<span class="hljs-comment">// 关闭本次输出流</span><br>			&#125;<br>			in.close();<span class="hljs-comment">// 最后才关闭输入流</span><br><br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br><br>	&#125;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(Enumeration&lt;InputStream&gt; es)</span> </span>&#123;<br>		<span class="hljs-comment">//构造一个合并流</span><br>		SequenceInputStream sis = <span class="hljs-keyword">new</span> SequenceInputStream(es);<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(<br>					<span class="hljs-keyword">new</span> FileOutputStream(<span class="hljs-string">"/home/xiaoming/音乐/java/花花卡.mp4"</span>));<br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			<span class="hljs-keyword">while</span>((len=sis.read(bytes))!=-<span class="hljs-number">1</span>) &#123;<br>				bos.write(bytes,<span class="hljs-number">0</span>,len);<br>				bos.flush();<br>			&#125;<br>			bos.close();<br>			sis.close();<br>			System.out.println(<span class="hljs-string">"合并完成"</span>);<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
+import java.util.Enumeration;
+import java.util.Vector;
+
+/*
+ * 文件的分割和合并
+ */
+public class FileDivisionMergeDemo {
+
+    public static void main(String[] args) {
+        //分割
+        File file = new File(
+                &quot;/media/M_fM__VM__GM_fM_!M_#/编程语言/Java/课程/千锋Java基础教程-Java基础（完结-217集）/千锋java基础教程：第10章 多线程与并发（12集）/第10章 多线程与并发_12_线程生命周期与线程池_小结.mp4&quot;);
+        division(file, 1024 * 1024 * 10);
+        System.out.println(&quot;分割成功&quot;);
+
+        //合并
+        Vector&lt;InputStream&gt; v = new Vector&lt;InputStream&gt;();
+        for(int i=1;i&lt;=59;i++) {
+            try {
+                InputStream in = new FileInputStream(new File(&quot;/home/xiaoming/音乐/java/花花卡&quot; + i + &quot;.mp4&quot;));
+                v.add(in);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        Enumeration&lt;InputStream&gt; es = v.elements();
+        merge(es);
+    }
+
+    /**
+     * 文件切割
+     * 
+     * @param file    要切割的文件
+     * @param cutSite 切割后每份文件的大小
+     */
+    private static void division(File targetFile, long cutSize) {
+
+        if (targetFile == null)
+            return;
+        // 计算文件的总分割数
+        int num = (targetFile.length() % cutSize == 0) ? (int) (targetFile.length() / cutSize)
+                : (int) ((targetFile.length() / cutSize) + 1);
+        try {
+            // 构造一个文件输入流
+            BufferedInputStream in = new BufferedInputStream(new FileInputStream(targetFile));
+            BufferedOutputStream out = null;
+
+            byte[] bytes = null;// 每次希望读取的最大字节数
+            int len = -1;// 每次读取的字节数
+            int count = 0;// 每一个文件要读取的次数
+
+            for (int i = 1; i &lt; num; i++) {
+                out = new BufferedOutputStream(new FileOutputStream(&quot;/home/xiaoming/音乐/java/花花卡&quot; + i + &quot;.mp4&quot;));
+
+                if (cutSize &lt;= 1024) {
+                    bytes = new byte[(int) cutSize];
+                    count = 1;
+                } else {
+                    bytes = new byte[1024];
+                    count = (int) cutSize / 1024;
+                }
+
+                // 边读边写入,不然会刷新数组,写入不了
+                // 判断条件应该把读放在后面,防止多读一次
+                while (count &gt; 0 &amp;&amp; (len = in.read(bytes)) != -1) {
+                    out.write(bytes);
+                    out.flush();
+                    count--;
+                }
+
+                // 如果余数不为零,数组不整除就需要多读一遍
+                if ((int) cutSize % 1024 != 0) {
+                    bytes = new byte[(int) cutSize % 1024];
+                    len = in.read(bytes);
+                    out.write(bytes, 0, len);
+                    out.flush();
+                }
+                out.close();// 关闭本次输出流
+            }
+            in.close();// 最后才关闭输入流
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void merge(Enumeration&lt;InputStream&gt; es) {
+        //构造一个合并流
+        SequenceInputStream sis = new SequenceInputStream(es);
+
+        try {
+            BufferedOutputStream bos = new BufferedOutputStream(
+                    new FileOutputStream(&quot;/home/xiaoming/音乐/java/花花卡.mp4&quot;));
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while((len=sis.read(bytes))!=-1) {
+                bos.write(bytes,0,len);
+                bos.flush();
+            }
+            bos.close();
+            sis.close();
+            System.out.println(&quot;合并完成&quot;);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+</code></pre>
 <h1 id="字符串流"><a href="#字符串流" class="headerlink" title="字符串流"></a>字符串流</h1><p><code>StringReader</code>以一个字符串为数据源,来构造一个字符流<br><code>StringWriter</code>无需关闭</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.StreamTokenizer;<br><span class="hljs-keyword">import</span> java.io.StringReader;<br><br><span class="hljs-comment">//字符串流</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StringStreamDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">stringReader</span><span class="hljs-params">()</span> </span>&#123;<br>		String info = <span class="hljs-string">"中 大 奖,花 呗 免 单!"</span>;<br>		StringReader sr = <span class="hljs-keyword">new</span> StringReader(info);<br>		<span class="hljs-comment">//流标记器</span><br>		StreamTokenizer st = <span class="hljs-keyword">new</span> StreamTokenizer(sr);<br>		<br>		<span class="hljs-keyword">int</span> count = <span class="hljs-number">0</span>;<span class="hljs-comment">//计算总数</span><br>		<span class="hljs-comment">//TT_EOF表示读到流的末尾,ttype是每一次读取返回的类型</span><br>		<span class="hljs-keyword">while</span>(st.ttype != StreamTokenizer.TT_EOF) &#123;<br>			<span class="hljs-keyword">try</span> &#123;<br>				<span class="hljs-comment">//TT_WORD表示读取的内容是文字</span><br>				<span class="hljs-keyword">if</span>(st.nextToken()==StreamTokenizer.TT_WORD) &#123;<br>					count++;<br>				&#125;<br>			&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>				e.printStackTrace();<br>			&#125;<br>		&#125;<br>		sr.close();<br>		System.out.println(<span class="hljs-string">"count="</span>+count);<br>	&#125;<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		stringReader();<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+
+//字符串流
+public class StringStreamDemo {
+
+    private static void stringReader() {
+        String info = &quot;中 大 奖,花 呗 免 单!&quot;;
+        StringReader sr = new StringReader(info);
+        //流标记器
+        StreamTokenizer st = new StreamTokenizer(sr);
+
+        int count = 0;//计算总数
+        //TT_EOF表示读到流的末尾,ttype是每一次读取返回的类型
+        while(st.ttype != StreamTokenizer.TT_EOF) {
+            try {
+                //TT_WORD表示读取的内容是文字
+                if(st.nextToken()==StreamTokenizer.TT_WORD) {
+                    count++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        sr.close();
+        System.out.println(&quot;count=&quot;+count);
+    }
+    public static void main(String[] args) {
+        stringReader();
+    }
+}
+</code></pre>
 <h1 id="RandomAccessFile"><a href="#RandomAccessFile" class="headerlink" title="RandomAccessFile"></a>RandomAccessFile</h1><p>直接继承Object类,只可以对文件进行操作,有两种模式(<strong>r</strong>,<strong>rw</strong>)</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.RandomAccessFile;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">RandomAccessFileDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<span class="hljs-keyword">try</span> &#123;<br>			RandomAccessFile r = <span class="hljs-keyword">new</span> RandomAccessFile(<span class="hljs-string">"/home/xiaoming/音乐/java/vince.text"</span>, <span class="hljs-string">"r"</span>);<br>			RandomAccessFile w = <span class="hljs-keyword">new</span> RandomAccessFile(<span class="hljs-string">"/home/xiaoming/音乐/java/vince2.text"</span>,<span class="hljs-string">"rw"</span>);<br>			<br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			<span class="hljs-keyword">while</span>((len = r.read(bytes))!= -<span class="hljs-number">1</span>) &#123;<br>				w.write(bytes,<span class="hljs-number">0</span>,len);<br>			&#125;<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		System.out.println(<span class="hljs-string">"copy success"</span>);<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+public class RandomAccessFileDemo {
+
+    public static void main(String[] args) {
+        try {
+            RandomAccessFile r = new RandomAccessFile(&quot;/home/xiaoming/音乐/java/vince.text&quot;, &quot;r&quot;);
+            RandomAccessFile w = new RandomAccessFile(&quot;/home/xiaoming/音乐/java/vince2.text&quot;,&quot;rw&quot;);
+
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while((len = r.read(bytes))!= -1) {
+                w.write(bytes,0,len);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(&quot;copy success&quot;);
+    }
+}
+</code></pre>
 <h1 id="Properties文件操作类"><a href="#Properties文件操作类" class="headerlink" title="Properties文件操作类"></a>Properties文件操作类</h1><p>主要用于读取配置文件</p>
-<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">//properties配置文件<br>#update config<br>#Sun Feb 03 10:58:41 CST 2019<br>db.password=987654321<br>db.username=xiaoming<br>app.version=2<br><br>//对配置文件的操作<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;<br>import java.io.InputStream;<br>import java.io.OutputStream;<br>import java.util.Properties;<br><br>public class PropertiesDemo &#123;<br>	<br>	public static String version = "";<br>	public static String username = "";<br>	public static String password = "";<br>	<br>	//静态代码块,在创建对象时执行一次<br>		static &#123;<br>			readConfig();<br>		&#125;<br>	/**	<br>	 * 输出操作<br>	 */<br>	private static void readConfig() &#123;<br>		<br>		Properties p = new Properties();<br>		try &#123;<br>			InputStream inStream = new FileInputStream("config.properties");<br>			//当文件不在当前项目根目录下时,使用如下方式指定路径<br>//			InputStream inStream1 = Thread.currentThread().getContextClassLoader()<br>//					.getResourceAsStream("com/res/config.properties");<br>			p.load(inStream);//加载文件<br>			<br>			//从properties中获取数据<br>			<br>			version = p.getProperty("app.version");<br>			username = p.getProperty("db.username");<br>			password = p.getProperty("db.password");<br>			<br>			inStream.close();<br>		&#125; catch (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; catch (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	<br>	/**<br>	 * 写入操作<br>	 * @param version<br>	 * @param username<br>	 * @param password<br>	 */<br>	private static void writeConfig(String version,String username,String password) &#123;<br>		Properties p = new Properties();<br>		//把属性写入变量p<br>		p.put("app.version",version);<br>		p.put("db.username", username);<br>		p.put("db.password",password);<br>		try &#123;<br>			OutputStream outStream = new FileOutputStream("config.properties");<br>			//写入文件,第二个参数是注释<br>			p.store(outStream, "update config");<br>			outStream.close();<br>		&#125; catch (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; catch (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br>	public static void main(String[] args) &#123;<br>		//readConfig();<br>		writeConfig("2", "xiaoming", "987654321");<br>		System.out.println(PropertiesDemo.version);<br>		System.out.println(PropertiesDemo.username);<br>		System.out.println(PropertiesDemo.password);<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">//properties配置文件
+#update config
+#Sun Feb 03 10:58:41 CST 2019
+db.password=987654321
+db.username=xiaoming
+app.version=2
+
+//对配置文件的操作
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+
+public class PropertiesDemo {
+
+    public static String version = &quot;&quot;;
+    public static String username = &quot;&quot;;
+    public static String password = &quot;&quot;;
+
+    //静态代码块,在创建对象时执行一次
+        static {
+            readConfig();
+        }
+    /**    
+     * 输出操作
+     */
+    private static void readConfig() {
+
+        Properties p = new Properties();
+        try {
+            InputStream inStream = new FileInputStream(&quot;config.properties&quot;);
+            //当文件不在当前项目根目录下时,使用如下方式指定路径
+//            InputStream inStream1 = Thread.currentThread().getContextClassLoader()
+//                    .getResourceAsStream(&quot;com/res/config.properties&quot;);
+            p.load(inStream);//加载文件
+
+            //从properties中获取数据
+
+            version = p.getProperty(&quot;app.version&quot;);
+            username = p.getProperty(&quot;db.username&quot;);
+            password = p.getProperty(&quot;db.password&quot;);
+
+            inStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 写入操作
+     * @param version
+     * @param username
+     * @param password
+     */
+    private static void writeConfig(String version,String username,String password) {
+        Properties p = new Properties();
+        //把属性写入变量p
+        p.put(&quot;app.version&quot;,version);
+        p.put(&quot;db.username&quot;, username);
+        p.put(&quot;db.password&quot;,password);
+        try {
+            OutputStream outStream = new FileOutputStream(&quot;config.properties&quot;);
+            //写入文件,第二个参数是注释
+            p.store(outStream, &quot;update config&quot;);
+            outStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void main(String[] args) {
+        //readConfig();
+        writeConfig(&quot;2&quot;, &quot;xiaoming&quot;, &quot;987654321&quot;);
+        System.out.println(PropertiesDemo.version);
+        System.out.println(PropertiesDemo.username);
+        System.out.println(PropertiesDemo.password);
+    }
+}
+</code></pre>
 <h1 id="文件压缩和解压缩"><a href="#文件压缩和解压缩" class="headerlink" title="文件压缩和解压缩"></a>文件压缩和解压缩</h1><p><strong>压缩</strong>:<code>ZipOutputStream</code><br><code>ZipOutputStream(OutputStream out)</code>:创建新的ZIP输出流<br><code>void putNextEntry(ZipEntry e)</code>:开始写入新的ZIP文件条目并将流定位到条目数据的开始处<br><code>ZipEntry(String name)</code>:使用指定名创建新的ZIP条目<br><strong>解压</strong>:<code>ZipInputStream</code><br><code>ZipInputStream(InputStream in)</code>:创建新的ZIP输入流<br><code>ZipEntry getNextEntry()</code>:读取写一个ZiP文件条目并将流定位到该条目数据的开始处</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">import</span> java.io.BufferedInputStream;<br><span class="hljs-keyword">import</span> java.io.BufferedOutputStream;<br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileNotFoundException;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.OutputStream;<br><span class="hljs-keyword">import</span> java.util.zip.ZipEntry;<br><span class="hljs-keyword">import</span> java.util.zip.ZipInputStream;<br><span class="hljs-keyword">import</span> java.util.zip.ZipOutputStream;<br><br><span class="hljs-comment">/**<br> * 压缩和解压缩实例<br> * <br> * <span class="hljs-doctag">@author</span> xiaoming<br> *<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CompressionAndDecompressionDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/12345"</span>);<br>		compression(<span class="hljs-string">"/home/xiaoming/音乐/123456789.zip"</span>, file);<br><br>		decompression(<span class="hljs-string">"/home/xiaoming/音乐/123456789.zip"</span>, <span class="hljs-string">"/home/xiaoming/音乐"</span>);<br><br>	&#125;<br><br>	<span class="hljs-comment">/**<br>	 * 压缩<br>	 * <br>	 * <span class="hljs-doctag">@param</span> zipFileName 希望压缩后的文件名(路径)<br>	 * <span class="hljs-doctag">@param</span> targetFile  目标文件<br>	 * <span class="hljs-doctag">@return</span><br>	 */</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">compression</span><span class="hljs-params">(String zipFileName, File targetFile)</span> </span>&#123;<br>		System.out.println(<span class="hljs-string">"正在压缩..."</span>);<br>		<span class="hljs-keyword">try</span> &#123;<br>			ZipOutputStream out = <span class="hljs-keyword">new</span> ZipOutputStream(<span class="hljs-keyword">new</span> FileOutputStream(zipFileName));<br>			<span class="hljs-comment">// 添加缓存加快效率</span><br>			BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(out);<br>			<span class="hljs-comment">// 进行压缩</span><br>			zip(out, targetFile, targetFile.getName(), bos);<br>			bos.close();<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		System.out.println(<span class="hljs-string">"压缩完成!!!"</span>);<br>	&#125;<br><br>	<span class="hljs-comment">/**<br>	 * 执行具体的压缩操作<br>	 * <br>	 * <span class="hljs-doctag">@param</span> out            对文件进行压缩的类<br>	 * <span class="hljs-doctag">@param</span> targetFile     目标文件<br>	 * <span class="hljs-doctag">@param</span> targetFileName 要压缩文件的文件名<br>	 * <span class="hljs-doctag">@param</span> bos            缓存流<br>	 * <span class="hljs-doctag">@throws</span> IOException<br>	 */</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">zip</span><span class="hljs-params">(ZipOutputStream out, File targetFile, String targetFileName, BufferedOutputStream bos)</span><br>			<span class="hljs-keyword">throws</span> IOException </span>&#123;<br>		<span class="hljs-comment">// 判断是目录还是文件夹</span><br>		<span class="hljs-keyword">if</span> (targetFile.isDirectory()) &#123;<br>			<span class="hljs-comment">// 如果是空目录</span><br>			<span class="hljs-keyword">if</span> (targetFile.length() == <span class="hljs-number">0</span>) &#123;<br>				out.putNextEntry(<span class="hljs-keyword">new</span> ZipEntry(targetFileName));<span class="hljs-comment">// 处理空目录</span><br>			&#125;<br>			File[] files = targetFile.listFiles();<br>			<span class="hljs-keyword">for</span> (File f : files) &#123;<br>				zip(out, f, targetFileName + <span class="hljs-string">"/"</span> + f.getName(), bos);<br>			&#125;<br>		&#125; <span class="hljs-keyword">else</span> &#123;<br>			out.putNextEntry(<span class="hljs-keyword">new</span> ZipEntry(targetFileName));<br>			FileInputStream in = <span class="hljs-keyword">new</span> FileInputStream(targetFile);<br>			BufferedInputStream bis = <span class="hljs-keyword">new</span> BufferedInputStream(in);<br>			<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>			<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>			<span class="hljs-keyword">while</span> ((len = bis.read(bytes)) != -<span class="hljs-number">1</span>) &#123;<br>				bos.write(bytes, <span class="hljs-number">0</span>, len);<br>			&#125;<br>			bis.close();<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">/**<br>	 * 解压<br>	 * <br>	 * <span class="hljs-doctag">@param</span> targetFileName 要解压的文件名<br>	 * <span class="hljs-doctag">@param</span> parent         解压到的位置<br>	 */</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">decompression</span><span class="hljs-params">(String targetFileName, String parent)</span> </span>&#123;<br>		<span class="hljs-comment">// 构造解压的输入流</span><br>		ZipInputStream zIn;<br>		<span class="hljs-keyword">try</span> &#123;<br>			zIn = <span class="hljs-keyword">new</span> ZipInputStream(<span class="hljs-keyword">new</span> FileInputStream(targetFileName));<br>			ZipEntry entry = <span class="hljs-keyword">null</span>;<br>			File file = <span class="hljs-keyword">null</span>;<br>			<span class="hljs-keyword">while</span> ((entry = zIn.getNextEntry()) != <span class="hljs-keyword">null</span> &amp;&amp; !entry.isDirectory()) &#123;<br>				file = <span class="hljs-keyword">new</span> File(parent, entry.getName());<br>				<span class="hljs-keyword">if</span> (!file.exists()) &#123;<br>					<span class="hljs-keyword">new</span> File(file.getParent()).mkdirs();<span class="hljs-comment">// 创建此文件的上级目录</span><br>				&#125;<br>				OutputStream out = <span class="hljs-keyword">new</span> FileOutputStream(file);<br>				BufferedOutputStream bos = <span class="hljs-keyword">new</span> BufferedOutputStream(out);<br>				<span class="hljs-keyword">byte</span>[] bytes = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>				<span class="hljs-keyword">int</span> len = -<span class="hljs-number">1</span>;<br>				<span class="hljs-keyword">while</span> ((len = zIn.read(bytes)) != -<span class="hljs-number">1</span>) &#123;<br>					bos.write(bytes, <span class="hljs-number">0</span>, len);<br>				&#125;<br>				bos.close();<br>				System.out.println(file.getAbsolutePath() + <span class="hljs-string">"解压成功"</span>);<br>			&#125;<br>		&#125; <span class="hljs-keyword">catch</span> (FileNotFoundException e) &#123;<br>			e.printStackTrace();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br><br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+/**
+ * 压缩和解压缩实例
+ * 
+ * @author xiaoming
+ *
+ */
+public class CompressionAndDecompressionDemo {
+
+    public static void main(String[] args) {
+        File file = new File(&quot;/home/xiaoming/音乐/12345&quot;);
+        compression(&quot;/home/xiaoming/音乐/123456789.zip&quot;, file);
+
+        decompression(&quot;/home/xiaoming/音乐/123456789.zip&quot;, &quot;/home/xiaoming/音乐&quot;);
+
+    }
+
+    /**
+     * 压缩
+     * 
+     * @param zipFileName 希望压缩后的文件名(路径)
+     * @param targetFile  目标文件
+     * @return
+     */
+    private static void compression(String zipFileName, File targetFile) {
+        System.out.println(&quot;正在压缩...&quot;);
+        try {
+            ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
+            // 添加缓存加快效率
+            BufferedOutputStream bos = new BufferedOutputStream(out);
+            // 进行压缩
+            zip(out, targetFile, targetFile.getName(), bos);
+            bos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(&quot;压缩完成!!!&quot;);
+    }
+
+    /**
+     * 执行具体的压缩操作
+     * 
+     * @param out            对文件进行压缩的类
+     * @param targetFile     目标文件
+     * @param targetFileName 要压缩文件的文件名
+     * @param bos            缓存流
+     * @throws IOException
+     */
+    private static void zip(ZipOutputStream out, File targetFile, String targetFileName, BufferedOutputStream bos)
+            throws IOException {
+        // 判断是目录还是文件夹
+        if (targetFile.isDirectory()) {
+            // 如果是空目录
+            if (targetFile.length() == 0) {
+                out.putNextEntry(new ZipEntry(targetFileName));// 处理空目录
+            }
+            File[] files = targetFile.listFiles();
+            for (File f : files) {
+                zip(out, f, targetFileName + &quot;/&quot; + f.getName(), bos);
+            }
+        } else {
+            out.putNextEntry(new ZipEntry(targetFileName));
+            FileInputStream in = new FileInputStream(targetFile);
+            BufferedInputStream bis = new BufferedInputStream(in);
+            byte[] bytes = new byte[1024];
+            int len = -1;
+            while ((len = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, len);
+            }
+            bis.close();
+        }
+    }
+
+    /**
+     * 解压
+     * 
+     * @param targetFileName 要解压的文件名
+     * @param parent         解压到的位置
+     */
+    private static void decompression(String targetFileName, String parent) {
+        // 构造解压的输入流
+        ZipInputStream zIn;
+        try {
+            zIn = new ZipInputStream(new FileInputStream(targetFileName));
+            ZipEntry entry = null;
+            File file = null;
+            while ((entry = zIn.getNextEntry()) != null &amp;&amp; !entry.isDirectory()) {
+                file = new File(parent, entry.getName());
+                if (!file.exists()) {
+                    new File(file.getParent()).mkdirs();// 创建此文件的上级目录
+                }
+                OutputStream out = new FileOutputStream(file);
+                BufferedOutputStream bos = new BufferedOutputStream(out);
+                byte[] bytes = new byte[1024];
+                int len = -1;
+                while ((len = zIn.read(bytes)) != -1) {
+                    bos.write(bytes, 0, len);
+                }
+                bos.close();
+                System.out.println(file.getAbsolutePath() + &quot;解压成功&quot;);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+</code></pre>
 <h1 id="New-IO-NIO"><a href="#New-IO-NIO" class="headerlink" title="New IO(NIO)"></a>New IO(NIO)</h1><p>原来的IO采用流的方式处理数据,为NIO以块的方式处理数据,效率更高,在NIO中,所有的数据都是在缓冲区处理,缓冲区实际上是一个数组</p>
 <h2 id="缓冲区"><a href="#缓冲区" class="headerlink" title="缓冲区"></a>缓冲区</h2><p>缓冲区的类型:</p>
 <ul>
@@ -283,12 +1235,120 @@
 <li>LongBuffer</li>
 <li>DoubleBuffer</li>
 <li>IntBuffer</li>
-<li>FloatBuffer<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> nio;<br><br><span class="hljs-keyword">import</span> java.nio.ByteBuffer;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NIODemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<span class="hljs-comment">//创建一个字节缓冲区,申请内存空间为8字节,参数为申请的内存空间</span><br>		ByteBuffer buf = ByteBuffer.allocate(<span class="hljs-number">8</span>);<br>		<br>		<span class="hljs-comment">//查看其内部属性值</span><br>		System.out.println(<span class="hljs-string">"position="</span>+buf.position());<br>		System.out.println(<span class="hljs-string">"limit="</span>+buf.limit());<br>		System.out.println(<span class="hljs-string">"capacity="</span>+buf.capacity());<br>		<br>		<span class="hljs-comment">//向缓冲区写入数据</span><br>		buf.put((<span class="hljs-keyword">byte</span>)<span class="hljs-number">10</span>);<br>		buf.put((<span class="hljs-keyword">byte</span>)<span class="hljs-number">20</span>);<br>		buf.put((<span class="hljs-keyword">byte</span>)<span class="hljs-number">30</span>);<br>		buf.put((<span class="hljs-keyword">byte</span>)<span class="hljs-number">40</span>);<br>		<br>		System.out.println(<span class="hljs-string">"position="</span>+buf.position());<br>		System.out.println(<span class="hljs-string">"limit="</span>+buf.limit());<br>		System.out.println(<span class="hljs-string">"capacity="</span>+buf.capacity());<br>		<br>		<span class="hljs-comment">//缓冲区反转(把limit设置为position的值,并把positon置零),在取值前使用</span><br>		buf.flip();<br>		System.out.println(<span class="hljs-string">"position="</span>+buf.position());<br>		System.out.println(<span class="hljs-string">"limit="</span>+buf.limit());<br>		System.out.println(<span class="hljs-string">"capacity="</span>+buf.capacity());<br>		<br>		<span class="hljs-comment">//取值</span><br>		<span class="hljs-comment">//判断当前位置与限制元素之间是否有元素</span><br>		<span class="hljs-keyword">if</span>(buf.hasRemaining()) &#123;<br>			<span class="hljs-comment">//返回当前位置与限制之间的元素数</span><br>			<span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;buf.remaining();i++) &#123;<br>				<span class="hljs-keyword">byte</span> b = buf.get(i);<span class="hljs-comment">//取值</span><br>				System.out.println(b);<br>			&#125;<br>		&#125;		<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h2 id="通道-Channel"><a href="#通道-Channel" class="headerlink" title="通道:Channel"></a>通道:Channel</h2></li>
+<li>FloatBuffer<pre><code class="java">package nio;
+</code></pre>
+</li>
 </ul>
-<p>数据通过通道进出缓冲区,Channel是一个类</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**<br> * 文件复制实例<br> */</span><br><span class="hljs-keyword">package</span> nio;<br><br><span class="hljs-keyword">import</span> java.io.FileInputStream;<br><span class="hljs-keyword">import</span> java.io.FileOutputStream;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.io.RandomAccessFile;<br><span class="hljs-keyword">import</span> java.nio.ByteBuffer;<br><span class="hljs-keyword">import</span> java.nio.MappedByteBuffer;<br><span class="hljs-keyword">import</span> java.nio.channels.FileChannel;<br><span class="hljs-keyword">import</span> java.nio.channels.FileChannel.MapMode;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CopyFileDemo</span> </span>&#123;<br>	<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<span class="hljs-keyword">try</span> &#123;<br>			copyFile();<br>			randomAccessFileCopy();<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-comment">//NIO方式</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">copyFile</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>		<span class="hljs-comment">//创建一个输入文件的通道</span><br>		FileChannel in = <span class="hljs-keyword">new</span> FileInputStream(<span class="hljs-string">"/home/xiaoming/图片/v2-c4a14410a05ed4ddede728e6d467effc_r.jpg"</span>).getChannel();<br>		<span class="hljs-comment">//创建一个输出文件的通道</span><br>		FileChannel out = <span class="hljs-keyword">new</span> FileOutputStream(<span class="hljs-string">"/home/xiaoming/音乐/background.jpg"</span>).getChannel();<br>		<br>		ByteBuffer buf = ByteBuffer.allocate(<span class="hljs-number">1024</span>);<br>		<span class="hljs-keyword">while</span>(in.read(buf)!=-<span class="hljs-number">1</span>) &#123;<br>			buf.flip();<br>			out.write(buf);<br>			buf.clear();<br>		&#125;<br>		in.close();<br>		out.close();<br>		System.out.println(<span class="hljs-string">"copy success"</span>);<br>	&#125;<br>	<br>	<span class="hljs-comment">//印射方式</span><br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">randomAccessFileCopy</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>		RandomAccessFile in = <span class="hljs-keyword">new</span> RandomAccessFile(<span class="hljs-string">"/home/xiaoming/图片/v2-c4a14410a05ed4ddede728e6d467effc_r.jpg"</span>,<span class="hljs-string">"r"</span>);<br>		RandomAccessFile out = <span class="hljs-keyword">new</span> RandomAccessFile(<span class="hljs-string">"/home/xiaoming/音乐/background1.jpg"</span>, <span class="hljs-string">"rw"</span>);<br>		<br>		FileChannel fcIn = in.getChannel();<br>		FileChannel fcOut = out.getChannel();<br>		<br>		<span class="hljs-keyword">long</span> size = fcIn.size();<span class="hljs-comment">//输入流的字节大小</span><br>		<span class="hljs-comment">//输入流的缓冲区</span><br>		MappedByteBuffer inBuf = fcIn.map(MapMode.READ_ONLY, <span class="hljs-number">0</span>, size);<br>		<span class="hljs-comment">//输出流的缓冲区</span><br>		MappedByteBuffer outBuf = fcOut.map(MapMode.READ_WRITE, <span class="hljs-number">0</span>, size);<br>		<br>		<span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>;i&lt;size;i++) &#123;<br>			outBuf.put(inBuf.get());<br>		&#125;<br>		fcIn.close();<br>		fcOut.close();<br>		in.close();<br>		out.close();<br>		System.out.println(<span class="hljs-string">"copy success"</span>);<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<p>IO操作的性能比较:</p>
+<p>import java.nio.ByteBuffer;</p>
+<p>public class NIODemo {</p>
+<pre><code>public static void main(String[] args) {
+    //创建一个字节缓冲区,申请内存空间为8字节,参数为申请的内存空间
+    ByteBuffer buf = ByteBuffer.allocate(8);
+
+    //查看其内部属性值
+    System.out.println(&quot;position=&quot;+buf.position());
+    System.out.println(&quot;limit=&quot;+buf.limit());
+    System.out.println(&quot;capacity=&quot;+buf.capacity());
+
+    //向缓冲区写入数据
+    buf.put((byte)10);
+    buf.put((byte)20);
+    buf.put((byte)30);
+    buf.put((byte)40);
+
+    System.out.println(&quot;position=&quot;+buf.position());
+    System.out.println(&quot;limit=&quot;+buf.limit());
+    System.out.println(&quot;capacity=&quot;+buf.capacity());
+
+    //缓冲区反转(把limit设置为position的值,并把positon置零),在取值前使用
+    buf.flip();
+    System.out.println(&quot;position=&quot;+buf.position());
+    System.out.println(&quot;limit=&quot;+buf.limit());
+    System.out.println(&quot;capacity=&quot;+buf.capacity());
+
+    //取值
+    //判断当前位置与限制元素之间是否有元素
+    if(buf.hasRemaining()) {
+        //返回当前位置与限制之间的元素数
+        for(int i=0;i&lt;buf.remaining();i++) {
+            byte b = buf.get(i);//取值
+            System.out.println(b);
+        }
+    }        
+}</code></pre><p>}</p>
+<pre><code>## 通道:Channel  
+
+数据通过通道进出缓冲区,Channel是一个类
+```java
+/**
+ * 文件复制实例
+ */
+package nio;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
+
+public class CopyFileDemo {
+
+    public static void main(String[] args) {
+        try {
+            copyFile();
+            randomAccessFileCopy();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    //NIO方式
+    private static void copyFile() throws IOException {
+        //创建一个输入文件的通道
+        FileChannel in = new FileInputStream(&quot;/home/xiaoming/图片/v2-c4a14410a05ed4ddede728e6d467effc_r.jpg&quot;).getChannel();
+        //创建一个输出文件的通道
+        FileChannel out = new FileOutputStream(&quot;/home/xiaoming/音乐/background.jpg&quot;).getChannel();
+
+        ByteBuffer buf = ByteBuffer.allocate(1024);
+        while(in.read(buf)!=-1) {
+            buf.flip();
+            out.write(buf);
+            buf.clear();
+        }
+        in.close();
+        out.close();
+        System.out.println(&quot;copy success&quot;);
+    }
+
+    //印射方式
+    private static void randomAccessFileCopy() throws IOException {
+        RandomAccessFile in = new RandomAccessFile(&quot;/home/xiaoming/图片/v2-c4a14410a05ed4ddede728e6d467effc_r.jpg&quot;,&quot;r&quot;);
+        RandomAccessFile out = new RandomAccessFile(&quot;/home/xiaoming/音乐/background1.jpg&quot;, &quot;rw&quot;);
+
+        FileChannel fcIn = in.getChannel();
+        FileChannel fcOut = out.getChannel();
+
+        long size = fcIn.size();//输入流的字节大小
+        //输入流的缓冲区
+        MappedByteBuffer inBuf = fcIn.map(MapMode.READ_ONLY, 0, size);
+        //输出流的缓冲区
+        MappedByteBuffer outBuf = fcOut.map(MapMode.READ_WRITE, 0, size);
+
+        for(int i=0;i&lt;size;i++) {
+            outBuf.put(inBuf.get());
+        }
+        fcIn.close();
+        fcOut.close();
+        in.close();
+        out.close();
+        System.out.println(&quot;copy success&quot;);
+    }
+}
+</code></pre><p>IO操作的性能比较:</p>
 <ol>
 <li>内存印射最快</li>
 <li>NIO读写</li>
@@ -296,346 +1356,319 @@
 <li>普通无缓存IO<h1 id="Path接口"><a href="#Path接口" class="headerlink" title="Path接口"></a>Path接口</h1></li>
 </ol>
 <p>Path表示一个目录名,表示具体路径</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> nio;<br><br><span class="hljs-keyword">import</span> java.io.File;<br><span class="hljs-keyword">import</span> java.io.IOException;<br><span class="hljs-keyword">import</span> java.nio.file.FileSystems;<br><span class="hljs-keyword">import</span> java.nio.file.Files;<br><span class="hljs-keyword">import</span> java.nio.file.Path;<br><span class="hljs-keyword">import</span> java.nio.file.Paths;<br><span class="hljs-keyword">import</span> java.nio.file.StandardCopyOption;<br><span class="hljs-keyword">import</span> java.nio.file.StandardOpenOption;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PathFileDemo</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		File file = <span class="hljs-keyword">new</span> File(<span class="hljs-string">"/home/xiaoming/音乐/background.jpg"</span>);<br>		<br>		<span class="hljs-comment">//path,通过这种方式获取文件</span><br>		Path p1 = Paths.get(<span class="hljs-string">"/home/xiaoming/音乐"</span>,<span class="hljs-string">"background.jpg"</span>);<br>		System.out.println(p1);<br>		<br>		Path p2 = file.toPath();<br>		System.out.println(p2);<br>		<br>		<span class="hljs-comment">//toPath方法的具体实现方法</span><br>		Path p3 = FileSystems.getDefault().getPath(<span class="hljs-string">"/home/xiaoming/音乐"</span>,<span class="hljs-string">"background.jpg"</span>);<br>		<br>		<span class="hljs-comment">//Files工具类</span><br>		Path p4 = Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/工具类.text"</span>);<br>		String info = <span class="hljs-string">"一闪一闪亮晶晶"</span>;<br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.write(p4, info.getBytes(<span class="hljs-string">"gb2312"</span>), StandardOpenOption.CREATE_NEW);<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-keyword">try</span> &#123;<br>			<span class="hljs-keyword">byte</span>[] bytes = Files.readAllBytes(p4);<br>			System.out.println(<span class="hljs-keyword">new</span> String(bytes));<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//复制(第三个参数可选)</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.copy(p3, Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/background2.jpg"</span>),StandardCopyOption.REPLACE_EXISTING);<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//移动文件</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.move(p3, Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/background2.jpg"</span>),StandardCopyOption.REPLACE_EXISTING);<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//删除文件</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.delete(p3);<br>			Files.deleteIfExists(p3);<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//创建目录文件</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.createDirectory(Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/abc"</span>));<span class="hljs-comment">//除了最后的一个部件,其他的必须是已存在的</span><br>			Files.createDirectories(Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/abc"</span>));<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//创建文件</span><br>		<span class="hljs-keyword">try</span> &#123;<br>			Files.createFile(Paths.get(<span class="hljs-string">"/home/xiaoming/音乐/abc.txt"</span>));<br>		&#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>			<span class="hljs-comment">// TODO Auto-generated catch block</span><br>			e.printStackTrace();<br>		&#125;<br>		<br>		<span class="hljs-comment">//添加前后缀创建临时文件或临时目录</span><br>		<span class="hljs-comment">//Path newPath = Files.createTempFile(prefix, suffix, attrs);</span><br>		<span class="hljs-comment">//Path newPath = Files.createTempDirectory(dir, prefix);</span><br><br>	&#125;<br>	<br>&#125;<br></code></pre></div></td></tr></table></figure>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/02/10/Java%E9%9B%86%E5%90%88/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Java集合</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/01/11/java%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
-                        <span class="hidden-mobile">java数据结构</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
-  
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
-    </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
-  </div>
-
-
-  
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
+<pre><code class="java">package nio;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
+
+public class PathFileDemo {
+
+    public static void main(String[] args) {
+        File file = new File(&quot;/home/xiaoming/音乐/background.jpg&quot;);
+
+        //path,通过这种方式获取文件
+        Path p1 = Paths.get(&quot;/home/xiaoming/音乐&quot;,&quot;background.jpg&quot;);
+        System.out.println(p1);
+
+        Path p2 = file.toPath();
+        System.out.println(p2);
+
+        //toPath方法的具体实现方法
+        Path p3 = FileSystems.getDefault().getPath(&quot;/home/xiaoming/音乐&quot;,&quot;background.jpg&quot;);
+
+        //Files工具类
+        Path p4 = Paths.get(&quot;/home/xiaoming/音乐/工具类.text&quot;);
+        String info = &quot;一闪一闪亮晶晶&quot;;
+        try {
+            Files.write(p4, info.getBytes(&quot;gb2312&quot;), StandardOpenOption.CREATE_NEW);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+        try {
+            byte[] bytes = Files.readAllBytes(p4);
+            System.out.println(new String(bytes));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //复制(第三个参数可选)
+        try {
+            Files.copy(p3, Paths.get(&quot;/home/xiaoming/音乐/background2.jpg&quot;),StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //移动文件
+        try {
+            Files.move(p3, Paths.get(&quot;/home/xiaoming/音乐/background2.jpg&quot;),StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //删除文件
+        try {
+            Files.delete(p3);
+            Files.deleteIfExists(p3);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //创建目录文件
+        try {
+            Files.createDirectory(Paths.get(&quot;/home/xiaoming/音乐/abc&quot;));//除了最后的一个部件,其他的必须是已存在的
+            Files.createDirectories(Paths.get(&quot;/home/xiaoming/音乐/abc&quot;));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //创建文件
+        try {
+            Files.createFile(Paths.get(&quot;/home/xiaoming/音乐/abc.txt&quot;));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //添加前后缀创建临时文件或临时目录
+        //Path newPath = Files.createTempFile(prefix, suffix, attrs);
+        //Path newPath = Files.createTempDirectory(dir, prefix);
+
+    }
+
+}
+</code></pre>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/01/11/java%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="prev" title="java数据结构">
+      <i class="fa fa-chevron-left"></i> java数据结构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/02/10/Java%E9%9B%86%E5%90%88/" rel="next" title="Java集合">
+      Java集合 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#File类"><span class="nav-number">1.</span> <span class="nav-text">File类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字节输出-输入流"><span class="nav-number">2.</span> <span class="nav-text">字节输出,输入流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符输出-输入流"><span class="nav-number">3.</span> <span class="nav-text">字符输出,输入流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字节字符转换流"><span class="nav-number">4.</span> <span class="nav-text">字节字符转换流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字节字符缓冲流"><span class="nav-number">5.</span> <span class="nav-text">字节字符缓冲流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#打印流"><span class="nav-number">6.</span> <span class="nav-text">打印流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象流和序列化"><span class="nav-number">7.</span> <span class="nav-text">对象流和序列化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#数据流"><span class="nav-number">8.</span> <span class="nav-text">数据流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件分割与合并"><span class="nav-number">9.</span> <span class="nav-text">文件分割与合并</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#字符串流"><span class="nav-number">10.</span> <span class="nav-text">字符串流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RandomAccessFile"><span class="nav-number">11.</span> <span class="nav-text">RandomAccessFile</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Properties文件操作类"><span class="nav-number">12.</span> <span class="nav-text">Properties文件操作类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件压缩和解压缩"><span class="nav-number">13.</span> <span class="nav-text">文件压缩和解压缩</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#New-IO-NIO"><span class="nav-number">14.</span> <span class="nav-text">New IO(NIO)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#缓冲区"><span class="nav-number">14.1.</span> <span class="nav-text">缓冲区</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Path接口"><span class="nav-number">15.</span> <span class="nav-text">Path接口</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
 </body>
 </html>

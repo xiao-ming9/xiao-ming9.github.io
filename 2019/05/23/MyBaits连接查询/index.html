@@ -1,274 +1,356 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="一对一在类中添加需要关联实体类的一个类属性 public class Blogs implements Serializable {     private Integer id;      private String title;      &#x2F;&#x2F;private Integer authorId;      private Authors authors;      private Byte f">
+<meta name="keywords" content="java,mybatis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis连接查询">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;05&#x2F;23&#x2F;MyBaits%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="一对一在类中添加需要关联实体类的一个类属性 public class Blogs implements Serializable {     private Integer id;      private String title;      &#x2F;&#x2F;private Integer authorId;      private Authors authors;      private Byte f">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:40:07.809Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/05/23/MyBaits%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>MyBatis连接查询 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="一对一在类中添加需要关联实体类的一个类属性
-123456789101112public class Blogs implements Serializable &amp;#123;    private Integer id;    private String title;    //private Integer authorId;    private Authors authors;    pri">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>MyBatis连接查询 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="MyBatis连接查询">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/23/MyBaits%E8%BF%9E%E6%8E%A5%E6%9F%A5%E8%AF%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MyBatis连接查询
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-23 15:17:57" itemprop="dateCreated datePublished" datetime="2019-05-23T15:17:57+08:00">2019-05-23</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-05-23 15:17" pubdate>
-        2019年5月23日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      1.1k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      17
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:40:07" itemprop="dateModified" datetime="2020-12-01T18:40:07+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>5.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>5 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">MyBatis连接查询</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h1><p>在类中添加需要关联实体类的一个类属性</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Blogs</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> Integer id;<br><br>    <span class="hljs-keyword">private</span> String title;<br><br>    <span class="hljs-comment">//private Integer authorId;</span><br><br>    <span class="hljs-keyword">private</span> Authors authors;<br><br>    <span class="hljs-keyword">private</span> Byte featured;<br><br>    <span class="hljs-keyword">private</span> String style;<br></code></pre></div></td></tr></table></figure>
+      
+        <h1 id="一对一"><a href="#一对一" class="headerlink" title="一对一"></a>一对一</h1><p>在类中添加需要关联实体类的一个类属性</p>
+<pre><code class="java">public class Blogs implements Serializable {
+    private Integer id;
+
+    private String title;
+
+    //private Integer authorId;
+
+    private Authors authors;
+
+    private Byte featured;
+
+    private String style;</code></pre>
 <a id="more"></a>
 <p>xml配置方案：<br>在需要进行关联查询的mapper中配置<code>association</code>节点</p>
 <ul>
-<li>property：对应该实体类关联另一个实体类的变量名</li>
-<li>column：对应表的字段名</li>
-<li>javaType：对应关联的实体类</li>
-<li>select：指定子查询（注意要加入名称空间）<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">resultMap</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"BaseResultMap"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"com.xm.pojo.Blogs"</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"id"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"INTEGER"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"id"</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"title"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"VARCHAR"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"title"</span> /&gt;</span><br><span class="hljs-comment">&lt;!--    &lt;result column="author_id" jdbcType="INTEGER" property="authorId" /&gt;--&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"featured"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"TINYINT"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"featured"</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"style"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"VARCHAR"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"style"</span> /&gt;</span><br><br>    <span class="hljs-tag">&lt;<span class="hljs-name">association</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"authors"</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_id"</span> <span class="hljs-attr">javaType</span>=<span class="hljs-string">"Authors"</span> <span class="hljs-attr">select</span>=<span class="hljs-string">"com.xm.dao.AuthorsMapper.selectByPrimaryKey"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">association</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">resultMap</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<li><p>property：对应该实体类关联另一个实体类的变量名</p>
+</li>
+<li><p>column：对应表的字段名</p>
+</li>
+<li><p>javaType：对应关联的实体类</p>
+</li>
+<li><p>select：指定子查询（注意要加入名称空间）</p>
+<pre><code class="xml">&lt;resultMap id=&quot;BaseResultMap&quot; type=&quot;com.xm.pojo.Blogs&quot;&gt;
+  &lt;id column=&quot;id&quot; jdbcType=&quot;INTEGER&quot; property=&quot;id&quot; /&gt;
+  &lt;result column=&quot;title&quot; jdbcType=&quot;VARCHAR&quot; property=&quot;title&quot; /&gt;
+&lt;!--    &lt;result column=&quot;author_id&quot; jdbcType=&quot;INTEGER&quot; property=&quot;authorId&quot; /&gt;--&gt;
+  &lt;result column=&quot;featured&quot; jdbcType=&quot;TINYINT&quot; property=&quot;featured&quot; /&gt;
+  &lt;result column=&quot;style&quot; jdbcType=&quot;VARCHAR&quot; property=&quot;style&quot; /&gt;
 
+  &lt;association property=&quot;authors&quot; column=&quot;author_id&quot; javaType=&quot;Authors&quot; select=&quot;com.xm.dao.AuthorsMapper.selectByPrimaryKey&quot;&gt;&lt;/association&gt;
+&lt;/resultMap&gt;</code></pre>
 </li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">test</span><span class="hljs-params">()</span></span>&#123;<br>    SqlSession session = MyBatisUtil.sqlSession();<br>    BlogsMapper mapper = session.getMapper(BlogsMapper<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>    Blogs blogs = mapper.selectByPrimaryKey(<span class="hljs-number">1</span>);<br>    session.commit();<br>    session.close();<br>    System.out.println(blogs);<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="java">@Test
+public void test(){
+    SqlSession session = MyBatisUtil.sqlSession();
+    BlogsMapper mapper = session.getMapper(BlogsMapper.class);
+    Blogs blogs = mapper.selectByPrimaryKey(1);
+    session.commit();
+    session.close();
+    System.out.println(blogs);
+}</code></pre>
 <blockquote>
 <p>如果是批量查询，关联查询时，如果所查是同一个id，会把所关联直接从一级缓存中获取  </p>
 </blockquote>
 <h1 id="一对多"><a href="#一对多" class="headerlink" title="一对多"></a>一对多</h1><p>首先在主表中要有一个列表属性用于存放多个数据</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Posts</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> List&lt;Comments&gt; commentsList;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="java">public class Posts {
+    private List&lt;Comments&gt; commentsList;
+}</code></pre>
 <p>配置文件：<br>在mapper文件中使用<code>collection</code>节点</p>
 <ul>
-<li>property：对应表中的commentsList</li>
-<li>column：当前表与外表关联的键（一般是id）</li>
-<li>javaType：对应property的类型</li>
-<li>ofType：对应外表的实体类<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">resultMap</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"BaseResultMap"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"com.xm.pojo.Posts"</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">id</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"id"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"INTEGER"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"id"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_id"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"INTEGER"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"blogId"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_id"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"INTEGER"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"authorId"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"create_on"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"TIMESTAMP"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"createOn"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"section"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"VARCHAR"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"section"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"subject"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"VARCHAR"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"subject"</span> /&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"visit"</span> <span class="hljs-attr">jdbcType</span>=<span class="hljs-string">"INTEGER"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"visit"</span> /&gt;</span><br><br>  <span class="hljs-tag">&lt;<span class="hljs-name">collection</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"commentsList"</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"id"</span> <span class="hljs-attr">javaType</span>=<span class="hljs-string">"ArrayList"</span> <span class="hljs-attr">ofType</span>=<span class="hljs-string">"Comments"</span><br>              <span class="hljs-attr">select</span>=<span class="hljs-string">"com.xm.dao.CommentsMapper.selectCommentsByPostId"</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">resultMap</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-meta">@Test</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">testSelectPostByPrimaryKey</span><span class="hljs-params">()</span></span>&#123;<br>    SqlSession session = MyBatisUtil.sqlSession();<br><br>    PostsMapper mapper = session.getMapper(PostsMapper<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>;<br>    PostsWithBLOBs posts = mapper.selectByPrimaryKey(<span class="hljs-number">1</span>);<br>    System.out.println(posts);<br>    session.close();<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<li><p>property：对应表中的commentsList</p>
+</li>
+<li><p>column：当前表与外表关联的键（一般是id）</p>
+</li>
+<li><p>javaType：对应property的类型</p>
+</li>
+<li><p>ofType：对应外表的实体类</p>
+<pre><code class="xml">&lt;resultMap id=&quot;BaseResultMap&quot; type=&quot;com.xm.pojo.Posts&quot;&gt;
+&lt;id column=&quot;id&quot; jdbcType=&quot;INTEGER&quot; property=&quot;id&quot; /&gt;
+&lt;result column=&quot;blog_id&quot; jdbcType=&quot;INTEGER&quot; property=&quot;blogId&quot; /&gt;
+&lt;result column=&quot;author_id&quot; jdbcType=&quot;INTEGER&quot; property=&quot;authorId&quot; /&gt;
+&lt;result column=&quot;create_on&quot; jdbcType=&quot;TIMESTAMP&quot; property=&quot;createOn&quot; /&gt;
+&lt;result column=&quot;section&quot; jdbcType=&quot;VARCHAR&quot; property=&quot;section&quot; /&gt;
+&lt;result column=&quot;subject&quot; jdbcType=&quot;VARCHAR&quot; property=&quot;subject&quot; /&gt;
+&lt;result column=&quot;visit&quot; jdbcType=&quot;INTEGER&quot; property=&quot;visit&quot; /&gt;
 
+&lt;collection property=&quot;commentsList&quot; column=&quot;id&quot; javaType=&quot;ArrayList&quot; ofType=&quot;Comments&quot;
+            select=&quot;com.xm.dao.CommentsMapper.selectCommentsByPostId&quot;/&gt;
+&lt;/resultMap&gt;</code></pre>
+<pre><code class="java">@Test
+public void testSelectPostByPrimaryKey(){
+  SqlSession session = MyBatisUtil.sqlSession();
+
+  PostsMapper mapper = session.getMapper(PostsMapper.class);
+  PostsWithBLOBs posts = mapper.selectByPrimaryKey(1);
+  System.out.println(posts);
+  session.close();
+}</code></pre>
 </li>
 </ul>
 <blockquote>
@@ -277,15 +359,74 @@
 <h1 id="嵌套结果的查询"><a href="#嵌套结果的查询" class="headerlink" title="嵌套结果的查询"></a>嵌套结果的查询</h1><blockquote>
 <p>先执行关联查询，一次性将所有数据都查询出来，再将所有查询出来的列组织成嵌套的结果对象。效率高，但写起来相对比较繁琐  </p>
 </blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">resultMap</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"blogResultMapNested"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"Blogs"</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">id</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_id"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"id"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_title"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"title"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_style"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"style"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_featured"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"featured"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br><br> 	<span class="hljs-comment">&lt;!-- 在association中配置关联的表格 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">association</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"blog_author_id"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"authors"</span> <span class="hljs-attr">javaType</span>=<span class="hljs-string">"Authors"</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">id</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_id"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"id"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">id</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_username"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"username"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_password"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"password"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_email"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"email"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_bio"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"bio"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_nickname"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"nickname"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_favorite_section"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"favoriteSection"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">result</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"author_realname"</span> <span class="hljs-attr">property</span>=<span class="hljs-string">"realname"</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">result</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">association</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">resultMap</span>&gt;</span><br><br><span class="hljs-comment">&lt;!-- 使用如下查询方式 --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"selectBlogListNested"</span> <span class="hljs-attr">resultMap</span>=<span class="hljs-string">"blogResultMapNested"</span>&gt;</span><br>  select <br>  b.id as blog_id,<br>  b.title as blog_title,<br>  b.author_id as  blog_author_id,<br>  b.style as blog_style,<br>  b.featured as blog_featured,<br>  <br>  a.id as author_id,<br>  a.username as author_username,<br>  a.password as author_password,<br>  a.email as author_email,<br>  a.bio as author_bio,<br>  a.favorite_section as author_favorite_section,<br>  a.nickname as author_nickname,<br>  a.realname as author_realname<br>  <br>  from blogs b<br>  left join authors a <br>  on b.author_id = a.id;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="xml">&lt;resultMap id=&quot;blogResultMapNested&quot; type=&quot;Blogs&quot;&gt;
+  &lt;id column=&quot;blog_id&quot; property=&quot;id&quot;&gt;&lt;/id&gt;
+  &lt;result column=&quot;blog_title&quot; property=&quot;title&quot;&gt;&lt;/result&gt;
+  &lt;result column=&quot;blog_style&quot; property=&quot;style&quot;&gt;&lt;/result&gt;
+  &lt;result column=&quot;blog_featured&quot; property=&quot;featured&quot;&gt;&lt;/result&gt;
 
+     &lt;!-- 在association中配置关联的表格 --&gt;
+  &lt;association column=&quot;blog_author_id&quot; property=&quot;authors&quot; javaType=&quot;Authors&quot;&gt;
+    &lt;id column=&quot;author_id&quot; property=&quot;id&quot;&gt;&lt;/id&gt;
+    &lt;result column=&quot;author_username&quot; property=&quot;username&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_password&quot; property=&quot;password&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_email&quot; property=&quot;email&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_bio&quot; property=&quot;bio&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_nickname&quot; property=&quot;nickname&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_favorite_section&quot; property=&quot;favoriteSection&quot;&gt;&lt;/result&gt;
+    &lt;result column=&quot;author_realname&quot; property=&quot;realname&quot;&gt;&lt;/result&gt;
+  &lt;/association&gt;
+&lt;/resultMap&gt;
+
+&lt;!-- 使用如下查询方式 --&gt;
+&lt;select id=&quot;selectBlogListNested&quot; resultMap=&quot;blogResultMapNested&quot;&gt;
+  select 
+  b.id as blog_id,
+  b.title as blog_title,
+  b.author_id as  blog_author_id,
+  b.style as blog_style,
+  b.featured as blog_featured,
+
+  a.id as author_id,
+  a.username as author_username,
+  a.password as author_password,
+  a.email as author_email,
+  a.bio as author_bio,
+  a.favorite_section as author_favorite_section,
+  a.nickname as author_nickname,
+  a.realname as author_realname
+
+  from blogs b
+  left join authors a 
+  on b.author_id = a.id;
+&lt;/select&gt;</code></pre>
 <h1 id="构造方法映射"><a href="#构造方法映射" class="headerlink" title="构造方法映射"></a>构造方法映射</h1><p>在查询后会调用构造方法创建对象</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Blogs</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>&#123;<br><br>    <span class="hljs-keyword">private</span> Integer id;<br><br>    <span class="hljs-keyword">private</span> String title;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Blogs</span><span class="hljs-params">(Integer id, String title)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.id = id;<br>        <span class="hljs-keyword">this</span>.title = title;<br>        System.out.println(<span class="hljs-string">"调用了构造方法"</span>);<br>    &#125;<br></code></pre></div></td></tr></table></figure>
-<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">resultMap</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"blogResultMapConstructor"</span> <span class="hljs-attr">type</span>=<span class="hljs-string">"Blogs"</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">constructor</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">idArg</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"id"</span> <span class="hljs-attr">javaType</span>=<span class="hljs-string">"int"</span>/&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">arg</span> <span class="hljs-attr">column</span>=<span class="hljs-string">"title"</span> <span class="hljs-attr">javaType</span>=<span class="hljs-string">"string"</span>/&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">constructor</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">resultMap</span>&gt;</span><br><br><span class="hljs-tag">&lt;<span class="hljs-name">select</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"selectBlogByIdConstructor"</span> <span class="hljs-attr">parameterType</span>=<span class="hljs-string">"int"</span> <span class="hljs-attr">resultMap</span>=<span class="hljs-string">"blogResultMapConstructor"</span>&gt;</span><br>  select * from blogs where id = #&#123;id&#125;<br><span class="hljs-tag">&lt;/<span class="hljs-name">select</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">public class Blogs implements Serializable {
 
+    private Integer id;
+
+    private String title;
+
+    public Blogs(Integer id, String title) {
+        this.id = id;
+        this.title = title;
+        System.out.println(&quot;调用了构造方法&quot;);
+    }</code></pre>
+<pre><code class="xml">&lt;resultMap id=&quot;blogResultMapConstructor&quot; type=&quot;Blogs&quot;&gt;
+  &lt;constructor&gt;
+    &lt;idArg column=&quot;id&quot; javaType=&quot;int&quot;/&gt;
+    &lt;arg column=&quot;title&quot; javaType=&quot;string&quot;/&gt;
+  &lt;/constructor&gt;
+&lt;/resultMap&gt;
+
+&lt;select id=&quot;selectBlogByIdConstructor&quot; parameterType=&quot;int&quot; resultMap=&quot;blogResultMapConstructor&quot;&gt;
+  select * from blogs where id = #{id}
+&lt;/select&gt;</code></pre>
 <h1 id="延迟加载"><a href="#延迟加载" class="headerlink" title="延迟加载"></a>延迟加载</h1><p>如果没有在mybatis配置文件中配置延迟加载，则默认使用积极加载，只要进行查询，都会执行所关联表的查询</p>
 <p>启动延迟加载的配置：</p>
-<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">settings</span>&gt;</span><br>		<span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"lazyLoadingEnabled"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"true"</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">settings</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="xml">&lt;settings&gt;
+        &lt;setting name=&quot;lazyLoadingEnabled&quot; value=&quot;true&quot;/&gt;
+&lt;/settings&gt;</code></pre>
 <p>延迟加载分为<strong>积极延迟加载</strong>和<strong>非积极延迟加载</strong>，当开启积极延迟加载后，默认是积极</p>
 <blockquote>
 <p>积极延迟加载：只要获取任意属性内容，无论属性是否是关联表的内容，都会执行关联的表查询  </p>
@@ -293,231 +434,204 @@
 <blockquote>
 <p>非积极延迟加载：使用非延迟加载，只有当访问关联表数据时，才会执行关联表的查询。  </p>
 </blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">settings</span> &gt;</span><br>      <span class="hljs-tag">&lt;<span class="hljs-name">setting</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"aggressiveLazyLoading"</span> <span class="hljs-attr">value</span>=<span class="hljs-string">"false"</span>/&gt;</span><br> <span class="hljs-tag">&lt;/<span class="hljs-name">settings</span>&gt;</span><br></code></pre></div></td></tr></table></figure>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
-                      <a class="hover-with-bg" href="/tags/mybatis/">mybatis</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/05/29/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Java%E5%9F%BA%E7%A1%80/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">java基础</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/05/23/mybatis%E7%BC%93%E5%AD%98/">
-                        <span class="hidden-mobile">mybatis缓存</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
+<pre><code class="xml">&lt;settings &gt;
+      &lt;setting name=&quot;aggressiveLazyLoading&quot; value=&quot;false&quot;/&gt;
+ &lt;/settings&gt;</code></pre>
 
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+              <a href="/tags/mybatis/" rel="tag"># mybatis</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/05/23/mybatis%E7%BC%93%E5%AD%98/" rel="prev" title="mybatis缓存">
+      <i class="fa fa-chevron-left"></i> mybatis缓存
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/05/29/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Java%E5%9F%BA%E7%A1%80/" rel="next" title="java基础">
+      java基础 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一对一"><span class="nav-number">1.</span> <span class="nav-text">一对一</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一对多"><span class="nav-number">2.</span> <span class="nav-text">一对多</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#嵌套结果的查询"><span class="nav-number">3.</span> <span class="nav-text">嵌套结果的查询</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#构造方法映射"><span class="nav-number">4.</span> <span class="nav-text">构造方法映射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#延迟加载"><span class="nav-number">5.</span> <span class="nav-text">延迟加载</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -525,41 +639,9 @@
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -573,68 +655,10 @@
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

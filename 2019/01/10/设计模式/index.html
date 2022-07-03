@@ -1,270 +1,828 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="单例设计模式只能有一个对象实例，通过私有化构造方法，并在类里创建一个静态对象实现,常用于工具类，节省重复创建对象，提高效率  通过构造方法私有化+静态方法 代替单例设计模式模式：占用内存多">
+<meta name="keywords" content="java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;01&#x2F;10&#x2F;%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="单例设计模式只能有一个对象实例，通过私有化构造方法，并在类里创建一个静态对象实现,常用于工具类，节省重复创建对象，提高效率  通过构造方法私有化+静态方法 代替单例设计模式模式：占用内存多">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-12-01T10:35:21.018Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2019/01/10/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>设计模式 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="单例设计模式只能有一个对象实例，通过私有化构造方法，并在类里创建一个静态对象实现,常用于工具类，节省重复创建对象，提高效率
-
-通过构造方法私有化+静态方法 代替单例设计模式模式：占用内存多
-">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>设计模式 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="设计模式">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/10/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          设计模式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-01-10 14:54:37" itemprop="dateCreated datePublished" datetime="2019-01-10T14:54:37+08:00">2019-01-10</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-01-10 14:54" pubdate>
-        2019年1月10日 下午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      3.6k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      59
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:35:21" itemprop="dateModified" datetime="2020-12-01T18:35:21+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>16k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">设计模式</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="单例设计模式"><a href="#单例设计模式" class="headerlink" title="单例设计模式"></a>单例设计模式</h1><p>只能有一个对象实例，通过私有化构造方法，并在类里创建一个静态对象实现,常用于工具类，节省重复创建对象，提高效率</p>
+      
+        <h1 id="单例设计模式"><a href="#单例设计模式" class="headerlink" title="单例设计模式"></a>单例设计模式</h1><p>只能有一个对象实例，通过私有化构造方法，并在类里创建一个静态对象实现,常用于工具类，节省重复创建对象，提高效率</p>
 <blockquote>
 <p>通过构造方法私有化+静态方法 代替单例设计模式模式：占用内存多</p>
 </blockquote>
 <a id="more"></a>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">//单例设计模式</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test3</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span></span>&#123;<br>        Singleton1 s1 = Singleton1.getInstance();<br>        Singleton2 s2 = Singleton2.getInstance();<br>        s1.print();<br>        s2.print();<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//懒汉式</span><br><span class="hljs-comment">//占用内存时间短，但效率较低（延迟加载）</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton1</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton1</span><span class="hljs-params">()</span></span>&#123;&#125;;<span class="hljs-comment">//私有化构造方法，外部无法创建对象</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton1 s1;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton1 <span class="hljs-title">getInstance</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(s1 == <span class="hljs-keyword">null</span>)&#123;<br>            s1 = <span class="hljs-keyword">new</span> Singleton1();<br>        &#125;<br>        <span class="hljs-keyword">return</span> s1;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"懒汉式测试方法"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//饿汉式</span><br><span class="hljs-comment">//占用内存时间长，但效率高</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton2</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton2</span><span class="hljs-params">()</span></span>&#123;&#125;;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Singleton2 s2 = <span class="hljs-keyword">new</span> Singleton2();<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton2 <span class="hljs-title">getInstance</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">return</span> s2;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">print</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"饿汉式测试方法"</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="单例设计模式优化"><a href="#单例设计模式优化" class="headerlink" title="单例设计模式优化"></a>单例设计模式优化</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">//1.实现Serializable接口，允许序列化，方便还原单例状态</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> volidate <span class="hljs-keyword">static</span> Singleton singleton = <span class="hljs-keyword">null</span>;<span class="hljs-comment">//使用volidate标记，每次取值从地址中取值，确保数据一致</span><br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(singleton != <span class="hljs-keyword">null</span>)&#123;<br>            <span class="hljs-comment">//防止反射调用私有化构造方法</span><br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> RuntimeException(<span class="hljs-string">"此类对象为单例模式，已经被实例化"</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton <span class="hljs-title">getSingleton</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>)&#123;<br>            <span class="hljs-comment">//多线程访问安全，使用两次判断，防止第一次判断完就中断，没有加锁</span><br>            <span class="hljs-keyword">synchronized</span> (Singleton<span class="hljs-class">.<span class="hljs-keyword">class</span>)</span>&#123;<br>                <span class="hljs-keyword">if</span>(singleton == <span class="hljs-keyword">null</span>)&#123;<br>                    singleton = <span class="hljs-keyword">new</span> Singleton();<br>                &#125;<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="模板方法设计模式"><a href="#模板方法设计模式" class="headerlink" title="模板方法设计模式"></a>模板方法设计模式</h1><p>定义一个操作中的算法骨架，而将一些可变部分的实现延迟到子类中，模板方法使得子类可以不改变一个算法的结构即可重新定义该算法的某些步骤</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test8</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        UserManager us = <span class="hljs-keyword">new</span> UserManager();<br>        us.action(<span class="hljs-string">"admin"</span>,<span class="hljs-string">"add"</span>);<br>        us.action(<span class="hljs-string">"test"</span>,<span class="hljs-string">"del"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseManager</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">action</span><span class="hljs-params">(String name,String method)</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(<span class="hljs-string">"admin"</span>.equals(name))&#123;<br>            excute(method);<br>        &#125;<span class="hljs-keyword">else</span>&#123;<br>            System.out.println(<span class="hljs-string">"需要管理员权限"</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title">excute</span><span class="hljs-params">(String method)</span></span>;<br>&#125;<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserManager</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">BaseManager</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">excute</span><span class="hljs-params">(String method)</span></span>&#123;<br>        <span class="hljs-comment">//只实现具体的操作方法，验证层面在父类抽象类中</span><br>        <span class="hljs-keyword">if</span>(<span class="hljs-string">"add"</span>.equals(method))&#123;<br>            System.out.println(<span class="hljs-string">"执行了添加操作"</span>);<br>        &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-string">"del"</span>.equals(method))&#123;<br>            System.out.println(<span class="hljs-string">"执行了删除操作"</span>);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h1><p>定义一系列算法，将每一种算法封装起来并可以相互替换使用，策略模式让算法独立于使用它的客户应用而独立变化</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test9</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        BaseService bs = <span class="hljs-keyword">new</span> UserService();<br>        bs.setISave(<span class="hljs-keyword">new</span> NetSave());<span class="hljs-comment">//类实现借口，任然可以认为类型属于该接口</span><br>        bs.add(<span class="hljs-string">"user"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//定义一个接口</span><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">ISave</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">save</span><span class="hljs-params">(String data)</span></span>;<br>&#125;<br><br><span class="hljs-comment">//对于不同的需求有不同的策略去实现</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FileSava</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ISave</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">save</span><span class="hljs-params">(String data)</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"把数据存到文件中"</span>+data);<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">NetSave</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ISave</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">save</span><span class="hljs-params">(String data)</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"把数据存到网络上"</span>+data);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//定义一个抽象类用于不同的对象统一通过此处调用不同方法</span><br><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BaseService</span></span>&#123;<br>    <span class="hljs-keyword">private</span> ISave iSave;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setISave</span><span class="hljs-params">(ISave iSave)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.iSave = iSave;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(String data)</span></span>&#123;<br>        iSave.save(data);<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserService</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">BaseService</span></span>&#123;<br><br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="简单工厂模式"><a href="#简单工厂模式" class="headerlink" title="简单工厂模式"></a>简单工厂模式</h1><p>由一个工厂对象决定创建出哪一种产品类的实例</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test10</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span></span>&#123;<br>        <span class="hljs-comment">//使用工厂模式降低耦合度，方便后期修改</span><br>        Product phone = ProductFactory.getProduct(<span class="hljs-string">"phone"</span>);<br>        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">null</span>!=phone)&#123;<br>            phone.work();<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProductFactory</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Product <span class="hljs-title">getProduct</span><span class="hljs-params">(String name)</span></span>&#123;<br>        <span class="hljs-keyword">if</span>(<span class="hljs-string">"phone"</span>.equals(name))&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Phone();<br>        &#125;<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-string">"computer"</span>.equals(name))&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> Computer();<br>        &#125;<span class="hljs-keyword">else</span>&#123;<br>            <span class="hljs-keyword">return</span>  <span class="hljs-keyword">null</span>;<br>        &#125;<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Product</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">work</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Phone</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Product</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">work</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"Phone is working..."</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Computer</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Product</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">work</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"Computer is working..."</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="静态代理模式"><a href="#静态代理模式" class="headerlink" title="静态代理模式"></a>静态代理模式</h1><p>为其他对象提供一种代理以控制对这个对象的访问，在访问对象时引入一定程度的间接性，以附加多种用途</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test11</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span></span>&#123;<br>        IAction user = <span class="hljs-keyword">new</span> UserAction();<br>        ActionProxy proxy = <span class="hljs-keyword">new</span> ActionProxy(user);<br>        proxy.doAction();<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//代理</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ActionProxy</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">IAction</span></span>&#123;<br>    <span class="hljs-keyword">private</span> IAction target;<span class="hljs-comment">//被代理的对象</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ActionProxy</span><span class="hljs-params">(IAction target)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.target = target;<br>    &#125;<br>    <span class="hljs-comment">//执行操作</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doAction</span><span class="hljs-params">()</span></span>&#123;<br>        <span class="hljs-keyword">long</span> startTime = System.currentTimeMillis();<br>        target.doAction();<span class="hljs-comment">//执行真正的业务</span><br>        System.out.println(<span class="hljs-string">"当前时间为："</span>+startTime);<br>    &#125;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">IAction</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doAction</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserAction</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">IAction</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">doAction</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"开始工作了。。。"</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="动态代理模式"><a href="#动态代理模式" class="headerlink" title="动态代理模式"></a>动态代理模式</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**<br> * 接口<br> */</span><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Subject</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">shopping</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Subject</span></span>&#123;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">shopping</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">"付款，买到心心念念的MacBook"</span>);<br>    &#125;<br>&#125;<br><span class="hljs-keyword">import</span> java.lang.reflect.InvocationHandler;<br><span class="hljs-keyword">import</span> java.lang.reflect.Method;<br><span class="hljs-keyword">import</span> java.lang.reflect.Proxy;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CreateProxy</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">InvocationHandler</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> Object target;<span class="hljs-comment">//被代理的对象</span><br><br>    <span class="hljs-comment">//用于创建代理对象的方法</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">create</span><span class="hljs-params">(Object target)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.target = target;<br>        Object proxy = (Object) Proxy.newProxyInstance(target.getClass().getClassLoader(),<br>                target.getClass().getInterfaces(),<span class="hljs-keyword">this</span>);<br>        <span class="hljs-keyword">return</span> proxy;<br>    &#125;<br><br>    <span class="hljs-comment">/**<br>     *<br>     * <span class="hljs-doctag">@param</span> proxy 代理类对象<br>     * <span class="hljs-doctag">@param</span> method 被代理对象的方法<br>     * <span class="hljs-doctag">@param</span> args 方法的参数<br>     * <span class="hljs-doctag">@return</span><br>     * <span class="hljs-doctag">@throws</span> Throwable<br>     */</span><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">invoke</span><span class="hljs-params">(Object proxy, Method method, Object[] args)</span> <span class="hljs-keyword">throws</span> Throwable </span>&#123;<br>        System.out.println(<span class="hljs-string">"接项目做赚钱"</span>);<br>        System.out.println(<span class="hljs-string">"上网上买"</span>);<br>        method.invoke(target,args);<br>        System.out.println(<span class="hljs-string">"梦想成真"</span>);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br>&#125;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ProxyTest</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        CreateProxy cp = <span class="hljs-keyword">new</span> CreateProxy();<br>        Subject person = <span class="hljs-keyword">new</span> Person();<br>        Subject proxy  = (Subject) cp.create(person);<br>        proxy.shopping();<span class="hljs-comment">//会调用invoke方法</span><br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><p>将一个类的接口转换成客户希望的另一个接口，用于使原来由于接口不兼容而不能一起工作的那些类可以一起工作</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test12</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span></span>&#123;<br>        <br>        Animal dog = <span class="hljs-keyword">new</span> Dog();<br>        dog.run();<br><br>        PowerA powerA = <span class="hljs-keyword">new</span> PowerAImpl();<br>        PowerB powerB = <span class="hljs-keyword">new</span> PowerBImpl();<br>        Adapter adapter = <span class="hljs-keyword">new</span> Adapter(powerB);<br>        work(powerA);<br>        <span class="hljs-comment">//work(powerB);若这样传则报错</span><br>        work(adapter);<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">work</span><span class="hljs-params">(PowerA a)</span></span>&#123;<br>        a.insert();<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/*第一种适配器*/</span><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Animal</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sing</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">cry</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">swim</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-comment">//适配器，当只需要实现一个方法的时候，避免子类多次重复空实现</span><br><span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AnimalFunction</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Animal</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">sing</span><span class="hljs-params">()</span></span>&#123;&#125;;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">cry</span><span class="hljs-params">()</span></span>&#123;&#125;;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span></span>&#123;&#125;;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">swim</span><span class="hljs-params">()</span></span>&#123;&#125;;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Dog</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AnimalFunction</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">run</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"the dog is running"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">/*第二种适配器*/</span><br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">PowerA</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">insert</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PowerAImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PowerA</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">insert</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"电源A开始工作"</span>);<br>    &#125;<br>&#125;<br><span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">PowerB</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">insert</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Adapter</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PowerA</span></span>&#123;<br>    <span class="hljs-keyword">private</span> PowerB powerB;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Adapter</span><span class="hljs-params">(PowerB powerB)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.powerB = powerB;<br>    &#125;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">insert</span><span class="hljs-params">()</span></span>&#123;<br>        powerB.insert();<br>    &#125;<br>&#125;<br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PowerBImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PowerB</span></span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">insert</span><span class="hljs-params">()</span></span>&#123;<br>        System.out.println(<span class="hljs-string">"电源B开始工作"</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="装饰者模式"><a href="#装饰者模式" class="headerlink" title="装饰者模式"></a>装饰者模式</h1><p>动态的给一个对象添加一些额外的职责,适用于子类过多,不能通过生成子类的方式进行扩充时  </p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-comment">/**<br> * Drink.java<br>**/</span><br><span class="hljs-keyword">package</span> decorator;<br><br><span class="hljs-comment">//被装饰者的基类(接口)</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Drink</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span></span>;<span class="hljs-comment">//计算价格</span><br>	<span class="hljs-function">String <span class="hljs-title">description</span><span class="hljs-params">()</span></span>;<span class="hljs-comment">//描述</span><br>&#125;<br><br><span class="hljs-comment">/**<br> * SoyaBeanMilk.java<br> **/</span><br><span class="hljs-keyword">package</span> decorator;<br><span class="hljs-comment">//具体的被装饰者的类</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SoyaBeanMilk</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Drink</span></span>&#123;<br><br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-number">3</span>;<br>	&#125;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">description</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">"纯豆浆"</span>;<br>	&#125;<br>	<br>&#125;<br><br><span class="hljs-comment">/**<br> * Decorator.java<br> **/</span><br><span class="hljs-keyword">package</span> decorator;<br><br><span class="hljs-comment">//装饰者的基类</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Decorator</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Drink</span></span>&#123;<br><br>	<span class="hljs-keyword">private</span> Drink drink;<span class="hljs-comment">//要装饰的对象</span><br>	<br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Decorator</span><span class="hljs-params">(Drink drink)</span> </span>&#123;<br>		<span class="hljs-keyword">this</span>.drink = drink;<br>	&#125;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> drink.cost();<br>	&#125;<br><br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">description</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> drink.description();<br>	&#125;<br><br>&#125;<br><br><span class="hljs-comment">/**<br> * SugarDecorator.java<br> **/</span><br><span class="hljs-keyword">package</span> decorator;<br><br><span class="hljs-comment">//具体的装饰类1</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SugarDecorator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Decorator</span></span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">SugarDecorator</span><span class="hljs-params">(Drink drink)</span> </span>&#123;<br>		<span class="hljs-keyword">super</span>(drink);<br>	&#125;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.cost()+<span class="hljs-number">1.0f</span>;<br>	&#125;<br>	<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">description</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.description()+<span class="hljs-string">"+ 糖"</span>;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">//具体的装饰类2</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EggDecorator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Decorator</span></span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">EggDecorator</span><span class="hljs-params">(Drink drink)</span> </span>&#123;<br>		<span class="hljs-keyword">super</span>(drink);<br>	&#125;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.cost()+<span class="hljs-number">2.0f</span>;<br>	&#125;<br>	<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">description</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.description()+<span class="hljs-string">"+ 蛋"</span>;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">//具体的装饰类3</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BlackBeanDecorator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Decorator</span></span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">BlackBeanDecorator</span><span class="hljs-params">(Drink drink)</span> </span>&#123;<br>		<span class="hljs-keyword">super</span>(drink);<br>	&#125;<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">float</span> <span class="hljs-title">cost</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.cost()+<span class="hljs-number">2.0f</span>;<br>	&#125;<br>	<br>	<span class="hljs-meta">@Override</span><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">description</span><span class="hljs-params">()</span> </span>&#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-keyword">super</span>.description()+<span class="hljs-string">"+ 黑豆"</span>;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">/**<br> * Test.java<br> **/</span><br><span class="hljs-keyword">package</span> decorator;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span> </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>		<br>		Drink drink = <span class="hljs-keyword">new</span> SoyaBeanMilk();<br>		SugarDecorator sugar = <span class="hljs-keyword">new</span> SugarDecorator(drink);<br>		EggDecorator egg = <span class="hljs-keyword">new</span> EggDecorator(sugar);<br>		BlackBeanDecorator blackBean = <span class="hljs-keyword">new</span> BlackBeanDecorator(egg);<br>		<br>		System.out.println(<span class="hljs-string">"你点的内容是:"</span> + blackBean.description());<br>		System.out.println(<span class="hljs-string">"总价:"</span>+blackBean.cost()+<span class="hljs-string">"元"</span>);<br>	&#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<h1 id="观察者设计模式"><a href="#观察者设计模式" class="headerlink" title="观察者设计模式"></a>观察者设计模式</h1><figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> abserver;<br><br><span class="hljs-comment">/**<br> * 被观察者接口<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">MessageSubject</span> </span>&#123;<br>    <span class="hljs-comment">//注册观察者</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">registerObserver</span><span class="hljs-params">(Observer o)</span></span>;<br>    <span class="hljs-comment">//移除观察者</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">removeObserver</span><span class="hljs-params">(Observer o)</span></span>;<br>    <span class="hljs-comment">//通知所有观察者</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">notifyObsevers</span><span class="hljs-params">()</span></span>;<br>&#125;<br><br><span class="hljs-comment">/**<br> * 观察者接口<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">Observer</span> </span>&#123;<br>    <span class="hljs-comment">//更新消息</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(String Message)</span></span>;<br>&#125;<br><br><span class="hljs-keyword">import</span> java.util.ArrayList;<br><span class="hljs-keyword">import</span> java.util.List;<br><br><span class="hljs-comment">/**<br> * 具体的被观察者<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Message</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">MessageSubject</span></span>&#123;<br>    <span class="hljs-comment">//维护的观察者列表</span><br>    <span class="hljs-keyword">private</span> List&lt;Observer&gt; list = <span class="hljs-keyword">new</span> ArrayList&lt;&gt;();<br>    <span class="hljs-comment">//通知的消息</span><br>    <span class="hljs-keyword">private</span> String message;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setMessage</span><span class="hljs-params">(String message)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.message = message;<br>        notifyObsevers();<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">registerObserver</span><span class="hljs-params">(Observer o)</span> </span>&#123;<br>        list.add(o);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">removeObserver</span><span class="hljs-params">(Observer o)</span> </span>&#123;<br>        list.remove(o);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">notifyObsevers</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; list.size(); i++) &#123;<br>            Observer observer = list.get(i);<br>            observer.update(message);<br>        &#125;<br>    &#125;<br>&#125;<br><span class="hljs-comment">/**<br> * 具体的观察者<br> */</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Observer</span></span>&#123;<br>    <span class="hljs-keyword">private</span> String name;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">User</span><span class="hljs-params">(String name)</span></span>&#123;<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(String Message)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">"["</span>+name+<span class="hljs-string">"]"</span>+<span class="hljs-string">"收到消息"</span>);<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">//测试 </span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TestObserver</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        Message message = <span class="hljs-keyword">new</span> Message();<br><br>        Observer user1 = <span class="hljs-keyword">new</span> User(<span class="hljs-string">"Tom"</span>);<br>        Observer user2 = <span class="hljs-keyword">new</span> User(<span class="hljs-string">"Jack"</span>);<br>        Observer user3 = <span class="hljs-keyword">new</span> User(<span class="hljs-string">"Monkey"</span>);<br><br>        message.registerObserver(user1);<br>        message.registerObserver(user2);<br>        message.registerObserver(user3);<br><br>        message.setMessage(<span class="hljs-string">"hello world"</span>);<br>        message.removeObserver(user1);<br>        message.setMessage(<span class="hljs-string">"see you again"</span>);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="java">//单例设计模式
+public class Test3{
+    public static void main(String[] args){
+        Singleton1 s1 = Singleton1.getInstance();
+        Singleton2 s2 = Singleton2.getInstance();
+        s1.print();
+        s2.print();
+    }
+}
 
+//懒汉式
+//占用内存时间短，但效率较低（延迟加载）
+class Singleton1{
+    private Singleton1(){};//私有化构造方法，外部无法创建对象
+    private static Singleton1 s1;
+    public static Singleton1 getInstance(){
+        if(s1 == null){
+            s1 = new Singleton1();
+        }
+        return s1;
+    }
+    public void print(){
+        System.out.println(&quot;懒汉式测试方法&quot;);
+    }
+}
+
+//饿汉式
+//占用内存时间长，但效率高
+class Singleton2{
+    private Singleton2(){};
+    private static Singleton2 s2 = new Singleton2();
+    public static Singleton2 getInstance(){
+        return s2;
+    }
+    public void print(){
+        System.out.println(&quot;饿汉式测试方法&quot;);
+    }
+}</code></pre>
+<h1 id="单例设计模式优化"><a href="#单例设计模式优化" class="headerlink" title="单例设计模式优化"></a>单例设计模式优化</h1><pre><code class="java">//1.实现Serializable接口，允许序列化，方便还原单例状态
+public class Singleton implements Serializable {
+    private volidate static Singleton singleton = null;//使用volidate标记，每次取值从地址中取值，确保数据一致
+    private Singleton(){
+        if(singleton != null){
+            //防止反射调用私有化构造方法
+            throw new RuntimeException(&quot;此类对象为单例模式，已经被实例化&quot;);
+        }
+    }
+    public static Singleton getSingleton(){
+        if(singleton == null){
+            //多线程访问安全，使用两次判断，防止第一次判断完就中断，没有加锁
+            synchronized (Singleton.class){
+                if(singleton == null){
+                    singleton = new Singleton();
+                }
+            }
+        }
+    }
+}</code></pre>
+<h1 id="模板方法设计模式"><a href="#模板方法设计模式" class="headerlink" title="模板方法设计模式"></a>模板方法设计模式</h1><p>定义一个操作中的算法骨架，而将一些可变部分的实现延迟到子类中，模板方法使得子类可以不改变一个算法的结构即可重新定义该算法的某些步骤</p>
+<pre><code class="java">public class Test8{
+    public static void main(String[] args) {
+        UserManager us = new UserManager();
+        us.action(&quot;admin&quot;,&quot;add&quot;);
+        us.action(&quot;test&quot;,&quot;del&quot;);
+    }
+}
+
+abstract class BaseManager{
+    public void action(String name,String method){
+        if(&quot;admin&quot;.equals(name)){
+            excute(method);
+        }else{
+            System.out.println(&quot;需要管理员权限&quot;);
+        }
+    }
+    public abstract void excute(String method);
+}
+
+
+class UserManager extends BaseManager{
+    public void excute(String method){
+        //只实现具体的操作方法，验证层面在父类抽象类中
+        if(&quot;add&quot;.equals(method)){
+            System.out.println(&quot;执行了添加操作&quot;);
+        }else if(&quot;del&quot;.equals(method)){
+            System.out.println(&quot;执行了删除操作&quot;);
+        }
+    }
+}</code></pre>
+<h1 id="策略模式"><a href="#策略模式" class="headerlink" title="策略模式"></a>策略模式</h1><p>定义一系列算法，将每一种算法封装起来并可以相互替换使用，策略模式让算法独立于使用它的客户应用而独立变化</p>
+<pre><code class="java">public class Test9{
+    public static void main(String[] args) {
+        BaseService bs = new UserService();
+        bs.setISave(new NetSave());//类实现借口，任然可以认为类型属于该接口
+        bs.add(&quot;user&quot;);
+    }
+}
+
+//定义一个接口
+interface ISave{
+    public void save(String data);
+}
+
+//对于不同的需求有不同的策略去实现
+class FileSava implements ISave{
+    public void save(String data){
+        System.out.println(&quot;把数据存到文件中&quot;+data);
+    }
+}
+
+class NetSave implements ISave{
+    public void save(String data){
+        System.out.println(&quot;把数据存到网络上&quot;+data);
+    }
+}
+
+//定义一个抽象类用于不同的对象统一通过此处调用不同方法
+abstract class BaseService{
+    private ISave iSave;
+    public void setISave(ISave iSave){
+        this.iSave = iSave;
+    }
+    public void add(String data){
+        iSave.save(data);
+    }
+}
+
+class UserService extends BaseService{
+
+}</code></pre>
+<h1 id="简单工厂模式"><a href="#简单工厂模式" class="headerlink" title="简单工厂模式"></a>简单工厂模式</h1><p>由一个工厂对象决定创建出哪一种产品类的实例</p>
+<pre><code class="java">public class Test10{
+    public static void main(String[] args){
+        //使用工厂模式降低耦合度，方便后期修改
+        Product phone = ProductFactory.getProduct(&quot;phone&quot;);
+        if(null!=phone){
+            phone.work();
+        }
+    }
+}
+
+class ProductFactory{
+    public static Product getProduct(String name){
+        if(&quot;phone&quot;.equals(name)){
+            return new Phone();
+        }else if(&quot;computer&quot;.equals(name)){
+            return new Computer();
+        }else{
+            return  null;
+        }
+    }
+}
+
+interface Product{
+    public void work();
+}
+
+class Phone implements Product{
+    public void work(){
+        System.out.println(&quot;Phone is working...&quot;);
+    }
+}
+
+class Computer implements Product{
+    public void work(){
+        System.out.println(&quot;Computer is working...&quot;);
+    }
+}</code></pre>
+<h1 id="静态代理模式"><a href="#静态代理模式" class="headerlink" title="静态代理模式"></a>静态代理模式</h1><p>为其他对象提供一种代理以控制对这个对象的访问，在访问对象时引入一定程度的间接性，以附加多种用途</p>
+<pre><code class="java">public class Test11{
+    public static void main(String[] args){
+        IAction user = new UserAction();
+        ActionProxy proxy = new ActionProxy(user);
+        proxy.doAction();
+    }
+}
+
+//代理
+class ActionProxy implements IAction{
+    private IAction target;//被代理的对象
+    public ActionProxy(IAction target){
+        this.target = target;
+    }
+    //执行操作
+    public void doAction(){
+        long startTime = System.currentTimeMillis();
+        target.doAction();//执行真正的业务
+        System.out.println(&quot;当前时间为：&quot;+startTime);
+    }
+}
+
+interface IAction{
+    public void doAction();
+}
+
+class UserAction implements IAction{
+    public void doAction(){
+        System.out.println(&quot;开始工作了。。。&quot;);
+    }
+}</code></pre>
+<h1 id="动态代理模式"><a href="#动态代理模式" class="headerlink" title="动态代理模式"></a>动态代理模式</h1><pre><code class="java">/**
+ * 接口
+ */
+interface Subject {
+    public void shopping();
+}
+
+public class Person implements Subject{
+
+    @Override
+    public void shopping() {
+        System.out.println(&quot;付款，买到心心念念的MacBook&quot;);
+    }
+}
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+public class CreateProxy implements InvocationHandler {
+    private Object target;//被代理的对象
+
+    //用于创建代理对象的方法
+    public Object create(Object target){
+        this.target = target;
+        Object proxy = (Object) Proxy.newProxyInstance(target.getClass().getClassLoader(),
+                target.getClass().getInterfaces(),this);
+        return proxy;
+    }
+
+    /**
+     *
+     * @param proxy 代理类对象
+     * @param method 被代理对象的方法
+     * @param args 方法的参数
+     * @return
+     * @throws Throwable
+     */
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println(&quot;接项目做赚钱&quot;);
+        System.out.println(&quot;上网上买&quot;);
+        method.invoke(target,args);
+        System.out.println(&quot;梦想成真&quot;);
+        return null;
+    }
+}
+
+public class ProxyTest {
+    public static void main(String[] args) {
+        CreateProxy cp = new CreateProxy();
+        Subject person = new Person();
+        Subject proxy  = (Subject) cp.create(person);
+        proxy.shopping();//会调用invoke方法
+    }
+}</code></pre>
+<h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a>适配器模式</h1><p>将一个类的接口转换成客户希望的另一个接口，用于使原来由于接口不兼容而不能一起工作的那些类可以一起工作</p>
+<pre><code class="java">public class Test12{
+    public static void main(String[] args){
+
+        Animal dog = new Dog();
+        dog.run();
+
+        PowerA powerA = new PowerAImpl();
+        PowerB powerB = new PowerBImpl();
+        Adapter adapter = new Adapter(powerB);
+        work(powerA);
+        //work(powerB);若这样传则报错
+        work(adapter);
+    }
+    public static void work(PowerA a){
+        a.insert();
+    }
+}
+
+/*第一种适配器*/
+interface Animal{
+    public void sing();
+    public void cry();
+    public void run();
+    public void swim();
+}
+
+//适配器，当只需要实现一个方法的时候，避免子类多次重复空实现
+abstract class AnimalFunction implements Animal{
+    public void sing(){};
+    public void cry(){};
+    public void run(){};
+    public void swim(){};
+}
+
+class Dog extends AnimalFunction{
+    public void run(){
+        System.out.println(&quot;the dog is running&quot;);
+    }
+}
+
+/*第二种适配器*/
+interface PowerA{
+    public void insert();
+}
+
+class PowerAImpl implements PowerA{
+    public void insert(){
+        System.out.println(&quot;电源A开始工作&quot;);
+    }
+}
+interface PowerB{
+    public void insert();
+}
+
+class Adapter implements PowerA{
+    private PowerB powerB;
+    public Adapter(PowerB powerB){
+        this.powerB = powerB;
+    }
+    public void insert(){
+        powerB.insert();
+    }
+}
+class PowerBImpl implements PowerB{
+    public void insert(){
+        System.out.println(&quot;电源B开始工作&quot;);
+    }
+}</code></pre>
+<h1 id="装饰者模式"><a href="#装饰者模式" class="headerlink" title="装饰者模式"></a>装饰者模式</h1><p>动态的给一个对象添加一些额外的职责,适用于子类过多,不能通过生成子类的方式进行扩充时  </p>
+<pre><code class="java">/**
+ * Drink.java
+**/
+package decorator;
+
+//被装饰者的基类(接口)
+public interface Drink {
+    float cost();//计算价格
+    String description();//描述
+}
+
+/**
+ * SoyaBeanMilk.java
+ **/
+package decorator;
+//具体的被装饰者的类
+public class SoyaBeanMilk implements Drink{
+
+
+    @Override
+    public float cost() {
+        return 3;
+    }
+
+    @Override
+    public String description() {
+        return &quot;纯豆浆&quot;;
+    }
+
+}
+
+/**
+ * Decorator.java
+ **/
+package decorator;
+
+//装饰者的基类
+public class Decorator implements Drink{
+
+    private Drink drink;//要装饰的对象
+
+    public Decorator(Drink drink) {
+        this.drink = drink;
+    }
+    @Override
+    public float cost() {
+        return drink.cost();
+    }
+
+    @Override
+    public String description() {
+        return drink.description();
+    }
+
+}
+
+/**
+ * SugarDecorator.java
+ **/
+package decorator;
+
+//具体的装饰类1
+public class SugarDecorator extends Decorator{
+
+    public SugarDecorator(Drink drink) {
+        super(drink);
+    }
+    @Override
+    public float cost() {
+        return super.cost()+1.0f;
+    }
+
+    @Override
+    public String description() {
+        return super.description()+&quot;+ 糖&quot;;
+    }
+}
+
+//具体的装饰类2
+public class EggDecorator extends Decorator{
+
+    public EggDecorator(Drink drink) {
+        super(drink);
+    }
+    @Override
+    public float cost() {
+        return super.cost()+2.0f;
+    }
+
+    @Override
+    public String description() {
+        return super.description()+&quot;+ 蛋&quot;;
+    }
+}
+
+//具体的装饰类3
+public class BlackBeanDecorator extends Decorator{
+
+    public BlackBeanDecorator(Drink drink) {
+        super(drink);
+    }
+    @Override
+    public float cost() {
+        return super.cost()+2.0f;
+    }
+
+    @Override
+    public String description() {
+        return super.description()+&quot;+ 黑豆&quot;;
+    }
+}
+
+/**
+ * Test.java
+ **/
+package decorator;
+
+public class Test {
+
+    public static void main(String[] args) {
+
+        Drink drink = new SoyaBeanMilk();
+        SugarDecorator sugar = new SugarDecorator(drink);
+        EggDecorator egg = new EggDecorator(sugar);
+        BlackBeanDecorator blackBean = new BlackBeanDecorator(egg);
+
+        System.out.println(&quot;你点的内容是:&quot; + blackBean.description());
+        System.out.println(&quot;总价:&quot;+blackBean.cost()+&quot;元&quot;);
+    }
+}
+</code></pre>
+<h1 id="观察者设计模式"><a href="#观察者设计模式" class="headerlink" title="观察者设计模式"></a>观察者设计模式</h1><pre><code class="java">package abserver;
+
+/**
+ * 被观察者接口
+ */
+public interface MessageSubject {
+    //注册观察者
+    public void registerObserver(Observer o);
+    //移除观察者
+    public void removeObserver(Observer o);
+    //通知所有观察者
+    public void notifyObsevers();
+}
+
+/**
+ * 观察者接口
+ */
+public interface Observer {
+    //更新消息
+    public void update(String Message);
+}
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * 具体的被观察者
+ */
+public class Message implements MessageSubject{
+    //维护的观察者列表
+    private List&lt;Observer&gt; list = new ArrayList&lt;&gt;();
+    //通知的消息
+    private String message;
+
+    public void setMessage(String message) {
+        this.message = message;
+        notifyObsevers();
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        list.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        list.remove(o);
+    }
+
+    @Override
+    public void notifyObsevers() {
+        for (int i = 0; i &lt; list.size(); i++) {
+            Observer observer = list.get(i);
+            observer.update(message);
+        }
+    }
+}
+/**
+ * 具体的观察者
+ */
+public class User implements Observer{
+    private String name;
+
+    public User(String name){
+        this.name = name;
+    }
+
+    @Override
+    public void update(String Message) {
+        System.out.println(&quot;[&quot;+name+&quot;]&quot;+&quot;收到消息&quot;);
+    }
+}
+
+//测试 
+public class TestObserver {
+    public static void main(String[] args) {
+        Message message = new Message();
+
+        Observer user1 = new User(&quot;Tom&quot;);
+        Observer user2 = new User(&quot;Jack&quot;);
+        Observer user3 = new User(&quot;Monkey&quot;);
+
+        message.registerObserver(user1);
+        message.registerObserver(user2);
+        message.registerObserver(user3);
+
+        message.setMessage(&quot;hello world&quot;);
+        message.removeObserver(user1);
+        message.setMessage(&quot;see you again&quot;);
+    }
+}</code></pre>
 <h1 id="dao设计模式"><a href="#dao设计模式" class="headerlink" title="dao设计模式"></a>dao设计模式</h1><p>DAO指的是Database Access Object，将数据库操作分为：</p>
 <ul>
 <li><code>DAO接口</code></li>
@@ -280,359 +838,588 @@
 <li>工具类写在<code>com.xx.util</code>包中</li>
 </ol>
 <p>数据库配置文件：</p>
-<figure class="highlight ini"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs ini"><span class="hljs-attr">driver</span> = com.mysql.jdbc.Driver<br><span class="hljs-attr">url</span> = jdbc:mysql://<span class="hljs-number">127.0</span>.<span class="hljs-number">0.1</span>:<span class="hljs-number">3306</span>/blog?useSSL=<span class="hljs-literal">false</span><br><span class="hljs-attr">user</span> = root<br><span class="hljs-attr">password</span> = xxx<br></code></pre></div></td></tr></table></figure>
+<pre><code>driver = com.mysql.jdbc.Driver
+url = jdbc:mysql://127.0.0.1:3306/blog?useSSL=false
+user = root
+password = xxx</code></pre><p>实体类：</p>
+<pre><code class="java">package com.xm.beans;
 
-<p>实体类：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.xm.beans;<br><br><span class="hljs-keyword">import</span> java.io.Serializable;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Student</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>&#123;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">long</span> serialVersionUID = -<span class="hljs-number">6861593743646559474L</span>;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> id;<br>    <span class="hljs-keyword">private</span> String stuName;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> age;<br>    <span class="hljs-keyword">private</span> String course;<br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">int</span> score;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Student</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Student</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id, String stuName, <span class="hljs-keyword">int</span> age, String course, <span class="hljs-keyword">int</span> score)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.id = id;<br>        <span class="hljs-keyword">this</span>.stuName = stuName;<br>        <span class="hljs-keyword">this</span>.age = age;<br>        <span class="hljs-keyword">this</span>.course = course;<br>        <span class="hljs-keyword">this</span>.score = score;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">long</span> <span class="hljs-title">getSerialVersionUID</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> serialVersionUID;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getId</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> id;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setId</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.id = id;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getStuName</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> stuName;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setStuName</span><span class="hljs-params">(String stuName)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.stuName = stuName;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> age;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setAge</span><span class="hljs-params">(<span class="hljs-keyword">int</span> age)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.age = age;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getCourse</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> course;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCourse</span><span class="hljs-params">(String course)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.course = course;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">int</span> <span class="hljs-title">getScore</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> score;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setScore</span><span class="hljs-params">(<span class="hljs-keyword">int</span> score)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.score = score;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">"Student&#123;"</span> +<br>                <span class="hljs-string">"id="</span> + id +<br>                <span class="hljs-string">", stuName='"</span> + stuName + <span class="hljs-string">'\''</span> +<br>                <span class="hljs-string">", age="</span> + age +<br>                <span class="hljs-string">", course='"</span> + course + <span class="hljs-string">'\''</span> +<br>                <span class="hljs-string">", score="</span> + score +<br>                <span class="hljs-string">'&#125;'</span>;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
+import java.io.Serializable;
+
+public class Student implements Serializable {
+    private static final long serialVersionUID = -6861593743646559474L;
+    private int id;
+    private String stuName;
+    private int age;
+    private String course;
+    private int score;
+
+    public Student() {
+    }
+
+    public Student(int id, String stuName, int age, String course, int score) {
+        this.id = id;
+        this.stuName = stuName;
+        this.age = age;
+        this.course = course;
+        this.score = score;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getStuName() {
+        return stuName;
+    }
+
+    public void setStuName(String stuName) {
+        this.stuName = stuName;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getCourse() {
+        return course;
+    }
+
+    public void setCourse(String course) {
+        this.course = course;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return &quot;Student{&quot; +
+                &quot;id=&quot; + id +
+                &quot;, stuName=&#39;&quot; + stuName + &#39;\&#39;&#39; +
+                &quot;, age=&quot; + age +
+                &quot;, course=&#39;&quot; + course + &#39;\&#39;&#39; +
+                &quot;, score=&quot; + score +
+                &#39;}&#39;;
+    }
+}</code></pre>
 <p>工具类：</p>
-<figure class="highlight"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java">package hellojdbc.com.xm.util;<br><br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.IOException;<br>import java.io.InputStream;<br>import java.sql.*;<br>import java.util.Properties;<br><br>/**<br> * 封装MySQL操作工具类<br> * 1. 注册驱动<br> * 2. 获取连接<br> * 3. 关闭连接<br> * 4. 执行命令<br> */<br>public class DbUtiles &#123;<br>    //驱动名称<br>    private static String driver;<br>    //连接字符串<br>    private static String url;<br>    //用户名<br>    private static String userName;<br>    //密码<br>    private static String password;<br><br>    static &#123;<br><br>        Properties properties = new Properties();<br>        //一种加载方法<br>        try &#123;<br>            FileInputStream fis = new FileInputStream("src/database.properties");<br>        &#125; catch (FileNotFoundException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>        //推荐使用这种方式，加载的是放在编译后.class文件夹中的properties文件<br>        InputStream is = DbUtiles.class.getClassLoader().getResourceAsStream("database.properties");<br><br>        try &#123;<br>            properties.load(is);<br>            is.close();<br>            driver = properties.getProperty("driver");<br>            url = properties.getProperty("url");<br>            userName = properties.getProperty("user");<br>            password = properties.getProperty("password");<br>        &#125; catch (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>        //注册驱动<br>        try &#123;<br>            Class.forName(driver);<br>        &#125; catch (ClassNotFoundException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    //获取连接<br>    public static Connection getConnection()&#123;<br>        try &#123;<br>            return DriverManager.getConnection(url, userName, password);<br>        &#125; catch (SQLException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>        return null;<br>    &#125;<br><br>    //关闭连接<br>    public static void closeAll(Connection connection, Statement statement,ResultSet resultSet)&#123;<br>        if(resultSet!=null)&#123;<br>            try &#123;<br>                resultSet.close();<br>            &#125; catch (SQLException e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br>        if(statement!=null)&#123;<br>            try&#123;<br>                statement.close();<br>            &#125;catch (SQLException e)&#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br>        if(connection!=null)&#123;<br>            try &#123;<br>                connection.close();<br>            &#125; catch (SQLException e) &#123;<br>                e.printStackTrace();<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    //执行命令（DML）,需要使用可变长度数组作为参数，可以执行增删改<br>    public static int executeUpdate(String sql,Object...objects)&#123;<br>        Connection connection = null;<br>        PreparedStatement preparedStatement = null;<br>        connection = getConnection();<br>        try &#123;<br>            preparedStatement = connection.prepareStatement(sql);<br>            for(int i=0;i&lt;objects.length;i++)&#123;<br>                preparedStatement.setObject(i+1,objects[i]);<br>            &#125;<br>            int result = preparedStatement.executeUpdate();<br>            closeAll(connection,preparedStatement,null);<br>            return result;<br>        &#125; catch (SQLException e) &#123;<br>            e.printStackTrace();<br>            return 0;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
-<p>接口类：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> hellojdbc.com.xm.dao;<br><br><span class="hljs-keyword">import</span> com.xm.beans.Student;<br><br><span class="hljs-keyword">import</span> java.util.List;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">interface</span> <span class="hljs-title">StudentDao</span> </span>&#123;<br>    <span class="hljs-comment">//查找所有</span><br>    <span class="hljs-function">List&lt;Student&gt; <span class="hljs-title">findAll</span><span class="hljs-params">()</span></span>;<br>    <span class="hljs-comment">//查找指定</span><br>    <span class="hljs-function">Student <span class="hljs-title">findById</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span></span>;<br>    <span class="hljs-comment">//更新</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Student student)</span></span>;<br>    <span class="hljs-comment">//删除</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">delete</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span></span>;<br>    <span class="hljs-comment">//添加</span><br>    <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(Student student)</span></span>;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-<p>接口实现类：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> com.xm.dao.impl;<br><br><span class="hljs-keyword">import</span> com.xm.beans.Student;<br><span class="hljs-keyword">import</span> hellojdbc.com.xm.dao.StudentDao;<br><span class="hljs-keyword">import</span> hellojdbc.com.xm.util.DbUtiles;<br><br><span class="hljs-keyword">import</span> java.sql.*;<br><span class="hljs-keyword">import</span> java.util.ArrayList;<br><span class="hljs-keyword">import</span> java.util.List;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">StudentDaoImpl</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">StudentDao</span> </span>&#123;<br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> List&lt;Student&gt; <span class="hljs-title">findAll</span><span class="hljs-params">()</span> </span>&#123;<br>        List&lt;Student&gt; students = <span class="hljs-keyword">new</span> ArrayList&lt;Student&gt;();<br>        Connection connection = <span class="hljs-keyword">null</span>;<br>        PreparedStatement ps = <span class="hljs-keyword">null</span>;<br>        ResultSet rs = <span class="hljs-keyword">null</span>;<br>        connection = DbUtiles.getConnection();<br>        <span class="hljs-keyword">try</span> &#123;<br>            ps = connection.prepareStatement(<span class="hljs-string">"select * from students"</span>);<br>            rs = ps.executeQuery();<br>            <span class="hljs-keyword">while</span> (rs.next())&#123;<br>                <span class="hljs-keyword">int</span> id = rs.getInt(<span class="hljs-string">"id"</span>);<br>                String stuName = rs.getString(<span class="hljs-string">"stuName"</span>);<br>                <span class="hljs-keyword">int</span> age = rs.getInt(<span class="hljs-string">"age"</span>);<br>                String course = rs.getString(<span class="hljs-string">"course"</span>);<br>                <span class="hljs-keyword">int</span> score = rs.getInt(<span class="hljs-string">"score"</span>);<br><br>                Student student = <span class="hljs-keyword">new</span> Student(id,stuName,age,course,score);<br>                students.add(student);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (SQLException e) &#123;<br>            e.printStackTrace();<br>        &#125;<span class="hljs-keyword">finally</span> &#123;<br>            DbUtiles.closeAll(connection,ps,rs);<br>        &#125;<br>        <span class="hljs-keyword">return</span> students;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Student <span class="hljs-title">findById</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span> </span>&#123;<br>        Connection conn = <span class="hljs-keyword">null</span>;<br>        PreparedStatement ps = <span class="hljs-keyword">null</span>;<br>        ResultSet rs = <span class="hljs-keyword">null</span>;<br>        Student student = <span class="hljs-keyword">null</span>;<br>        <span class="hljs-keyword">try</span> &#123;<br>            conn = DbUtiles.getConnection();<br>            ps = conn.prepareStatement(<span class="hljs-string">"select * from students where id="</span>+id);<br>            rs =  ps.executeQuery();<br>            <span class="hljs-keyword">if</span>(rs.next())&#123;<br>                String stuName = rs.getString(<span class="hljs-string">"stuName"</span>);<br>                <span class="hljs-keyword">int</span> age = rs.getInt(<span class="hljs-string">"age"</span>);<br>                String course = rs.getString(<span class="hljs-string">"course"</span>);<br>                <span class="hljs-keyword">int</span> score = rs.getInt(<span class="hljs-string">"score"</span>);<br>                student = <span class="hljs-keyword">new</span> Student(id,stuName,age,course,score);<br>            &#125;<br>        &#125; <span class="hljs-keyword">catch</span> (SQLException e) &#123;<br>            e.printStackTrace();<br>        &#125;<span class="hljs-keyword">finally</span> &#123;<br>            DbUtiles.closeAll(conn,ps,rs);<br>            <span class="hljs-keyword">return</span> student;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">update</span><span class="hljs-params">(Student student)</span> </span>&#123;<br>        Object[] params = &#123;student.getAge(),student.getScore(),student.getId()&#125;;<br>        DbUtiles.executeUpdate(<span class="hljs-string">"update students set age=?,score=? where id=?"</span>,params);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">delete</span><span class="hljs-params">(<span class="hljs-keyword">int</span> id)</span> </span>&#123;<br>        DbUtiles.executeUpdate(<span class="hljs-string">"delete from students where id=?"</span>,id);<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">add</span><span class="hljs-params">(Student student)</span> </span>&#123;<br>        Object[] params = &#123;student.getId(),student.getStuName(),student.getAge(),student.getCourse(),student.getScore()&#125;;<br>        DbUtiles.executeUpdate(<span class="hljs-string">"insert into students values (?,?,?,?,?)"</span>,params);<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
-<p>测试：</p>
-<figure class="highlight java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs java"><span class="hljs-keyword">package</span> hellojdbc;<br><br><span class="hljs-keyword">import</span> com.xm.beans.Student;<br><span class="hljs-keyword">import</span> com.xm.dao.impl.StudentDaoImpl;<br><span class="hljs-keyword">import</span> hellojdbc.com.xm.dao.StudentDao;<br><br><span class="hljs-keyword">import</span> java.util.List;<br><span class="hljs-keyword">import</span> java.util.Scanner;<br><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DAOTest</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">"请选择操作：1查询 2添加 3更新 4删除"</span>);<br>        Scanner input = <span class="hljs-keyword">new</span> Scanner(System.in);<br>        <span class="hljs-keyword">int</span> choice = input.nextInt();<br>        StudentDao studentDao = <span class="hljs-keyword">new</span> StudentDaoImpl();<br>        <span class="hljs-keyword">switch</span> (choice)&#123;<br>            <span class="hljs-keyword">case</span> <span class="hljs-number">1</span>:<br>                List&lt;Student&gt; students = studentDao.findAll();<br>                <span class="hljs-keyword">for</span>(Student student:students)&#123;<br>                    System.out.println(student.toString());<br>                &#125;<br>                <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">case</span> <span class="hljs-number">2</span>:<br>                System.out.println(<span class="hljs-string">"请输入id"</span>);<br>                <span class="hljs-keyword">int</span> id = input.nextInt();<br><br>                System.out.println(<span class="hljs-string">"请输入姓名"</span>);<br>                String stuName = input.next();<br><br>                System.out.println(<span class="hljs-string">"请输入年龄"</span>);<br>                <span class="hljs-keyword">int</span> age = input.nextInt();<br><br>                System.out.println(<span class="hljs-string">"请输入科目"</span>);<br>                String course = input.next();<br><br>                System.out.println(<span class="hljs-string">"请输入分数"</span>);<br>                <span class="hljs-keyword">int</span> score = input.nextInt();<br>                Student student = <span class="hljs-keyword">new</span> Student(id,stuName,age,course,score);<br>                studentDao.add(student);<br>                System.out.println(<span class="hljs-string">"添加成功！"</span>);<br>                <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">case</span> <span class="hljs-number">3</span>:<br>                System.out.println(<span class="hljs-string">"要更新的编号："</span>);<br>                <span class="hljs-keyword">int</span> sid = input.nextInt();<br>                Student s = studentDao.findById(sid);<br>                <span class="hljs-keyword">if</span>(s!=<span class="hljs-keyword">null</span>)&#123;<br>                    System.out.println(<span class="hljs-string">"输入分数"</span>);<br>                    <span class="hljs-keyword">int</span> score1 = input.nextInt();<br>                    s.setScore(score1);<br>                    studentDao.update(s);<br>                    System.out.println(<span class="hljs-string">"修改成功"</span>);<br>                &#125;<span class="hljs-keyword">else</span>&#123;<br>                    System.out.println(<span class="hljs-string">"没有此人"</span>);<br>                &#125;<br>                <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">case</span> <span class="hljs-number">4</span>:<br>                System.out.println(<span class="hljs-string">"请输入删除编号"</span>);<br>                <span class="hljs-keyword">int</span> num = input.nextInt();<br>                studentDao.delete(num);<br>                System.out.println(<span class="hljs-string">"删除成功"</span>);<br>                <span class="hljs-keyword">break</span>;<br>            <span class="hljs-keyword">default</span>:<br>                System.out.println(<span class="hljs-string">"操作失误"</span>);<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/java/">java</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/01/11/java%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">java数据结构</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2018/12/07/Java%E5%9F%BA%E7%A1%80/">
-                        <span class="hidden-mobile">Java基础</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
-    </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
-
-      </div>
-    
-  </div>
-</div>
-
-<!-- Custom -->
-
-
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
-    </div>
-  </div>
-</div>
-    
-
-    
-  </main>
-
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
-  
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
-    </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
-  </div>
-
-
-  
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
-
-
-
-  
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
-
-  
-
-  
-
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
+<pre><code class="java">package hellojdbc.com.xm.util;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.*;
+import java.util.Properties;
+
+/**
+ * 封装MySQL操作工具类
+ * 1. 注册驱动
+ * 2. 获取连接
+ * 3. 关闭连接
+ * 4. 执行命令
+ */
+public class DbUtiles {
+    //驱动名称
+    private static String driver;
+    //连接字符串
+    private static String url;
+    //用户名
+    private static String userName;
+    //密码
+    private static String password;
+
+    static {
+
+        Properties properties = new Properties();
+        //一种加载方法
+        try {
+            FileInputStream fis = new FileInputStream(&quot;src/database.properties&quot;);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        //推荐使用这种方式，加载的是放在编译后.class文件夹中的properties文件
+        InputStream is = DbUtiles.class.getClassLoader().getResourceAsStream(&quot;database.properties&quot;);
+
+        try {
+            properties.load(is);
+            is.close();
+            driver = properties.getProperty(&quot;driver&quot;);
+            url = properties.getProperty(&quot;url&quot;);
+            userName = properties.getProperty(&quot;user&quot;);
+            password = properties.getProperty(&quot;password&quot;);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //注册驱动
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //获取连接
+    public static Connection getConnection(){
+        try {
+            return DriverManager.getConnection(url, userName, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //关闭连接
+    public static void closeAll(Connection connection, Statement statement,ResultSet resultSet){
+        if(resultSet!=null){
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        if(statement!=null){
+            try{
+                statement.close();
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        if(connection!=null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //执行命令（DML）,需要使用可变长度数组作为参数，可以执行增删改
+    public static int executeUpdate(String sql,Object...objects){
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        connection = getConnection();
+        try {
+            preparedStatement = connection.prepareStatement(sql);
+            for(int i=0;i&lt;objects.length;i++){
+                preparedStatement.setObject(i+1,objects[i]);
+            }
+            int result = preparedStatement.executeUpdate();
+            closeAll(connection,preparedStatement,null);
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+}</code></pre>
+<p>接口类：</p>
+<pre><code class="java">package hellojdbc.com.xm.dao;
+
+import com.xm.beans.Student;
+
+import java.util.List;
+
+public interface StudentDao {
+    //查找所有
+    List&lt;Student&gt; findAll();
+    //查找指定
+    Student findById(int id);
+    //更新
+    void update(Student student);
+    //删除
+    void delete(int id);
+    //添加
+    void add(Student student);
+}</code></pre>
+<p>接口实现类：</p>
+<pre><code class="java">package com.xm.dao.impl;
+
+import com.xm.beans.Student;
+import hellojdbc.com.xm.dao.StudentDao;
+import hellojdbc.com.xm.util.DbUtiles;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentDaoImpl implements StudentDao {
+    @Override
+    public List&lt;Student&gt; findAll() {
+        List&lt;Student&gt; students = new ArrayList&lt;Student&gt;();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        connection = DbUtiles.getConnection();
+        try {
+            ps = connection.prepareStatement(&quot;select * from students&quot;);
+            rs = ps.executeQuery();
+            while (rs.next()){
+                int id = rs.getInt(&quot;id&quot;);
+                String stuName = rs.getString(&quot;stuName&quot;);
+                int age = rs.getInt(&quot;age&quot;);
+                String course = rs.getString(&quot;course&quot;);
+                int score = rs.getInt(&quot;score&quot;);
+
+                Student student = new Student(id,stuName,age,course,score);
+                students.add(student);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DbUtiles.closeAll(connection,ps,rs);
+        }
+        return students;
+    }
+
+    @Override
+    public Student findById(int id) {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Student student = null;
+        try {
+            conn = DbUtiles.getConnection();
+            ps = conn.prepareStatement(&quot;select * from students where id=&quot;+id);
+            rs =  ps.executeQuery();
+            if(rs.next()){
+                String stuName = rs.getString(&quot;stuName&quot;);
+                int age = rs.getInt(&quot;age&quot;);
+                String course = rs.getString(&quot;course&quot;);
+                int score = rs.getInt(&quot;score&quot;);
+                student = new Student(id,stuName,age,course,score);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            DbUtiles.closeAll(conn,ps,rs);
+            return student;
+        }
+    }
+
+    @Override
+    public void update(Student student) {
+        Object[] params = {student.getAge(),student.getScore(),student.getId()};
+        DbUtiles.executeUpdate(&quot;update students set age=?,score=? where id=?&quot;,params);
+    }
+
+    @Override
+    public void delete(int id) {
+        DbUtiles.executeUpdate(&quot;delete from students where id=?&quot;,id);
+    }
+
+    @Override
+    public void add(Student student) {
+        Object[] params = {student.getId(),student.getStuName(),student.getAge(),student.getCourse(),student.getScore()};
+        DbUtiles.executeUpdate(&quot;insert into students values (?,?,?,?,?)&quot;,params);
+    }
+}</code></pre>
+<p>测试：</p>
+<pre><code class="java">package hellojdbc;
+
+import com.xm.beans.Student;
+import com.xm.dao.impl.StudentDaoImpl;
+import hellojdbc.com.xm.dao.StudentDao;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class DAOTest {
+    public static void main(String[] args) {
+        System.out.println(&quot;请选择操作：1查询 2添加 3更新 4删除&quot;);
+        Scanner input = new Scanner(System.in);
+        int choice = input.nextInt();
+        StudentDao studentDao = new StudentDaoImpl();
+        switch (choice){
+            case 1:
+                List&lt;Student&gt; students = studentDao.findAll();
+                for(Student student:students){
+                    System.out.println(student.toString());
+                }
+                break;
+            case 2:
+                System.out.println(&quot;请输入id&quot;);
+                int id = input.nextInt();
+
+                System.out.println(&quot;请输入姓名&quot;);
+                String stuName = input.next();
+
+                System.out.println(&quot;请输入年龄&quot;);
+                int age = input.nextInt();
+
+                System.out.println(&quot;请输入科目&quot;);
+                String course = input.next();
+
+                System.out.println(&quot;请输入分数&quot;);
+                int score = input.nextInt();
+                Student student = new Student(id,stuName,age,course,score);
+                studentDao.add(student);
+                System.out.println(&quot;添加成功！&quot;);
+                break;
+            case 3:
+                System.out.println(&quot;要更新的编号：&quot;);
+                int sid = input.nextInt();
+                Student s = studentDao.findById(sid);
+                if(s!=null){
+                    System.out.println(&quot;输入分数&quot;);
+                    int score1 = input.nextInt();
+                    s.setScore(score1);
+                    studentDao.update(s);
+                    System.out.println(&quot;修改成功&quot;);
+                }else{
+                    System.out.println(&quot;没有此人&quot;);
+                }
+                break;
+            case 4:
+                System.out.println(&quot;请输入删除编号&quot;);
+                int num = input.nextInt();
+                studentDao.delete(num);
+                System.out.println(&quot;删除成功&quot;);
+                break;
+            default:
+                System.out.println(&quot;操作失误&quot;);
+        }
+    }
+}   </code></pre>
+
+    </div>
+
+    
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/java/" rel="tag"># java</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/12/07/Java%E5%9F%BA%E7%A1%80/" rel="prev" title="Java基础">
+      <i class="fa fa-chevron-left"></i> Java基础
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/01/11/java%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" rel="next" title="java数据结构">
+      java数据结构 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单例设计模式"><span class="nav-number">1.</span> <span class="nav-text">单例设计模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单例设计模式优化"><span class="nav-number">2.</span> <span class="nav-text">单例设计模式优化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模板方法设计模式"><span class="nav-number">3.</span> <span class="nav-text">模板方法设计模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#策略模式"><span class="nav-number">4.</span> <span class="nav-text">策略模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简单工厂模式"><span class="nav-number">5.</span> <span class="nav-text">简单工厂模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#静态代理模式"><span class="nav-number">6.</span> <span class="nav-text">静态代理模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动态代理模式"><span class="nav-number">7.</span> <span class="nav-text">动态代理模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#适配器模式"><span class="nav-number">8.</span> <span class="nav-text">适配器模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#装饰者模式"><span class="nav-number">9.</span> <span class="nav-text">装饰者模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者设计模式"><span class="nav-number">10.</span> <span class="nav-text">观察者设计模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dao设计模式"><span class="nav-number">11.</span> <span class="nav-text">dao设计模式</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
 </body>
 </html>

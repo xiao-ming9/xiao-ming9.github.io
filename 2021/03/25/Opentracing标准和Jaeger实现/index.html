@@ -1,247 +1,292 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="OpenTracing 简介OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。 OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并">
+<meta name="keywords" content="分布式,go">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式链路追踪（OpenTracing标准）和 Jaeger 实现">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;03&#x2F;25&#x2F;Opentracing%E6%A0%87%E5%87%86%E5%92%8CJaeger%E5%AE%9E%E7%8E%B0&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="OpenTracing 简介OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。 OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Logging%2CMetrics%2CTracing%20%E9%87%8D%E5%8F%A0%E7%9A%84%E9%83%A8%E5%88%86.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%85%B8%E5%9E%8BTrace%E6%A1%88%E4%BE%8B.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%8C%85%E5%90%AB%E6%97%B6%E9%97%B4%E8%BD%B4%E7%9A%84%E6%97%B6%E5%BA%8F%E5%9B%BEtrace.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;opentracing-appdash.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Span%E5%9C%A8%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E4%BD%93%E7%8E%B0.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Relationships%E5%9C%A8%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E4%BD%93%E7%8E%B0.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;OpenTracing%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%AE%9E%E8%B7%B5-1.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;OpenTracing%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%AE%9E%E8%B7%B5-2.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;OpenTracing%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%AE%9E%E8%B7%B5-3.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;OpenTracing%E5%A4%A7%E8%A7%84%E6%A8%A1%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%E5%AE%9E%E8%B7%B5-4.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;jaeger%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%94%B6%E9%9B%86%E5%99%A8%E7%9B%B4%E6%8E%A5%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE%E5%BA%93.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%94%B6%E9%9B%86%E5%99%A8%E5%B0%86%E6%95%B0%E6%8D%AE%E5%86%99%E5%85%A5%20kafka%20%E4%BD%9C%E4%B8%BA%E5%88%9D%E6%AD%A5%E7%BC%93%E5%86%B2%E5%8C%BA.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Jaeger-UI.jpg">
+<meta property="og:updated_time" content="2021-03-29T14:44:44.652Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Logging%2CMetrics%2CTracing%20%E9%87%8D%E5%8F%A0%E7%9A%84%E9%83%A8%E5%88%86.png">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/25/Opentracing%E6%A0%87%E5%87%86%E5%92%8CJaeger%E5%AE%9E%E7%8E%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>分布式链路追踪（OpenTracing标准）和 Jaeger 实现 | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="OpenTracing 简介OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。
-OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>分布式链路追踪（OpenTracing标准）和 Jaeger 实现 - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="分布式链路追踪（OpenTracing标准）和 Jaeger 实现">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/25/Opentracing%E6%A0%87%E5%87%86%E5%92%8CJaeger%E5%AE%9E%E7%8E%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          分布式链路追踪（OpenTracing标准）和 Jaeger 实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-25 22:48:13" itemprop="dateCreated datePublished" datetime="2021-03-25T22:48:13+08:00">2021-03-25</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2021-03-25 22:48" pubdate>
-        2021年3月25日 晚上
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      13.6k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      162
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-29 22:44:44" itemprop="dateModified" datetime="2021-03-29T22:44:44+08:00">2021-03-29</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>31k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>28 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">分布式链路追踪（OpenTracing标准）和 Jaeger 实现</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2021年3月29日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="OpenTracing-简介"><a href="#OpenTracing-简介" class="headerlink" title="OpenTracing 简介"></a>OpenTracing 简介</h1><p>OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。</p>
+      
+        <h1 id="OpenTracing-简介"><a href="#OpenTracing-简介" class="headerlink" title="OpenTracing 简介"></a>OpenTracing 简介</h1><p>OpenTracing 是一个中立的（厂商无关、平台无关）分布式追踪的 API 规范，提供了统一接口方便开发者在自己的服务中集成一种或者多种分布式追踪的实现。</p>
 <h2 id="OpenTracing-诞生的背景"><a href="#OpenTracing-诞生的背景" class="headerlink" title="OpenTracing 诞生的背景"></a>OpenTracing 诞生的背景</h2><p>开发和工程团队因为系统组件水平扩展、开发团队小型化、敏捷开发、CD（持续集成）、解耦等各种需求，开始使用微服务的架构取代以前好的单机系统。 也就是说，当一个生产系统面对真正的高并发，或者解耦成大量微服务时，以前很容易实现的重点任务变得困难了。过程中需要面临一系列问题：用户体验优化、后台真是错误原因分析，分布式系统内各组件的调用情况等。随着服务数量的增多和内部调用链的复杂化，仅凭借日志和性能监控很难做到 “See the Whole Picture”，在进行问题排查或是性能分析的时候，无异于盲人摸象。</p>
 <a id="more"></a>
 
@@ -294,19 +339,45 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <li>很多 span 可以并行工作（或者分布式工作）都可能是一个父级的 span 的子项，他会合并所有子span的执行结果，并在指定期限内返回</li>
 </ul>
 <p>一个具有 <code>ChildOf</code> 父子节点关系的时序图如下：</p>
-<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">[-Parent Span---------]<br>        [-Child Span----]<br><br>   [-Parent Span--------------]<br>        [-Child Span A----]<br>         [-Child Span B----]<br>       [-Child Span C----]<br>        [-Child Span D---------------]<br>        [-Child Span E----]<br></code></pre></div></td></tr></table></figure>
+<pre><code> [-Parent Span---------]
+         [-Child Span----]
 
-<p><strong><code>FollowsFrom</code> 引用:</strong> 一些父级节点不以任何方式依赖他们子节点的执行结果，这种情况下，就说这些子 span 和父 span 之间是 “FollowsFrom” 的因果关系。”FollowsFrom” 关系可以被分为很多不同的子类型，未来版本的 OpenTracing 中将正式的区分这些类型。</p>
+    [-Parent Span--------------]
+         [-Child Span A----]
+          [-Child Span B----]
+        [-Child Span C----]
+         [-Child Span D---------------]
+         [-Child Span E----]</code></pre><p><strong><code>FollowsFrom</code> 引用:</strong> 一些父级节点不以任何方式依赖他们子节点的执行结果，这种情况下，就说这些子 span 和父 span 之间是 “FollowsFrom” 的因果关系。”FollowsFrom” 关系可以被分为很多不同的子类型，未来版本的 OpenTracing 中将正式的区分这些类型。</p>
 <p>一个具有 <code>FollowsFrom</code> 父子节点关系的时序图如下：</p>
-<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">[-Parent Span-]  [-Child Span-]<br><br><br>    [-Parent Span--]<br>     [-Child Span-]<br><br><br>    [-Parent Span-]<br>                [-Child Span-]<br></code></pre></div></td></tr></table></figure>
+<pre><code>[-Parent Span-]  [-Child Span-]
 
-<p>综上，在一个 tracer 过程中，各 span 可以有如下关系：</p>
-<figure class="highlight mathematica"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs mathematica">       [<span class="hljs-keyword">Span</span> A]  ←←←(the root span)<br>           |<br>    +------+------+<br>    |             |<br>[<span class="hljs-keyword">Span</span> B]      [<span class="hljs-keyword">Span</span> C] ←←←(<span class="hljs-keyword">Span</span> C 是 <span class="hljs-keyword">Span</span> A 的孩子节点, ChildOf)<br>    |             |<br>[<span class="hljs-keyword">Span</span> D]      +---+-------+<br>              |           |<br>          [<span class="hljs-keyword">Span</span> E]    [<span class="hljs-keyword">Span</span> F] &gt;&gt;&gt; [<span class="hljs-keyword">Span</span> G] &gt;&gt;&gt; [<span class="hljs-keyword">Span</span> H]<br>                                      ↑<br>                                      ↑<br>                                      ↑<br>                        (<span class="hljs-keyword">Span</span> G 在 <span class="hljs-keyword">Span</span> F 后被调用, FollowsFrom)<br></code></pre></div></td></tr></table></figure>
 
-<p>上述 tracer 与 span 的时间轴关系如下：</p>
-<figure class="highlight gherkin"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs gherkin">––|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–––––––</span>|<span class="hljs-string">–&gt; time<br><br> [Span A···················································]<br>   [Span B··············································]<br>      [Span D··········································]<br>    [Span C········································]<br>         [Span E·······]        [Span F··] [Span G··] [Span H··]</span><br></code></pre></div></td></tr></table></figure>
+    [-Parent Span--]
+     [-Child Span-]
 
-<h3 id="SpanContext"><a href="#SpanContext" class="headerlink" title="SpanContext"></a>SpanContext</h3><p>每个 span 必须提供方法访问 <strong>SpanContext</strong>。SpanContext 代表跨越进程边界，传递到下级 span 的状态。(例如，包含 <code>&lt;trace_id, span_id, sampled&gt;</code> 元组)，并用于封装 <strong>Baggage</strong> 。SpanContext 在跨越进程边界和追踪图中创建边界的时候会被使用。</p>
+
+    [-Parent Span-]
+                [-Child Span-]</code></pre><p>综上，在一个 tracer 过程中，各 span 可以有如下关系：</p>
+<pre><code>        [Span A]  ←←←(the root span)
+            |
+     +------+------+
+     |             |
+ [Span B]      [Span C] ←←←(Span C 是 Span A 的孩子节点, ChildOf)
+     |             |
+ [Span D]      +---+-------+
+               |           |
+           [Span E]    [Span F] &gt;&gt;&gt; [Span G] &gt;&gt;&gt; [Span H]
+                                       ↑
+                                       ↑
+                                       ↑
+                         (Span G 在 Span F 后被调用, FollowsFrom)</code></pre><p>上述 tracer 与 span 的时间轴关系如下：</p>
+<pre><code>––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–&gt; time
+
+ [Span A···················································]
+   [Span B··············································]
+      [Span D··········································]
+    [Span C········································]
+         [Span E·······]        [Span F··] [Span G··] [Span H··]</code></pre><h3 id="SpanContext"><a href="#SpanContext" class="headerlink" title="SpanContext"></a>SpanContext</h3><p>每个 span 必须提供方法访问 <strong>SpanContext</strong>。SpanContext 代表跨越进程边界，传递到下级 span 的状态。(例如，包含 <code>&lt;trace_id, span_id, sampled&gt;</code> 元组)，并用于封装 <strong>Baggage</strong> 。SpanContext 在跨越进程边界和追踪图中创建边界的时候会被使用。</p>
 <p>每一个 <strong>SpanContext</strong> 包含以下特点：</p>
 <ul>
 <li>任何一个 OpenTracing 的实现，都需要将当前调用链的状态（例如：trace 和 span 的 id），依赖一个独特的 Span 去跨进程边界传输。</li>
@@ -432,20 +503,217 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <p>另一方面，为了构建真正的端到端追踪，还需要包含调用HTTP请求的客户端的span信息。所以需要在端到端过程中传递 span 的上下文信息，使得各端中的 span 可以合并到一个追踪过程中。这就是API中 Inject/Extract 的职责。<strong>homeHandler</strong>方法在第一次被调用时，创建一个根span，将关于本地追踪调用的 span 的元信息，设置到 http 的头上，并传递出去。</p>
 <p>在 ServiceHandler 中，通过 http头获取到前面注入的元数据，并根据获取情况，还可以指定 span 之间的关系。</p>
 <p>具体的代码实例如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> server<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"github.com/opentracing/opentracing-go"</span><br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"math/rand"</span><br>	<span class="hljs-string">"net/http"</span><br>	<span class="hljs-string">"time"</span><br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">IndexHandler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	_, _ = w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">`&lt;a href = "/home"&gt; Click here to start a request &lt;/a&gt;`</span>))<br>&#125;<br><br><span class="hljs-comment">// HomeHandler "/home" 路径下</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">HomeHandler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	_, _ = w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"Request started\n"</span>))<br><br>	<span class="hljs-comment">// 在入口处设置一个 span</span><br>	span := opentracing.StartSpan(<span class="hljs-string">"GET /home"</span>)<br>	<span class="hljs-keyword">defer</span> span.Finish()<br><br>	<span class="hljs-comment">// 创建请求</span><br>	asyncReq, _ := http.NewRequest(<span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://localhost:8888/async"</span>, <span class="hljs-literal">nil</span>)<br>	<span class="hljs-comment">// 将关于本地追踪调用的 span 的元信息，设置到 http 的头上，并准备传递出去</span><br>	err := span.Tracer().Inject(span.Context(),<br>		opentracing.TextMap,<br>		opentracing.HTTPHeadersCarrier(asyncReq.Header))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">"%s: Could not inject span context into async request header: %v"</span>, r.URL.Path, err)<br>	&#125;<br><br>	<span class="hljs-comment">// 为 span 设置 tags 和 logs</span><br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		sleepMilli(<span class="hljs-number">50</span>)<br>		<span class="hljs-comment">// 通过判断 homeHandler 方法是否正确返回，决定是否记录方法调用的错误信息</span><br>		<span class="hljs-keyword">if</span> _, err = http.DefaultClient.Do(asyncReq); err != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-comment">// 方法调用出错，为期设置 tag 和 log</span><br>			span.SetTag(<span class="hljs-string">"error"</span>, <span class="hljs-literal">true</span>)<br>			span.LogKV(fmt.Sprintf(<span class="hljs-string">"%s: Async call failed (%v)"</span>, r.URL.Path, err))<br>		&#125;<br>	&#125;()<br><br>	sleepMilli(<span class="hljs-number">10</span>)<br><br>	syncReq, _ := http.NewRequest(<span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://localhost:8888/service"</span>, <span class="hljs-literal">nil</span>)<br>	err = span.Tracer().Inject(span.Context(),<br>		opentracing.TextMap,<br>		opentracing.HTTPHeadersCarrier(syncReq.Header))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">"%s: Could not inject span context into service request header: %v"</span>, r.URL.Path, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> _, err = http.DefaultClient.Do(syncReq); err != <span class="hljs-literal">nil</span> &#123;<br>		span.SetTag(<span class="hljs-string">"error"</span>, <span class="hljs-literal">true</span>)<br>		span.LogKV(fmt.Sprintf(<span class="hljs-string">"%s: GET /service error: %v"</span>, r.URL.Path, err))<br>	&#125;<br>	_, _ = w.Write([]<span class="hljs-keyword">byte</span>(<span class="hljs-string">"Request done!\n"</span>))<br>&#125;<br><br><span class="hljs-comment">// ServiceHandler "/service" 路径下</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ServiceHandler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	<span class="hljs-comment">// 在 ServiceHandler 服务中提取上面的元数据信息</span><br>	<span class="hljs-keyword">var</span> sp opentracing.Span<br>	opName := fmt.Sprintf(<span class="hljs-string">"%s %s"</span>, r.Method, r.URL.Path)<br>	<span class="hljs-comment">// 尝试通过请求头获取 span 的上下文信息</span><br>	wireContext, err := opentracing.GlobalTracer().Extract(<br>		opentracing.TextMap,<br>		opentracing.HTTPHeadersCarrier(r.Header))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-comment">// 如果由于某种原因导致无法获取信息，则继续启动一个新的根路径下的 span</span><br>		sp = opentracing.StartSpan(opName)<br>		log.Printf(<span class="hljs-string">"err: %v for the wireContext: %v"</span>, err, wireContext)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-comment">// 没有出错则可以指定 span 之间的关系</span><br>		sp = opentracing.StartSpan(opName, opentracing.ChildOf(wireContext))<br>		log.Printf(<span class="hljs-string">"the wireContext: %v"</span>, wireContext)<br>	&#125;<br>	<span class="hljs-keyword">defer</span> sp.Finish()<br><br>	sleepMilli(<span class="hljs-number">50</span>)<br><br>	dbReq, _ := http.NewRequest(<span class="hljs-string">"GET"</span>, <span class="hljs-string">"http://localhost:8888/db"</span>, <span class="hljs-literal">nil</span>)<br>	err = sp.Tracer().Inject(sp.Context(),<br>		opentracing.TextMap,<br>		opentracing.HTTPHeadersCarrier(dbReq.Header))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">"%s: Couldn't inject headers (%v)"</span>, r.URL.Path, err)<br>	&#125;<br>	<span class="hljs-keyword">if</span> _, err = http.DefaultClient.Do(dbReq); err != <span class="hljs-literal">nil</span> &#123;<br>		sp.LogKV(<span class="hljs-string">"da request error"</span>, err)<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// DbHandler "/db"路径下</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">DbHandler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;<br>	<span class="hljs-keyword">var</span> sp opentracing.Span<br><br>	spanCtx, err := opentracing.GlobalTracer().Extract(opentracing.TextMap,<br>		opentracing.HTTPHeadersCarrier(r.Header))<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		sp = opentracing.StartSpan(<span class="hljs-string">"GET /db"</span>)<br>		log.Printf(<span class="hljs-string">"%s: Coule not join trace (%v)\n"</span>, r.URL.Path, err)<br>		<span class="hljs-keyword">return</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		sp = opentracing.StartSpan(<span class="hljs-string">"GET /db"</span>, opentracing.ChildOf(spanCtx))<br>	&#125;<br>	<span class="hljs-keyword">defer</span> sp.Finish()<br>	sleepMilli(<span class="hljs-number">25</span>)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sleepMilli</span><span class="hljs-params">(min <span class="hljs-keyword">int</span>)</span></span> &#123;<br>	time.Sleep(time.Millisecond * time.Duration(min+rand.Intn(<span class="hljs-number">100</span>)))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package server
 
+import (
+    &quot;fmt&quot;
+    &quot;github.com/opentracing/opentracing-go&quot;
+    &quot;log&quot;
+    &quot;math/rand&quot;
+    &quot;net/http&quot;
+    &quot;time&quot;
+)
+
+func IndexHandler(w http.ResponseWriter, r *http.Request) {
+    _, _ = w.Write([]byte(`&lt;a href = &quot;/home&quot;&gt; Click here to start a request &lt;/a&gt;`))
+}
+
+// HomeHandler &quot;/home&quot; 路径下
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+    _, _ = w.Write([]byte(&quot;Request started\n&quot;))
+
+    // 在入口处设置一个 span
+    span := opentracing.StartSpan(&quot;GET /home&quot;)
+    defer span.Finish()
+
+    // 创建请求
+    asyncReq, _ := http.NewRequest(&quot;GET&quot;, &quot;http://localhost:8888/async&quot;, nil)
+    // 将关于本地追踪调用的 span 的元信息，设置到 http 的头上，并准备传递出去
+    err := span.Tracer().Inject(span.Context(),
+        opentracing.TextMap,
+        opentracing.HTTPHeadersCarrier(asyncReq.Header))
+    if err != nil {
+        log.Fatalf(&quot;%s: Could not inject span context into async request header: %v&quot;, r.URL.Path, err)
+    }
+
+    // 为 span 设置 tags 和 logs
+    go func() {
+        sleepMilli(50)
+        // 通过判断 homeHandler 方法是否正确返回，决定是否记录方法调用的错误信息
+        if _, err = http.DefaultClient.Do(asyncReq); err != nil {
+            // 方法调用出错，为期设置 tag 和 log
+            span.SetTag(&quot;error&quot;, true)
+            span.LogKV(fmt.Sprintf(&quot;%s: Async call failed (%v)&quot;, r.URL.Path, err))
+        }
+    }()
+
+    sleepMilli(10)
+
+    syncReq, _ := http.NewRequest(&quot;GET&quot;, &quot;http://localhost:8888/service&quot;, nil)
+    err = span.Tracer().Inject(span.Context(),
+        opentracing.TextMap,
+        opentracing.HTTPHeadersCarrier(syncReq.Header))
+    if err != nil {
+        log.Fatalf(&quot;%s: Could not inject span context into service request header: %v&quot;, r.URL.Path, err)
+    }
+    if _, err = http.DefaultClient.Do(syncReq); err != nil {
+        span.SetTag(&quot;error&quot;, true)
+        span.LogKV(fmt.Sprintf(&quot;%s: GET /service error: %v&quot;, r.URL.Path, err))
+    }
+    _, _ = w.Write([]byte(&quot;Request done!\n&quot;))
+}
+
+// ServiceHandler &quot;/service&quot; 路径下
+func ServiceHandler(w http.ResponseWriter, r *http.Request) {
+    // 在 ServiceHandler 服务中提取上面的元数据信息
+    var sp opentracing.Span
+    opName := fmt.Sprintf(&quot;%s %s&quot;, r.Method, r.URL.Path)
+    // 尝试通过请求头获取 span 的上下文信息
+    wireContext, err := opentracing.GlobalTracer().Extract(
+        opentracing.TextMap,
+        opentracing.HTTPHeadersCarrier(r.Header))
+    if err != nil {
+        // 如果由于某种原因导致无法获取信息，则继续启动一个新的根路径下的 span
+        sp = opentracing.StartSpan(opName)
+        log.Printf(&quot;err: %v for the wireContext: %v&quot;, err, wireContext)
+    } else {
+        // 没有出错则可以指定 span 之间的关系
+        sp = opentracing.StartSpan(opName, opentracing.ChildOf(wireContext))
+        log.Printf(&quot;the wireContext: %v&quot;, wireContext)
+    }
+    defer sp.Finish()
+
+    sleepMilli(50)
+
+    dbReq, _ := http.NewRequest(&quot;GET&quot;, &quot;http://localhost:8888/db&quot;, nil)
+    err = sp.Tracer().Inject(sp.Context(),
+        opentracing.TextMap,
+        opentracing.HTTPHeadersCarrier(dbReq.Header))
+    if err != nil {
+        log.Fatalf(&quot;%s: Couldn&#39;t inject headers (%v)&quot;, r.URL.Path, err)
+    }
+    if _, err = http.DefaultClient.Do(dbReq); err != nil {
+        sp.LogKV(&quot;da request error&quot;, err)
+    }
+}
+
+// DbHandler &quot;/db&quot;路径下
+func DbHandler(w http.ResponseWriter, r *http.Request) {
+    var sp opentracing.Span
+
+    spanCtx, err := opentracing.GlobalTracer().Extract(opentracing.TextMap,
+        opentracing.HTTPHeadersCarrier(r.Header))
+    if err != nil {
+        sp = opentracing.StartSpan(&quot;GET /db&quot;)
+        log.Printf(&quot;%s: Coule not join trace (%v)\n&quot;, r.URL.Path, err)
+        return
+    } else {
+        sp = opentracing.StartSpan(&quot;GET /db&quot;, opentracing.ChildOf(spanCtx))
+    }
+    defer sp.Finish()
+    sleepMilli(25)
+}
+
+func sleepMilli(min int) {
+    time.Sleep(time.Millisecond * time.Duration(min+rand.Intn(100)))
+}</code></pre>
 <h2 id="连接到追踪系统"><a href="#连接到追踪系统" class="headerlink" title="连接到追踪系统"></a>连接到追踪系统</h2><p>当系统按照 OpenTracing 标准被监控之后，增加一个追踪系统便变得非常简单，只需要在启动之前，指定所连接的链路追踪系统即可，下面使用 appdash 追踪系统，通过在 main 函数中添加一小段代码来启动 Appdash 实例，不需要修改任何监控代码就可以实现追踪：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">package</span> main<br><br><span class="hljs-keyword">import</span> (<br>	<span class="hljs-string">"flag"</span><br>	<span class="hljs-string">"fmt"</span><br>	<span class="hljs-string">"github.com/opentracing/opentracing-go"</span><br>	<span class="hljs-string">"log"</span><br>	<span class="hljs-string">"net"</span><br>	<span class="hljs-string">"net/http"</span><br>	<span class="hljs-string">"net/url"</span><br>	<span class="hljs-string">"opentracing-demo/server"</span><br>	<span class="hljs-string">"sourcegraph.com/sourcegraph/appdash"</span><br>	appdashot <span class="hljs-string">"sourcegraph.com/sourcegraph/appdash/opentracing"</span><br>	<span class="hljs-string">"sourcegraph.com/sourcegraph/appdash/traceapp"</span><br>)<br><br><span class="hljs-keyword">var</span> (<br>	port        = flag.Int(<span class="hljs-string">"port"</span>, <span class="hljs-number">8888</span>, <span class="hljs-string">"Example app port."</span>)<br>	appdashPort = flag.Int(<span class="hljs-string">"appdash.port"</span>, <span class="hljs-number">8700</span>, <span class="hljs-string">"Run appdash locally on this port."</span>)<br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	flag.Parse()<br><br>	<span class="hljs-comment">// 连接到追踪系统（Appdash）</span><br>	addr := startAppdashServer(*appdashPort)<br>	tracer := appdashot.NewTracer(appdash.NewRemoteCollector(addr))<br>	opentracing.InitGlobalTracer(tracer)<br>	addr = fmt.Sprintf(<span class="hljs-string">":%d"</span>, *port)<br>	mux := http.NewServeMux()<br>	mux.HandleFunc(<span class="hljs-string">"/"</span>, server.IndexHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/home"</span>, server.HomeHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/async"</span>, server.ServiceHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/service"</span>, server.ServiceHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/db"</span>, server.DbHandler)<br>	fmt.Printf(<span class="hljs-string">"Go to http://localhost:%d/home to start arequest!\n"</span>, *port)<br>	log.Fatal(http.ListenAndServe(addr, mux))<br>&#125;<br><br><span class="hljs-comment">// startAppdashServer 连接到 Appdash 链路追踪系统</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startAppdashServer</span><span class="hljs-params">(appdashPort <span class="hljs-keyword">int</span>)</span> <span class="hljs-params">(collectorPortStr <span class="hljs-keyword">string</span>)</span></span> &#123;<br>	store := appdash.NewMemoryStore()<br>	<span class="hljs-comment">// 在本地侦听任何可用的 TCP 端口</span><br>	l, err := net.ListenTCP(<span class="hljs-string">"tcp"</span>, &amp;net.TCPAddr&#123;IP: net.IPv4(<span class="hljs-number">127</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>), Port: <span class="hljs-number">0</span>&#125;)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatal(err)<br>	&#125;<br><br>	collectorPort := l.Addr().(*net.TCPAddr).Port<br>	collectorPortStr = fmt.Sprintf(<span class="hljs-string">":%d"</span>, collectorPort)<br><br>	<span class="hljs-comment">// 启动一个 Appdash 收集服务器，该服务器将侦听 span 和批注并将其添加到本地收集器（存储在内存中）</span><br>	cs := appdash.NewServer(l, appdash.NewLocalCollector(store))<br>	<span class="hljs-keyword">go</span> cs.Start()<br><br>	<span class="hljs-comment">// 打印将运行 web 界面的 URL</span><br>	appdashURLStr := fmt.Sprintf(<span class="hljs-string">"http://localhost:%d"</span>, appdashPort)<br>	appdashURL, err := url.Parse(appdashURLStr)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">"Error parsing %s: %s"</span>, appdashURLStr, err)<br>	&#125;<br>	fmt.Printf(<span class="hljs-string">"To see your traces,go to %s/traces\n"</span>, appdashURL)<br><br>	<span class="hljs-comment">// 在单独的 goroutine 中启动 web UI 界面</span><br>	tapp, err := traceapp.New(<span class="hljs-literal">nil</span>, appdashURL)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Fatalf(<span class="hljs-string">"Error creating traceapp: %v"</span>, err)<br>	&#125;<br>	tapp.Store = store<br>	tapp.Queryer = store<br>	<span class="hljs-keyword">go</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		log.Fatal(http.ListenAndServe(fmt.Sprintf(<span class="hljs-string">":%d"</span>, appdashPort), tapp))<br>	&#125;()<br><br>	<span class="hljs-keyword">return</span><br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">package main
 
+import (
+    &quot;flag&quot;
+    &quot;fmt&quot;
+    &quot;github.com/opentracing/opentracing-go&quot;
+    &quot;log&quot;
+    &quot;net&quot;
+    &quot;net/http&quot;
+    &quot;net/url&quot;
+    &quot;opentracing-demo/server&quot;
+    &quot;sourcegraph.com/sourcegraph/appdash&quot;
+    appdashot &quot;sourcegraph.com/sourcegraph/appdash/opentracing&quot;
+    &quot;sourcegraph.com/sourcegraph/appdash/traceapp&quot;
+)
+
+var (
+    port        = flag.Int(&quot;port&quot;, 8888, &quot;Example app port.&quot;)
+    appdashPort = flag.Int(&quot;appdash.port&quot;, 8700, &quot;Run appdash locally on this port.&quot;)
+)
+
+func main() {
+    flag.Parse()
+
+    // 连接到追踪系统（Appdash）
+    addr := startAppdashServer(*appdashPort)
+    tracer := appdashot.NewTracer(appdash.NewRemoteCollector(addr))
+    opentracing.InitGlobalTracer(tracer)
+    addr = fmt.Sprintf(&quot;:%d&quot;, *port)
+    mux := http.NewServeMux()
+    mux.HandleFunc(&quot;/&quot;, server.IndexHandler)
+    mux.HandleFunc(&quot;/home&quot;, server.HomeHandler)
+    mux.HandleFunc(&quot;/async&quot;, server.ServiceHandler)
+    mux.HandleFunc(&quot;/service&quot;, server.ServiceHandler)
+    mux.HandleFunc(&quot;/db&quot;, server.DbHandler)
+    fmt.Printf(&quot;Go to http://localhost:%d/home to start arequest!\n&quot;, *port)
+    log.Fatal(http.ListenAndServe(addr, mux))
+}
+
+// startAppdashServer 连接到 Appdash 链路追踪系统
+func startAppdashServer(appdashPort int) (collectorPortStr string) {
+    store := appdash.NewMemoryStore()
+    // 在本地侦听任何可用的 TCP 端口
+    l, err := net.ListenTCP(&quot;tcp&quot;, &amp;net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 0})
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    collectorPort := l.Addr().(*net.TCPAddr).Port
+    collectorPortStr = fmt.Sprintf(&quot;:%d&quot;, collectorPort)
+
+    // 启动一个 Appdash 收集服务器，该服务器将侦听 span 和批注并将其添加到本地收集器（存储在内存中）
+    cs := appdash.NewServer(l, appdash.NewLocalCollector(store))
+    go cs.Start()
+
+    // 打印将运行 web 界面的 URL
+    appdashURLStr := fmt.Sprintf(&quot;http://localhost:%d&quot;, appdashPort)
+    appdashURL, err := url.Parse(appdashURLStr)
+    if err != nil {
+        log.Fatalf(&quot;Error parsing %s: %s&quot;, appdashURLStr, err)
+    }
+    fmt.Printf(&quot;To see your traces,go to %s/traces\n&quot;, appdashURL)
+
+    // 在单独的 goroutine 中启动 web UI 界面
+    tapp, err := traceapp.New(nil, appdashURL)
+    if err != nil {
+        log.Fatalf(&quot;Error creating traceapp: %v&quot;, err)
+    }
+    tapp.Store = store
+    tapp.Queryer = store
+    go func() {
+        log.Fatal(http.ListenAndServe(fmt.Sprintf(&quot;:%d&quot;, appdashPort), tapp))
+    }()
+
+    return
+}
+</code></pre>
 <p>运行之后，就可以通过 UI 界面观察到本地程序的请求链路，耗时情况等：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/opentracing-appdash.jpg" alt="opentracing-appdash"></p>
 <h1 id="OpenTracing-最佳实践"><a href="#OpenTracing-最佳实践" class="headerlink" title="OpenTracing 最佳实践"></a>OpenTracing 最佳实践</h1><h2 id="针对准备使用-OpenTracing-API-的实践"><a href="#针对准备使用-OpenTracing-API-的实践" class="headerlink" title="针对准备使用 OpenTracing API 的实践"></a>针对准备使用 OpenTracing API 的实践</h2><h3 id="追踪-Function（函数）"><a href="#追踪-Function（函数）" class="headerlink" title="追踪 Function（函数）"></a>追踪 Function（函数）</h3><p>假设现在最顶层的函数如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">top_level_function</span><span class="hljs-params">()</span>:</span><br>    span1 = tracer.start_span(<span class="hljs-string">'top_level_function'</span>)<br>    <span class="hljs-keyword">try</span>:<br>        . . . <span class="hljs-comment"># business logic，业务逻辑</span><br>    <span class="hljs-keyword">finally</span>:<br>        span1.finish()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">def top_level_function():
+    span1 = tracer.start_span(&#39;top_level_function&#39;)
+    try:
+        . . . # business logic，业务逻辑
+    finally:
+        span1.finish()</code></pre>
 <p>在后面的流程中，作为业务逻辑的一部分，我们调用的 <code>function2</code> 方法，也希望能够被追踪。为了让这个追踪附着在正在进行的追踪上（和上述的追踪形成一根调用链），需要获取到正在进行的追踪。</p>
 <p>现在，假设一个 <code>get_current_span</code> 函数可以完成这个功能：</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">function2</span><span class="hljs-params">()</span>:</span><br>    span2 = get_current_span().start_child(<span class="hljs-string">'function2'</span>)<br>        <span class="hljs-keyword">if</span> get_current_span() <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span><br>    <span class="hljs-keyword">try</span>:<br>        . . . <span class="hljs-comment"># business logic</span><br>    <span class="hljs-keyword">finally</span>:<br>        <span class="hljs-keyword">if</span> span2:<br>            span2.finish()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">def function2():
+    span2 = get_current_span().start_child(&#39;function2&#39;)
+        if get_current_span() else None
+    try:
+        . . . # business logic
+    finally:
+        if span2:
+            span2.finish()</code></pre>
 <p>假设如果这个追踪还未被启动，无论什么原因，开发者都不想在这个函数内启动一个新的追踪，所以 <code>get_current_span</code> 函数可能返回 <code>None</code>。</p>
 <h3 id="服务端追踪"><a href="#服务端追踪" class="headerlink" title="服务端追踪"></a>服务端追踪</h3><p>当一个应用服务器要追踪一个请求的执行情况，一般需要以下几步：</p>
 <ol>
@@ -454,13 +722,23 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <li>最终，当服务端完成请求处理后，使用 <code>span.finish()</code> 关闭 span。</li>
 </ol>
 <h4 id="从请求中获取（Extracting）SpanContext"><a href="#从请求中获取（Extracting）SpanContext" class="headerlink" title="从请求中获取（Extracting）SpanContext"></a>从请求中获取（Extracting）SpanContext</h4><p>假设，有一个HTTP服务器，SpanContext 通过 HTTP 头从客户端传递到服务端，可通过 <code>request.headers</code> 访问到：</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">extracted_context = tracer.extract(<br>    format=opentracing.HTTP_HEADER_FORMAT,<br>    carrier=request.headers<br>)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">extracted_context = tracer.extract(
+    format=opentracing.HTTP_HEADER_FORMAT,
+    carrier=request.headers
+)</code></pre>
 <p>这里，使用 <code>headers</code> 中的 map 作为 carrier。追踪程序知道需要 hearder 的哪些内容，用来重新构建 tracer 的状态和 Baggage。</p>
 <h4 id="从请求中获取一个已经存在的追踪，或者开启一个新的追踪"><a href="#从请求中获取一个已经存在的追踪，或者开启一个新的追踪" class="headerlink" title="从请求中获取一个已经存在的追踪，或者开启一个新的追踪"></a>从请求中获取一个已经存在的追踪，或者开启一个新的追踪</h4><p>如果无法在请求的相关的头信息中获取所需的值，上文中的 <code>extracted_context</code> 可能为<code>None</code>：此时假设客户端没有发送他们。</p>
 <p>在这种情况下，服务端需要新创建一个追踪（新调用链）。</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">extracted_context = tracer.extract(<br>    format=opentracing.HTTP_HEADER_FORMAT,<br>    carrier=request.headers<br>)<br><span class="hljs-keyword">if</span> extracted_context <span class="hljs-keyword">is</span> <span class="hljs-literal">None</span>:<br>    span = tracer.start_span(operation_name=operation)<br><span class="hljs-keyword">else</span>:<br>    span = tracer.start_span(operation_name=operation, child_of=extracted_context)<br>span.set_tag(<span class="hljs-string">'http.method'</span>, request.method)<br>span.set_tag(<span class="hljs-string">'http.url'</span>, request.full_url)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">extracted_context = tracer.extract(
+    format=opentracing.HTTP_HEADER_FORMAT,
+    carrier=request.headers
+)
+if extracted_context is None:
+    span = tracer.start_span(operation_name=operation)
+else:
+    span = tracer.start_span(operation_name=operation, child_of=extracted_context)
+span.set_tag(&#39;http.method&#39;, request.method)
+span.set_tag(&#39;http.url&#39;, request.full_url)</code></pre>
 <p>可以通过调用 <code>set_tag</code>，是在Span中记录请求的附加信息。</p>
 <p>上面提到的 <code>operation</code> 是通过提供的服务名指定 Span 的名称。例如,如果HTTP请求到 <code>/save_user/123</code>，那么 <code>operation</code> 名称应该被设置为 <code>post:/save_user/</code>。OpenTracing API 不会强制要求应用程序如何给 span 命名。</p>
 <h4 id="进程内请求上下文传输"><a href="#进程内请求上下文传输" class="headerlink" title="进程内请求上下文传输"></a>进程内请求上下文传输</h4><p>请求的上下文传输是指，对于一个请求，所有处理这个请求的层都需要可以访问到同一个 <code>context</code>（上下文）。可以通过特定值，例如：用户id、token、请求的截止时间等，获取到这个 <code>context</code>（上下文）。也可以通过这种方法获取正在追踪的 Span。</p>
@@ -468,12 +746,57 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <h5 id="隐式传输"><a href="#隐式传输" class="headerlink" title="隐式传输"></a>隐式传输</h5><p>隐式传输技术要求 <code>context</code>（上下文）需要被存储到平台特定的位置，允许从应用程序的任何地方获取这个值。常用的 RPC 框架会利用 thread-local 或 continuation-local 存储机制，或者全局变量（如果是单线程处理）。</p>
 <p>这种方式的缺点在于，有明显的性能损耗，有些平台比如 Go 不知道基于 thread-local 的存储，隐式传输将几乎不可能实现。</p>
 <h5 id="显示传输"><a href="#显示传输" class="headerlink" title="显示传输"></a>显示传输</h5><p>显示传输技术要求应用程序代码，包装并传递 <code>context</code>（上下文）对象：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">HandleHttp</span><span class="hljs-params">(w http.ResponseWriter, req *http.Request)</span></span> &#123;<br>    ctx := context.Background()<br>    ...<br>    BusinessFunction1(ctx, arg1, ...)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BusinessFunction1</span><span class="hljs-params">(ctx context.Context, arg1...)</span></span> &#123;<br>    ...<br>    BusinessFunction2(ctx, arg1, ...)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">BusinessFunction2</span><span class="hljs-params">(ctx context.Context, arg1...)</span></span> &#123;<br>    parentSpan := opentracing.SpanFromContext(ctx)<br>    childSpan := opentracing.StartSpan(<br>        <span class="hljs-string">"..."</span>, opentracing.ChildOf(parentSpan.Context()), ...)<br>    ...<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">func HandleHttp(w http.ResponseWriter, req *http.Request) {
+    ctx := context.Background()
+    ...
+    BusinessFunction1(ctx, arg1, ...)
+}
 
+func BusinessFunction1(ctx context.Context, arg1...) {
+    ...
+    BusinessFunction2(ctx, arg1, ...)
+}
+
+func BusinessFunction2(ctx context.Context, arg1...) {
+    parentSpan := opentracing.SpanFromContext(ctx)
+    childSpan := opentracing.StartSpan(
+        &quot;...&quot;, opentracing.ChildOf(parentSpan.Context()), ...)
+    ...
+}</code></pre>
 <p>显示传输的缺点在于，它向应用程序代码，暴露了底层的实现。</p>
 <h3 id="追踪客户端调用"><a href="#追踪客户端调用" class="headerlink" title="追踪客户端调用"></a>追踪客户端调用</h3><p>当一个应用程序作为一个 RPC 客户端时，它可能希望在发起调用之前，启动一个新的追踪的 span，并将这个新的 span 随请求一起传输。下面，通过一个HTTP请求的实例，展现如何做到这点。</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">traced_request</span><span class="hljs-params">(request, operation, http_client)</span>:</span><br>    <span class="hljs-comment"># retrieve current span from propagated request context</span><br>    parent_span = get_current_span()<br><br>    <span class="hljs-comment"># start a new span to represent the RPC</span><br>    span = tracer.start_span(<br>        operation_name=operation,<br>        child_of=parent_span.context,<br>        tags=&#123;<span class="hljs-string">'http.url'</span>: request.full_url&#125;<br>    )<br><br>    <span class="hljs-comment"># propagate the Span via HTTP request headers</span><br>    tracer.inject(<br>        span.context,<br>        format=opentracing.HTTP_HEADER_FORMAT,<br>        carrier=request.headers)<br><br>    <span class="hljs-comment"># define a callback where we can finish the span</span><br>    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">on_done</span><span class="hljs-params">(future)</span>:</span><br>        <span class="hljs-keyword">if</span> future.exception():<br>            span.log(event=<span class="hljs-string">'rpc exception'</span>, payload=exception)<br>        span.set_tag(<span class="hljs-string">'http.status_code'</span>, future.result().status_code)<br>        span.finish()<br><br>    <span class="hljs-keyword">try</span>:<br>        future = http_client.execute(request)<br>        future.add_done_callback(on_done)<br>        <span class="hljs-keyword">return</span> future<br>    <span class="hljs-keyword">except</span> Exception e:<br>        span.log(event=<span class="hljs-string">'general exception'</span>, payload=e)<br>        span.finish()<br>        <span class="hljs-keyword">raise</span><br></code></pre></div></td></tr></table></figure>
+<pre><code class="python">def traced_request(request, operation, http_client):
+    # retrieve current span from propagated request context
+    parent_span = get_current_span()
 
+    # start a new span to represent the RPC
+    span = tracer.start_span(
+        operation_name=operation,
+        child_of=parent_span.context,
+        tags={&#39;http.url&#39;: request.full_url}
+    )
+
+    # propagate the Span via HTTP request headers
+    tracer.inject(
+        span.context,
+        format=opentracing.HTTP_HEADER_FORMAT,
+        carrier=request.headers)
+
+    # define a callback where we can finish the span
+    def on_done(future):
+        if future.exception():
+            span.log(event=&#39;rpc exception&#39;, payload=exception)
+        span.set_tag(&#39;http.status_code&#39;, future.result().status_code)
+        span.finish()
+
+    try:
+        future = http_client.execute(request)
+        future.add_done_callback(on_done)
+        return future
+    except Exception e:
+        span.log(event=&#39;general exception&#39;, payload=e)
+        span.finish()
+        raise</code></pre>
 <ul>
 <li><code>get_current_span()</code> 函数不是 OpenTracing API 的一部分。它仅仅代表一个工具类的方法，通过当前的请求上下文获取当前的span。（在Python一般会这样用）。</li>
 <li>假定 HTTP 请求是异步的，所以他会返回一个 Future。我们为这次调用增加的成功回调函数，在回调函数内部完成当前的 span。</li>
@@ -481,18 +804,31 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <li>因为 HTTP 请求可以在返回 Future 后发生异常，则使用 try/catch 块，在任何情况下都会完成 span，保证这个 span 会被上报，并避免内存溢出。</li>
 </ul>
 <h3 id="使用-Baggage-分布式上下文传输"><a href="#使用-Baggage-分布式上下文传输" class="headerlink" title="使用 Baggage / 分布式上下文传输"></a>使用 Baggage / 分布式上下文传输</h3><p>上面通过网络在客户端和服务端间传输的 Span 和 Trace，包含了任意的 Baggage。客户端可以使用 Baggage 将一些额外的数据传递到服务端，以及这个服务端的下游其他服务器。</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-comment"># client side</span><br>span.context.set_baggage_item(<span class="hljs-string">'auth-token'</span>, <span class="hljs-string">'.....'</span>)<br><br><span class="hljs-comment"># server side (one or more levels down from the client)</span><br>token = span.context.get_baggage_item(<span class="hljs-string">'auth-token'</span>)<br></code></pre></div></td></tr></table></figure>
+<pre><code class="python"># client side
+span.context.set_baggage_item(&#39;auth-token&#39;, &#39;.....&#39;)
 
+# server side (one or more levels down from the client)
+token = span.context.get_baggage_item(&#39;auth-token&#39;)</code></pre>
 <h3 id="Logging-事件"><a href="#Logging-事件" class="headerlink" title="Logging 事件"></a>Logging 事件</h3><p>在客户端 span 的示例代码中，已经使用过 <code>log</code>。事件被记录不会有额外的负载，也不一定必须在 span 创建或完成时进行操作。例如，应用通过可以在执行过程中，通过获取当前请求的当前 span,记录一个缓存未命中事件：</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">span = get_current_span()<br>span.log(event=<span class="hljs-string">'cache-miss'</span>)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">span = get_current_span()
+span.log(event=&#39;cache-miss&#39;)</code></pre>
 <p>tracer 会为事件自动增加一个时间戳，这点和 Span 的 tag 操作时不同的。也可以将外部的时间戳和事件相关联。</p>
 <h3 id="使用外部的时间戳，记录Span"><a href="#使用外部的时间戳，记录Span" class="headerlink" title="使用外部的时间戳，记录Span"></a>使用外部的时间戳，记录Span</h3><p>因为多种多样的原因，有些场景下，会将 OpenTracing 兼容的 tracer 集成到一个服务中。例如,一个用户有一个日志文件，其中包含大量的来自黑盒进程（如：HAProxy）产生的 span。为了让这些数据接入 OpenTracing 兼容的系统，API 需要提供一种方法通过外部的时间戳记录 span 的信息。</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python">explicit_span = tracer.start_span(<br>    operation_name=external_format.operation,<br>    start_time=external_format.start,<br>    tags=external_format.tags<br>)<br>explicit_span.finish(<br>    finish_time=external_format.finish,<br>    bulk_logs=map(..., external_format.logs)<br>)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">explicit_span = tracer.start_span(
+    operation_name=external_format.operation,
+    start_time=external_format.start,
+    tags=external_format.tags
+)
+explicit_span.finish(
+    finish_time=external_format.finish,
+    bulk_logs=map(..., external_format.logs)
+)</code></pre>
 <h3 id="在追踪开始之前，设置采样优先级"><a href="#在追踪开始之前，设置采样优先级" class="headerlink" title="在追踪开始之前，设置采样优先级"></a>在追踪开始之前，设置采样优先级</h3><p>很多分布式追踪系统，通过采样来降低追踪数据的数量。有时，开发者想有一种方式，确保这 trace 一定会被记录（采样），例如：HTTP 请求中包含特定的参数，如 <code>debug=true</code>。OpenTracing API 标准化了一些有用的 tag，其中一个被叫做 “sampling priority”（采样优先级）：精确的语义是由追踪系统的实现者决定的，但是任何值大于0（默认）代表一条 trace 的高优先级。为了将 <code>debug</code> 属性传递给追踪系统，需要在追踪前进行预处理，如下面所写的这样：</p>
-<figure class="highlight python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs python"><span class="hljs-keyword">if</span> request.get(<span class="hljs-string">'debug'</span>):<br>    span = tracer.start_span(<br>        operation_name=operation,<br>        tags=&#123;tags.SAMPLING_PRIORITY: <span class="hljs-number">1</span>&#125;<br>    )<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="python">if request.get(&#39;debug&#39;):
+    span = tracer.start_span(
+        operation_name=operation,
+        tags={tags.SAMPLING_PRIORITY: 1}
+    )</code></pre>
 <h2 id="针对准备将-OpenTracing-集成到-web，RPC-或者其他框架的实践"><a href="#针对准备将-OpenTracing-集成到-web，RPC-或者其他框架的实践" class="headerlink" title="针对准备将 OpenTracing 集成到 web，RPC 或者其他框架的实践"></a>针对准备将 OpenTracing 集成到 web，RPC 或者其他框架的实践</h2><p>总体来说，集成 OpenTracing 需要做两件事情：</p>
 <p>服务端框架修改需求：</p>
 <ul>
@@ -522,26 +858,45 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <h4 id="获取当前的追踪链的状态"><a href="#获取当前的追踪链的状态" class="headerlink" title="获取当前的追踪链的状态"></a>获取当前的追踪链的状态</h4><p>为了在分布式系统中，跨进程边界追踪调用情况，RPC 服务需要能够衔接每一个服务请求的服务端和客户端。OpenTracing 允许通过 inject 和 extract 方法，将 span 的上下文信息编码到 carrier 中。</p>
 <p>如果客户端发起一个请求时，span 的上下文就已经被加到了请求内容中。需要做的工作是使用 io.opentracing.Tracer.extract 方法，从请求中获取 span 的上下文。carrier 判断使用哪种服务，决定使用哪种方法从请求中获取上下文；例如，web 服务通过 HTTP 头作为 carrier，从 HTTP 请求中获 span 上下文（如下所示）：</p>
 <p>Python:</p>
-<figure class="highlight Python"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs Python">span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, request.headers)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="Python">span_ctx = tracer.extract(opentracing.Format.HTTP_HEADERS, request.headers)</code></pre>
 <p>Java:</p>
-<figure class="highlight Java"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs Java"><span class="hljs-keyword">import</span> io.opentracing.propagation.Format;<br><span class="hljs-keyword">import</span> io.opentracing.propagation.TextMap;<br><br>Map&lt;String, String&gt; headers = request.getHeaders();<br>SpanContext parentSpan = tracer.getTracer().extract(Format.Builtin.HTTP_HEADERS,<br>    <span class="hljs-keyword">new</span> TextMapExtractAdapter(headers));<br></code></pre></div></td></tr></table></figure>
+<pre><code class="Java">import io.opentracing.propagation.Format;
+import io.opentracing.propagation.TextMap;
 
+Map&lt;String, String&gt; headers = request.getHeaders();
+SpanContext parentSpan = tracer.getTracer().extract(Format.Builtin.HTTP_HEADERS,
+    new TextMapExtractAdapter(headers));</code></pre>
 <p>OpenTracing 当提取失败时，可以选择抛出异常，所以确保会捕获异常，防止异常造成服务器宕机。这种情况通常意味着请求来自于第三方应用（没有被追踪的应用），此时应该开启一个新的追踪。</p>
 <h4 id="保存当前的span上下文"><a href="#保存当前的span上下文" class="headerlink" title="保存当前的span上下文"></a>保存当前的span上下文</h4><p>在处理请求期间，让用户可以访问 span 上下文是十分重要的。只有获取上下文，才能为服务端，进行自定义的 tag 设置，记录事件(log event)，创建子级的 span，用于最终展现服务内部的工作情况。为了满足这个目标，必须决定如何让用户访问当前的 span。这将由框架的架构决定。这里有两个常见用例：</p>
 <h5 id="使用请求上下文"><a href="#使用请求上下文" class="headerlink" title="使用请求上下文"></a>使用请求上下文</h5><p>如果使用的框架有一个请求上下文，上下文可以存储任意值，这样可以在请求处理过程中，一直把现在的 span 存储到上下文中。如果框架中有过滤器（Filter），这种实现方式是一种很好的方式。例如有一个请求上下文叫做 ctx，那么可以这样实现一个过滤器（Filter）：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">def filter(request):<br>    span = # extract / start span from request<br>    with (ctx.active_span = span):<br>        process_request(request)<br>    span.finish()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">def filter(request):
+    span = # extract / start span from request
+    with (ctx.active_span = span):
+        process_request(request)
+    span.finish()</code></pre>
 <p>现在，在请求处理的任何时候，用户都可以通过 <code>ctx.active_span</code> 获取当前的 span。注意，一旦请求被处理，<code>ctx.active_span</code> 的值就不应该被改变。</p>
 <h5 id="建立请求和-span-的映射关系"><a href="#建立请求和-span-的映射关系" class="headerlink" title="建立请求和 span 的映射关系"></a>建立请求和 span 的映射关系</h5><p>如果存在这种情况：如有可能没有一个可用的请求上下文，或者针对请求的预处理和后处理有不同的过滤器方法， 可以选择建立一个请求和 span 的映射表。其中一种实现方式是创建一个框架特有的 tracer 的包装器（tracer wrapper），存储这个映射表，例如：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">class MyFrameworkTracer:<br>    def __init__(opentracing_tracer):<br>        self.internal_tracer = opentracing_tracer<br>        self.active_spans = &#123;&#125;<br>    def add_span(request, span):<br>        self.active_spans[request] = span<br>    def get_span(request):<br>        <span class="hljs-keyword">return</span> self.active_spans[request]<br>    def finish_span(request):<br>        span = self.active_spans[request]<br>        span.finish()<br>        del self.active_spans[request]<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">class MyFrameworkTracer:
+    def __init__(opentracing_tracer):
+        self.internal_tracer = opentracing_tracer
+        self.active_spans = {}
+    def add_span(request, span):
+        self.active_spans[request] = span
+    def get_span(request):
+        return self.active_spans[request]
+    def finish_span(request):
+        span = self.active_spans[request]
+        span.finish()
+        del self.active_spans[request]</code></pre>
 <ol>
 <li>如果服务器可以并行的处理请求，需要确保 span 的映射表是线程安全的。</li>
 <li>过滤器处理示例代码如下：</li>
 </ol>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">def process_request(request):<br>    span = # extract / start span from request<br>    tracer.add_span(request, span)<br>def process_response(request, response):<br>    tracer.finish_span(request)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">def process_request(request):
+    span = # extract / start span from request
+    tracer.add_span(request, span)
+def process_response(request, response):
+    tracer.finish_span(request)</code></pre>
 <p>注意：用户在处理 reponse 时，调用 <code>tracer.get_span(request)</code> 获取当前的 span，请确保用户依然能获取 request 实例。（也可以不使用 request 对象，而使用其他可以标识当前请求的参数）</p>
 <h3 id="客户端追踪"><a href="#客户端追踪" class="headerlink" title="客户端追踪"></a>客户端追踪</h3><p>当框架有一个客户端组件的时候，需要在初始化 request 的时候，开启客户端的追踪。这样做是为了将生成的 span 放到请求头中，这样 span 才能请求随着请求，传递到服务端。</p>
 <p>类似于服务端追踪，需要知道如何修改客户端代码，来发送请求，和接收相应。当客户端完成修改，就可以完成端到端的追踪了。</p>
@@ -561,20 +916,34 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 </ul>
 <h4 id="读取现在的追踪状态-新建一个span"><a href="#读取现在的追踪状态-新建一个span" class="headerlink" title="读取现在的追踪状态 / 新建一个span"></a>读取现在的追踪状态 / 新建一个span</h4><p>正如服务端一样，必须知道是应该开启一个新的追踪或者和一个已有的追踪连接上。例如,一个基于微服务架构分布式架构中，一个应用可能即是服务端又是客户端。一个服务的提供方同时又是另一个服务的发起方，这个东西需要被联系起来。如果存在一个活跃的调用链，需要将它的活跃 span 作为父级 span，并在客户端请求出开启一个新的 span。否则，需要新建没有没有父级节点的 span。</p>
 <p>如何判断是否存在一个活跃的追踪，取决于如何存储的活跃的 span。如果使用一个请求上下文，你可以这样处理：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">if</span> hasattr(ctx, active_span):<br>    parent_span = getattr(ctx, active_span)<br>    span = tracer.start_span(operation_name=operation_name,<br>        child_of=parent_span)<br><span class="hljs-keyword">else</span>:<br>    span = tracer.start_span(operation_name=operation_name)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">if hasattr(ctx, active_span):
+    parent_span = getattr(ctx, active_span)
+    span = tracer.start_span(operation_name=operation_name,
+        child_of=parent_span)
+else:
+    span = tracer.start_span(operation_name=operation_name)</code></pre>
 <p>如果使用 request 到 span 的映射机制，可以这样处理：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">parent_span = tracer.get_span(request)<br>span = tracer.start_span(<br>    operation_name=operation_name,<br>    child_of=parent_span)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">parent_span = tracer.get_span(request)
+span = tracer.start_span(
+    operation_name=operation_name,
+    child_of=parent_span)</code></pre>
 <h4 id="注入-Inject-Span"><a href="#注入-Inject-Span" class="headerlink" title="注入(Inject) Span"></a>注入(Inject) Span</h4><p>注入 span 的时候，会把当前追踪的上下文信息放到客户端的请求中，这样当调用发生时，追踪可以在服务端被还原，并继续进行。如果是使用HTTP请求，可以使用HTTP头作为上下文数据的carrier(载体)。</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">span = # 从请求头中获取当前的追踪状态 <span class="hljs-string">`tracer.inject(span, opentracing.Format.HTTP_HEADERS, request.headers)`</span><br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go"> span = # 从请求头中获取当前的追踪状态 `tracer.inject(span, opentracing.Format.HTTP_HEADERS, request.headers)`</code></pre>
 <h4 id="完成并关闭span"><a href="#完成并关闭span" class="headerlink" title="完成并关闭span"></a>完成并关闭span</h4><p>当收到相应后，完成并关闭 span，标志着客户端调用结束。和服务端一样，如果完成这个操作取决于在客户端如何处理请求和响应。如果存在过滤器(filter)，可以这样处理：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">def filter(request, response):<br>    span = # start span from the current trace state<br>    tracer.inject(span, opentracing.Format.HTTP_HEADERS, request.headers)<br>    response = send_request(request)<br>    <span class="hljs-keyword">if</span> response.error:<br>       span.set_tag(opentracing., <span class="hljs-literal">true</span>)<br>    span.finish()<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">def filter(request, response):
+    span = # start span from the current trace state
+    tracer.inject(span, opentracing.Format.HTTP_HEADERS, request.headers)
+    response = send_request(request)
+    if response.error:
+       span.set_tag(opentracing., true)
+    span.finish()</code></pre>
 <p>否则，如果请求和相应是分开处理的，可能需要扩展 tracer，包含请求和 span 的映射关系。参考实现如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go">def process_request(request):<br>    span = # start span from the current trace state<br>    tracer.inject(span. opentracing.Format.HTTP_HEADERS, request.headers)<br>    tracer.add_client_span(request, span)<br>def process_response(request, response):<br>    tracer.finish_client_span(request)<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="go">def process_request(request):
+    span = # start span from the current trace state
+    tracer.inject(span. opentracing.Format.HTTP_HEADERS, request.headers)
+    tracer.add_client_span(request, span)
+def process_response(request, response):
+    tracer.finish_client_span(request)</code></pre>
 <h2 id="跟踪大规模分布式系统的实践"><a href="#跟踪大规模分布式系统的实践" class="headerlink" title="跟踪大规模分布式系统的实践"></a>跟踪大规模分布式系统的实践</h2><h3 id="Spans-和它们之间的关系"><a href="#Spans-和它们之间的关系" class="headerlink" title="Spans 和它们之间的关系"></a>Spans 和它们之间的关系</h3><p>实现 OpenTracing 完成分布式追踪的两个基本概念就是 <code>Spans</code>和 <code>Relationships</code> (span 间关系)：</p>
 <ul>
 <li><p>Spans 是系统中的一个逻辑工作单元，包含这个工作单元启动时间和执行时间。在一条追踪链路中，各个 span 与系统中的不同组件有关，并体现这些组件的执行路径。</p>
@@ -658,8 +1027,49 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <blockquote>
 <p>如果未提供任何配置，则收集器将为所有服务返回默认概率抽样策略，概率为 0.001（0.1％）</p>
 </blockquote>
-<figure class="highlight json"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">"service_strategies"</span>: [<br>    &#123;<br>      <span class="hljs-attr">"service"</span>: <span class="hljs-string">"foo"</span>,<br>      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>      <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.8</span>,<br>      <span class="hljs-attr">"operation_strategies"</span>: [<br>        &#123;<br>          <span class="hljs-attr">"operation"</span>: <span class="hljs-string">"op1"</span>,<br>          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>          <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.2</span><br>        &#125;,<br>        &#123;<br>          <span class="hljs-attr">"operation"</span>: <span class="hljs-string">"op2"</span>,<br>          <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>          <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.4</span><br>        &#125;<br>      ]<br>    &#125;,<br>    &#123;<br>      <span class="hljs-attr">"service"</span>: <span class="hljs-string">"bar"</span>,<br>      <span class="hljs-attr">"type"</span>: <span class="hljs-string">"ratelimiting"</span>,<br>      <span class="hljs-attr">"param"</span>: <span class="hljs-number">5</span><br>    &#125;<br>  ],<br>  <span class="hljs-attr">"default_strategy"</span>: &#123;<br>    <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>    <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.5</span>,<br>    <span class="hljs-attr">"operation_strategies"</span>: [<br>      &#123;<br>        <span class="hljs-attr">"operation"</span>: <span class="hljs-string">"/health"</span>,<br>        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>        <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.0</span><br>      &#125;,<br>      &#123;<br>        <span class="hljs-attr">"operation"</span>: <span class="hljs-string">"/metrics"</span>,<br>        <span class="hljs-attr">"type"</span>: <span class="hljs-string">"probabilistic"</span>,<br>        <span class="hljs-attr">"param"</span>: <span class="hljs-number">0.0</span><br>      &#125;<br>    ]<br>  &#125;<br>&#125;<br></code></pre></div></td></tr></table></figure>
-
+<pre><code class="json">{
+  &quot;service_strategies&quot;: [
+    {
+      &quot;service&quot;: &quot;foo&quot;,
+      &quot;type&quot;: &quot;probabilistic&quot;,
+      &quot;param&quot;: 0.8,
+      &quot;operation_strategies&quot;: [
+        {
+          &quot;operation&quot;: &quot;op1&quot;,
+          &quot;type&quot;: &quot;probabilistic&quot;,
+          &quot;param&quot;: 0.2
+        },
+        {
+          &quot;operation&quot;: &quot;op2&quot;,
+          &quot;type&quot;: &quot;probabilistic&quot;,
+          &quot;param&quot;: 0.4
+        }
+      ]
+    },
+    {
+      &quot;service&quot;: &quot;bar&quot;,
+      &quot;type&quot;: &quot;ratelimiting&quot;,
+      &quot;param&quot;: 5
+    }
+  ],
+  &quot;default_strategy&quot;: {
+    &quot;type&quot;: &quot;probabilistic&quot;,
+    &quot;param&quot;: 0.5,
+    &quot;operation_strategies&quot;: [
+      {
+        &quot;operation&quot;: &quot;/health&quot;,
+        &quot;type&quot;: &quot;probabilistic&quot;,
+        &quot;param&quot;: 0.0
+      },
+      {
+        &quot;operation&quot;: &quot;/metrics&quot;,
+        &quot;type&quot;: &quot;probabilistic&quot;,
+        &quot;param&quot;: 0.0
+      }
+    ]
+  }
+}
+</code></pre>
 <p><code>service_strategies</code> 元素定义特定于服务的采样策略，而 <code>operation_strategies</code> 元素定义特定于操作的采样策略。可能有两种策略：概率策略和速率限制，如上所述（注意：<code>operation_strategies</code> 不支持速率限制）。如果服务不是 <code>service_strategies</code> 定义在内的操作，则采用 <code>default_strategy</code> 定义的采样策略。</p>
 <p>在上面的例子中，</p>
 <p>服务 <code>foo</code> 的所有操作均以概率 0.8 进行采样，操作 <code>op1</code>和 <code>op2</code> 分别以概率 0.2 和 0.4 概率进行采样。 服务栏的所有操作均以每秒 5 条 traces 的速率进行速率限制。 任何其他服务都将以 <code>default_strategy</code> 定义的概率 0.5 进行采样。</p>
@@ -705,8 +1115,55 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 </tr>
 </tbody></table>
 <p>修改后的 <code>main.go</code> 如下：</p>
-<figure class="highlight go"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs go"><span class="hljs-keyword">var</span> (<br>	port        = flag.Int(<span class="hljs-string">"port"</span>, <span class="hljs-number">8888</span>, <span class="hljs-string">"Example app port."</span>)<br>	appdashPort = flag.Int(<span class="hljs-string">"appdash.port"</span>, <span class="hljs-number">8700</span>, <span class="hljs-string">"Run appdash locally on this port."</span>)<br>)<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	flag.Parse()<br><br>	<span class="hljs-comment">// 连接到追踪系统（Appdash）</span><br>	<span class="hljs-comment">//addr := startAppdashServer(*appdashPort)</span><br>	<span class="hljs-comment">//tracer := appdashot.NewTracer(appdash.NewRemoteCollector(addr))</span><br>	<span class="hljs-comment">//opentracing.InitGlobalTracer(tracer)</span><br><br>	<span class="hljs-comment">// 连接到追踪系统（Jaeger）</span><br>	cfg := jaegercfg.Configuration&#123;<br>		Sampler: &amp;jaegercfg.SamplerConfig&#123;<br>			Type:  jaeger.SamplerTypeConst,<br>			Param: <span class="hljs-number">1</span>,<br>		&#125;,<br>		Reporter: &amp;jaegercfg.ReporterConfig&#123;<br>			LogSpans:           <span class="hljs-literal">true</span>,<br>		&#125;,<br>	&#125;<br><br>	jLogger := jaegerlog.StdLogger<br>	jMetricsFactory := metrics.NullFactory<br><br>	closer, err := cfg.InitGlobalTracer(<br>		<span class="hljs-string">"serviceName"</span>,<br>		jaegercfg.Logger(jLogger),<br>		jaegercfg.Metrics(jMetricsFactory),<br>	)<br>	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> &#123;<br>		log.Printf(<span class="hljs-string">"Could not initialize jaeger trace: %s"</span>,err.Error())<br>		<span class="hljs-keyword">return</span><br>	&#125;<br>	<span class="hljs-keyword">defer</span> closer.Close()<br><br>	addr := fmt.Sprintf(<span class="hljs-string">":%d"</span>, *port)<br>	mux := http.NewServeMux()<br>	mux.HandleFunc(<span class="hljs-string">"/"</span>, server.IndexHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/home"</span>, server.HomeHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/async"</span>, server.ServiceHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/service"</span>, server.ServiceHandler)<br>	mux.HandleFunc(<span class="hljs-string">"/db"</span>, server.DbHandler)<br>	fmt.Printf(<span class="hljs-string">"Go to http://localhost:%d/home to start arequest!\n"</span>, *port)<br>	log.Fatal(http.ListenAndServe(addr, mux))<br>&#125;<br></code></pre></div></td></tr></table></figure>
+<pre><code class="go">var (
+    port        = flag.Int(&quot;port&quot;, 8888, &quot;Example app port.&quot;)
+    appdashPort = flag.Int(&quot;appdash.port&quot;, 8700, &quot;Run appdash locally on this port.&quot;)
+)
 
+func main() {
+    flag.Parse()
+
+    // 连接到追踪系统（Appdash）
+    //addr := startAppdashServer(*appdashPort)
+    //tracer := appdashot.NewTracer(appdash.NewRemoteCollector(addr))
+    //opentracing.InitGlobalTracer(tracer)
+
+    // 连接到追踪系统（Jaeger）
+    cfg := jaegercfg.Configuration{
+        Sampler: &amp;jaegercfg.SamplerConfig{
+            Type:  jaeger.SamplerTypeConst,
+            Param: 1,
+        },
+        Reporter: &amp;jaegercfg.ReporterConfig{
+            LogSpans:           true,
+        },
+    }
+
+    jLogger := jaegerlog.StdLogger
+    jMetricsFactory := metrics.NullFactory
+
+    closer, err := cfg.InitGlobalTracer(
+        &quot;serviceName&quot;,
+        jaegercfg.Logger(jLogger),
+        jaegercfg.Metrics(jMetricsFactory),
+    )
+    if err != nil {
+        log.Printf(&quot;Could not initialize jaeger trace: %s&quot;,err.Error())
+        return
+    }
+    defer closer.Close()
+
+    addr := fmt.Sprintf(&quot;:%d&quot;, *port)
+    mux := http.NewServeMux()
+    mux.HandleFunc(&quot;/&quot;, server.IndexHandler)
+    mux.HandleFunc(&quot;/home&quot;, server.HomeHandler)
+    mux.HandleFunc(&quot;/async&quot;, server.ServiceHandler)
+    mux.HandleFunc(&quot;/service&quot;, server.ServiceHandler)
+    mux.HandleFunc(&quot;/db&quot;, server.DbHandler)
+    fmt.Printf(&quot;Go to http://localhost:%d/home to start arequest!\n&quot;, *port)
+    log.Fatal(http.ListenAndServe(addr, mux))
+}
+</code></pre>
 <p>运行之前，需要先将 Jaeger 的各个组件都跑起来，官方提供了 <a href="https://www.jaegertracing.io/docs/1.22/getting-started/#all-in-one" target="_blank" rel="noopener"><code>all-in-one</code></a> 支持一键部署，可以下载可执行文件先执行，或者运行 docker 镜像。</p>
 <p>之后，运行 main 函数，就可以通过 <code>http://localhost:16686</code> UI 界面直观的看到链路追踪的详细内容：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Jaeger-UI.jpg" alt="Jaeger-UI"></p>
@@ -727,230 +1184,200 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 <p><a href="https://juejin.cn/post/6844903971010641934" target="_blank" rel="noopener">微服务链路追踪之Jaeger</a></p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a>
-                    
-                      <a class="hover-with-bg" href="/tags/go/">go</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2021/04/30/%E6%97%A5%E5%BF%97%E5%AE%9E%E8%B7%B5%E4%B8%80%E4%B8%A4%E4%BA%8B/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">日志的小记录</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2021/03/23/go%E4%B8%AD%E7%9A%84time%E5%8C%85/">
-                        <span class="hidden-mobile">go 中 time 包的使用</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" rel="tag"># 分布式</a>
+              <a href="/tags/go/" rel="tag"># go</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/23/go%E4%B8%AD%E7%9A%84time%E5%8C%85/" rel="prev" title="go 中 time 包的使用">
+      <i class="fa fa-chevron-left"></i> go 中 time 包的使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/04/30/%E6%97%A5%E5%BF%97%E5%AE%9E%E8%B7%B5%E4%B8%80%E4%B8%A4%E4%BA%8B/" rel="next" title="日志的小记录">
+      日志的小记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenTracing-简介"><span class="nav-number">1.</span> <span class="nav-text">OpenTracing 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#OpenTracing-诞生的背景"><span class="nav-number">1.1.</span> <span class="nav-text">OpenTracing 诞生的背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式追踪的相关概念"><span class="nav-number">1.2.</span> <span class="nav-text">分布式追踪的相关概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tracing"><span class="nav-number">1.2.1.</span> <span class="nav-text">Tracing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式追踪的核心步骤"><span class="nav-number">1.2.2.</span> <span class="nav-text">分布式追踪的核心步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenTracing-数据模型"><span class="nav-number">2.</span> <span class="nav-text">OpenTracing 数据模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Traces"><span class="nav-number">2.1.</span> <span class="nav-text">Traces</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spans"><span class="nav-number">2.2.</span> <span class="nav-text">Spans</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Span-Reference"><span class="nav-number">2.2.1.</span> <span class="nav-text">Span Reference</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpanContext"><span class="nav-number">2.2.2.</span> <span class="nav-text">SpanContext</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Inject-和-Extract"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">Inject 和 Extract</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Baggage"><span class="nav-number">2.2.3.</span> <span class="nav-text">Baggage</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Baggage-与-Span-Tags-的区别"><span class="nav-number">2.2.3.1.</span> <span class="nav-text">Baggage 与 Span Tags 的区别</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenTracing-定义的-API"><span class="nav-number">3.</span> <span class="nav-text">OpenTracing 定义的 API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#各平台-API-支持"><span class="nav-number">3.1.</span> <span class="nav-text">各平台 API 支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关-API"><span class="nav-number">3.2.</span> <span class="nav-text">相关 API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tracer"><span class="nav-number">3.2.1.</span> <span class="nav-text">Tracer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建一个新-Span"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">创建一个新 Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将-SpanContext-上下文-Inject（注入）到-carrier"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">将 SpanContext 上下文 Inject（注入）到 carrier</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将-SpanContext-上下文从-carrier-中-Extract（提取）"><span class="nav-number">3.2.1.3.</span> <span class="nav-text">将 SpanContext 上下文从 carrier 中 Extract（提取）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Span"><span class="nav-number">3.2.2.</span> <span class="nav-text">Span</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取-Span-的-SpanContext"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">获取 Span 的 SpanContext</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复写操作名（operation-name）"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">复写操作名（operation name）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#结束Span"><span class="nav-number">3.2.2.3.</span> <span class="nav-text">结束Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为Span设置tag"><span class="nav-number">3.2.2.4.</span> <span class="nav-text">为Span设置tag</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Log结构化数据"><span class="nav-number">3.2.2.5.</span> <span class="nav-text">Log结构化数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置一个baggage（随行数据）元素"><span class="nav-number">3.2.2.6.</span> <span class="nav-text">设置一个baggage（随行数据）元素</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取一个-baggage-元素"><span class="nav-number">3.2.2.7.</span> <span class="nav-text">获取一个 baggage 元素</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SpanContext-1"><span class="nav-number">3.2.3.</span> <span class="nav-text">SpanContext</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#遍历所有的-baggage-元素"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">遍历所有的 baggage 元素</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NoopTracer"><span class="nav-number">3.2.4.</span> <span class="nav-text">NoopTracer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可选-API-元素"><span class="nav-number">3.2.5.</span> <span class="nav-text">可选 API 元素</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenTracing-入门实践"><span class="nav-number">4.</span> <span class="nav-text">OpenTracing 入门实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#server-go"><span class="nav-number">4.1.</span> <span class="nav-text">server.go</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接到追踪系统"><span class="nav-number">4.2.</span> <span class="nav-text">连接到追踪系统</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenTracing-最佳实践"><span class="nav-number">5.</span> <span class="nav-text">OpenTracing 最佳实践</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#针对准备使用-OpenTracing-API-的实践"><span class="nav-number">5.1.</span> <span class="nav-text">针对准备使用 OpenTracing API 的实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#追踪-Function（函数）"><span class="nav-number">5.1.1.</span> <span class="nav-text">追踪 Function（函数）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端追踪"><span class="nav-number">5.1.2.</span> <span class="nav-text">服务端追踪</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#从请求中获取（Extracting）SpanContext"><span class="nav-number">5.1.2.1.</span> <span class="nav-text">从请求中获取（Extracting）SpanContext</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#从请求中获取一个已经存在的追踪，或者开启一个新的追踪"><span class="nav-number">5.1.2.2.</span> <span class="nav-text">从请求中获取一个已经存在的追踪，或者开启一个新的追踪</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#进程内请求上下文传输"><span class="nav-number">5.1.2.3.</span> <span class="nav-text">进程内请求上下文传输</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#隐式传输"><span class="nav-number">5.1.2.3.1.</span> <span class="nav-text">隐式传输</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#显示传输"><span class="nav-number">5.1.2.3.2.</span> <span class="nav-text">显示传输</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追踪客户端调用"><span class="nav-number">5.1.3.</span> <span class="nav-text">追踪客户端调用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Baggage-分布式上下文传输"><span class="nav-number">5.1.4.</span> <span class="nav-text">使用 Baggage / 分布式上下文传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logging-事件"><span class="nav-number">5.1.5.</span> <span class="nav-text">Logging 事件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用外部的时间戳，记录Span"><span class="nav-number">5.1.6.</span> <span class="nav-text">使用外部的时间戳，记录Span</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在追踪开始之前，设置采样优先级"><span class="nav-number">5.1.7.</span> <span class="nav-text">在追踪开始之前，设置采样优先级</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对准备将-OpenTracing-集成到-web，RPC-或者其他框架的实践"><span class="nav-number">5.2.</span> <span class="nav-text">针对准备将 OpenTracing 集成到 web，RPC 或者其他框架的实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端追踪-1"><span class="nav-number">5.2.1.</span> <span class="nav-text">服务端追踪</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取当前的追踪链的状态"><span class="nav-number">5.2.1.1.</span> <span class="nav-text">获取当前的追踪链的状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#保存当前的span上下文"><span class="nav-number">5.2.1.2.</span> <span class="nav-text">保存当前的span上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#使用请求上下文"><span class="nav-number">5.2.1.2.1.</span> <span class="nav-text">使用请求上下文</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#建立请求和-span-的映射关系"><span class="nav-number">5.2.1.2.2.</span> <span class="nav-text">建立请求和 span 的映射关系</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端追踪"><span class="nav-number">5.2.2.</span> <span class="nav-text">客户端追踪</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#读取现在的追踪状态-新建一个span"><span class="nav-number">5.2.2.1.</span> <span class="nav-text">读取现在的追踪状态 / 新建一个span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注入-Inject-Span"><span class="nav-number">5.2.2.2.</span> <span class="nav-text">注入(Inject) Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#完成并关闭span"><span class="nav-number">5.2.2.3.</span> <span class="nav-text">完成并关闭span</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#跟踪大规模分布式系统的实践"><span class="nav-number">5.3.</span> <span class="nav-text">跟踪大规模分布式系统的实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spans-和它们之间的关系"><span class="nav-number">5.3.1.</span> <span class="nav-text">Spans 和它们之间的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#专注高价值区域"><span class="nav-number">5.3.2.</span> <span class="nav-text">专注高价值区域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#先走再跑，逐步提高"><span class="nav-number">5.3.3.</span> <span class="nav-text">先走再跑，逐步提高</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例实例"><span class="nav-number">5.3.4.</span> <span class="nav-text">示例实例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jaeger-链路追踪系统"><span class="nav-number">6.</span> <span class="nav-text">Jaeger 链路追踪系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Jaeger-的系统架构"><span class="nav-number">6.1.</span> <span class="nav-text">Jaeger 的系统架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jaeger-client-库"><span class="nav-number">6.1.1.</span> <span class="nav-text">jaeger-client 库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jaeger-agent"><span class="nav-number">6.1.2.</span> <span class="nav-text">jaeger-agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jaeger-collector"><span class="nav-number">6.1.3.</span> <span class="nav-text">jaeger-collector</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jaeger-query"><span class="nav-number">6.1.4.</span> <span class="nav-text">jaeger-query</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jaeger-采样"><span class="nav-number">6.2.</span> <span class="nav-text">Jaeger 采样</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端采样策略配置"><span class="nav-number">6.2.1.</span> <span class="nav-text">客户端采样策略配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自适应采样器"><span class="nav-number">6.2.2.</span> <span class="nav-text">自适应采样器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Jaeger-采样配置示例"><span class="nav-number">6.2.3.</span> <span class="nav-text">Jaeger 采样配置示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jaeger-部署"><span class="nav-number">6.3.</span> <span class="nav-text">Jaeger 部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#收集器直接写入数据库"><span class="nav-number">6.3.1.</span> <span class="nav-text">收集器直接写入数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#收集器将数据写入-kafka-作为初步缓冲区"><span class="nav-number">6.3.2.</span> <span class="nav-text">收集器将数据写入 kafka 作为初步缓冲区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用示例"><span class="nav-number">6.4.</span> <span class="nav-text">使用示例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -958,41 +1385,9 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -1006,68 +1401,10 @@ OpenTracing 诞生的背景开发和工程团队因为系统组件水平扩展�
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>

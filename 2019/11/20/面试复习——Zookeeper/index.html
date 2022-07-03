@@ -1,247 +1,301 @@
-
-
 <!DOCTYPE html>
-<html lang="zh-CN" data-default-color-scheme=&quot;auto&quot;>
-
-
-
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <link rel="apple-touch-icon" sizes="76x76" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <link rel="icon" href="https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2icon.jpeg">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-  <meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Mist',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1. Zookeeper ZAB协议为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。 ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广">
+<meta name="keywords" content="面试,Zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zookeeper">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;11&#x2F;20&#x2F;%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper&#x2F;index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="1. Zookeeper ZAB协议为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。 ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041615117.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041632405.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041645454.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041723580.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041738662.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041757212.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041817539.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041833444.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041907813.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041923754.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041937775.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041955650.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042009165.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042029601.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042045130.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042058968.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042119217.jpg">
+<meta property="og:image" content="https:&#x2F;&#x2F;github.com&#x2F;xiao-ming9&#x2F;xiao-ming9.github.io&#x2F;blob&#x2F;master&#x2F;images&#x2F;zookeeper%E7%9B%91%E5%90%AC%E5%99%A8%E5%8E%9F%E7%90%86.png?raw=true">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042158212.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042227598.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042242375.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042304441.jpg">
+<meta property="og:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105042317577.jpg">
+<meta property="og:updated_time" content="2020-12-01T10:35:12.985Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;dbaplus.cn&#x2F;uploadfile&#x2F;2018&#x2F;0105&#x2F;20180105041615117.jpg">
+
+<link rel="canonical" href="http://yoursite.com/2019/11/20/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Zookeeper | Silverming</title>
   
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-  
-  <meta name="theme-color" content="#2f4154">
-  <meta name="description" content="1. Zookeeper ZAB协议为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。
-ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广">
-  <meta name="author" content="Silverming">
-  <meta name="keywords" content="">
-  
-  <title>Zookeeper - Silverming</title>
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
-
-
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
-  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
-
-  
-    
-    
-      
-      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
-    
-  
-
-  
-    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
-  
 
 
 
-<!-- 主题依赖的图标库，不要自行修改 -->
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
-
-<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
-
-<link  rel="stylesheet" href="/css/main.css" />
-
-<!-- 自定义样式保持在最底部 -->
 
 
-  <script id="fluid-configs">
-    var Fluid = window.Fluid || {};
-    var CONFIG = {"hostname":"yoursite.com","root":"/","version":"1.8.11","typing":{"enable":true,"typeSpeed":70,"cursorChar":"|","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":false,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"baidu":"54ebb03ad7ad5b762ac8ff7958df6d3f","google":"G-M2RT7SDT3L","gtag":"G-M2RT7SDT3L","tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"tFHjJkaAYKqH8BIXKnJVurUc-MdYXbMMI","app_key":"1qR5F7XyydYd5YJtIpMJBFmP","server_url":null}},"search_path":"/local-search.xml"};
-  </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
 </head>
 
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
 
-<body>
-  <header style="height: 70vh;">
-    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
-  <div class="container">
-    <a class="navbar-brand"
-       href="/">&nbsp;<strong>Silverming</strong>&nbsp;</a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
 
-    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <div class="animated-icon"><span></span><span></span><span></span></div>
-    </button>
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Silverming</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">Stay hungry,stay foolish</p>
+  </div>
 
-    <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav ml-auto text-center">
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/">
-                <i class="iconfont icon-home-fill"></i>
-                首页
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/">
-                <i class="iconfont icon-archive-fill"></i>
-                归档
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/">
-                <i class="iconfont icon-tags-fill"></i>
-                标签
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/about/">
-                <i class="iconfont icon-user-fill"></i>
-                关于
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/links/">
-                <i class="iconfont icon-link-fill"></i>
-                友链
-              </a>
-            </li>
-          
-        
-        
-          <li class="nav-item" id="search-btn">
-            <a class="nav-link" target="_self" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
-                class="iconfont icon-search"></i>&nbsp;</a>
-          </li>
-        
-        
-          <li class="nav-item" id="color-toggle-btn">
-            <a class="nav-link" target="_self">&nbsp;<i
-                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
-          </li>
-        
-      </ul>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
   </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
 </nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
 
-    <div class="banner" id="banner" parallax=true
-         style="background: url('https://qiniu.xiaoming.net.cn/%E5%8D%9A%E5%AE%A2%E8%83%8C%E6%99%AF%E5%9B%BE.jpg') no-repeat center center;
-           background-size: cover;">
-      <div class="full-bg-img">
-        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
-          <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Zookeeper">
-              
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/20/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Zookeeper
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-20 11:03:25" itemprop="dateCreated datePublished" datetime="2019-11-20T11:03:25+08:00">2019-11-20</time>
             </span>
-
-            
-              <div class="mt-3">
-  
-  
-    <span class="post-meta">
-      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2019-11-20 11:03" pubdate>
-        2019年11月20日 上午
-      </time>
-    </span>
-  
-</div>
-
-<div class="mt-1">
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-chart"></i>
-      8k 字
-    </span>
-  
-
-  
-    
-    <span class="post-meta mr-2">
-      <i class="iconfont icon-clock-fill"></i>
-      
-      
-      86
-       分钟
-    </span>
-  
-
-  
-  
-    
-      <!-- LeanCloud 统计文章PV -->
-      <span id="leancloud-page-views-container" class="post-meta" style="display: none">
-        <i class="iconfont icon-eye" aria-hidden="true"></i>
-        <span id="leancloud-page-views"></span> 次
-      </span>
-    
-  
-</div>
-
-            
-          </div>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-01 18:35:12" itemprop="dateModified" datetime="2020-12-01T18:35:12+08:00">2020-12-01</time>
+              </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>11 分钟</span>
+            </span>
+
         </div>
-      </div>
-    </div>
-  </header>
+      </header>
 
-  <main>
     
-      
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="d-none d-lg-block col-lg-2"></div>
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div class="py-5" id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">Zookeeper</h1>
-            
-              <p class="note note-info">
-                
-                  本文最后更新于：2020年12月1日 晚上
-                
-              </p>
-            
-            <div class="markdown-body">
-              <h1 id="1-Zookeeper-ZAB协议"><a href="#1-Zookeeper-ZAB协议" class="headerlink" title="1. Zookeeper ZAB协议"></a>1. Zookeeper ZAB协议</h1><p>为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。</p>
+      
+        <h1 id="1-Zookeeper-ZAB协议"><a href="#1-Zookeeper-ZAB协议" class="headerlink" title="1. Zookeeper ZAB协议"></a>1. Zookeeper ZAB协议</h1><p>为了保证写操作的一致性和可用性，Zookeeper专门设计了一种名为原子广播（ZAB）的支持崩溃恢复的一致性协议。基于该协议，Zookeeper实现了一种主从模式的系统架构来保持集群中各个副本之间的数据一致性。</p>
 <p>ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服务 ZooKeeper 专门设计的一种支持崩溃恢复的原子广播协议。 在 ZooKeeper 中，主要依赖 ZAB 协议来实现分布式数据一致性，基于该协议，ZooKeeper 实现了一种主备模式的系统架构来保持集群中各个副本之间的数据一致性。</p>
 <a id="more"></a>
 
@@ -273,8 +327,9 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <p>由于处理读请求不需要服务器之间的交互，<code>Follower/Observer</code>越多，整体可处理的读请求量越大，也即读性能越好。</p>
 <h1 id="3-领导选举算法"><a href="#3-领导选举算法" class="headerlink" title="3. 领导选举算法"></a>3. 领导选举算法</h1><p>Zookeeper使用<strong>基于TCP的FastLeaderElection</strong>算法进行领导选举。原理：</p>
 <h2 id="1-myid"><a href="#1-myid" class="headerlink" title="1.  myid"></a>1.  myid</h2><p>每个ZooKeeper服务器，都需要在数据文件夹下创建一个名为<code>myid</code>的文件，该文件包含整个ZooKeeper集群唯一的ID（整数）。例如，某ZooKeeper集群包含三台服务器，<code>hostname</code>分别为zoo1、zoo2和zoo3，其<code>myid</code>分别为1、2和3，则在配置文件中其ID与<code>hostname</code>必须一一对应，如下所示。在该配置文件中，<code>server.</code>后面的数据即为<code>myid</code></p>
-<figure class="highlight angelscript"><table><tr><td class="gutter hljs"><div class="hljs code-wrapper"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></div></td><td class="code"><div class="hljs code-wrapper"><pre><code class="hljs angelscript">server<span class="hljs-number">.1</span>=zoo1:<span class="hljs-number">2888</span>:<span class="hljs-number">3888</span><br>server<span class="hljs-number">.2</span>=zoo2:<span class="hljs-number">2888</span>:<span class="hljs-number">3888</span><br>server<span class="hljs-number">.3</span>=zoo3:<span class="hljs-number">2888</span>:<span class="hljs-number">3888</span><br></code></pre></div></td></tr></table></figure>
-<h2 id="2-zxid"><a href="#2-zxid" class="headerlink" title="2. zxid"></a>2. zxid</h2><p>类似于RDBMS中的事务ID，用于标识一次更新操作的<code>Proposal ID</code>。为了保证顺序性，该<code>zkid</code>必须单调递增。因此ZooKeeper使用一个64位的数来表示，高32位是<code>Leader</code>的<code>epoch</code>，从1开始，每次选出新的<code>Leader</code>，<code>epoch</code>加一。低32位为该<code>epoch</code>内的序号，每次<code>epoch</code>变化，都将低32位的序号重置。这样保证了<code>zkid</code>的全局递增性。</p>
+<pre><code>server.1=zoo1:2888:3888
+server.2=zoo2:2888:3888
+server.3=zoo3:2888:3888</code></pre><h2 id="2-zxid"><a href="#2-zxid" class="headerlink" title="2. zxid"></a>2. zxid</h2><p>类似于RDBMS中的事务ID，用于标识一次更新操作的<code>Proposal ID</code>。为了保证顺序性，该<code>zkid</code>必须单调递增。因此ZooKeeper使用一个64位的数来表示，高32位是<code>Leader</code>的<code>epoch</code>，从1开始，每次选出新的<code>Leader</code>，<code>epoch</code>加一。低32位为该<code>epoch</code>内的序号，每次<code>epoch</code>变化，都将低32位的序号重置。这样保证了<code>zkid</code>的全局递增性。</p>
 <h2 id="3-服务器状态"><a href="#3-服务器状态" class="headerlink" title="3. 服务器状态"></a>3. 服务器状态</h2><ul>
 <li><code>LOOKING</code>:不确定<code>Leader</code>状态。该状态下的服务器认为当前集群中没有<code>Leader</code>，会发起<code>Leader</code>选举。</li>
 <li><code>FOLLOWING</code>:跟随者状态。表明当前服务器角色是<code>Follower</code>，并且它知道<code>Leader</code>是谁。</li>
@@ -486,230 +541,200 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 <p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a href="https://github.com/Snailclimb/JavaGuide" target="_blank" rel="noopener">https://github.com/Snailclimb/JavaGuide</a><br><a href="https://github.com/CyC2018/CS-Notes" target="_blank" rel="noopener">https://github.com/CyC2018/CS-Notes</a>  </p>
 </blockquote>
 
-            </div>
-            <hr>
-            <div>
-              <div class="post-metas mb-3">
-                
-                
-                  <div class="post-meta">
-                    <i class="iconfont icon-tags"></i>
-                    
-                      <a class="hover-with-bg" href="/tags/%E9%9D%A2%E8%AF%95/">面试</a>
-                    
-                      <a class="hover-with-bg" href="/tags/Zookeeper/">Zookeeper</a>
-                    
-                  </div>
-                
-              </div>
-              
-                <p class="note note-warning">
-                  
-                    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
-                  
-                </p>
-              
-              
-                <div class="post-prevnext">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2019/11/21/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%EF%BC%88%E6%9B%B4%E6%96%B0%E4%B8%AD%EF%BC%89/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">消息队列(更新中...)</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2019/11/19/Zookeeper/">
-                        <span class="hidden-mobile">Zookeeper基本使用</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
-              
-            </div>
-
-            
-              <!-- Comments -->
-              <article class="comments" id="comments">
-                
-                  
-                
-                
-  <script type="text/javascript">
-    Fluid.utils.loadComments('#comments', function() {
-      var light = 'github-light';
-      var dark = 'github-dark';
-      var schema = document.documentElement.getAttribute('data-user-color-scheme');
-      if (schema === 'dark') {
-        schema = dark;
-      } else {
-        schema = light;
-      }
-      window.UtterancesThemeLight = light;
-      window.UtterancesThemeDark = dark;
-      var s = document.createElement('script');
-      s.setAttribute('src', 'https://utteranc.es/client.js');
-      s.setAttribute('repo', 'xiao-ming9/xiao-ming9.github.io');
-      s.setAttribute('issue-term', 'pathname');
-      
-      s.setAttribute('label', 'utterances');
-      
-      s.setAttribute('theme', schema);
-      s.setAttribute('crossorigin', 'anonymous');
-      document.getElementById('comments').appendChild(s);
-    })
-  </script>
-  <noscript>Please enable JavaScript to view the comments</noscript>
-
-
-              </article>
-            
-          </article>
-        </div>
-      </div>
     </div>
-    
-      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
-        <div id="toc">
-  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
-  <div class="toc-body" id="toc-body"></div>
-</div>
 
-      </div>
     
+    
+    
+        <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <p>支付宝</p>
+      </div>
+
   </div>
 </div>
 
-<!-- Custom -->
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
+              <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          </div>
+
+        
 
 
-    
-
-    
-      <a id="scroll-top-button" href="#" role="button">
-        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
-      </a>
-    
-
-    
-      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
-     aria-hidden="true">
-  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
-    <div class="modal-content">
-      <div class="modal-header text-center">
-        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
-        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body mx-3">
-        <div class="md-form mb-5">
-          <input type="text" id="local-search-input" class="form-control validate">
-          <label data-error="x" data-success="v"
-                 for="local-search-input">关键词</label>
-        </div>
-        <div class="list-group" id="local-search-result"></div>
-      </div>
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/19/Zookeeper/" rel="prev" title="Zookeeper基本使用">
+      <i class="fa fa-chevron-left"></i> Zookeeper基本使用
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/21/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="next" title="消息队列()">
+      消息队列() <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
   </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-Zookeeper-ZAB协议"><span class="nav-number">1.</span> <span class="nav-text">1. Zookeeper ZAB协议</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-Zookeeper读写流程"><span class="nav-number">2.</span> <span class="nav-text">2. Zookeeper读写流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#写Leader"><span class="nav-number">2.1.</span> <span class="nav-text">写Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写Follower-Obsever"><span class="nav-number">2.2.</span> <span class="nav-text">写Follower/Obsever</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读操作"><span class="nav-number">2.3.</span> <span class="nav-text">读操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-领导选举算法"><span class="nav-number">3.</span> <span class="nav-text">3. 领导选举算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-myid"><span class="nav-number">3.1.</span> <span class="nav-text">1.  myid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-zxid"><span class="nav-number">3.2.</span> <span class="nav-text">2. zxid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-服务器状态"><span class="nav-number">3.3.</span> <span class="nav-text">3. 服务器状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-选票的数据结构"><span class="nav-number">3.4.</span> <span class="nav-text">4. 选票的数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-投票流程"><span class="nav-number">3.5.</span> <span class="nav-text">5. 投票流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自增选举轮次"><span class="nav-number">3.5.1.</span> <span class="nav-text">自增选举轮次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化选票"><span class="nav-number">3.5.2.</span> <span class="nav-text">初始化选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发送初始化选票"><span class="nav-number">3.5.3.</span> <span class="nav-text">发送初始化选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#接收外部投票"><span class="nav-number">3.5.4.</span> <span class="nav-text">接收外部投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#判断选举轮次"><span class="nav-number">3.5.5.</span> <span class="nav-text">判断选举轮次</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选票PK"><span class="nav-number">3.5.6.</span> <span class="nav-text">选票PK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#统计选票"><span class="nav-number">3.5.7.</span> <span class="nav-text">统计选票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新服务器状态"><span class="nav-number">3.5.8.</span> <span class="nav-text">更新服务器状态</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-集群启动领导选举"><span class="nav-number">4.</span> <span class="nav-text">4. 集群启动领导选举</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-初始投票给自己"><span class="nav-number">4.1.</span> <span class="nav-text">1. 初始投票给自己</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-更新投票"><span class="nav-number">4.2.</span> <span class="nav-text">2. 更新投票</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-根据选票确定角色"><span class="nav-number">4.3.</span> <span class="nav-text">3. 根据选票确定角色</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-Follower-Leader重启选举"><span class="nav-number">5.</span> <span class="nav-text">5. Follower/Leader重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Follower重启选举"><span class="nav-number">5.1.</span> <span class="nav-text">Follower重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Follower重启投票给自己"><span class="nav-number">5.1.1.</span> <span class="nav-text">1. Follower重启投票给自己</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-发现已有Leader后成为Follower"><span class="nav-number">5.1.2.</span> <span class="nav-text">2. 发现已有Leader后成为Follower</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Leader重启选举"><span class="nav-number">5.2.</span> <span class="nav-text">Leader重启选举</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Follower发起新投票"><span class="nav-number">5.2.1.</span> <span class="nav-text">1. Follower发起新投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-广播更新投票"><span class="nav-number">5.2.2.</span> <span class="nav-text">2. 广播更新投票</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-选出新的Leader"><span class="nav-number">5.2.3.</span> <span class="nav-text">3. 选出新的Leader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-旧Leader恢复后发起选举"><span class="nav-number">5.2.4.</span> <span class="nav-text">4. 旧Leader恢复后发起选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-旧Leader成为Follower"><span class="nav-number">5.2.5.</span> <span class="nav-text">5. 旧Leader成为Follower</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-Zookeeper如何保证commit过的数据不丢失"><span class="nav-number">6.</span> <span class="nav-text">6. Zookeeper如何保证commit过的数据不丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Failover前状态"><span class="nav-number">6.1.</span> <span class="nav-text">1. Failover前状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-选出Leader"><span class="nav-number">6.2.</span> <span class="nav-text">2. 选出Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-通知Follower可对外服务"><span class="nav-number">6.3.</span> <span class="nav-text">3. 通知Follower可对外服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未Commit过的消息对客户端不可见"><span class="nav-number">6.4.</span> <span class="nav-text">未Commit过的消息对客户端不可见</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-Zookeeper节点类型"><span class="nav-number">7.</span> <span class="nav-text">7. Zookeeper节点类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-Zookeeper如何进行语义保证？"><span class="nav-number">8.</span> <span class="nav-text">8. Zookeeper如何进行语义保证？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-Zookeeper-Watch机制"><span class="nav-number">9.</span> <span class="nav-text">9. Zookeeper Watch机制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-Zookeeper实现分布式锁原理"><span class="nav-number">10.</span> <span class="nav-text">10. Zookeeper实现分布式锁原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#非公平领导选举实现分布式锁"><span class="nav-number">10.1.</span> <span class="nav-text">非公平领导选举实现分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-选主过程："><span class="nav-number">10.1.1.</span> <span class="nav-text">1. 选主过程：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-放弃领导权"><span class="nav-number">10.1.2.</span> <span class="nav-text">2. 放弃领导权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-感知领导权的放弃"><span class="nav-number">10.1.3.</span> <span class="nav-text">3. 感知领导权的放弃</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-重新选举"><span class="nav-number">10.1.4.</span> <span class="nav-text">4. 重新选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非公平领导选举的优缺点"><span class="nav-number">10.1.5.</span> <span class="nav-text">非公平领导选举的优缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公平领导选举实现分布式锁"><span class="nav-number">10.2.</span> <span class="nav-text">公平领导选举实现分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-选主过程"><span class="nav-number">10.2.1.</span> <span class="nav-text">1. 选主过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-放弃领导权-1"><span class="nav-number">10.2.2.</span> <span class="nav-text">2. 放弃领导权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-感知领导权的放弃-1"><span class="nav-number">10.2.3.</span> <span class="nav-text">3. 感知领导权的放弃</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-重新选举-1"><span class="nav-number">10.2.4.</span> <span class="nav-text">4. 重新选举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#优缺点"><span class="nav-number">10.2.5.</span> <span class="nav-text">优缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#11-Zookeeper权限控制"><span class="nav-number">11.</span> <span class="nav-text">11. Zookeeper权限控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#12-Zookeeper中session概念"><span class="nav-number">12.</span> <span class="nav-text">12. Zookeeper中session概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#13-Zookeeper的应用场景"><span class="nav-number">13.</span> <span class="nav-text">13. Zookeeper的应用场景</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
 </div>
-    
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">139</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">49</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
 
-    
-  </main>
 
-  <footer class="text-center mt-5 py-3">
-  <div class="footer-content">
-     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
-  </div>
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
   
-  <div class="statistics">
-    
-    
-
-    
-      
-        <!-- LeanCloud 统计PV -->
-        <span id="leancloud-site-pv-container" style="display: none">
-            总访问量 
-            <span id="leancloud-site-pv"></span>
-             次
-          </span>
-      
-      
-        <!-- LeanCloud 统计UV -->
-        <span id="leancloud-site-uv-container" style="display: none">
-            总访客数 
-            <span id="leancloud-site-uv"></span>
-             人
-          </span>
-      
-
-    
-  </div>
-
-
-  
-  <!-- 备案信息 -->
-  <div class="beian">
-    <span>
-      <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
-        粤ICP备18114217号
-      </a>
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
     </span>
-    
-      
-        <span>
-          <a
-            href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=粤ICP备18114217号-1"
-            rel="nofollow noopener"
-            class="beian-police"
-            target="_blank"
-          >
-            
-              <span style="visibility: hidden; width: 0">|</span>
-              <img src="/img/police_beian.png" alt="police-icon"/>
-            
-            <span>粤ICP备18114217号-1</span>
-          </a>
-        </span>
-      
-    
+    <span title="站点总字数">2.2m</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">33:57</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
+  </div>
+  <div>
+     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
   </div>
 
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
 
   
-</footer>
-
-
-  <!-- SCRIPTS -->
-  
-  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
-  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
-
-  <script>
-    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
-    NProgress.start()
-    window.addEventListener('load', function() {
-      NProgress.done();
-    })
-  </script>
-
-
-<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
-<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
-
-<!-- Plugins -->
-
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -717,41 +742,9 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 
 
 
-  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
 
+  <script src="/js/local-search.js"></script>
 
-
-  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
-
-
-
-  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
-
-
-
-  <script  src="/js/local-search.js" ></script>
-
-
-
-
-  <script defer src="/js/leancloud.js" ></script>
-
-
-
-  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
-  <script>
-    (function (window, document) {
-      var typing = Fluid.plugins.typing;
-      var title = document.getElementById('subtitle').title;
-      
-      typing(title)
-      
-    })(window, document);
-  </script>
 
 
 
@@ -765,68 +758,10 @@ ZAB（ZooKeeper Atomic Broadcast 原子广播） 协议是为分布式协调服�
 
 
   
-    <!-- Baidu Analytics -->
-    <script defer>
-      var _hmt = _hmt || [];
-      (function () {
-        var hm = document.createElement("script");
-        hm.src = "https://hm.baidu.com/hm.js?54ebb03ad7ad5b762ac8ff7958df6d3f";
-        var s = document.getElementsByTagName("script")[0];
-        s.parentNode.insertBefore(hm, s);
-      })();
-    </script>
-  
-
-  
-    <!-- Google Analytics -->
-    <script defer>
-      window.ga = window.ga || function () { (ga.q = ga.q || []).push(arguments) };
-      ga.l = +new Date;
-      ga('create', 'G-M2RT7SDT3L', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script async src='https://www.google-analytics.com/analytics.js'></script>
-  
-
-  
-    <!-- Google gtag.js -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M2RT7SDT3L"></script>
-    <script defer>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-M2RT7SDT3L');
-    </script>
-  
 
   
 
   
 
-  
-
-
-
-
-
-<!-- 主题的启动项 保持在最底部 -->
-<script  src="/js/boot.js" ></script>
-
-
-<script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-        tex2jax: {
-            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
-            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-            processEscapes: true
-        }
-    });
-    MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax();
-        for (var i = 0; i < all.length; ++i)
-            all[i].SourceElement().parentNode.className += ' has-jax';
-    });
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
