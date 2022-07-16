@@ -55,7 +55,7 @@
 <meta property="og:description" content="常用代码段new() 和 make() 选择 切片、映射和通道，使用 make   数组、结构体和所有的值类型，使用 new     new 出来的是一个指针  字符串相关操作修改字符串的一个字符str:=&amp;quot;hello&amp;quot; c:=[]byte(str) c[0]=&amp;#39;c&amp;#39; s2:= string(c) &#x2F;&#x2F; s2 == &amp;quot;cello&amp;quot;">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;map%E7%9A%84%E6%96%AD%E8%A8%80.png">
-<meta property="og:updated_time" content="2022-01-16T05:06:21.085Z">
+<meta property="og:updated_time" content="2022-07-16T05:38:30.347Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;map%E7%9A%84%E6%96%AD%E8%A8%80.png">
 
@@ -238,7 +238,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-01-16 13:06:21" itemprop="dateModified" datetime="2022-01-16T13:06:21+08:00">2022-01-16</time>
+                <time title="修改时间：2022-07-16 13:38:30" itemprop="dateModified" datetime="2022-07-16T13:38:30+08:00">2022-07-16</time>
               </span>
 
           
@@ -254,14 +254,14 @@
                 <i class="fa fa-file-word-o"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>24k</span>
+              <span>25k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="fa fa-clock-o"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>22 分钟</span>
+              <span>23 分钟</span>
             </span>
 
         </div>
@@ -692,6 +692,41 @@ if something {
 <p>而不是：</p>
 <pre><code class="php">   func findBiggest( listOfNumbers *[]int ) int {}</code></pre>
 <p><strong>当切片作为参数传递时，切记不要解引用切片。</strong></p>
+<h2 id="append-数组时，忽略对底层数组的修改"><a href="#append-数组时，忽略对底层数组的修改" class="headerlink" title="append 数组时，忽略对底层数组的修改"></a>append 数组时，忽略对底层数组的修改</h2><p>append 操作时，有如下需要注意的事项：</p>
+<ul>
+<li>slice本身并非指针，append追加元素后，意味着底层数组数据（或数组）、len、cap会发生变化，因此append后需要返回新的slice。</li>
+<li>append在追加元素时，<strong>当前cap足够容纳元素，则直接存入数据</strong>，否则需要扩容后重新创建新的底层数组，拷贝原数组元素后，再存入追加元素。</li>
+<li>cap的扩容意味着内存的重新分配，数据的拷贝等操作，为了提高append的效率，若是能预估cap的大小的话，尽量提前声明cap，避免后期的扩容操作。</li>
+</ul>
+<p>看下面的例子：</p>
+<pre><code class="go">func main() {
+    var ret [][]int
+    var val = make([]int, 0, 100)
+    fmt.Printf(&quot;%p\n&quot;, val)
+    deal(&amp;ret, val)
+    fmt.Println(ret)
+}
+
+func deal(ret *[][]int, val []int) {
+    fmt.Printf(&quot;%p\n&quot;, val) // 此时与外面的 val 指定同一个地址（都还未初始化）
+    val = append(val, 1)
+    val = append(val, 1)
+    val = append(val, 1)
+    fmt.Printf(&quot;%p\n&quot;, val) // 此时由于底层数组扩容，地址发生改变，跟原来地址不一样了
+    *ret = append(*ret, val)
+
+    //val[2] = 2
+
+    // 此时由于为发生扩容，以及修改的是范围里的值，修改会影响原来的
+    val = val[:len(val)-1]
+    val = append(val, 2)
+    fmt.Printf(&quot;%p\n&quot;, val)
+
+    // 继续 append，发生扩容，不会影响原来的
+    val = append(val, 4, 5, 6, 7, 8)
+    val = val[:3]
+    fmt.Printf(&quot;%p\n&quot;, val)
+}</code></pre>
 <h2 id="不要使用指针指向接口类型"><a href="#不要使用指针指向接口类型" class="headerlink" title="不要使用指针指向接口类型"></a>不要使用指针指向接口类型</h2><p>在下面的程序中：<code>nexter</code> 是一个接口类型，并且定义了一个 <code>next()</code> 方法读取下一字节。函数 <code>nextFew1</code> 将 <code>nexter</code> 接口作为参数并读取接下来的 <code>num</code> 个字节，并返回一个切片：这是正确做法。但是 <code>nextFew2</code> 使用一个指向 <code>nexter</code> 接口类型的指针作为参数传递给函数：当使用 <code>next()</code> 函数时，系统会给出一个编译错误：</p>
 <pre><code>n.next undefined (type \*nexter has no field or method next) （n.next 未定义（*nexter 类型没有 next 成员或 next 方法））</code></pre><pre><code class="go">package main
 import (
@@ -1360,7 +1395,7 @@ count, err := count(bufio.NewReader(file))</code></pre>
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#常用代码段"><span class="nav-number">1.</span> <span class="nav-text">常用代码段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#new-和-make-选择"><span class="nav-number">1.1.</span> <span class="nav-text">new() 和 make() 选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串相关操作"><span class="nav-number">1.2.</span> <span class="nav-text">字符串相关操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改字符串的一个字符"><span class="nav-number">1.2.1.</span> <span class="nav-text">修改字符串的一个字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取字符串的字串"><span class="nav-number">1.2.2.</span> <span class="nav-text">获取字符串的字串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-for-或者-for-range-遍历一个字符串"><span class="nav-number">1.2.3.</span> <span class="nav-text">使用 for 或者 for-range 遍历一个字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取一个字符串的字节数"><span class="nav-number">1.2.4.</span> <span class="nav-text">获取一个字符串的字节数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取一个字符串的字符数："><span class="nav-number">1.2.5.</span> <span class="nav-text">获取一个字符串的字符数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串拼接"><span class="nav-number">1.2.6.</span> <span class="nav-text">字符串拼接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打印字符串"><span class="nav-number">1.3.</span> <span class="nav-text">打印字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优雅实现存储单位的常量枚举"><span class="nav-number">1.4.</span> <span class="nav-text">优雅实现存储单位的常量枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优雅的进行错误检测和处理"><span class="nav-number">1.5.</span> <span class="nav-text">优雅的进行错误检测和处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反射常用示例"><span class="nav-number">1.6.</span> <span class="nav-text">反射常用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写单测相关"><span class="nav-number">1.7.</span> <span class="nav-text">写单测相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造带-body-的-http-Response"><span class="nav-number">1.7.1.</span> <span class="nav-text">构造带 body 的 http Response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造-http-ResponseWriter"><span class="nav-number">1.7.2.</span> <span class="nav-text">构造 http ResponseWriter</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#time-的时区设置"><span class="nav-number">2.</span> <span class="nav-text">time 的时区设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#空结构体的应用"><span class="nav-number">3.</span> <span class="nav-text">空结构体的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法接收者"><span class="nav-number">3.1.</span> <span class="nav-text">实现方法接收者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现集合类型"><span class="nav-number">3.2.</span> <span class="nav-text">实现集合类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现空通道"><span class="nav-number">3.3.</span> <span class="nav-text">实现空通道</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-中常用的包"><span class="nav-number">4.</span> <span class="nav-text">go 中常用的包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#regexp包"><span class="nav-number">4.1.</span> <span class="nav-text">regexp包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sync-包"><span class="nav-number">4.2.</span> <span class="nav-text">sync 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#精密计算和big包"><span class="nav-number">4.3.</span> <span class="nav-text">精密计算和big包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见错误"><span class="nav-number">5.</span> <span class="nav-text">常见错误</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#短变量声明导致变量覆盖"><span class="nav-number">5.1.</span> <span class="nav-text">短变量声明导致变量覆盖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要对需要-append-的空切片使用-make-声明变量"><span class="nav-number">5.2.</span> <span class="nav-text">不要对需要 append 的空切片使用 make 声明变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#误用-defer-关闭一个文件"><span class="nav-number">5.3.</span> <span class="nav-text">误用 defer 关闭一个文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不需要将一个指向切片的指针传递给函数"><span class="nav-number">5.4.</span> <span class="nav-text">不需要将一个指向切片的指针传递给函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要使用指针指向接口类型"><span class="nav-number">5.5.</span> <span class="nav-text">不要使用指针指向接口类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意循环中的协程使用"><span class="nav-number">5.6.</span> <span class="nav-text">注意循环中的协程使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要在生产环境使用默认的-HTTP-Client"><span class="nav-number">5.7.</span> <span class="nav-text">不要在生产环境使用默认的 HTTP Client</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解决办法"><span class="nav-number">5.7.1.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.7.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#map的key-value不能同时断言"><span class="nav-number">5.8.</span> <span class="nav-text">map的key,value不能同时断言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未知枚举值"><span class="nav-number">5.9.</span> <span class="nav-text">未知枚举值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基准测试自动优化"><span class="nav-number">5.9.1.</span> <span class="nav-text">基准测试自动优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针迁移到堆上导致指针传递比按值传递更慢"><span class="nav-number">5.10.</span> <span class="nav-text">指针迁移到堆上导致指针传递比按值传递更慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#break-逻辑不符合预期"><span class="nav-number">5.11.</span> <span class="nav-text">break 逻辑不符合预期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缺失上下文的错误"><span class="nav-number">5.12.</span> <span class="nav-text">缺失上下文的错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递文件名给函数"><span class="nav-number">5.13.</span> <span class="nav-text">传递文件名给函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#出于性能考虑的最佳实践和建议"><span class="nav-number">6.</span> <span class="nav-text">出于性能考虑的最佳实践和建议</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#常用代码段"><span class="nav-number">1.</span> <span class="nav-text">常用代码段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#new-和-make-选择"><span class="nav-number">1.1.</span> <span class="nav-text">new() 和 make() 选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串相关操作"><span class="nav-number">1.2.</span> <span class="nav-text">字符串相关操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#修改字符串的一个字符"><span class="nav-number">1.2.1.</span> <span class="nav-text">修改字符串的一个字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取字符串的字串"><span class="nav-number">1.2.2.</span> <span class="nav-text">获取字符串的字串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-for-或者-for-range-遍历一个字符串"><span class="nav-number">1.2.3.</span> <span class="nav-text">使用 for 或者 for-range 遍历一个字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取一个字符串的字节数"><span class="nav-number">1.2.4.</span> <span class="nav-text">获取一个字符串的字节数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取一个字符串的字符数："><span class="nav-number">1.2.5.</span> <span class="nav-text">获取一个字符串的字符数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串拼接"><span class="nav-number">1.2.6.</span> <span class="nav-text">字符串拼接</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打印字符串"><span class="nav-number">1.3.</span> <span class="nav-text">打印字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优雅实现存储单位的常量枚举"><span class="nav-number">1.4.</span> <span class="nav-text">优雅实现存储单位的常量枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优雅的进行错误检测和处理"><span class="nav-number">1.5.</span> <span class="nav-text">优雅的进行错误检测和处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反射常用示例"><span class="nav-number">1.6.</span> <span class="nav-text">反射常用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写单测相关"><span class="nav-number">1.7.</span> <span class="nav-text">写单测相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构造带-body-的-http-Response"><span class="nav-number">1.7.1.</span> <span class="nav-text">构造带 body 的 http Response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构造-http-ResponseWriter"><span class="nav-number">1.7.2.</span> <span class="nav-text">构造 http ResponseWriter</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#time-的时区设置"><span class="nav-number">2.</span> <span class="nav-text">time 的时区设置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#空结构体的应用"><span class="nav-number">3.</span> <span class="nav-text">空结构体的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法接收者"><span class="nav-number">3.1.</span> <span class="nav-text">实现方法接收者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现集合类型"><span class="nav-number">3.2.</span> <span class="nav-text">实现集合类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现空通道"><span class="nav-number">3.3.</span> <span class="nav-text">实现空通道</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-中常用的包"><span class="nav-number">4.</span> <span class="nav-text">go 中常用的包</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#regexp包"><span class="nav-number">4.1.</span> <span class="nav-text">regexp包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sync-包"><span class="nav-number">4.2.</span> <span class="nav-text">sync 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#精密计算和big包"><span class="nav-number">4.3.</span> <span class="nav-text">精密计算和big包</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见错误"><span class="nav-number">5.</span> <span class="nav-text">常见错误</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#短变量声明导致变量覆盖"><span class="nav-number">5.1.</span> <span class="nav-text">短变量声明导致变量覆盖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要对需要-append-的空切片使用-make-声明变量"><span class="nav-number">5.2.</span> <span class="nav-text">不要对需要 append 的空切片使用 make 声明变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#误用-defer-关闭一个文件"><span class="nav-number">5.3.</span> <span class="nav-text">误用 defer 关闭一个文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不需要将一个指向切片的指针传递给函数"><span class="nav-number">5.4.</span> <span class="nav-text">不需要将一个指向切片的指针传递给函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#append-数组时，忽略对底层数组的修改"><span class="nav-number">5.5.</span> <span class="nav-text">append 数组时，忽略对底层数组的修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要使用指针指向接口类型"><span class="nav-number">5.6.</span> <span class="nav-text">不要使用指针指向接口类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#注意循环中的协程使用"><span class="nav-number">5.7.</span> <span class="nav-text">注意循环中的协程使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#不要在生产环境使用默认的-HTTP-Client"><span class="nav-number">5.8.</span> <span class="nav-text">不要在生产环境使用默认的 HTTP Client</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解决办法"><span class="nav-number">5.8.1.</span> <span class="nav-text">解决办法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.8.2.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#map的key-value不能同时断言"><span class="nav-number">5.9.</span> <span class="nav-text">map的key,value不能同时断言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未知枚举值"><span class="nav-number">5.10.</span> <span class="nav-text">未知枚举值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基准测试自动优化"><span class="nav-number">5.10.1.</span> <span class="nav-text">基准测试自动优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指针迁移到堆上导致指针传递比按值传递更慢"><span class="nav-number">5.11.</span> <span class="nav-text">指针迁移到堆上导致指针传递比按值传递更慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#break-逻辑不符合预期"><span class="nav-number">5.12.</span> <span class="nav-text">break 逻辑不符合预期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缺失上下文的错误"><span class="nav-number">5.13.</span> <span class="nav-text">缺失上下文的错误</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#传递文件名给函数"><span class="nav-number">5.14.</span> <span class="nav-text">传递文件名给函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#出于性能考虑的最佳实践和建议"><span class="nav-number">6.</span> <span class="nav-text">出于性能考虑的最佳实践和建议</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -1415,12 +1450,12 @@ count, err := count(bufio.NewReader(file))</code></pre>
     <span class="post-meta-item-icon">
       <i class="fa fa-area-chart"></i>
     </span>
-    <span title="站点总字数">2.2m</span>
+    <span title="站点总字数">2.3m</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:01</span>
+    <span title="站点阅读时长">34:34</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
   </div>
