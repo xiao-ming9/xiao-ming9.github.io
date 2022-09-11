@@ -747,9 +747,15 @@ func main() &#123;
         <i class="far fa-calendar"></i>
       </span>
       <span class="post-meta-item-text">发表于</span>
-      
 
-      <time title="创建时间：2021-10-16 12:20:25 / 修改时间：12:20:42" itemprop="dateCreated datePublished" datetime="2021-10-16T12:20:25+08:00">2021-10-16</time>
+      <time title="创建时间：2021-10-16 12:20:25" itemprop="dateCreated datePublished" datetime="2021-10-16T12:20:25+08:00">2021-10-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-09-11 12:30:05" itemprop="dateModified" datetime="2022-09-11T12:30:05+08:00">2022-09-11</time>
     </span>
 
   
@@ -794,149 +800,14 @@ z := &lt;-a //从channel中读取数据
 <li>发送操作在接收者准备好之前是阻塞的，接收操作在发送之前是阻塞的。</li>
 </ul>
 <p>解决办法就是<strong>改为缓冲通道</strong>，或者<strong>使用协程配对</strong>。</p>
-<h3 id="协程配对，先发送还是先接收无所谓只要配对就好"><a href="#协程配对，先发送还是先接收无所谓只要配对就好" class="headerlink" title="协程配对，先发送还是先接收无所谓只要配对就好"></a>协程配对，先发送还是先接收无所谓只要配对就好</h3><pre><code class="go">chanInt := make(chan int)
-go func() &#123;
-    chanInt &lt;- 1
-&#125;()
-
-res := &lt;-chanInt
-</code></pre>
-<h3 id="缓冲通道"><a href="#缓冲通道" class="headerlink" title="缓冲通道"></a>缓冲通道</h3><pre><code class="go">chanInt := make(chan int,1)
-chanInt &lt;- 2
-res := &lt;-chanInt
-</code></pre>
-<ul>
-<li>缓冲通道内部的消息数量用 <code>len()</code> 函数可以测试出来</li>
-<li>缓冲通道的容量可以用 <code>cap()</code> 测试出来</li>
-<li>在满足 <code>cap&gt;len</code> 时候，因为没有满，发送不会阻塞</li>
-<li>在 <code>len&gt;0</code> 时，因为不为空，所以接收不会阻塞</li>
-</ul>
-<p>使用缓冲通道可以让生产者和消费者减少阻塞的可能性，对异步操作更友好，不用等待对方准备，但是容量不应设置过大，不然会占用较多内存。</p>
-<h2 id="多个值发送产生的死锁"><a href="#多个值发送产生的死锁" class="headerlink" title="多个值发送产生的死锁"></a>多个值发送产生的死锁</h2><p>配对可以让死锁消失，但如果发送多个值，这时候由于无法配对了，又会产生死锁：</p>
-<pre><code class="go">func multipleDeathLock() &#123;
- chanInt := make(chan int)
- defer close(chanInt)
- go func() &#123;
-  res := &lt;-chanInt
-  fmt.Println(res)
- &#125;()
- chanInt &lt;- 1
- chanInt &lt;- 1
-&#125;
-</code></pre>
-<h3 id="循环接收值解决死锁"><a href="#循环接收值解决死锁" class="headerlink" title="循环接收值解决死锁"></a>循环接收值解决死锁</h3><p>循环来不断接收值，接受一个处理一个，可以解决上述的死锁问题，如下：</p>
-<pre><code class="go">func multipleLoop() &#123;
- chanInt := make(chan int)
- defer close(chanInt)
- go func() &#123;
-  for &#123;
-   //不使用ok会goroutine泄漏
-   //res := &lt;-chanInt
-   res,ok := &lt;-chanInt
-   if !ok &#123;
-                 break
-            &#125;
-   fmt.Println(res)
-  &#125;
- &#125;()
- chanInt &lt;- 1
- chanInt &lt;- 1
-&#125;
-</code></pre>
-<ul>
-<li>给通道的接收加上二个值，<code>ok</code> 代表通道是否正常，如果是关闭则为<code>false</code>值</li>
-<li>如果不使用 ok 判断，会输出 <code>1 1 0 0 0</code> 这样的数列，因为关闭是需要时间的，而循环接收关闭的通道拿到的是 <code>0</code>，另外还会导致<code>goroutine</code>泄漏（后面讲到）</li>
-</ul>
-<h3 id="先接收还是先发送"><a href="#先接收还是先发送" class="headerlink" title="先接收还是先发送"></a>先接收还是先发送</h3><p>在上面的例子中，使用的是先开一个协程来接收，再进行发送的过程。如果反过来，在协程中进行发送：</p>
-<pre><code class="go">func multipleDeathLock2() &#123;
- chanInt := make(chan int)
- defer close(chanInt)
- go func() &#123;
-  chanInt &lt;- 1
-  chanInt &lt;- 2
- &#125;()
- for &#123;
-  res, ok := &lt;-chanInt
-  if !ok &#123;
-   break
-  &#125;
-  fmt.Println(res)
- &#125;
-&#125;
-</code></pre>
-<p>此时运行程序会导致死锁：</p>
-<pre><code class="go">1
-2
-fatal error: all goroutines are asleep - deadlock!
-
-goroutine 1 [chan receive]:
-main.multipleDeathLock2()
-</code></pre>
-<ul>
-<li>出现上面的结果是因为 <code>for</code> 循环一直在获取通道中的值，但是在读取完 <code>1 2</code> 后，通道中没有新的值传入，而且此时不会执行  <code>defer close(chanInt)</code>，这样接收者就阻塞了。</li>
-<li>为什么先接收再发送可以，因为<strong>发送提前结束后会触发函数的 <code>defer</code> 自动关闭通道</strong></li>
-<li>所以<strong>应该总是先接收后发送，并由发送端来关闭</strong></li>
-</ul>
-<h2 id="goroutine-泄漏"><a href="#goroutine-泄漏" class="headerlink" title="goroutine 泄漏"></a>goroutine 泄漏</h2><p><code>goroutine</code> 终止的场景有三个：</p>
-<ul>
-<li>当一个 <code>goroutine</code> 完成了它的工作</li>
-<li>由于发生了没有处理的错误</li>
-<li>有其他的协程告诉它终止</li>
-</ul>
-<p>当三个条件都没有满足时，<code>goroutine</code> 就会一直运行下去。</p>
-<pre><code class="go">func goroutineLeak() &#123;
- chanInt := make(chan int)
- defer close(chanInt)
- go func() &#123;
-  for &#123;
-   res := &lt;-chanInt
-   //res,ok := &lt;-chanInt
-   //if !ok &#123;
-            //     break
-            //&#125;
-   fmt.Println(res)
-  &#125;
- &#125;()
- chanInt &lt;- 1
- chanInt &lt;- 1
-&#125;
-</code></pre>
-<p>上面程序运行后，后面会一直打印 0 ：</p>
-<pre><code>1
-1
-0
-0
-0
-...
-</code></pre>
-<ul>
-<li>上面的 <code>goroutineLeak()</code> 函数结束后触发 <code>defer close(chanInt)</code> 关闭了通道</li>
-<li>但是匿名函数中 <code>goroutine</code> 并没有关闭，而是一直在循环取值，并且取到的是关闭后的通道值（这里是 <code>int</code> 的默认值 0）</li>
-<li><code>goroutine</code> 会永远运行下去，如果以后再次使用又会出现新的泄漏！导致内存、<code>cpu</code>占用越来越多。</li>
-</ul>
-<p>假如不关闭且外部没有写入值，那接收处就会永远阻塞在那里，连输出都不会有：</p>
-<pre><code class="go">func goroutineLeakNoClosed() &#123;
- chanInt := make(chan int)
- go func() &#123;
-  for &#123;
-   res := &lt;-chanInt
-   fmt.Println(res)
-  &#125;
- &#125;()
-&#125;
-</code></pre>
-<ul>
-<li>无任何输出的阻塞</li>
-<li>换成写入也是一样的</li>
-<li>如果是有缓冲的通道，换成已满的通道写没有读；或者换成向空的通道读没有写也是同样的情况</li>
-<li>除了阻塞，<code>goroutine</code>进入死循环也是泄露的原因</li>
-</ul>
-<p>要发现死锁，可以通过 pprof 工具。</p>
-<p><strong>参考文章</strong>：</p>
-<blockquote>
-<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/fxJeMfHFNZRhC2JP3SP1XQ">面试高频：Go语言死锁与goroutine泄露问题谈论</a></p>
-</blockquote>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/10/16/%E4%BD%BF%E7%94%A8channel%E5%AF%BC%E8%87%B4%E7%9A%84%E6%AD%BB%E9%94%81%E5%92%8C%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E9%97%AE%E9%A2%98/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1389,7 +1260,7 @@ main.multipleDeathLock2()
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">36:04</span>
+    <span title="站点阅读时长">36:03</span>
   </span>
 </div>
 <div class="busuanzi-count">
