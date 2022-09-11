@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,76 +14,46 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="业务背景我们有一款产品跟海外某个国家的客户有业务合作，因此，我们在这个国家的服务器上单独部署了一整套的服务（大概有八九个微服务），这些服务的宿主机大概都集中在三、四台宿主机上。这些服务日复一日，年复一年的并肩作战着，直到有一天…… 初见端倪前阵子，我们在一个服务进行扩容、重启的时候，总是概率性的出现如下错误导致的 panic：  Google 的结果是说由于 Linux 分配的客户端连接端口用尽，">
-<meta name="keywords" content="go,内存泄漏">
+    <meta name="description" content="业务背景我们有一款产品跟海外某个国家的客户有业务合作，因此，我们在这个国家的服务器上单独部署了一整套的服务（大概有八九个微服务），这些服务的宿主机大概都集中在三、四台宿主机上。这些服务日复一日，年复一年的并肩作战着，直到有一天…… 初见端倪前阵子，我们在一个服务进行扩容、重启的时候，总是概率性的出现如下错误导致的 panic：  Google 的结果是说由于 Linux 分配的客户端连接端口用尽，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次内存泄漏的排查">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2022&#x2F;04&#x2F;07&#x2F;%E4%B8%80%E6%AC%A1%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E7%9A%84%E6%8E%92%E6%9F%A5&#x2F;index.html">
+<meta property="og:url" content="http://yoursite.com/2022/04/07/%E4%B8%80%E6%AC%A1%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E7%9A%84%E6%8E%92%E6%9F%A5/index.html">
 <meta property="og:site_name" content="Silverming">
 <meta property="og:description" content="业务背景我们有一款产品跟海外某个国家的客户有业务合作，因此，我们在这个国家的服务器上单独部署了一整套的服务（大概有八九个微服务），这些服务的宿主机大概都集中在三、四台宿主机上。这些服务日复一日，年复一年的并肩作战着，直到有一天…… 初见端倪前阵子，我们在一个服务进行扩容、重启的时候，总是概率性的出现如下错误导致的 panic：  Google 的结果是说由于 Linux 分配的客户端连接端口用尽，">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%AB%AF%E5%8F%A3%E7%94%A8%E5%B0%BDpanic.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8%E7%AB%AF%E5%8F%A3%E8%80%97%E5%B0%BD.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT1.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT2.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT3.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-ESTABLISHED.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-ip%E7%AB%AF%E5%8F%A3%E6%8E%92%E6%9F%A5.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-pprof%20%E6%8E%92%E6%9F%A5.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%BB%A3%E7%A0%81.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%BB%A3%E7%A0%812.jpg">
-<meta property="og:updated_time" content="2022-07-03T14:13:34.665Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E7%AB%AF%E5%8F%A3%E7%94%A8%E5%B0%BDpanic.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8%E7%AB%AF%E5%8F%A3%E8%80%97%E5%B0%BD.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT1.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT2.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-TIME_WAIT3.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-ESTABLISHED.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-ip%E7%AB%AF%E5%8F%A3%E6%8E%92%E6%9F%A5.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-pprof%20%E6%8E%92%E6%9F%A5.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%BB%A3%E7%A0%81.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%BB%A3%E7%A0%812.jpg">
+<meta property="article:published_time" content="2022-04-07T10:19:15.000Z">
+<meta property="article:modified_time" content="2022-07-03T14:13:34.665Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="内存泄漏">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%AB%AF%E5%8F%A3%E7%94%A8%E5%B0%BDpanic.jpg">
+<meta name="twitter:image" content="https://qiniu.xiaoming.net.cn/%E7%AB%AF%E5%8F%A3%E7%94%A8%E5%B0%BDpanic.jpg">
+
 
 <link rel="canonical" href="http://yoursite.com/2022/04/07/%E4%B8%80%E6%AC%A1%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E7%9A%84%E6%8E%92%E6%9F%A5/">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
 
-  <title>一次内存泄漏的排查 | Silverming</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2022/04/07/%E4%B8%80%E6%AC%A1%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E7%9A%84%E6%8E%92%E6%9F%A5/","path":"2022/04/07/一次内存泄漏的排查/","title":"一次内存泄漏的排查"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>一次内存泄漏的排查 | Silverming</title>
   
 
 
@@ -91,187 +62,222 @@
 
 
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
   </div>
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
+
 <nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
-
 </nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
+           type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">业务背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9D%E8%A7%81%E7%AB%AF%E5%80%AA"><span class="nav-number">2.</span> <span class="nav-text">初见端倪</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%90%E9%9C%B2%E5%A4%B4%E8%A7%92"><span class="nav-number">3.</span> <span class="nav-text">渐露头角</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%B7%E8%A7%92%E5%90%B9%E5%93%8D"><span class="nav-number">4.</span> <span class="nav-text">号角吹响</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%BA%E5%B8%88%E6%9C%AA%E6%8D%B7"><span class="nav-number">5.</span> <span class="nav-text">出师未捷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%90%E5%85%A5%E4%BD%B3%E5%A2%83"><span class="nav-number">6.</span> <span class="nav-text">渐入佳境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9F%A5%E5%85%B6%E7%84%B6%EF%BC%8C%E7%9F%A5%E5%85%B6%E6%89%80%E4%BB%A5%E7%84%B6"><span class="nav-number">7.</span> <span class="nav-text">知其然，知其所以然</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%90%86%E8%AE%BA%E5%AE%9E%E8%B7%B5%E7%9B%B8%E7%BB%93%E5%90%88"><span class="nav-number">8.</span> <span class="nav-text">理论实践相结合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%B8%B8%E8%AF%BB%E5%8F%96%E5%92%8C%E5%85%B3%E9%97%AD"><span class="nav-number">8.1.</span> <span class="nav-text">正常读取和关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AA%E8%AF%BB%E5%8F%96%E4%B8%8D%E5%85%B3%E9%97%AD"><span class="nav-number">8.2.</span> <span class="nav-text">只读取不关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AA%E5%85%B3%E9%97%AD%E4%B8%8D%E8%AF%BB%E5%8F%96"><span class="nav-number">8.3.</span> <span class="nav-text">只关闭不读取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A2%E4%B8%8D%E5%85%B3%E9%97%AD%E4%B9%9F%E4%B8%8D%E8%AF%BB%E5%8F%96"><span class="nav-number">8.4.</span> <span class="nav-text">既不关闭也不读取</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">9.</span> <span class="nav-text">后记</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
 
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content">
-            
+    <div class="main-inner post posts-expand">
 
-  <div class="posts-expand">
-      
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/04/07/%E4%B8%80%E6%AC%A1%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E7%9A%84%E6%8E%92%E6%9F%A5/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="一次内存泄漏的排查 | Silverming">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           一次内存泄漏的排查
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2022-04-07 18:19:15" itemprop="dateCreated datePublished" datetime="2022-04-07T18:19:15+08:00">2022-04-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-07-03 22:13:34" itemprop="dateModified" datetime="2022-07-03T22:13:34+08:00">2022-07-03</time>
-              </span>
+      <time title="创建时间：2022-04-07 18:19:15" itemprop="dateCreated datePublished" datetime="2022-04-07T18:19:15+08:00">2022-04-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-07-03 22:13:34" itemprop="dateModified" datetime="2022-07-03T22:13:34+08:00">2022-07-03</time>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>14k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>13 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>15k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -280,14 +286,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
         <h1 id="业务背景"><a href="#业务背景" class="headerlink" title="业务背景"></a>业务背景</h1><p>我们有一款产品跟海外某个国家的客户有业务合作，因此，我们在这个国家的服务器上单独部署了一整套的服务（大概有八九个微服务），这些服务的宿主机大概都集中在三、四台宿主机上。这些服务日复一日，年复一年的并肩作战着，直到有一天……</p>
 <h1 id="初见端倪"><a href="#初见端倪" class="headerlink" title="初见端倪"></a>初见端倪</h1><p>前阵子，我们在一个服务进行扩容、重启的时候，总是概率性的出现如下错误导致的 panic：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E7%AB%AF%E5%8F%A3%E7%94%A8%E5%B0%BDpanic.jpg" alt="端口用尽panic"></p>
 <p>Google 的结果是说由于 Linux 分配的客户端连接端口用尽，无法建立 socket 连接导致的。</p>
 <p>这时候还有点懵逼，单纯以为是容器的宿主机有问题，于是，我重新在另外一台机器进行了节点扩容，这次很幸运，服务启动成功了，于是乎以为问题已经顺利解决，可以美美的下班了。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h1 id="渐露头角"><a href="#渐露头角" class="headerlink" title="渐露头角"></a>渐露头角</h1><p>过了一周，我们发现线上的另一个服务在疯狂报错，上去查看日志，发现：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-%E5%85%B6%E4%BB%96%E6%9C%BA%E5%99%A8%E7%AB%AF%E5%8F%A3%E8%80%97%E5%B0%BD.jpg" alt="内存泄漏排查-其他机器端口耗尽"></p>
@@ -306,14 +310,17 @@ net.ipv4.tcp_tw_reuse=1
 //修改系默认的 TIMEOUT 时间，默认为60s
 net.ipv4.tcp_fin_timeout=15
 // 表示用于向外连接的端口范围。设置为 1024 到 65535
-net.ipv4.ip_local_port_range=1024 65535</code></pre><p>看起来似乎这个问题很容易解决嘛，看来今天又可以美美的下班了。</p>
+net.ipv4.ip_local_port_range=1024 65535
+</code></pre>
+<p>看起来似乎这个问题很容易解决嘛，看来今天又可以美美的下班了。</p>
 <h1 id="出师未捷"><a href="#出师未捷" class="headerlink" title="出师未捷"></a>出师未捷</h1><p>在上手开始操作之前，我打算先看看现在的 <code>TIME_WAIT</code> 数量到底有多少，于是，Google 一条显示当前连接状态的命令（真的记不住。。。），熟练的按下 <code>command+C</code>，<code>command+V</code>：</p>
-<pre><code class="shell">netstat -an | awk &#39;/^tcp/ {++y[$NF]} END {for(w in y) print w, y[w]}&#39;
+<pre><code class="shell">netstat -an | awk &#39;/^tcp/ &#123;++y[$NF]&#125; END &#123;for(w in y) print w, y[w]&#125;&#39;
 
 LISTEN 54
 ESTABLISHED 142640
 SYN_SENT 2
-TIME_WAIT 216</code></pre>
+TIME_WAIT 216
+</code></pre>
 <p>。。。</p>
 <p>。。。</p>
 <p>。。。</p>
@@ -340,7 +347,8 @@ TIME_WAIT 216</code></pre>
 <p>这时，组里的大佬提点了一句，一直这样查也查不出什么，不如先看看这些连接是从哪里来的。</p>
 <p>确实，马克思主义教导我们，脱离实践的理论都是空洞的理论，一切还得从实际出发，那不如先来看看这些连接都是从哪里来的。</p>
 <h1 id="渐入佳境"><a href="#渐入佳境" class="headerlink" title="渐入佳境"></a>渐入佳境</h1><p>于是我在容器上，用 <code>netstat</code> 命令统计了本机发起的链接，过滤出处于 <code>ESTABLISHED</code> 链接状态的连接，看看大部分是来自于本机哪个端口：</p>
-<pre><code class="shell">netstat -na | grep ESTABLISHED | awk &#39;{print $4}&#39; | sort | uniq -c|sort -n</code></pre>
+<pre><code class="shell">netstat -na | grep ESTABLISHED | awk &#39;&#123;print $4&#125;&#39; | sort | uniq -c|sort -n
+</code></pre>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E6%8E%92%E6%9F%A5-ip%E7%AB%AF%E5%8F%A3%E6%8E%92%E6%9F%A5.jpg" alt="内存泄漏排查-ip端口排查"></p>
 <p>结果很让我意外，某一个 ipport 的连接居然高达 10w+，更让我意外的是，这个地址，竟然是我们部署的某一个微服务！</p>
 <p>到这里，问题的根源就呼之欲出了。。。</p>
@@ -358,108 +366,108 @@ TIME_WAIT 216</code></pre>
 <p>欲知此事如何，请听下文源码分析。(<strong>内容相对枯燥，谨慎入内。。。</strong>)</p>
 <p>以 <code>http.Get</code> 方法为例：</p>
 <pre><code class="go">es, err := client.Do(req)
-func (c *Client) Do(req *Request) (*Response, error) {
+func (c *Client) Do(req *Request) (*Response, error) &#123;
     return c.do(req)
-}
+&#125;
 
-func (c *Client) do(req *Request) (retres *Response, reterr error) {
+func (c *Client) do(req *Request) (retres *Response, reterr error) &#123;
      //...
-     if resp, didTimeout, err = c.send(req, deadline); err != nil {
+     if resp, didTimeout, err = c.send(req, deadline); err != nil &#123;
        //...
-}
+&#125;
      //...
-}
+&#125;
 
-func (c *Client) send(req *Request, deadline time.Time) (resp *Response, didTimeoutfunc() bool, err error) {
+func (c *Client) send(req *Request, deadline time.Time) (resp *Response, didTimeoutfunc() bool, err error) &#123;
      //...
      // 这里关注下 c.transport 和 send 方法
      resp, didTimeout, err = send(req, c.transport(), deadline)
      //...
-}
+&#125;
 
 // 可以看到，http 的请求采用 DefaultTransport 进行连接管理
-func (c *Client) transport() RoundTripper {
-    if c.Transport != nil {
+func (c *Client) transport() RoundTripper &#123;
+    if c.Transport != nil &#123;
         return c.Transport
-    }
+    &#125;
     return DefaultTransport
-}
+&#125;
 
-func send(ireq *Request, rt RoundTripper, deadline time.Time) (resp *Response, didTimeout func() bool, err error) {
+func send(ireq *Request, rt RoundTripper, deadline time.Time) (resp *Response, didTimeout func() bool, err error) &#123;
      //...
      resp, err = rt.RoundTrip(req)
      //...
-}
+&#125;
 
 // 这里开始进入 RoundTrip 逻辑
 // src/net/http/roundtrip.go
-func (t *Transport) RoundTrip(req *Request) (*Response, error) {
+func (t *Transport) RoundTrip(req *Request) (*Response, error) &#123;
     return t.roundTrip(req)
-}
+&#125;
 
-func (t *Transport) roundTrip(req *Request) (*Response, error) {
+func (t *Transport) roundTrip(req *Request) (*Response, error) &#123;
      //...
      // 这里会获取一个空闲链接，该链接有可能是连接池里的，也有可能是新创建出来的
      pconn, err := t.getConn(treq, cm)
      //...
-}
+&#125;
 
 // 这个函数是重点，返回一个长连接
-func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persistConn, err error) {
+func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persistConn, err error) &#123;
      //...
      // 这里尝试从空闲连接中获取一个连接
-     if delivered := t.queueForIdleConn(w); delivered {
+     if delivered := t.queueForIdleConn(w); delivered &#123;
        //...
            return w.pc,nil
-    }
+    &#125;
      //...
      // 如果上面没有获取到连接，在这个函数里创建连接
     t.queueForDial(w)
      //...
-}
+&#125;
 
 // 使用空闲连接
-func (t *Transport) queueForIdleConn(w *wantConn) (delivered bool) {
+func (t *Transport) queueForIdleConn(w *wantConn) (delivered bool) &#123;
      //...
-     if list, ok := t.idleConn[w.key]; ok {
+     if list, ok := t.idleConn[w.key]; ok &#123;
        //...
-    }
+    &#125;
      //...
-}
+&#125;
 
 // 创建连接
-func (t *Transport) queueForDial(w *wantConn) {
+func (t *Transport) queueForDial(w *wantConn) &#123;
      //...
      // 如果没有限制最大连接数，则直接创建新的连接
-     if t.MaxConnsPerHost &lt;= 0 {
+     if t.MaxConnsPerHost &lt;= 0 &#123;
         go t.dialConnFor(w)
     return
-    }
+    &#125;
      //...
      // 如果有最大连接数限制就判断是否已经超过了最大连接，没超过直接创建
-     if n := t.connsPerHost[w.key]; n &lt; t.MaxConnsPerHost {
-        if t.connsPerHost == nil {
+     if n := t.connsPerHost[w.key]; n &lt; t.MaxConnsPerHost &#123;
+        if t.connsPerHost == nil &#123;
             t.connsPerHost = make(map[connectMethodKey]int)
-        }
+        &#125;
         t.connsPerHost[w.key] = n + 1
         go t.dialConnFor(w)
         return
-    }
+    &#125;
      //...
      // 超过了放到等待队列里
      q := t.connsPerHostWait[w.key]
      //...
-}
+&#125;
 
 // 创建新的连接都会走到这个方法
-func (t *Transport) dialConnFor(w *wantConn) {
+func (t *Transport) dialConnFor(w *wantConn) &#123;
      //...
      // 在这里创建连接
      pc, err := t.dialConn(w.ctx, w.cm)
      //...
-}
+&#125;
 
-func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (pconn *persistConn, err error) {
+func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (pconn *persistConn, err error) &#123;
      //...
      conn, err := t.dial(ctx, &quot;tcp&quot;, cm.addr())
      //...
@@ -467,63 +475,67 @@ func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (pconn *pers
      go pconn.readLoop()
     go pconn.writeLoop()
      //...
-}</code></pre>
+&#125;
+</code></pre>
 <p>首先，<code>Get</code> 方法一路会走到 <code>Transport</code> 的 <code>getConn</code> 方法里(前面还有很长的流程，这里就忽略了），这个方法会<strong>优先尝试从没有释放的空闲连接中获取一个连接</strong>，如果没有则执行连接创建。</p>
 <pre><code class="go">/ 这个函数是重点，返回一个长连接
-func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persistConn, err error) {
+func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persistConn, err error) &#123;
      //...
      // 这里尝试从空闲连接中获取一个连接
-     if delivered := t.queueForIdleConn(w); delivered {
+     if delivered := t.queueForIdleConn(w); delivered &#123;
        //...
            return w.pc,nil
-    }
+    &#125;
      //...
      // 如果上面没有获取到连接，在这个函数里创建连接
     t.queueForDial(w)
      //...
-}</code></pre>
+&#125;
+</code></pre>
 <p>创建新连接的方法是 <code>dialConn</code>，这个方法也很长，但是这里的重点在方法结尾处的两行：</p>
-<pre><code class="go">func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (pconn *persistConn, err error) {
+<pre><code class="go">func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (pconn *persistConn, err error) &#123;
     // ...
     go pconn.readLoop()
     go pconn.writeLoop()
     return pconn, nil
-}</code></pre>
+&#125;
+</code></pre>
 <p>可以看到，一旦创建一个新连接，就会启动一个读 goroutine 和一个写 goroutine。这两个 goroutine 内部都是一个 for 循环，只有在满足特定的条件下，才会退出循环。</p>
 <p>那么，这两个 goroutine 在什么时候释放呢？</p>
 <p>先看看 <code>writeLoop</code>:</p>
-<pre><code class="go">func (pc *persistConn) writeLoop() {
+<pre><code class="go">func (pc *persistConn) writeLoop() &#123;
     defer close(pc.writeLoopDone)
-    for {
-        select {
+    for &#123;
+        select &#123;
         case wr := &lt;-pc.writech:
             startBytesWritten := pc.nwrite
             err := wr.req.Request.write(pc.bw, pc.isProxy, wr.req.extra, pc.waitForContinue(wr.continueCh))
             // ...
-            if err != nil {
+            if err != nil &#123;
                 pc.close(err)
                 return
-            }
+            &#125;
         case &lt;-pc.closech:
             return
-        }
-    }
-}</code></pre>
+        &#125;
+    &#125;
+&#125;
+</code></pre>
 <p><code>writeLoop</code> 退出循环的场景，一个是执行 request 的写入失败，另外一个就是当前连接被关闭。</p>
 <p><code>readLoop</code> 的代码则相对复杂一些：</p>
-<pre><code class="go">func (pc *persistConn) readLoop() {
+<pre><code class="go">func (pc *persistConn) readLoop() &#123;
     //...
     alive := true
-    for alive {
+    for alive &#123;
         //...
-        if resp.Close || rc.req.Close || resp.StatusCode &lt;= 199 || bodyWritable {
+        if resp.Close || rc.req.Close || resp.StatusCode &lt;= 199 || bodyWritable &#123;
             // Don&#39;t do keep-alive on error if either party requested a close
             // or we get an unexpected informational (1xx) response.
             // StatusCode 100 is already handled above.
             alive = false
-        }
+        &#125;
         //...
-        if !hasBody || bodyWritable {
+        if !hasBody || bodyWritable &#123;
             replaced := pc.t.replaceReqCanceler(rc.cancelKey, nil)
 
             // Put the idle conn back into the pool before we send the response
@@ -539,12 +551,12 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persi
                 pc.wroteRequest() &amp;&amp;
                 replaced &amp;&amp; tryPutIdleConn(trace)
             //...
-        }
+        &#125;
         //...
         // Before looping back to the top of this function and peeking on
         // the bufio.Reader, wait for the caller goroutine to finish
         // reading the response body. (or for cancellation or death)
-        select {
+        select &#123;
         case bodyEOF := &lt;-waitForBodyRead:
             replaced := pc.t.replaceReqCanceler(rc.cancelKey, nil) // before pc might return to idle pool
             alive = alive &amp;&amp;
@@ -552,9 +564,9 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persi
                 !pc.sawEOF &amp;&amp;
                 pc.wroteRequest() &amp;&amp;
                 replaced &amp;&amp; tryPutIdleConn(trace)
-            if bodyEOF {
-                eofc &lt;- struct{}{}
-            }
+            if bodyEOF &#123;
+                eofc &lt;- struct&#123;&#125;&#123;&#125;
+            &#125;
         case &lt;-rc.req.Cancel:
             alive = false
             pc.t.CancelRequest(rc.req)
@@ -563,10 +575,11 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persi
             pc.t.cancelRequest(rc.cancelKey, rc.req.Context().Err())
         case &lt;-pc.closech:
             alive = false
-        }
+        &#125;
         //...
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p><code>readLoop</code> 函数同样也是一个 <code>for</code> 循环，而退出循环的条件是 <code>alive</code> 的值是 <code>false</code> ，那么 <code>alive</code> 什么时候会是 <code>false</code> 呢？</p>
 <p>从上面的代码中可以看到，只有在以下几种场景中，存在 <code>alive</code> 是 <code>false</code> ，使得 goroutine 退出的可能：</p>
 <ul>
@@ -582,30 +595,32 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persi
                 bodyEOF &amp;&amp;
                 !pc.sawEOF &amp;&amp;
                 pc.wroteRequest() &amp;&amp;
-                replaced &amp;&amp; tryPutIdleConn(trace)</code></pre>
+                replaced &amp;&amp; tryPutIdleConn(trace)
+</code></pre>
 <p>这里 <code>alive</code> 是否为 <code>true</code> 便取决于 <code>bodyEOF</code> 的值，<code>bodyEOF</code> 来源于一个通道 <code>waitForBodyRead</code>，这个通道的值则来自：</p>
 <pre><code class="go">waitForBodyRead := make(chan bool, 2)
-    body := &amp;bodyEOFSignal{
+    body := &amp;bodyEOFSignal&#123;
         body: resp.Body,
-        earlyCloseFn: func() error {
+        earlyCloseFn: func() error &#123;
             waitForBodyRead &lt;- false
             &lt;-eofc // will be closed by deferred call at the end of the function
             return nil
 
-        },
-        fn: func(err error) error {
+        &#125;,
+        fn: func(err error) error &#123;
             isEOF := err == io.EOF
             waitForBodyRead &lt;- isEOF
-            if isEOF {
+            if isEOF &#123;
                 &lt;-eofc // see comment above eofc declaration
-            } else if err != nil {
-                if cerr := pc.canceled(); cerr != nil {
+            &#125; else if err != nil &#123;
+                if cerr := pc.canceled(); cerr != nil &#123;
                     return cerr
-                }
-            }
+                &#125;
+            &#125;
             return err
-        },
-    }</code></pre>
+        &#125;,
+    &#125;
+</code></pre>
 <p>在上面的代码中，如果执行了 <code>earlyCloseFn</code>，那么 <code>waitForBodyRead</code> 就会输入 false，<code>alive</code> 也就会是 <code>false</code>，此时会退出 <code>readLoop</code> 这个循环。</p>
 <p>如果执行了 <code>fn</code>，其中包括正常情况下 <code>body</code> 读完数据抛出 <code>io.EOF</code> 时的 <code>case</code>，此时 <code>waitForBodyRead</code> 通道输入时 <code>true</code>，<code>alive</code> 也会是 <code>true</code>, 它会接着往下执行 <code>tryPutIdleConn(trace)</code>,将 <code>pconn</code> 连接放回到空闲队列中等待新的请求，也就是该连接会被复用。</p>
 <p>那接下来就是看看 <code>earlyCloseFn</code> 和 <code>fn</code> 这两个方法分别是在什么场景下执行了。</p>
@@ -617,55 +632,57 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (pc *persi
 <p>首先来看看读取 rsp body 的场景：</p>
 <pre><code class="go">body, err := ioutil.ReadAll(rsp.Body)
 
-func ReadAll(r io.Reader) ([]byte, error) {
+func ReadAll(r io.Reader) ([]byte, error) &#123;
     return io.ReadAll(r)
-}
+&#125;
 
-func ReadAll(r Reader) ([]byte, error) {
+func ReadAll(r Reader) ([]byte, error) &#123;
     //...
     n, err := r.Read(b[len(b):cap(b)])
        //...
-}
+&#125;
 
-func (es *bodyEOFSignal) Read(p []byte) (n int, err error) {
+func (es *bodyEOFSignal) Read(p []byte) (n int, err error) &#123;
     //...
     n, err = es.body.Read(p)
-    if err != nil {
+    if err != nil &#123;
         es.mu.Lock()
         defer es.mu.Unlock()
-        if es.rerr == nil {
+        if es.rerr == nil &#123;
             es.rerr = err
-        }
+        &#125;
         // 这里会有一个 io.EOF 的报错，因为 ReadAll 读取完了全部的数据
         err = es.condfn(err)
-    }
+    &#125;
     return
-}
+&#125;
 
-func (es *bodyEOFSignal) condfn(err error) error {
-    if es.fn == nil {
+func (es *bodyEOFSignal) condfn(err error) error &#123;
+    if es.fn == nil &#123;
         return err
-    }
+    &#125;
     // 这里就执行了 fn
     err = es.fn(err)
     es.fn = nil
     return err
-}</code></pre>
+&#125;
+</code></pre>
 <p>可以看到，在最后读取完毕之后，会执行 <code>fn</code> ，而这里的入参 <code>err</code> 因为已经读取完了所有内容，所以是一个 <code>io.EOF</code>，所以此时 <code>waitForBodyRead</code> 输入 true，<code>alive</code> 继续会 true，此时 <code>readLoop</code> 继续存在，并不会退出，此时会执行 <code>tryPutIdleConn(trace)</code> 把连接放回池子里复用。</p>
 <p>再看看 Close 的场景：</p>
-<pre><code class="go">func (es *bodyEOFSignal) Close() error {
+<pre><code class="go">func (es *bodyEOFSignal) Close() error &#123;
     es.mu.Lock()
     defer es.mu.Unlock()
-    if es.closed {
+    if es.closed &#123;
         return nil
-    }
+    &#125;
     es.closed = true
-    if es.earlyCloseFn != nil &amp;&amp; es.rerr != io.EOF {
+    if es.earlyCloseFn != nil &amp;&amp; es.rerr != io.EOF &#123;
         return es.earlyCloseFn()
-    }
+    &#125;
     err := es.body.Close()
     return es.condfn(err)
-}</code></pre>
+&#125;
+</code></pre>
 <p>可以看到，如果在读取到了非 <code>io.EOF</code> 错误时（<strong>也就是 rsp.Body 的内容没有被读取完毕的场景下</strong>）会执行会执行 <code>earlyCloseFn</code>，此时 <code>waitForBodyRead</code> 会输入 <code>false</code>，那么 <code>alive</code> 就会是 <code>false</code> 从而使得 <code>readLoop</code> 退出。</p>
 <p>而如果 body 内容已经被读取完毕，则同样调用 <code>fn</code> ，此时连接不会退出，但是可以在下次有需要新连接时被复用。</p>
 <p>到了这里，再回顾一下上面 <code>raedLoop</code> 退出的几个条件：</p>
@@ -676,9 +693,9 @@ func (es *bodyEOFSignal) condfn(err error) error {
                 !pc.sawEOF &amp;&amp;
                 pc.wroteRequest() &amp;&amp;
                 replaced &amp;&amp; tryPutIdleConn(trace)
-            if bodyEOF {
-                eofc &lt;- struct{}{}
-            }
+            if bodyEOF &#123;
+                eofc &lt;- struct&#123;&#125;&#123;&#125;
+            &#125;
         case &lt;-rc.req.Cancel:
             alive = false
             pc.t.CancelRequest(rc.req)
@@ -687,7 +704,8 @@ func (es *bodyEOFSignal) condfn(err error) error {
             pc.t.cancelRequest(rc.cancelKey, rc.req.Context().Err())
         case &lt;-pc.closech:
             alive = false
-        }</code></pre>
+        &#125;
+</code></pre>
 <ul>
 <li>request 或者 respone 任何一方请求关闭连接，或者收到 1xx 的状态码。</li>
 <li><code>body</code> 被读取完毕或者 <code>body</code> 被关闭。</li>
@@ -700,110 +718,124 @@ func (es *bodyEOFSignal) condfn(err error) error {
 <p>当然，这两种场景导致的结果也不相同。对于只读取 body 的场景，连接并不会被释放掉，而是作为空闲链接等待下一次的复用。而对于关闭 body 的场景，则分为两种情况，当 body 内容被读取完毕时，连接能够进行复用；而当 body 内容没有被读取完毕时，连接会被释放掉，下一次请求会重新建立连接。</p>
 <h1 id="理论实践相结合"><a href="#理论实践相结合" class="headerlink" title="理论实践相结合"></a>理论实践相结合</h1><p>前面逼逼赖赖说了那么多，但是事实到底是不是如此呢？</p>
 <p>都说实践是检验真理的唯一标准，那么下面我们就来验证一下上面的观点。</p>
-<h2 id="正常读取和关闭"><a href="#正常读取和关闭" class="headerlink" title="正常读取和关闭"></a>正常读取和关闭</h2><pre><code class="go">func main() {
+<h2 id="正常读取和关闭"><a href="#正常读取和关闭" class="headerlink" title="正常读取和关闭"></a>正常读取和关闭</h2><pre><code class="go">func main() &#123;
     num := 10
-    for index := 0; index &lt; num; index++ {
+    for index := 0; index &lt; num; index++ &#123;
         rsp, err := http.Get(&quot;https://www.baidu.com&quot;)
-        if err != nil {
+        if err != nil &#123;
             continue
-        }
+        &#125;
         io.Copy(ioutil.Discard, rsp.Body)
         rsp.Body.Close()
-    }
+    &#125;
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 90) // 一段时间连接空闲，自动关闭，默认值是 90s
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
-}</code></pre>
+&#125;
+</code></pre>
 <p>执行结果：</p>
 <pre><code>此时goroutine个数= 3
-此时goroutine个数= 1</code></pre><h2 id="只读取不关闭"><a href="#只读取不关闭" class="headerlink" title="只读取不关闭"></a>只读取不关闭</h2><pre><code class="go">func main() {
+此时goroutine个数= 1
+</code></pre>
+<h2 id="只读取不关闭"><a href="#只读取不关闭" class="headerlink" title="只读取不关闭"></a>只读取不关闭</h2><pre><code class="go">func main() &#123;
     num := 10
-    for index := 0; index &lt; num; index++ {
+    for index := 0; index &lt; num; index++ &#123;
         rsp, err := http.Get(&quot;https://www.baidu.com&quot;)
-        if err != nil {
+        if err != nil &#123;
             continue
-        }
+        &#125;
         io.Copy(ioutil.Discard, rsp.Body)
         //rsp.Body.Close()
-    }
+    &#125;
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 10) // 一段时间连接空闲，看看连接是否释放
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 90) // 一段时间连接空闲，自动关闭，默认值是 90s
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
-}</code></pre>
+&#125;
+</code></pre>
 <p>执行结果：</p>
 <pre><code>此时goroutine个数= 3
 此时goroutine个数= 3
-此时goroutine个数= 1</code></pre><h2 id="只关闭不读取"><a href="#只关闭不读取" class="headerlink" title="只关闭不读取"></a>只关闭不读取</h2><pre><code class="go">func main() {
+此时goroutine个数= 1
+</code></pre>
+<h2 id="只关闭不读取"><a href="#只关闭不读取" class="headerlink" title="只关闭不读取"></a>只关闭不读取</h2><pre><code class="go">func main() &#123;
     num := 10
-    for index := 0; index &lt; num; index++ {
+    for index := 0; index &lt; num; index++ &#123;
         rsp, err := http.Get(&quot;https://www.baidu.com&quot;)
-        if err != nil {
+        if err != nil &#123;
             continue
-        }
+        &#125;
         //io.Copy(ioutil.Discard, rsp.Body)
         rsp.Body.Close()
-    }
+    &#125;
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 10) // 一段时间连接空闲，看看连接是否关闭
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 90) // 一段时间连接空闲，自动关闭，默认值是 90s
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
-}</code></pre>
+&#125;
+</code></pre>
 <p>执行结果：</p>
 <pre><code>此时goroutine个数= 3
 此时goroutine个数= 1
-此时goroutine个数= 1</code></pre><h2 id="既不关闭也不读取"><a href="#既不关闭也不读取" class="headerlink" title="既不关闭也不读取"></a>既不关闭也不读取</h2><pre><code class="go">func main() {
+此时goroutine个数= 1
+</code></pre>
+<h2 id="既不关闭也不读取"><a href="#既不关闭也不读取" class="headerlink" title="既不关闭也不读取"></a>既不关闭也不读取</h2><pre><code class="go">func main() &#123;
     num := 10
-    for index := 0; index &lt; num; index++ {
+    for index := 0; index &lt; num; index++ &#123;
         _, err := http.Get(&quot;https://www.baidu.com&quot;)
-        if err != nil {
+        if err != nil &#123;
             continue
-        }
+        &#125;
         //io.Copy(ioutil.Discard, rsp.Body)
         //rsp.Body.Close()
-    }
+    &#125;
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 10) // 一段时间连接空闲，看看连接是否关闭
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
     time.Sleep(time.Second * 90) // 一段时间连接空闲，自动关闭，默认值是 90s
     fmt.Printf(&quot;此时goroutine个数= %d\n&quot;, runtime.NumGoroutine())
-}</code></pre>
+&#125;
+</code></pre>
 <p>执行结果：</p>
 <pre><code>此时goroutine个数= 21
 此时goroutine个数= 21
-此时goroutine个数= 21</code></pre><p>可以看到，在最后一种场景下，会造成 goroutine 的泄漏。</p>
+此时goroutine个数= 21
+</code></pre>
+<p>可以看到，在最后一种场景下，会造成 goroutine 的泄漏。</p>
 <p>综上，我们日常在写代码的过程中，对于需要执行 HTTP 请求的场景，一定记得 <code>resp.Body.Close</code>，这也是一个良好的代码习惯：</p>
 <pre><code class="go">res, err := http.Get(url)
-if err != nil {
+if err != nil &#123;
     log.Printf(&quot;Error: %s\n&quot;, err)
     return
-}
-defer res.Body.Close()</code></pre>
+&#125;
+defer res.Body.Close()
+</code></pre>
 <p>多提一些题外话，在网上查看的时候，发现有很多博客上认为应该采用下面的写法：</p>
 <pre><code class="go">res, err := http.Get(url)
-defer func() {
-   if res != nil &amp;&amp; res.Body != nil {
+defer func() &#123;
+   if res != nil &amp;&amp; res.Body != nil &#123;
       res.Body.Close()
-   }
-}()
-if err != nil {
+   &#125;
+&#125;()
+if err != nil &#123;
     log.Printf(&quot;Error: %s\n&quot;, err)
     return
-}</code></pre>
+&#125;
+</code></pre>
 <p>上面的代码为什么不是在 <code>err != nil</code> 的场景下才执行 <code>Close</code> 呢？原因是在于存在一种特殊的场景：当请求得到一个重定向的错误时，此时返回的 body 内容并非空的。</p>
 <p>初看上面的代码总感觉很奇怪，而且感觉这似乎不属于 Golang 的风格，于是去搜刮了一下 Golang 的官方仓库，发现之前确实存在这种问题，但是在后续的版本其实已经做了处理。</p>
 <p>现有的版本下，如果出现重定向的错误，其返回的 body 虽然不为空，但是其实已经对其进行了 <code>Close</code> 操作，这一步主要在上面的 <code>do</code> 方法中执行：</p>
-<pre><code class="go">func (c *Client) do(req *Request) (retres *Response, reterr error) {
+<pre><code class="go">func (c *Client) do(req *Request) (retres *Response, reterr error) &#123;
       //...
-
+  
             // Sentinel error to let users select the
             // previous response, without closing its
             // body. See Issue 10069.
-            if err == ErrUseLastResponse {
+            if err == ErrUseLastResponse &#123;
                 return resp, nil
-            }
+            &#125;
 
             // Close the previous response&#39;s body. But
             // read at least some of the body so if it&#39;s
@@ -811,12 +843,12 @@ if err != nil {
             // re-used. No need to check for errors: if it
             // fails, the Transport won&#39;t reuse it anyway.
             const maxBodySlurpSize = 2 &lt;&lt; 10
-            if resp.ContentLength == -1 || resp.ContentLength &lt;= maxBodySlurpSize {
+            if resp.ContentLength == -1 || resp.ContentLength &lt;= maxBodySlurpSize &#123;
                 io.CopyN(io.Discard, resp.Body, maxBodySlurpSize)
-            }
+            &#125;
             resp.Body.Close()
 
-            if err != nil {
+            if err != nil &#123;
                 // Special case for Go 1 compatibility: return both the response
                 // and an error if the CheckRedirect function failed.
                 // See https://golang.org/issue/3795
@@ -824,21 +856,22 @@ if err != nil {
                 ue := uerr(err)
                 ue.(*url.Error).URL = loc
                 return resp, ue
-            }
+            &#125;
       // ...
-}</code></pre>
+&#125;
+</code></pre>
 <p>有兴趣的可以看看下面的两个 Issue 和 commit 记录：</p>
 <ul>
-<li><a href="https://github.com/golang/go/issues/3795" target="_blank" rel="noopener">net/http has broken compatibility on redirection handler #3795</a></li>
-<li><a href="https://github.com/golang/go/issues/10069" target="_blank" rel="noopener">net/http: redirection response has closed body #10069</a></li>
-<li><a href="https://github.com/golang/go/commit/aecfcd827edb4a7ab6248668f7329a330e1f0e4a" target="_blank" rel="noopener">net/http: clean up the Client redirect code, document Body.Close rule…</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/3795">net&#x2F;http has broken compatibility on redirection handler #3795</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/10069">net&#x2F;http: redirection response has closed body #10069</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/golang/go/commit/aecfcd827edb4a7ab6248668f7329a330e1f0e4a">net&#x2F;http: clean up the Client redirect code, document Body.Close rule…</a></li>
 </ul>
 <h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>通过这次内存泄漏的排查，也学到不少新技能，从发现问题，到问题分析，定位问题，再到源码了解，一步一步走过来，积累了很多知识，也很感谢组里大佬们的帮助，让自己从中学到了很多实用的经验。</p>
 <p>以上分析内容如果有不正确的地方，欢迎各位大佬们批评指正！下次线上问题，再会！（希望没有下次了～）</p>
 <blockquote>
-<p><a href="https://mp.weixin.qq.com/s?__biz=Mzg5NDY2MDk4Mw==&mid=2247486370&idx=1&sn=8b8bbd7ef43849ad71b72f7fddbb12b7&source=41#wechat_redirect" target="_blank" rel="noopener">给大家丢脸了，用了三年golang，我还是没答对这道内存泄漏题</a></p>
-<p><a href="https://mp.weixin.qq.com/s/7Fl5MuCl-G6wIQQiAqLAKA" target="_blank" rel="noopener">i/o timeout ， 希望你不要踩到这个net/http包的坑</a></p>
-<p><a href="https://draveness.me/golang/docs/part4-advanced/ch09-stdlib/golang-net-http/#请求和响应" target="_blank" rel="noopener">go语言设计与实现</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=Mzg5NDY2MDk4Mw==&mid=2247486370&idx=1&sn=8b8bbd7ef43849ad71b72f7fddbb12b7&source=41#wechat_redirect">给大家丢脸了，用了三年golang，我还是没答对这道内存泄漏题</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/7Fl5MuCl-G6wIQQiAqLAKA">i&#x2F;o timeout ， 希望你不要踩到这个net&#x2F;http包的坑</a></p>
+<p><a target="_blank" rel="noopener" href="https://draveness.me/golang/docs/part4-advanced/ch09-stdlib/golang-net-http/#%E8%AF%B7%E6%B1%82%E5%92%8C%E5%93%8D%E5%BA%94">go语言设计与实现</a></p>
 </blockquote>
 
     </div>
@@ -846,28 +879,26 @@ if err != nil {
     
     
     
-        <div class="reward-container">
+
+    <footer class="post-footer">
+          <div class="reward-container">
   <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
+  <button>
+    赞赏
   </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
       </div>
-      
-      <div style="display: inline-block;">
+      <div>
         <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
+        <span>支付宝</span>
       </div>
 
   </div>
 </div>
 
-
-      <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/go/" rel="tag"># go</a>
               <a href="/tags/%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F/" rel="tag"># 内存泄漏</a>
@@ -875,129 +906,60 @@ if err != nil {
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2021/11/07/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Golang%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" rel="prev" title="Golang 常见问题">
-      <i class="fa fa-chevron-left"></i> Golang 常见问题
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/04/07/go%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="next" title="Go 内存对齐">
-      Go 内存对齐 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/11/07/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94Golang%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" rel="prev" title="Golang 常见问题">
+                  <i class="fa fa-chevron-left"></i> Golang 常见问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2022/04/07/go%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/" rel="next" title="Go 内存对齐">
+                  Go 内存对齐 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
           </div>
-          
+    </footer>
+  </article>
+</div>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
   </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#业务背景"><span class="nav-number">1.</span> <span class="nav-text">业务背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#初见端倪"><span class="nav-number">2.</span> <span class="nav-text">初见端倪</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#渐露头角"><span class="nav-number">3.</span> <span class="nav-text">渐露头角</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#号角吹响"><span class="nav-number">4.</span> <span class="nav-text">号角吹响</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#出师未捷"><span class="nav-number">5.</span> <span class="nav-text">出师未捷</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#渐入佳境"><span class="nav-number">6.</span> <span class="nav-text">渐入佳境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#知其然，知其所以然"><span class="nav-number">7.</span> <span class="nav-text">知其然，知其所以然</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#理论实践相结合"><span class="nav-number">8.</span> <span class="nav-text">理论实践相结合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#正常读取和关闭"><span class="nav-number">8.1.</span> <span class="nav-text">正常读取和关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只读取不关闭"><span class="nav-number">8.2.</span> <span class="nav-text">只读取不关闭</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只关闭不读取"><span class="nav-number">8.3.</span> <span class="nav-text">只关闭不读取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#既不关闭也不读取"><span class="nav-number">8.4.</span> <span class="nav-text">既不关闭也不读取</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#后记"><span class="nav-number">9.</span> <span class="nav-text">后记</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">139</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">50</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
 
 <div class="copyright">
-  
   &copy; 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.3m</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:37</span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -1005,8 +967,7 @@ if err != nil {
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -1015,53 +976,36 @@ if err != nil {
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
+    </div>
+  </footer>
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
 
   
 
-  
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
 
 </body>
 </html>

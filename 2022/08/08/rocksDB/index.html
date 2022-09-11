@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="背景嵌入式数据库 RocksDB 是 Facebook 基于 LevelDB 开发的一种嵌入式 Key-value 存储系统，该数据库能够充分利用闪存的性能，大大提升应用服务器的速度。 Rocksdb 这个开源引擎是基于 Google 的 leveldb 1.5 版本，据说对其做了许多优化，性能相对 leveldb 有了很大的提升，而且解决了 leveldb 主动限制写的问题。 Facebook">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rocksDB">
+<meta property="og:url" content="http://yoursite.com/2022/08/08/rocksDB/index.html">
+<meta property="og:site_name" content="Silverming">
+<meta property="og:description" content="背景嵌入式数据库 RocksDB 是 Facebook 基于 LevelDB 开发的一种嵌入式 Key-value 存储系统，该数据库能够充分利用闪存的性能，大大提升应用服务器的速度。 Rocksdb 这个开源引擎是基于 Google 的 leveldb 1.5 版本，据说对其做了许多优化，性能相对 leveldb 有了很大的提升，而且解决了 leveldb 主动限制写的问题。 Facebook">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qiniu.xiaoming.net.cn/LSM%E6%A0%91Merge%E6%93%8D%E4%BD%9C.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/leveldb%20%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/rocksdb%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84.webp">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/RocksDB%E8%AF%BB%E5%86%99%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/RocksDB%E8%AF%BB%E5%86%99%E6%B5%81%E7%A8%8B.png">
+<meta property="article:published_time" content="2022-08-08T11:54:31.000Z">
+<meta property="article:modified_time" content="2022-09-10T15:09:39.242Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="rocksdb">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://qiniu.xiaoming.net.cn/LSM%E6%A0%91Merge%E6%93%8D%E4%BD%9C.png">
+
+
+<link rel="canonical" href="http://yoursite.com/2022/08/08/rocksDB/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2022/08/08/rocksDB/","path":"2022/08/08/rocksDB/","title":"rocksDB"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>rocksDB | Silverming</title>
+  
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LevelDB"><span class="nav-number">2.</span> <span class="nav-text">LevelDB</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">整体结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E5%8E%8B%E7%BC%A9"><span class="nav-number">2.2.</span> <span class="nav-text">合并压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LevelDB-%E7%89%B9%E7%82%B9"><span class="nav-number">2.3.</span> <span class="nav-text">LevelDB 特点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RocksDB"><span class="nav-number">3.</span> <span class="nav-text">RocksDB</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">RocksDB 基础架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E5%88%86%E6%9E%90"><span class="nav-number">3.1.1.</span> <span class="nav-text">架构分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocksDB-%E6%A0%B8%E5%BF%83%E7%BB%93%E6%9E%84"><span class="nav-number">3.1.2.</span> <span class="nav-text">RocksDB 核心结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MemTable"><span class="nav-number">3.1.2.1.</span> <span class="nav-text">MemTable</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Block-Cache"><span class="nav-number">3.1.2.2.</span> <span class="nav-text">Block Cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Write-Buffer-Manager"><span class="nav-number">3.1.2.3.</span> <span class="nav-text">Write Buffer Manager</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-Compation"><span class="nav-number">3.2.</span> <span class="nav-text">RocksDB Compation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-%E8%AF%BB%E5%86%99%E6%B5%81%E7%A8%8B"><span class="nav-number">3.3.</span> <span class="nav-text">RocksDB 读写流程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E6%B5%81%E7%A8%8B"><span class="nav-number">3.3.1.</span> <span class="nav-text">写流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%BB%E6%B5%81%E7%A8%8B"><span class="nav-number">3.3.2.</span> <span class="nav-text">读流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-%E4%BC%98%E5%8C%96%E8%BF%87%E7%A8%8B"><span class="nav-number">3.4.</span> <span class="nav-text">RocksDB 优化过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%99%E6%94%BE%E5%A4%A7"><span class="nav-number">3.4.1.</span> <span class="nav-text">写放大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E9%97%B4%E6%94%BE%E5%A4%A7"><span class="nav-number">3.4.2.</span> <span class="nav-text">空间放大</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU%E5%88%A9%E7%94%A8%E7%8E%87"><span class="nav-number">3.4.3.</span> <span class="nav-text">CPU利用率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E5%BA%94%E6%96%B0%E7%9A%84%E7%A1%AC%E4%BB%B6%E6%8A%80%E6%9C%AF"><span class="nav-number">3.4.4.</span> <span class="nav-text">适应新的硬件技术</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-%E4%B8%8E-LevelDB-%E5%AF%B9%E6%AF%94"><span class="nav-number">3.5.</span> <span class="nav-text">RocksDB 与 LevelDB 对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocksDB-%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.6.</span> <span class="nav-text">RocksDB 使用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.6.1.</span> <span class="nav-text">适用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.6.2.</span> <span class="nav-text">不适用场景</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/08/08/rocksDB/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Silverming">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="rocksDB | Silverming">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          rocksDB
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-08-08 19:54:31" itemprop="dateCreated datePublished" datetime="2022-08-08T19:54:31+08:00">2022-08-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-09-10 23:09:39" itemprop="dateModified" datetime="2022-09-10T23:09:39+08:00">2022-09-10</time>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>11 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>嵌入式数据库 RocksDB 是 Facebook 基于 LevelDB 开发的一种嵌入式 Key-value 存储系统，该数据库能够充分利用闪存的性能，大大提升应用服务器的速度。</p>
+<p>Rocksdb 这个开源引擎是基于 Google 的 leveldb 1.5 版本，据说对其做了许多优化，性能相对 leveldb 有了很大的提升，而且解决了 leveldb 主动限制写的问题。</p>
+<p>Facebook 使用 RocksDB 来驱动一些面向用户的应用，这些应用由于需要通过网络访问外部存储而性能低下，此外 Facebook 还用 RocksDB 来解决固态硬盘 IO利用率不高相关的一些问题。Facebook 的数据库工程师 Dhruba Borthakur 在其个人博客介绍了 RocksDB 的设计原由和原理，但实际上催生 RocksDB 的最大动力来自服务器闪存存储卡的价格大幅下滑，Facebook 的定制服务器已经开始全面采用闪存。</p>
+<p>随着闪存存储时代的到来，一些新的应用可以在闪存中管理并快速访问自己的数据集，无需通过网络访问外部数据。这些新应用使用的就是这种<strong>嵌入式数据库</strong>。</p>
+<p>数据库查询如果在本地闪存中进行，速度理论上会比通过数据中心内部网络查询快一倍，因为数据库中心内部网络有50微妙的延迟。</p>
+<p>RocksDB 的能够充分利用闪存的高IOPS性能，同时也能利用多核服务器的计算性能。</p>
+<span id="more"></span>
+
+<h1 id="LevelDB"><a href="#LevelDB" class="headerlink" title="LevelDB"></a>LevelDB</h1><p>RocksDB 是基于 LevelDB 开发的，因此有必要先了解一下 LevelDB 。</p>
+<p>LevelDB 是 Google 的两位 Fellow （Jeaf Dean和Sanjay Ghemawat）设计和开发的嵌入式K-V系统，读写性能非常彪悍，官方网站报道其写性能40万&#x2F;s，读性能达到6万&#x2F;s，写操作要远快于读操作。</p>
+<p>LevelDB 的数据是存储在磁盘上的，采用 LSM-Tree 的结构实现。LSM-Tree 将磁盘的<strong>随机写转化为顺序写</strong>，从而<strong>大大提高了写速度</strong>。为了做到这一点， LSM-Tree 的思路是将索引树结构拆成一大一小两颗树，较小的一个常驻内存，较大的一个持久化到磁盘，他们共同维护一个有序的 key 空间。写入操作会首先操作内存中的树，随着内存中树的不断变大，会触发与磁盘中树的归并操作，而归并操作本身仅有<strong>批量</strong>顺序写。</p>
+<p>随着数据的不断写入，磁盘中的树会不断膨胀，为了避免每次参与归并操作的数据量过大，以及优化读操作的考虑，LevelDB 将磁盘中的数据又拆分成多层，每一层的数据达到一定容量后会触发向下一层的归并操作，每一层的数据量比其上一层<strong>成倍增长</strong>。这也就是LevelDB的名称来源。</p>
+<p><img src="http://qiniu.xiaoming.net.cn/LSM%E6%A0%91Merge%E6%93%8D%E4%BD%9C.png" alt="Merge操作"></p>
+<h2 id="整体结构"><a href="#整体结构" class="headerlink" title="整体结构"></a>整体结构</h2><p>具体到代码实现上，LevelDB 有几个重要的角色，包括内存数据的 Memtable，分层数据存储的 SST 文件，版本控制的 Manifest、Current 文件，以及写 Memtable 前的 WAL。这里介绍一下各个组件的作用和在整个结构中的位置。</p>
+<p><img src="https://qiniu.xiaoming.net.cn/leveldb%20%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84.png" alt="leveldb 存储结构"></p>
+<ul>
+<li><strong>Memtable</strong>：是一种内存数据结构，采用跳表来实现，用于保留刚写入的数据直至刷新到 SST 文件中；</li>
+<li><strong>Log文件：</strong>Commit Log，也称为提交日志。写 Memtable 前会先写 Log 文件，Log 通过 append 的方式顺序写入。Log 的存在使得机器宕机导致的内存数据丢失得以恢复；</li>
+<li><strong>Immutable Memtable：</strong>达到 Memtable 设置的容量上限后，Memtable 会变为 Immutable，为之后向 SST 文件的归并做准备，Immutable Mumtable 不再接受用户写入，同时会有新的 Memtable 生成；</li>
+<li><strong>SST文件：</strong>磁盘数据存储文件。分为 Level 0 到 Level N 多层，每一层包含多个 SST 文件；单层 SST 文件总量随层次增加<strong>成倍</strong>增长；文件内数据有序；其中Level0 的 SST 文件由 Immutable 直接 Dump 产生，其他 Level 的 SST 文件由其上一层的文件和本层文件<strong>归并</strong>产生；SST 文件在归并过程中<strong>顺序写</strong>生成，生成后仅可能在之后的归并中被删除，而不会有任何的修改操作。</li>
+<li><strong>Manifest文件：</strong> 清单文件。SSTable 中的文件是<strong>按照记录的主键排序</strong>的，每个文件有最小的主键和最大的主键。清单文件记录这些<strong>元数据</strong>，包括属于哪个层级、文件名称、最小主键和最大主键。</li>
+<li><strong>Current文件:</strong> 当前文件记录了<strong>当前的清单文件名</strong>，即当前的Manifest，而 Manifest 可能有多个。</li>
+</ul>
+<p> 总之，当写入一个 key-value 的时候，首先写入 log 文件中，然后才会写入 memtable 中，然后当 memtable 到达一定程度时，然后转变成 Immutable memtable，系统此时会重新创建新的 memtable 用于插入数据。然后 Immutable memtable 通过压缩数据存储到磁盘 SSTable 中。 </p>
+<h2 id="合并压缩"><a href="#合并压缩" class="headerlink" title="合并压缩"></a>合并压缩</h2><p>LevelDB 写入操作简单，但是读取操作比较复杂，需要在内存以及各个层级文件中按照从新到老依次查找，代价很高。为了加快读取速度， LevelDB 内部执行Compaction 操作来对已有的记录进行整理<strong>压缩</strong>，从而删除一些不再有效的记录，减少数据规模和文件数量。</p>
+<p>Compaction分为两种：</p>
+<p><strong>Minor Compaction</strong>是指当内存中的MemTable大小到一定值时，将内存数据转储 dump到 SSTable 中。</p>
+<p><strong>Major Compaction</strong> 是指每个层级下有多个 SSTable，当某个层级下的 SSTable 文件数目超过一定设置后， LevelDB 会从这个层级中选择 SSTable 文件，将和高一级的 SSTable 文件进行合并。相当于执行多路归并：按照主键顺序依次迭代出所有 SSTable 文件中的记录，如果没有保存价值则直接丢掉，否则将其写入到新生成的 SSTable 文件中。</p>
+<h2 id="LevelDB-特点"><a href="#LevelDB-特点" class="headerlink" title="LevelDB 特点"></a>LevelDB 特点</h2><ol>
+<li>LevelDB是一个持久化存储的KV系统，和Redis这种内存型的KV系统不同，LevelDB不会像Redis一样狂吃内存，而是将大部分数据存储到磁盘上。</li>
+<li>LevleDB在存储数据时，是根据记录的key值有序存储的，就是说相邻的key值在存储文件中是依次顺序存储的，而应用可以自定义key大小比较函数。</li>
+<li>LevelDB支持数据快照（snapshot）功能，使得读取操作不受写操作影响，可以在读操作过程中始终看到一致的数据。</li>
+<li>LevelDB还支持数据压缩等操作，这对于减小存储空间以及增快IO效率都有直接的帮助。</li>
+</ol>
+<h1 id="RocksDB"><a href="#RocksDB" class="headerlink" title="RocksDB"></a>RocksDB</h1><p>Rocksdb 是基于Google LevelDB研发的高性能kv持久化存储引擎，以库组件形式嵌入程序中，为大规模分布式应用在 ssd 上运行提供优化。Rocksdb 是 Facebook 公司在 Leveldb 基础之上开发的一个嵌入式K-V系统，<strong>在很多方面对 LevelDB 做了优化和增强</strong>，更像是一个完整的产品。</p>
+<p>RocksDB 虽然在代码层面上是在 LevelDB 原有的代码上进行开发的，但却借鉴了Apache HBase的一些好的 idea。RocksDB也开始支持HDFS，允许从HDFS读取数据。而 LevelDB 则是一个比较单一的存储引擎，也是因为LevelDB的单一性，在做具体的应用的时候一般需要对其作进一步扩展。</p>
+<p>RocksDB不提供高层级的操作，例如备份、负载均衡、快照等，而是选择提供工具支持将实现交给上层应用。正是这种高度可定制化能力，允许 RocksDB 对广泛的需求和工作负载场景进行定制。</p>
+<h2 id="RocksDB-基础架构"><a href="#RocksDB-基础架构" class="headerlink" title="RocksDB 基础架构"></a>RocksDB 基础架构</h2><p><img src="https://qiniu.xiaoming.net.cn/rocksdb%20%E5%9F%BA%E7%A1%80%E6%9E%B6%E6%9E%84.webp" alt="rocksdb 基础架构"></p>
+<p>RocksDB 中引入了 ColumnFamily (列族, CF)的概念，所谓列族也就是一系列 kv 组成的数据集。所有的读写操作都需要先指定列族。</p>
+<p>写操作先写WAL（磁盘上的Write-Ahead-Log），再写memtable，memtable 达到一定阈值后切换为 Immutable Memtable，只能读不能写。</p>
+<p>后台 Flush 线程负责按照时间顺序将 Immu Memtable 刷盘，生成 level0 层的有序文件(SST)。后台合并线程负责将上层的 SST 合并生成下层的 SST。</p>
+<p>SST files 按照 key 排序，且每个文件的 key range 互相不重叠。为了 check 一个 key 可能存在于哪一个 SST file 中，RocksDB 并没有依次遍历每一个 SST file，然后去检查 key 是否在这个 file 的 key range 内，而是执行二分搜索算法（FileMetaData.largest ）去定位这个 SST file。</p>
+<p>Manifest 负责记录系统某个时刻 SST 文件的视图，Current 文件记录，当前最新的 Manifest 文件名。  每个 ColumnFamily 有自己的Memtable， SST 文件，所有 ColumnFamily 共享 WAL、Current、Manifest 文件。</p>
+<h3 id="架构分析"><a href="#架构分析" class="headerlink" title="架构分析"></a>架构分析</h3><p>RocksDB 整个系统的设计如上所述，这种设计的优势很明显，主要有以下几点：</p>
+<ol>
+<li><p>所有的刷盘操作都采用 append 方式，这种方式对磁盘和 SSD 是相当有诱惑力的；</p>
+</li>
+<li><p>写操作写完 WAL 和 Memtable 就立即返回，写效率非常高。  </p>
+</li>
+<li><p>由于最终的数据是存储在离散的 SST 中，SST 文件的大小可以根据 kv 的大小自由配置，因此很适合做变长存储。</p>
+</li>
+</ol>
+<p>但是这种设计也带来了很多其他的问题：</p>
+<ol>
+<li>为了支持批量和事务以及断电恢复操作，WAL 是多个CF共享的，导致了 WAL 的单线程写模式，不能充分发挥高速设备的性能优势（这是相对介质讲，相对B树等其他结构还是有优势）；</li>
+<li>读写操作都需要对 Memtable 进行互斥访问，在多线程并发写及读写混合的场景下容易形成瓶颈。</li>
+<li>由于 Level0 层的文件是按照时间顺序刷盘的，而不是根据 key 的范围做划分，所以导致各个文件之间范围有重叠，再加上文件自上向下的合并，读的时候有可能需要查找 level0 层的多个文件及其他层的文件，这也造成了很大的读放大。尤其是当纯随机写入后，读几乎是要查询 level0 层的所有文件，导致了读操作的低效。</li>
+<li>针对第三点问题，RocksDB 中依据 level0 层文件的个数来做前台写流控及后台合并触发，以此来平衡读写的性能。这又导致了性能抖动及不能发挥高速介质性能的问题。  </li>
+<li>合并流程难以控制，容易造成性能抖动及写放大。尤其是写放大问题，在使用过程中实际测试的写放大经常达到二十倍左右。这是不可接受的，当前也没有找到合适的解决办法，只是暂时采用大 value 分离存储的方式来将写放大尽量控制在小数据。</li>
+</ol>
+<h3 id="RocksDB-核心结构"><a href="#RocksDB-核心结构" class="headerlink" title="RocksDB 核心结构"></a>RocksDB 核心结构</h3><p>RocksDB 包含的核心结构如下：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/RocksDB%E8%AF%BB%E5%86%99%E6%B5%81%E7%A8%8B.png" alt="RocksDB读写流程"></p>
+<h4 id="MemTable"><a href="#MemTable" class="headerlink" title="MemTable"></a>MemTable</h4><p>MemTable 是一种内存数据结构，用于保留刚写入的数据直至刷新到SST文件中。它同时服务于读和写：新的写入总是将数据插入到 memtable 中；而读取流程最先查询 memtable，因为 memtable 中的数据较新。</p>
+<p>一旦一个 memtable 满了，它就会变得不可变，并被一个新的 memtable 取代。</p>
+<p>后台线程会将内存表的内容刷新到 SST 文件中，然后销毁已经落盘的内存表。</p>
+<p>memtable 默认使用SkipList实现。还可以选择 HashLinkList、HashSkipList、Vector 用来加速某些查询。</p>
+<ul>
+<li>SkipList MemTable：读写、随机访问和顺序扫描提供了总体良好的性能，还提供了其他 memtable 实现不支持的一些有用功能，例如并发插入和带Hit 插入</li>
+<li>HashSkipList MemTable：HashSkipList 将数据组织在哈希表中，每一个哈希桶都是一个有序的 SkipList，key 是原始 key 通过 Options.prefix_extractor 截取的前缀 key。主要用于减少查询时的比较次数。一般与 PlainTable SST 格式配合使用将数据存储在 RAMFS 中。基于哈希的 memtables 的最大限制是跨多个前缀进行扫描需要复制和排序，非常慢且内存成本高。</li>
+</ul>
+<p>触发 Memtable 刷新落盘的场景：</p>
+<ol>
+<li>写入后 Memtable 大小超过 <code>ColumnFamilyOptions.write_buffer_size</code></li>
+<li>所有列族的 Memtable 用量超过 <code>DBOptions.db_write_buffer_size</code> 或者 <code>write_buffer_manager</code> 发出刷新信号。最大的 MemTable 将会 flushed</li>
+<li>WAL 文件大小超过 <code>DBOptions.max_total_wal_size</code></li>
+</ol>
+<h4 id="Block-Cache"><a href="#Block-Cache" class="headerlink" title="Block Cache"></a>Block Cache</h4><p>RocksDB 在内存中缓存数据以供读取的地方。一个 Cache 对象可以被同一个进程中的多个 RocksDB 实例共享，用户可以控制整体的缓存容量。</p>
+<p>块缓存存储未压缩的块。用户可以选择设置存储压缩块的二级块缓存。读取将首先从未压缩的块缓存中获取数据块，然后是压缩的块缓存。如果使用 Direct-IO，压缩块缓存可以替代 OS 页面缓存。</p>
+<p>Block Cache 有两种缓存实现，分别是 LRUCache 和 ClockCache。两种类型的缓存都使用分片以减轻锁争用。容量平均分配给每个分片，分片不共享容量。默认情况下，每个缓存最多会被分成 64 个分片，每个分片的容量不小于 512k 字节。</p>
+<ul>
+<li>LRUCache： 默认的缓存实现。使用容量为8MB的基于LRU的缓存。缓存的每个分片都维护自己的LRU列表和自己的哈希表以供查找。通过每个分片的互斥锁实现同步，查找与插入都需要对分片加锁。</li>
+</ul>
+<blockquote>
+<p>极少数情况下，在块上进行读或迭代的，并且固定的块总大小超过限制，缓存的大小可能会大于容量。如果主机没有足够的内存，这可能会导致意外的 OOM 错误，从而导致数据库崩溃</p>
+</blockquote>
+<ul>
+<li>ClockCache： ClockCache 实现了 CLOCK 算法。时钟缓存的每个分片都维护一个缓存条目的循环列表。时钟句柄在循环列表上运行，寻找要驱逐的未固定条目，但如果自上次扫描以来已使用过，也给每个条目第二次机会留在缓存中。</li>
+</ul>
+<blockquote>
+<p>ClockCache 还不稳定，不建议使用</p>
+</blockquote>
+<h4 id="Write-Buffer-Manager"><a href="#Write-Buffer-Manager" class="headerlink" title="Write Buffer Manager"></a>Write Buffer Manager</h4><p>Write Buffer Manager 用于控制多个列族或者多个数据库实例的内存表总使用量。</p>
+<p>使用方式：用户创建一个write buffer manager对象，并将对象传递到需要控制内存的列族或数据库实例中。</p>
+<p>有两种限制方式：</p>
+<ul>
+<li><p>限制 memtables 的总内存用量：触发其中一个条件将会在实例的列族上触发flush操作：</p>
+<ol>
+<li>如果活跃的 memtables 使用超过阈值的90%</li>
+<li>总内存超过限制，活跃的 mamtables 使用也超过阈值的 50% 时。</li>
+</ol>
+</li>
+<li><p>memtable 的内存占用转移到 block cache</p>
+<p>  大多数情况下，block cache 中实际使用的 block 远小于 block cache 中缓存的，所以当用户启用该功能时，block cache 容量将覆盖 block cache 和 memtable 两者的内存使用量。</p>
+<p>  如果用户同时开启 cache_index_and_filter_blocks，那么 RocksDB 的三大内存区域（index and filter cache， memtables， block cache）内存占用都在block cache中。</p>
+</li>
+</ul>
+<h2 id="RocksDB-Compation"><a href="#RocksDB-Compation" class="headerlink" title="RocksDB Compation"></a>RocksDB Compation</h2><p>LSM tree 有多个层级，每个层级由多个 ssTable 组成，如果没有 Compaction，那么写入是非常快的，但会造成读性能降低，同样也会造成很严重的空间放大问题。其会造成以下三个问题：</p>
+<ol>
+<li><p>读放大（Read Amplification）：LSM-Tree 的读操作需要从新到旧（从上到下）一层一层查找，直到找到想要的数据。这个过程可能需要不止一次 I&#x2F;O。特别是 range query 的情况，影响很明显。</p>
+</li>
+<li><p>空间放大（Space Amplification）：因为所有的写入都是顺序写（append-only）的，不是 in-place update ，所以过期数据不会马上被清理掉。</p>
+</li>
+<li><p>写放大。实际写入 HDD&#x2F;SSD 的数据大小和程序要求写入数据大小之比。正常情况下，HDD&#x2F;SSD 观察到的写入数据多于上层程序写入的数据。</p>
+</li>
+</ol>
+<p>RocksDB 和 LevelDB 通过后台的 compaction 来减少读放大（减少 SST 文件数量）和空间放大（清理过期数据），至于写放大（Write Amplification） 的问题，compaction 其实就是以写放大作为代价，换取更好的读取性能。</p>
+<p>最新的 ssTable 都会放置在level-0（最顶层），下层的 ssTable通过 Compaction（压缩）操作创建。每层的ssTable总大小由配置参数决定，当L层数据大小超出预设值，会选择L层的SSTable与L+1层的SSTable重叠部分合并，通过这一过程将写入数据从Level-0逐渐推到最后一层。基于这些操作完成了数据的删除与覆盖，同时优化了数据空间与读性能。</p>
+<p>Compaction 操作对于I&#x2F;O是高效的，因为压缩是可以并行执行，并且对数据文件的读写是批量的。</p>
+<p>Level-0 中单个 ssTable 中的 key 是有序的，不同的 ssTable 存在 key 重叠。下层的 key 是整体有序的。</p>
+<p>对于 RocksDB 来说，他有三种压缩类型：</p>
+<ol>
+<li>Leveled Compaction：从 LevelDB 迁移改进过来的，每一层的大小由上至下指数增长，数据量达到指定大小开始压缩。</li>
+<li>Tiered Compaction：也叫 Universal Compaction，与Apache Cassandra&#x2F; HBase使用的延迟压缩类似，当某层的runs&#x2F;ssTables个数超出预设值或者数据库大小与最大一层的大小比值超过预设系数时才开始压缩。</li>
+<li>FIFO Compaction：一旦数据量达到预设值，将会丢弃旧数据并执行轻量级压缩，主要应用于内存缓存的场景。</li>
+</ol>
+<p>压缩模式的选择，让 RocksDB 适用于广泛的场景。通过调整压缩策略，能将 RocksDB 配置成读友好、写友好、或者针对特殊缓存工作的极度写友好模式。</p>
+<p>开发者需要根据使用场景权衡指标配置。延迟压缩算法能够减少写放大、写吞吐，但是读性能会收到影响；而积极的压缩策略会影响写性能，但读效率会更高。日志与流处理服务可以使用侧重写，而数据库服务需要在读写之间做好平衡。</p>
+<p>在 HDD 作为主流存储的时代，RocksDB 的 compaction 带来的写放大问题并没有非常明显。这是因为：</p>
+<ol>
+<li><p>HDD 顺序读写性能远远优于随机读写性能，足以抵消写放大带来的开销。</p>
+</li>
+<li><p>HDD 的写入量基本不影响其使用寿命。</p>
+</li>
+</ol>
+<p>现在 SSD 逐渐成为主流存储，compaction 带来的写放大问题显得越来越严重：</p>
+<ol>
+<li>SSD 顺序读写性能比随机读写性能好一些，但是差距并没有 HDD 那么大。所以，顺序写相比随机写带来的好处，能不能抵消写放大带来的开销，这是个问题。</li>
+<li>SSD 的使用寿命和其写入量有关，写放大太严重会大大缩短 SSD 的使用寿命。因为 SSD 不支持覆盖写，必须先擦除（erase）再写入。而每个 SSD block（block 是 SSD 擦除操作的基本单位） 的平均擦除次数是有限的。</li>
+</ol>
+<h2 id="RocksDB-读写流程"><a href="#RocksDB-读写流程" class="headerlink" title="RocksDB 读写流程"></a>RocksDB 读写流程</h2><p><img src="https://qiniu.xiaoming.net.cn/RocksDB%E8%AF%BB%E5%86%99%E6%B5%81%E7%A8%8B.png" alt="RocksDB读写流程"></p>
+<h3 id="写流程"><a href="#写流程" class="headerlink" title="写流程"></a>写流程</h3><ol>
+<li><p>首先当一条数据写入 RocksDB 时，会将这条记录封装成一个 batch，也可以是多条记录一个 batch，由 batch 来保证原子操作。就是一个 batch 里的数据要么全部成功要么全部失败。</p>
+</li>
+<li><p>第一步先以日志的形式落地磁盘，记 write ahead log，落地成功后再写入 memtable。</p>
+</li>
+</ol>
+<blockquote>
+<p>这里记录 wal 的原因就是防止重启时内存中的数据丢失。所以在 db 重新打开时会先从 wal 恢复内存中的 memtable。可配置 WAL 保存在可靠的存储里。</p>
+<p>为了保证数据的有序性，数据插入搜索的高效性（<code>O(log n)</code>），这里的 memtable 是在内存中的一个跳表结构（skiplist）。每一个节点都是存储着一个 key, value。跳表可使查找的复杂度为 logn，同时插入数据非常简单。每个 batch 独占 memtable 的写锁。这个是为了避免多线程写造成的数据错乱。</p>
+</blockquote>
+<ol start="3">
+<li><p>当 memtable 的数据大小超过阈值(write_buffer_size)后，MemTable 与 WAL 将会转为不可变状态，同时分配新的 MemTable 与 WAL 用于后续写入。</p>
+</li>
+<li><p>当只读 memtable 的数量超过阈值后，会将所有的只读 memtable 按照 key 进行合并，并 flush 到磁盘生成一个 SST （Sorted String Table）文件，同时丢弃关联的 MemTable 与 WAL 数据。</p>
+<blockquote>
+<p>每个 ssTable 除了包含数据块（DataBlock）外，还有一个索引块（IndexBlock）用于二分查找，这里的 SST 属于 level0，level0 中的每个 SST 有序，整个 level0 不一定有序。</p>
+</blockquote>
+</li>
+<li><p>当 level0 的 sst 文件数超过阈值或者总大小超过阈值，会触发 compaction 操作，将 level0 中的数据合并到 level1 中。同样 level1 的文件数超过阈值或者总大小超过阈值，也会触发 compaction 操作， 这时候随机选择一个 sst 合并到更高层的 level 中。</p>
+</li>
+</ol>
+<blockquote>
+<p>level1 及其以上的 level 都整体有序。每个 sst 存储一个范围的数据互不交叉互不重合；</p>
+<p>level1 以上的 compaction 操作可以多线程执行，前提是每个线程所操作的数据互不交叉</p>
+</blockquote>
+<h3 id="读流程"><a href="#读流程" class="headerlink" title="读流程"></a>读流程</h3><p>RocksDB 中的每一条记录(KeyValue)都有一个 lsn(LogSequenceNumber)，从最初的 0 开始，每次写入加 1。lsn 在 memtable 中单调递增。</p>
+<p>首先读操作先访问 memtable。跳表的时间复杂度可达到logn。</p>
+<p>如果在 memtable 不存在，则会访问 level0，而 level0 整体不是有序的，所以会按创建时间由新到老依次访问每一个 sst 文件。所以时间复杂度为 <code>m*logn</code>。</p>
+<p>如果仍不存在，则继续访问 level1，由于 level1及其以上的 level 都整体有序，所以只需要访问一个 sst 文件即可。 直到查找到最高层或者找到这个 key。所以读操作可能会被放大好多倍。</p>
+<p>rocksdb 对读操作做了几点优化:</p>
+<ul>
+<li>为每个 SST 提供一个可配置的 bloomfilter。每个 level 的配置不一样。这样可以快速的确认一个 key 在不在某个 SST 中，这点以牺牲磁盘空间来换取时间。</li>
+<li>另一点是提供可配置的 cache, 用于保存访问过的 key 在内存中, 它缓存的是某个 key 在 SST 文件中的整个 block 里的记录。</li>
+</ul>
+<p>RocksDB 在 LSM 的每一层上搜索都使用二分查找搜索目标 ssTables，接着利用 Bloom filter 过滤掉非必要搜索的 sssTable，最后在 ssTable 中二分查找出指定 key 的 value。</p>
+<h2 id="RocksDB-优化过程"><a href="#RocksDB-优化过程" class="headerlink" title="RocksDB 优化过程"></a>RocksDB 优化过程</h2><p>RocksDB 优化的演变进程：</p>
+<ol>
+<li>优化写放大： Log-Structure Merge Tree</li>
+<li>空间放大： compaction 操作</li>
+<li>减少 compaction 带来的 cpu 负载：优化 lsm，控制压缩频率粒度</li>
+<li>cpu、ssd 资源平衡：拆分存储，使用远程存储（hdfs、s3、oss）</li>
+</ol>
+<h3 id="写放大"><a href="#写放大" class="headerlink" title="写放大"></a>写放大</h3><p>RocksDB 早起专注于通过节省闪存的擦除周期来减小写入放大。写放大主要出现在两个层面：</p>
+<ol>
+<li>SSD 本身引入的写入放大，放大范围在1.1~3；</li>
+<li>存储和数据库软件也会产生写放大，有时会高达100（eg：当100bytes 的变更导致 4kB&#x2F;8KB&#x2F;16KB 的 page 被写出）</li>
+</ol>
+<p>Leveled Compaction 通常会带来 10-30 之间的写入放大，在大多数情况下比 B-trees 要低，但对于写敏感的应用来说还是太高。</p>
+<p>所以有了 Tiered Compaction，牺牲了读性能将写放大减小到 4-10 之间。</p>
+<p>数据写入速率高的场景使用 Tiered Compaction 这类压缩策略减少写入放大，写入速率偏低的场景使用Leveled Compaction这类策略减少空间使用和提高读取效率。</p>
+<h3 id="空间放大"><a href="#空间放大" class="headerlink" title="空间放大"></a>空间放大</h3><p>后续对大多数程序的观察可知，闪存的写入周期与写入开销都没有受到约束，IO负载远低于SSD能提供的能力。空间的利用率变得比写放大更重要，因此开始对磁盘空间进行优化。</p>
+<p>得益于 LSM-trees 结构的非碎片化数据布局，其对于磁盘空间优化也能起到有效作用。可以通过减少 LSM-trees 中的脏数据（delete&#x2F;overwrite）来优化 Leveled-Compaction。</p>
+<p>因此有了新的数据压缩策略 Dynamic Leveled Compaction，每一层的数据大小根据上一层的实际大小动态调整，实现比 Leveled Compaction 更好更稳定的空间效率。</p>
+<p>极端情况下 Leveled Compaction 的磁盘使用会高达90%，而 Dynamic Leveled Compaction 依旧能保持在相对稳定的范围。</p>
+<h3 id="CPU利用率"><a href="#CPU利用率" class="headerlink" title="CPU利用率"></a>CPU利用率</h3><p>减少 CPU 负载可以提高少数受 CPU 限制的应用性能。更重要的是减少 CPU 开销能够节省硬件成本。</p>
+<p>早期降低CPU开销的方式包括：引入前缀布隆过滤器、在索引查询之前应用布隆过滤器、优化布隆过滤器</p>
+<h3 id="适应新的硬件技术"><a href="#适应新的硬件技术" class="headerlink" title="适应新的硬件技术"></a>适应新的硬件技术</h3><p>SSD：与 SSD 相关的架构改进可能会影响 RocksDB。例如 open-channel SSDs，multi-stream和 SSDZNS 都承诺改善查询延迟并节省闪存擦除周期。</p>
+<p>由于大部分使用 RocksDB 的软件受限于磁盘空间而不是擦除周期和延迟，这种新技术变更只会对小部分使用 RocksDB 的软件有性能提升。让RocksDB直接适应新的硬件技术将会对 RocksDB 的一致性体验带来挑战。目前社区对存储计算这方面还没有研究与优化规划。</p>
+<p>Disaggregated (remote) storag： 远程存储是目前的优先事项。目前的优化都是预设闪存在本机环境，然而现在的网络已经允许支撑更多的远程I&#x2F;O。</p>
+<p>因此对越来越多的程序来说，支持远程存储的 RocksDB 性能变得越来越重要。使用远程存储可以按需配置，能更容易重复利用CPU与SSD资源。</p>
+<p>目前针对分离存储的优化有：整合&amp;并行化I&#x2F;O来优化I&#x2F;O延迟、将QoS需求传递到底层系统、报告分析信息</p>
+<p>Storage Class Memory（SCM：存储级内存，即既具有memory的优势，又兼顾了storage的特点。目前有几种应用设想：</p>
+<ol>
+<li>SCM做为内存拓展，涉及到如何设计贴合两种存储的数据结构</li>
+<li>SCM做为db主要存储</li>
+<li>将SCM应用于WAL</li>
+</ol>
+<h2 id="RocksDB-与-LevelDB-对比"><a href="#RocksDB-与-LevelDB-对比" class="headerlink" title="RocksDB 与 LevelDB 对比"></a>RocksDB 与 LevelDB 对比</h2><ol>
+<li><p>LevelDB 只能获取单个K-V，而 RocksDB支持一次获取多个K-V，还支持 Key 范围查找。</p>
+</li>
+<li><p>RocksDB 除了简单的Put、Delete操作，还提供了一个 Merge 操作，说是为了对多个Put操作进行合并，优化了 modify 的效率。但相比其带来的价值，其实现的成本要昂贵很多。据网上一些大牛测试，RocksDB 性能的瓶颈其实主要在合并上，多一次少一次 Put 对性能的影响并无大碍。</p>
+</li>
+<li><p>LevelDB 是单线程合并文件，而 RocksDB 可以支持多线程合并文件，充分利用多核的特性，加快文件合并的速度，避免文件合并期间引起系统停顿。LSM 型的数据结构，最大的性能问题就出现在其合并的时间损耗上，在多 CPU 的环境下，多线程合并的效率是 LevelDB 所无法比拟的。不过根据官网上的介绍，似乎多线程合并还只是针对那些与下一层没有Key重叠的文件。</p>
+</li>
+<li><p>RocksDB 增加了合并时过滤器，对一些不再符合条件的 K-V 进行丢弃，如根据K-V的有效期进行过滤。</p>
+</li>
+<li><p>在 LevelDB 里面因为只有一个 Memtable，如果 Memtable 满了却还来不及持久化，这个时候 LevelDB 将会减缓 Put 操作，导致整体性能下降。而RocksDB 支持管道式的 Memtable，也就说允许根据需要开辟多个 Memtable，以解决 Put 与 Compact 速度差异的性能瓶颈问题。</p>
+</li>
+<li><p>压缩方面，RocksDB 采用多种压缩算法，除了 LevelDB 用的 snappy，还有 zlib、bzip2。LevelDB 里面按数据的压缩率（压缩后低于75%）判断是否对数据进行压缩存储，而 RocksDB 典型的做法是 Level 0-2 不压缩，最后一层使用 zlib，而其它各层采用 snappy。</p>
+</li>
+<li><p>在故障方面，RocksDB 支持增量备份和全量备份，允许将已删除的数据备份到指定的目录，供后续恢复。</p>
+</li>
+<li><p>RocksDB 支持在单个进程中启用多个实例，而 LevelDB 只允许单个实例。</p>
+</li>
+<li><p>此外，RocksDB 提供了一些方便的工具，这些工具包含解析 sst 文件中的 K-V 记录、解析 MANIFEST 文件的内容等。有了这些工具，就不用再像使用 LevelDB 那样，只能在程序中才能知道 sst 文件 K-V 的具体信息了。</p>
+</li>
+<li><p>其他优化：增加了column family，这样有利于多个不相关的数据集存储在同一个 db 中，因为不同 column family 的数据是存储在不同的 sst 和 memtable 中，所以一定程度上起到了隔离的作用。将 flush 和 compaction 分开不同的线程池，能有效的加快 flush，防止 stall 拖延停顿。增加了对 write ahead log(WAL) 的特殊管理机制，这样就能方便管理 WAL 文件，因为 WAL 是 binlog 文件。</p>
+</li>
+</ol>
+<p>不过虽然 RocksDB 在性能上提升了不少，但在文件存储格式上跟 LevelDB 还是没什么变化的，稍微有点更新的只是 RocksDB 对原来 LevelDB 中 sst 文件预留下来的 MetaBlock 进行了具体利用。</p>
+<p>目前 RocksDB 尚未解决的地方：</p>
+<ol>
+<li>依然是完全依赖于 MANIFEST，一旦该文件丢失，则整个数据库基本废掉。</li>
+<li>合并上依然是整个文件载入，一些没用的 Value 将被多次的读入内存，如果这些 Value 很大的话，那没必要的内存占用将是一个很大的成本。</li>
+</ol>
+<h2 id="RocksDB-使用场景"><a href="#RocksDB-使用场景" class="headerlink" title="RocksDB 使用场景"></a>RocksDB 使用场景</h2><h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ol>
+<li>需要存储用户的查阅历史记录和网站用户的应用</li>
+<li>需要快速访问数据的垃圾检测应用</li>
+<li>需要实时 scan 数据集的图搜索 query</li>
+<li>需要实时请求Hadoop的应用</li>
+<li>支持大量写和删除操作的消息队列</li>
+<li>对写性能要求很高，同时有较大内存来缓存 SST 块以提供快速读的场景</li>
+<li>SSD 等对写放大比较敏感以及磁盘等对随机写比较敏感的场景</li>
+<li>需要变长 kv 存储的场景</li>
+<li>小规模元数据的存取</li>
+<li>分布式系统副本存储介质</li>
+</ol>
+<p>虽然说 Rocksdb 底层支持 HDFS，数据可以多副本存储，但是前端没有分片，仍然无法满足分布式系统的可扩展要求。</p>
+<p>实际中，可以将 Levledb 或者 Rocksdb 作为数据存储系统引擎，在其上面实现分片和多副本，从而实现一个真正的分布式存储系统，例如微信开源的PaxosStore，默认就是以 Rocksdb 作为其某个副本的存储介质，上层通过 Paxos 协议来保证副本之间的数据一致性。</p>
+<h3 id="不适用场景"><a href="#不适用场景" class="headerlink" title="不适用场景"></a>不适用场景</h3><ol>
+<li>大 value 的场景，需要做 kv 分离</li>
+<li>大规模数据的存取</li>
+</ol>
+<p><strong>参考文档</strong>：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.open-open.com/lib/view/open1450007812240.html">RocksDB介绍：一个比LevelDB更彪悍的引擎</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/orange-CC/p/13212042.html">LevelDB &amp; RocksDB简介</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/73fa1d4e4273">Rocksdb的优劣及应用场景分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.51cto.com/wendashuai/2854088">rocksdb机制介绍</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_30708747/article/details/120841257">RocksDB基本架构与原理介绍</a></p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>打工不易，想买杯奶茶</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/rocksdb/" rel="tag"># rocksdb</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2022/07/04/Kafka/" rel="prev" title="Kafka 知识汇总">
+                  <i class="fa fa-chevron-left"></i> Kafka 知识汇总
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
+  </div>
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Silverming</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
+
+</body>
+</html>

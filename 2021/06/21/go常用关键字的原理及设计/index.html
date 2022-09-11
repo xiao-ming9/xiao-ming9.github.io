@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,68 +14,38 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="for 和 range循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 range 用于快速遍历数组、哈希表以及 Channel 等元素。 这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。 for 循环和 for…ran">
-<meta name="keywords" content="go">
+    <meta name="description" content="for 和 range循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 range 用于快速遍历数组、哈希表以及 Channel 等元素。 这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。 for 循环和 for…ran">
 <meta property="og:type" content="article">
 <meta property="og:title" content="go 常用关键字的原理及设计">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;06&#x2F;21&#x2F;go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1&#x2F;index.html">
+<meta property="og:url" content="http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="Silverming">
 <meta property="og:description" content="for 和 range循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 range 用于快速遍历数组、哈希表以及 Channel 等元素。 这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。 for 循环和 for…ran">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%80%E4%B8%AA%20goroutine%20%E5%AE%9A%E4%B9%89%E5%A4%9A%E4%B8%AA%20defer.jpg">
-<meta property="og:updated_time" content="2021-10-16T04:16:54.895Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%80%E4%B8%AA%20goroutine%20%E5%AE%9A%E4%B9%89%E5%A4%9A%E4%B8%AA%20defer.jpg">
+<meta property="article:published_time" content="2021-06-21T01:55:34.000Z">
+<meta property="article:modified_time" content="2022-07-16T08:58:22.873Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="面试">
+<meta property="article:tag" content="go">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp">
+<meta name="twitter:image" content="https://qiniu.xiaoming.net.cn/go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp">
+
 
 <link rel="canonical" href="http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
 
-  <title>go 常用关键字的原理及设计 | Silverming</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/","path":"2021/06/21/go常用关键字的原理及设计/","title":"go 常用关键字的原理及设计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>go 常用关键字的原理及设计 | Silverming</title>
   
 
 
@@ -83,187 +54,222 @@
 
 
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
   </div>
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
+
 <nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
-
 </nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
+           type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#for-%E5%92%8C-range"><span class="nav-number">1.</span> <span class="nav-text">for 和 range</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#for-%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.1.</span> <span class="nav-text">for 经典循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for-range-%E8%8C%83%E5%9B%B4%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.2.</span> <span class="nav-text">for-range 范围循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87"><span class="nav-number">1.2.1.</span> <span class="nav-text">数组和切片</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B8%85%E7%A9%BA%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">清空数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-range-a-%E9%81%8D%E5%8E%86%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">for range a {} 遍历数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-i-range-a-%E9%81%8D%E5%8E%86%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">for i :&#x3D; range a {} 遍历数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-i-elem-range-a-%E9%81%8D%E5%8E%86%E6%95%B0%E7%BB%84%E5%92%8C%E5%88%87%E7%89%87"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">for i, elem :&#x3D; range a {} 遍历数组和切片</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">1.2.2.</span> <span class="nav-text">map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.2.3.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E9%81%93"><span class="nav-number">1.2.4.</span> <span class="nav-text">通道</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%8E%B0%E8%B1%A1%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.</span> <span class="nav-text">常见现象总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B0%B8%E4%B8%8D%E5%81%9C%E6%AD%A2%E7%9A%84%E5%BE%AA%E7%8E%AF"><span class="nav-number">1.3.1.</span> <span class="nav-text">永不停止的循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E4%B8%AD%E7%9A%84%E6%8C%87%E9%92%88%E8%B5%8B%E5%80%BC"><span class="nav-number">1.3.2.</span> <span class="nav-text">循环中的指针赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%85%E7%A9%BA%E6%95%B0%E7%BB%84"><span class="nav-number">1.3.3.</span> <span class="nav-text">清空数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA%E9%81%8D%E5%8E%86"><span class="nav-number">1.3.4.</span> <span class="nav-text">随机遍历</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#defer"><span class="nav-number">2.</span> <span class="nav-text">defer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-%E7%9A%84%E7%9B%B8%E5%85%B3%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98"><span class="nav-number">2.1.</span> <span class="nav-text">defer 的相关使用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%B8%80"><span class="nav-number">2.1.1.</span> <span class="nav-text">示例一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%BA%8C"><span class="nav-number">2.1.2.</span> <span class="nav-text">示例二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E4%B8%89"><span class="nav-number">2.1.3.</span> <span class="nav-text">示例三</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%E5%9B%9B"><span class="nav-number">2.1.4.</span> <span class="nav-text">示例四</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer%E4%BD%BF%E7%94%A8%E6%97%B6%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.2.</span> <span class="nav-text">defer使用时的注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#defer-%E7%9A%84%E6%89%A7%E8%A1%8C%E6%97%B6%E6%9C%BA"><span class="nav-number">2.2.1.</span> <span class="nav-text">defer 的执行时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E8%AE%A1%E7%AE%97%E5%8F%82%E6%95%B0%EF%BC%9Adefer-%E8%AF%AD%E5%8F%A5%E7%9A%84%E5%8F%82%E6%95%B0%E5%9C%A8%E5%AE%83%E5%87%BA%E7%8E%B0%E6%97%B6%E5%B0%B1%E5%B7%B2%E7%BB%8F%E7%A1%AE%E5%AE%9A%E4%B8%8B%E6%9D%A5"><span class="nav-number">2.2.2.</span> <span class="nav-text">预计算参数：defer 语句的参数在它出现时就已经确定下来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E5%87%BD%E6%95%B0%E6%89%A7%E8%A1%8C%E6%8C%89%E5%90%8E%E8%BF%9B%E5%85%88%E5%87%BA%E7%9A%84%E9%A1%BA%E5%BA%8F%E6%89%A7%E8%A1%8C"><span class="nav-number">2.2.3.</span> <span class="nav-text">延迟函数执行按后进先出的顺序执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#defer-%E5%8F%AF%E8%83%BD%E6%93%8D%E4%BD%9C%E4%B8%BB%E5%87%BD%E6%95%B0%E7%9A%84%E5%85%B7%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">2.2.4.</span> <span class="nav-text">defer 可能操作主函数的具名返回值</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E7%9A%84%E8%BF%94%E5%9B%9E%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">函数的返回过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%87%BD%E6%95%B0%E6%8B%A5%E6%9C%89%E5%8C%BF%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%EF%BC%8C%E8%BF%94%E5%9B%9E%E5%AD%97%E9%9D%A2%E5%80%BC"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">主函数拥有匿名返回值，返回字面值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%87%BD%E6%95%B0%E6%8B%A5%E6%9C%89%E5%8C%BF%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC%EF%BC%8C%E8%BF%94%E5%9B%9E%E5%8F%98%E9%87%8F"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">主函数拥有匿名返回值，返回变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%87%BD%E6%95%B0%E6%8B%A5%E6%9C%89%E5%85%B7%E5%90%8D%E8%BF%94%E5%9B%9E%E5%80%BC"><span class="nav-number">2.2.4.4.</span> <span class="nav-text">主函数拥有具名返回值</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.3.</span> <span class="nav-text">defer 数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6"><span class="nav-number">2.4.</span> <span class="nav-text">defer 执行机制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#make-%E5%92%8C-new"><span class="nav-number">3.</span> <span class="nav-text">make 和 new</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#make-%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.1.</span> <span class="nav-text">make 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.</span> <span class="nav-text">new 实现</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
 
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content">
-            
+    <div class="main-inner post posts-expand">
 
-  <div class="posts-expand">
-      
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="go 常用关键字的原理及设计 | Silverming">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           go 常用关键字的原理及设计
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-06-21 09:55:34" itemprop="dateCreated datePublished" datetime="2021-06-21T09:55:34+08:00">2021-06-21</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-10-16 12:16:54" itemprop="dateModified" datetime="2021-10-16T12:16:54+08:00">2021-10-16</time>
-              </span>
+      <time title="创建时间：2021-06-21 09:55:34" itemprop="dateCreated datePublished" datetime="2021-06-21T09:55:34+08:00">2021-06-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-07-16 16:58:22" itemprop="dateModified" datetime="2022-07-16T16:58:22+08:00">2022-07-16</time>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>12k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>10 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>13k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>11 分钟</span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -272,29 +278,29 @@
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
         <h1 id="for-和-range"><a href="#for-和-range" class="headerlink" title="for 和 range"></a>for 和 range</h1><p>循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 <code>range</code> 用于快速遍历数组、哈希表以及 Channel 等元素。</p>
 <p>这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。</p>
 <p>for 循环和 for…range 循环的形式分别如下：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     // for 循环
-    for i := 0; i &lt; 10; i++ {
+    for i := 0; i &lt; 10; i++ &#123;
         println(i)
-    }
-
+    &#125;
+    
     // for range 循环
-    arr := []int{1, 2, 3}
-    for i, _ := range arr {
+    arr := []int&#123;1, 2, 3&#125;
+    for i, _ := range arr &#123;
         println(i)
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>在汇编语言中，无论是经典的 for  循环还是 for-range 循环都会使用 <code>JMP</code> 等命令跳回循环体的开始位置复用代码，所以<strong>使用 for…range 语法的控制结构最终应该也会被 Go 语言的编译器转换成普通的 for 循环</strong>。</p>
 <p>接下来将逐个分析每一种循环的场景。</p>
 <h2 id="for-经典循环"><a href="#for-经典循环" class="headerlink" title="for 经典循环"></a>for 经典循环</h2><p>Go 语言中的for 经典循环在编译器看来就是一个 <code>OFOR</code> 类型的节点，这个节点具有以下的结构：</p>
-<pre><code class="go">for Ninit; Left; Right {
+<pre><code class="go">for Ninit; Left; Right &#123;
     NBody
-}</code></pre>
+&#125;
+</code></pre>
 <p>其中包括初始化循环的 <code>Ninit</code>、循环的中止条件 <code>Left</code>、循环体结束时执行的 <code>Right</code> 表达式以及循环体 <code>NBody</code>。</p>
 <p>一个常见的 for 循环代码会被 <code>stmt</code> 方法转换成以下的控制结构，其中包含了 4 个不同的块，这些不同的代码块之间会通过边去连接，与我们理解的 for 循环控制结构其实没有太多的差别。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp" alt="go经典循环"></p>
@@ -302,35 +308,38 @@
 <p>下面分别分析每一种结构下的循环场景。</p>
 <h3 id="数组和切片"><a href="#数组和切片" class="headerlink" title="数组和切片"></a>数组和切片</h3><p>对于数组和切片来说，for-range 循环有三种不同的遍历方式，这三种不同的遍历方式会在 <code>walkrange</code> 函数中被转换成不同的控制逻辑，这三种不同的逻辑分别对应着代码中的不同条件。</p>
 <h4 id="清空数组和切片"><a href="#清空数组和切片" class="headerlink" title="清空数组和切片"></a>清空数组和切片</h4><p>当想要清空数组或者哈希表等结构时，通常会使用遍历清除的方式：</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    for i, _ := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    for i, _ := range arr &#123;
         arr[i] = 0
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>依次遍历切片和哈希是非常耗费性能的，因为数组、切片和哈希占用的内存空间都是连续的，所以<strong>最快的方法是直接清空这片内存中的内容</strong>。<strong>在 go 的编译器中，针对这种情况，编译器会直接使用 <code>memclrNoHeapPointers</code> 直接清空切片中的数据</strong>。</p>
 <p>在 <code>walkrange</code> 最开始的逻辑就是数组和切片的清空逻辑：</p>
-<pre><code class="go">func walkrange(n *Node) *Node {
-    switch t.Etype {
+<pre><code class="go">func walkrange(n *Node) *Node &#123;
+    switch t.Etype &#123;
     case TARRAY, TSLICE:
-        if arrayClear(n, v1, v2, a) {
+        if arrayClear(n, v1, v2, a) &#123;
             return n
-        }</code></pre>
+        &#125;
+</code></pre>
 <p><code>arrayClear</code> 是一个非常有趣的优化，当在 Go 语言中遍历去删除所有的元素时，其实会在这个函数中被优化成如下的代码：</p>
 <pre><code class="go">// 原代码
-for i := range a {
+for i := range a &#123;
     a[i] = zero
-}
+&#125;
 
 // 优化后
-if len(a) != 0 {
+if len(a) != 0 &#123;
     hp = &amp;a[0]
     hn = len(a)*sizeof(elem(a))
     memclrNoHeapPointers(hp, hn)
     i = len(a) - 1
-}</code></pre>
+&#125;
+</code></pre>
 <p>相比于依次清除数组或者切片中的数据，Go 语言会直接使用 <code>memclrNoHeapPointers</code> 或者 <code>memclrHashPointers</code> 函数直接清除目标数组对应内存空间中的数据并在执行完成后更新用于遍历数组的索引，保证上下文不会出现问题，这也印证了我们在概述一节中观察到的现象。</p>
-<h4 id="for-range-a-遍历数组和切片"><a href="#for-range-a-遍历数组和切片" class="headerlink" title="for range a {} 遍历数组和切片"></a><code>for range a {}</code> 遍历数组和切片</h4><p>在处理了上面清空这种特殊的情况之后，继续回到 <code>ORANGE</code> 节点的处理过程了，在这里首先会设置 for 循环的 <code>Left</code> 和 <code>Right</code> 字段，也就是终止的条件和循环体每次执行结束后运行的代码：</p>
+<h4 id="for-range-a-遍历数组和切片"><a href="#for-range-a-遍历数组和切片" class="headerlink" title="for range a {} 遍历数组和切片"></a><code>for range a &#123;&#125;</code> 遍历数组和切片</h4><p>在处理了上面清空这种特殊的情况之后，继续回到 <code>ORANGE</code> 节点的处理过程了，在这里首先会设置 for 循环的 <code>Left</code> 和 <code>Right</code> 字段，也就是终止的条件和循环体每次执行结束后运行的代码：</p>
 <pre><code class="go">        ha := a
 
         hv1 := temp(types.Types[TINT])
@@ -342,170 +351,185 @@ if len(a) != 0 {
         n.Left = nod(OLT, hv1, hn)
         n.Right = nod(OAS, hv1, nod(OADD, hv1, nodintconst(1)))
 
-        if v1 == nil {
+        if v1 == nil &#123;
             break
-        }</code></pre>
-<p>如果循环是 <code>for range a {}</code>，那么就满足了上述代码中的条件 <code>v1 == nil</code>，即循环不关心数组的索引和数据，在这种情况下只是单纯的遍历，并不关心索引和数据的情况，那么它会被转换成如下所示的代码：</p>
+        &#125;
+</code></pre>
+<p>如果循环是 <code>for range a &#123;&#125;</code>，那么就满足了上述代码中的条件 <code>v1 == nil</code>，即循环不关心数组的索引和数据，在这种情况下只是单纯的遍历，并不关心索引和数据的情况，那么它会被转换成如下所示的代码：</p>
 <pre><code class="go">ha := a
 hv1 := 0
 hn := len(ha)
 v1 := hv1
-for ; hv1 &lt; hn; hv1++ {
+for ; hv1 &lt; hn; hv1++ &#123;
     // ...
-}</code></pre>
+&#125;
+</code></pre>
 <p>这其实是最简单的 <code>range</code> 结构在编译期间被转换后的形式，由于原代码其实并不需要数组中任何元素的信息，只需要使用数组或者切片的数量执行对应次数的循环。</p>
-<h4 id="for-i-range-a-遍历数组和切片"><a href="#for-i-range-a-遍历数组和切片" class="headerlink" title="for i := range a {} 遍历数组和切片"></a><code>for i := range a {}</code> 遍历数组和切片</h4><p>如果我们只需要使用遍历数组时的索引就会执行如下的代码：</p>
-<pre><code class="go">        if v2 == nil {
-            body = []*Node{nod(OAS, v1, hv1)}
+<h4 id="for-i-range-a-遍历数组和切片"><a href="#for-i-range-a-遍历数组和切片" class="headerlink" title="for i := range a {} 遍历数组和切片"></a><code>for i := range a &#123;&#125;</code> 遍历数组和切片</h4><p>如果我们只需要使用遍历数组时的索引就会执行如下的代码：</p>
+<pre><code class="go">        if v2 == nil &#123;
+            body = []*Node&#123;nod(OAS, v1, hv1)&#125;
             break
-        }</code></pre>
-<p>它会将类似 <code>for i := range a {}</code> 的结构转换成如下所示的逻辑，与第一种循环相比，这种循环额外地在循环体中添加了 <code>v1 := hv1</code> 用于传递遍历数组时的索引：</p>
+        &#125;
+</code></pre>
+<p>它会将类似 <code>for i := range a &#123;&#125;</code> 的结构转换成如下所示的逻辑，与第一种循环相比，这种循环额外地在循环体中添加了 <code>v1 := hv1</code> 用于传递遍历数组时的索引：</p>
 <pre><code class="go">ha := a
 hv1 := 0
 hn := len(ha)
 v1 := hv1
-for ; hv1 &lt; hn; hv1++ {
+for ; hv1 &lt; hn; hv1++ &#123;
     v1 := hv1
     // ...
-}</code></pre>
-<h4 id="for-i-elem-range-a-遍历数组和切片"><a href="#for-i-elem-range-a-遍历数组和切片" class="headerlink" title="for i, elem := range a {} 遍历数组和切片"></a><code>for i, elem := range a {}</code> 遍历数组和切片</h4><p>这种场景下需要同时获取索引和值，也是最常用的一种场景，处理这种情况在 <code>walkrange</code> 中使用如下代码：</p>
+&#125;
+</code></pre>
+<h4 id="for-i-elem-range-a-遍历数组和切片"><a href="#for-i-elem-range-a-遍历数组和切片" class="headerlink" title="for i, elem := range a {} 遍历数组和切片"></a><code>for i, elem := range a &#123;&#125;</code> 遍历数组和切片</h4><p>这种场景下需要同时获取索引和值，也是最常用的一种场景，处理这种情况在 <code>walkrange</code> 中使用如下代码：</p>
 <pre><code class="go">    tmp := nod(OINDEX, ha, hv1)
         tmp.SetBounded(true)
         a := nod(OAS2, nil, nil)
         a.List.Set2(v1, v2)
         a.Rlist.Set2(hv1, tmp)
-        body = []*Node{a}
-    }
+        body = []*Node&#123;a&#125;
+    &#125;
     n.Ninit.Append(init...)
     n.Nbody.Prepend(body...)
 
     return n
-}</code></pre>
-<p>这段代码处理的就是类似 <code>for i, elem := range a {}</code> 的逻辑，它不止会在循环体中插入更新索引的表达式，还会插入赋值的操作让循环体内部的代码能够访问数组中的元素：</p>
+&#125;
+</code></pre>
+<p>这段代码处理的就是类似 <code>for i, elem := range a &#123;&#125;</code> 的逻辑，它不止会在循环体中插入更新索引的表达式，还会插入赋值的操作让循环体内部的代码能够访问数组中的元素：</p>
 <pre><code class="go">ha := a
 hv1 := 0
 hn := len(ha)
 v1 := hv1
 v2 := nil
-for ; hv1 &lt; hn; hv1++ {
+for ; hv1 &lt; hn; hv1++ &#123;
     tmp := ha[hv1]
     v1, v2 = hv1, tmp
     ...
-}</code></pre>
+&#125;
+</code></pre>
 <p>对于所有的 range 循环，<strong>Go 语言都会在编译期将原切片或者数组赋值给一个新变量 <code>ha</code>，在赋值的过程中就发生了拷贝</strong>，而我们又通过 <code>len</code> 关键字预先获取了切片的长度，所以此时遍历的切片其实已经不是原有的切片变量了。</p>
 <p>下面的这个例子中，在每次循环中都往数组中加入的变量，以此试图构建一个永不停止的循环，然而<strong>实际上该循环只会循环三次</strong>，原因就是编译期间传入循环的是 arr 的一个拷贝，并不是当前实时的 arr，所以在循环中追加新的元素也不会改变循环执行的次数。</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    for _, v := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    for _, v := range arr &#123;
         arr = append(arr, v)
-    }
+    &#125;
     fmt.Println(arr)
-}
+&#125;
 
 $ go run main.go
-1 2 3 1 2 3</code></pre>
+1 2 3 1 2 3
+</code></pre>
 <p>遇到这种同时遍历索引和元素的 <code>range</code> 循环时，从上面的代码中可以看到，Go 语言会额外创建一个新的 <code>v2</code> 变量存储切片中的元素，<strong>循环中使用的这个变量 v2 会在每一次迭代中都被重新赋值，在赋值时也发生了拷贝</strong>。</p>
 <p>在下面的代码中，在一个循环中将 range 返回的变量值的地址赋值给另外一个新数组，当打印这个新数组中变量地址的值的时候，实际上这个新数组中的值都是老数组的最后一个值。</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    newArr := []*int{}
-    for _, v := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    newArr := []*int&#123;&#125;
+    for _, v := range arr &#123;
         newArr = append(newArr, &amp;v)
-    }
-    for _, v := range newArr {
+    &#125;
+    for _, v := range newArr &#123;
         fmt.Println(*v)
-    }
-}
+    &#125;
+&#125;
 
 $ go run main.go
-3 3 3</code></pre>
-<p>在这种场景下，<strong>正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code></strong>。</p>
+3 3 3
+</code></pre>
+<p>在这种场景下，**正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code>**。</p>
 <p>所以如果想要访问数组中元素所在的地址，不应该直接获取 <code>range</code> 返回的 <code>v2</code> 变量的地址 <code>&amp;v2</code>，想要解决这个问题应该使用 <code>&amp;a[index]</code> 这种方式获取数组中元素对应的地址。</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    newArr := []*int{}
-    for i, _ := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    newArr := []*int&#123;&#125;
+    for i, _ := range arr &#123;
         newArr = append(newArr, &amp;arr[i])
-    }
-    for _, v := range newArr {
+    &#125;
+    for _, v := range newArr &#123;
         fmt.Println(*v)
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>在遇到这种问题时，应该使用如上所示的代码来获取数组中元素的地址，而不应该使用编译器生成的、会被复用的临时变量。</p>
-<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map 的遍历详细在这里：<a href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/#%E9%81%8D%E5%8E%86-map" target="_blank" rel="noopener">map 遍历</a></p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>map 的遍历详细在这里：<a target="_blank" rel="noopener" href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/#%E9%81%8D%E5%8E%86-map">map 遍历</a></p>
 <p>总的来说，哈希表的遍历会随机选择开始的位置，然后依次遍历桶中的元素，桶中元素如果被遍历完，就会遍历当前桶对应的溢出桶，溢出桶都遍历结束之后才会遍历哈希中的下一个桶，直到所有的桶都被遍历完成。</p>
-<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>字符串的遍历与数组和哈希表非常相似，只是在遍历的过程中会获取字符串中索引对应的字节，然后将字节转换成 <code>rune</code>，我们在遍历字符串时拿到的值都是 <code>rune</code> 类型的变量，其实类似 <code>for i, r := range s {}</code> 的结构都会被转换成如下的形式：</p>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>字符串的遍历与数组和哈希表非常相似，只是在遍历的过程中会获取字符串中索引对应的字节，然后将字节转换成 <code>rune</code>，我们在遍历字符串时拿到的值都是 <code>rune</code> 类型的变量，其实类似 <code>for i, r := range s &#123;&#125;</code> 的结构都会被转换成如下的形式：</p>
 <pre><code class="go">ha := s
-for hv1 := 0; hv1 &lt; len(ha); {
+for hv1 := 0; hv1 &lt; len(ha); &#123;
     hv1t := hv1
     hv2 := rune(ha[hv1])
-    if hv2 &lt; utf8.RuneSelf {
+    if hv2 &lt; utf8.RuneSelf &#123;
         hv1++
-    } else {
+    &#125; else &#123;
         hv2, hv1 = decoderune(h1, hv1)
-    }
+    &#125;
     v1, v2 = hv1t, hv2
-}</code></pre>
+&#125;
+</code></pre>
 <p>这段代码的框架与上面提到的数组和哈希其实非常相似，只是细节有一些不同。<strong>字符串其实就是一个只读的字节数组切片</strong>，所以使用下标访问字符串中的元素时其实得到的就是字节，但是这段代码会将当前的字节转换成 <code>rune</code> 类型，如果当前的 <code>rune</code> 是 ASCII 的，那么只会占用一个字节长度，这时只需要将索引加一，但是如果当前的 <code>rune</code> 占用了多个字节就会使用 <code>decoderune</code> 进行解码，具体的过程就不详细介绍了。</p>
-<h3 id="通道"><a href="#通道" class="headerlink" title="通道"></a>通道</h3><p>在 <code>range</code> 循环中使用 Channel 其实也是比较常见的做法，一个形如 <code>for v := range ch {}</code> 的表达式会最终被转换成如下的格式：</p>
+<h3 id="通道"><a href="#通道" class="headerlink" title="通道"></a>通道</h3><p>在 <code>range</code> 循环中使用 Channel 其实也是比较常见的做法，一个形如 <code>for v := range ch &#123;&#125;</code> 的表达式会最终被转换成如下的格式：</p>
 <pre><code class="go">ha := a
 hv1, hb := &lt;-ha
-for ; hb != false; hv1, hb = &lt;-ha {
+for ; hb != false; hv1, hb = &lt;-ha &#123;
     v1 := hv1
     hv1 = nil
     // ...
-}</code></pre>
+&#125;
+</code></pre>
 <p>这里的代码可能与编译器生成的稍微有一些出入，但是结构和效果是完全相同的。该循环会使用 <code>&lt;-ch</code> 从管道中取出等待处理的值，这个操作会调用 <code>runtime.chanrecv2</code> 并阻塞当前的协程，当 <code>runtime.chanrecv2</code> 返回时会根据布尔值 <code>hb</code> 判断当前的值是否存在：</p>
 <ul>
 <li>如果不存在当前值，意味着当前的管道已经被关闭；</li>
 <li>如果存在当前值，会为 <code>v1</code> 赋值并清除 <code>hv1</code> 变量中的数据，然后重新陷入阻塞等待新数据；</li>
 </ul>
 <h2 id="常见现象总结"><a href="#常见现象总结" class="headerlink" title="常见现象总结"></a>常见现象总结</h2><h3 id="永不停止的循环"><a href="#永不停止的循环" class="headerlink" title="永不停止的循环"></a>永不停止的循环</h3><p>下面的代码中，在每次循环中都往数组中加入的变量，以此试图构建一个永不停止的循环，然而<strong>实际上该循环只会循环三次</strong>。</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    for _, v := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    for _, v := range arr &#123;
         arr = append(arr, v)
-    }
+    &#125;
     fmt.Println(arr)
-}
+&#125;
 
 $ go run main.go
-1 2 3 1 2 3</code></pre>
+1 2 3 1 2 3
+</code></pre>
 <h3 id="循环中的指针赋值"><a href="#循环中的指针赋值" class="headerlink" title="循环中的指针赋值"></a>循环中的指针赋值</h3><p>在下面的代码中，在一个循环中将 range 返回的变量值的地址赋值给另外一个新数组，当打印这个新数组中变量地址的值的时候，实际上这个新数组中的值都是老数组的最后一个值。</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    newArr := []*int{}
-    for _, v := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    newArr := []*int&#123;&#125;
+    for _, v := range arr &#123;
         newArr = append(newArr, &amp;v)
-    }
-    for _, v := range newArr {
+    &#125;
+    for _, v := range newArr &#123;
         fmt.Println(*v)
-    }
-}
+    &#125;
+&#125;
 
 $ go run main.go
-3 3 3</code></pre>
-<p>在这种场景下，<strong>正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code></strong>。</p>
+3 3 3
+</code></pre>
+<p>在这种场景下，**正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code>**。</p>
 <h3 id="清空数组"><a href="#清空数组" class="headerlink" title="清空数组"></a>清空数组</h3><p>当想要清空数组或者哈希表等结构时，通常会使用遍历清除的方式：</p>
-<pre><code class="go">func main() {
-    arr := []int{1, 2, 3}
-    for i, _ := range arr {
+<pre><code class="go">func main() &#123;
+    arr := []int&#123;1, 2, 3&#125;
+    for i, _ := range arr &#123;
         arr[i] = 0
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>依次遍历切片和哈希是非常耗费性能的，因为数组、切片和哈希占用的内存空间都是连续的，所以<strong>最快的方法是直接清空这片内存中的内容</strong>。<strong>在 go 的编译器中，针对这种情况，编译器会直接使用 <code>memclrNoHeapPointers</code> 直接清空切片中的数据</strong>。</p>
 <h3 id="随机遍历"><a href="#随机遍历" class="headerlink" title="随机遍历"></a>随机遍历</h3><p>当遍历 map 结构时，每次遍历出来的结果的顺序都是不确定的，这是 Go 故意设计的，为了提高这种不确定性，go 甚至还做了一些工作，以此告诉所有使用 Go 语言的开发者不要依赖于哈希遍历的稳定。</p>
 <h1 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h1><p>defer 主要用来做一些收尾的工作，例如关闭文件描述符、关闭数据库连接以及释放资源等。</p>
 <p>在defer函数定义时，对外部变量的引用是有两种方式的，分别是作为函数参数和作为闭包引用。作为函数参数，则在 defer 定义时就把值传递给 defer，并被 cache 起来；<strong>作为闭包引用的话，则会在 defer 函数真正调用时根据整个上下文确定当前的值</strong>。</p>
 <p>defer 后面的语句在执行的时候，函数调用的参数会被保存起来，也就是复制了一份。真正执行的时候，实际上用到的是这个复制的变量，因此如果此变量是一个“值”，那么就和定义的时候是一致的。如果此变量是一个“引用”，那么就可能和定义的时候不一致。</p>
-<h2 id="defer-的相关使用问题"><a href="#defer-的相关使用问题" class="headerlink" title="defer 的相关使用问题"></a>defer 的相关使用问题</h2><h3 id="示例一"><a href="#示例一" class="headerlink" title="示例一"></a>示例一</h3><pre><code class="go">func deferFuncParameter() {
+<h2 id="defer-的相关使用问题"><a href="#defer-的相关使用问题" class="headerlink" title="defer 的相关使用问题"></a>defer 的相关使用问题</h2><h3 id="示例一"><a href="#示例一" class="headerlink" title="示例一"></a>示例一</h3><pre><code class="go">func deferFuncParameter() &#123;
     var aInt = 1
 
     defer fmt.Println(aInt)
 
     aInt = 2
     return
-}</code></pre>
+&#125;
+</code></pre>
 <blockquote>
 <p>输出 1。延迟函数 <code>fmt.Println(aInt)</code> 的参数在 defer 语句出现时就已经确定了，所以无论后面如何修改aInt变量都不会影响延迟函数。</p>
 </blockquote>
@@ -513,93 +537,100 @@ $ go run main.go
 
 import &quot;fmt&quot;
 
-func printArray(array *[3]int) {
-    for i := range array {
+func printArray(array *[3]int) &#123;
+    for i := range array &#123;
         fmt.Println(array[i])
-    }
-}
+    &#125;
+&#125;
 
-func deferFuncParameter() {
-    var aArray = [3]int{1, 2, 3}
+func deferFuncParameter() &#123;
+    var aArray = [3]int&#123;1, 2, 3&#125;
 
     defer printArray(&amp;aArray)
 
     aArray[0] = 10
     return
-}
+&#125;
 
-func main() {
+func main() &#123;
     deferFuncParameter()
-}</code></pre>
+&#125;
+</code></pre>
 <blockquote>
 <p>输出10、2、3三个值。延迟函数printArray()的参数在defer语句出现时就已经确定了，即数组的地址，由于延迟函数执行时机是在return语句之前，所以对数组的最终修改值会被打印出来。</p>
 </blockquote>
-<h3 id="示例三"><a href="#示例三" class="headerlink" title="示例三"></a>示例三</h3><pre><code class="go">func deferFuncReturn() (result int) {
+<h3 id="示例三"><a href="#示例三" class="headerlink" title="示例三"></a>示例三</h3><pre><code class="go">func deferFuncReturn() (result int) &#123;
     i := 1
 
-    defer func() {
+    defer func() &#123;
        result++
-    }()
+    &#125;()
 
     return i
-}</code></pre>
+&#125;
+</code></pre>
 <blockquote>
 <p>函数输出 2。函数的 return 语句并不是原子的，实际执行分为设置返回值–&gt;ret，defer 语句实际执行在返回前，即拥有 defer 的函数返回过程是：设置返回值–&gt;执行defer–&gt;ret。所以 return 语句先把 result 设置为i的值，即1，defer语句中又把result递增1，所以最终返回2。</p>
 </blockquote>
-<h3 id="示例四"><a href="#示例四" class="headerlink" title="示例四"></a>示例四</h3><pre><code class="go">func f() (r int) {
-  defer func(r int) {
+<h3 id="示例四"><a href="#示例四" class="headerlink" title="示例四"></a>示例四</h3><pre><code class="go">func f() (r int) &#123;
+  defer func(r int) &#123;
         r = r + 5
-  }(r)
+  &#125;(r)
   return 1
-}</code></pre>
+&#125;
+</code></pre>
 <blockquote>
 <p>根据上述 return 规则拆解，所以得到的结果是 1</p>
 </blockquote>
-<pre><code class="go">func f() (r int) {
+<pre><code class="go">func f() (r int) &#123;
       t := 5
       // 1. 赋值指令
       r = t
       // 2. defer 被插入到赋值与返回之间执行，这里 r 是传值
-      func (r int) {
+      func (r int) &#123;
             r = r + 5
-    }(r)
+    &#125;(r)
       // 3. 空的 return
       return
-}</code></pre>
-<h2 id="defer使用时的注意事项"><a href="#defer使用时的注意事项" class="headerlink" title="defer使用时的注意事项"></a>defer使用时的注意事项</h2><h3 id="defer-的执行时机"><a href="#defer-的执行时机" class="headerlink" title="defer 的执行时机"></a>defer 的执行时机</h3><pre><code class="go">func main() {
-    {
+&#125;
+</code></pre>
+<h2 id="defer使用时的注意事项"><a href="#defer使用时的注意事项" class="headerlink" title="defer使用时的注意事项"></a>defer使用时的注意事项</h2><h3 id="defer-的执行时机"><a href="#defer-的执行时机" class="headerlink" title="defer 的执行时机"></a>defer 的执行时机</h3><pre><code class="go">func main() &#123;
+    &#123;
         defer fmt.Println(&quot;defer runs&quot;)
         fmt.Println(&quot;block ends&quot;)
-    }
-
+    &#125;
+    
     fmt.Println(&quot;main ends&quot;)
-}
+&#125;
 
 $ go run main.go
 block ends
 main ends
-defer runs</code></pre>
+defer runs
+</code></pre>
 <p><code>defer</code> 传入的函数不是在退出代码块的作用域时执行的，它只会在当前函数和方法返回之前被调用。</p>
-<h3 id="预计算参数：defer-语句的参数在它出现时就已经确定下来"><a href="#预计算参数：defer-语句的参数在它出现时就已经确定下来" class="headerlink" title="预计算参数：defer 语句的参数在它出现时就已经确定下来"></a>预计算参数：defer 语句的参数在它出现时就已经确定下来</h3><pre><code class="go">func main() {
+<h3 id="预计算参数：defer-语句的参数在它出现时就已经确定下来"><a href="#预计算参数：defer-语句的参数在它出现时就已经确定下来" class="headerlink" title="预计算参数：defer 语句的参数在它出现时就已经确定下来"></a>预计算参数：defer 语句的参数在它出现时就已经确定下来</h3><pre><code class="go">func main() &#123;
     startedAt := time.Now()
     defer fmt.Println(time.Since(startedAt))
-
+    
     time.Sleep(time.Second)
-}
+&#125;
 
 $ go run main.go
-0s</code></pre>
+0s
+</code></pre>
 <p>当调用 <code>defer</code> 关键字时，它会立刻拷贝函数中引用的外部参数，所以 <code>time.Since(startedAt)</code> 的结果不是在 <code>main</code> 函数退出之前计算的，而是在 <code>defer</code> 关键字调用时计算的，最终导致上述代码输出 0s。</p>
 <p>想要解决这个问题，只需要向 <code>defer</code> 关键字传入匿名函数：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     startedAt := time.Now()
-    defer func() { fmt.Println(time.Since(startedAt)) }()
-
+    defer func() &#123; fmt.Println(time.Since(startedAt)) &#125;()
+    
     time.Sleep(time.Second)
-}
+&#125;
 
 $ go run main.go
-1s</code></pre>
+1s
+</code></pre>
 <p>虽然调用 <code>defer</code> 关键字时也使用值传递，但是因为拷贝的是函数指针，所以 <code>time.Since(startedAt)</code> 会在 <code>main</code> 函数返回前调用并打印出符合预期的结果。</p>
 <p>注意：对于指针类型参数，规则仍然适用，只不过延迟函数的参数是一个地址值，这种情况下，defer 后面的语句对变量的修改可能会影响延迟函数。</p>
 <h3 id="延迟函数执行按后进先出的顺序执行"><a href="#延迟函数执行按后进先出的顺序执行" class="headerlink" title="延迟函数执行按后进先出的顺序执行"></a>延迟函数执行按后进先出的顺序执行</h3><p>定义 defer 类似于入栈操作，执行 defer 类似于出栈操作。</p>
@@ -613,96 +644,106 @@ $ go run main.go
 <li>然后执行跳转</li>
 </ol>
 <p>而 defer 的执行时机正是跳转前，所以说 defer 执行时还是有机会操作返回值的。例如下面这个例子：</p>
-<pre><code class="go">func deferFuncReturn() (result int) {
+<pre><code class="go">func deferFuncReturn() (result int) &#123;
     i := 1
 
-    defer func() {
+    defer func() &#123;
        result++
-    }()
+    &#125;()
 
     return i
-}</code></pre>
+&#125;
+</code></pre>
 <p>该函数的 return 语句可以拆分成下面两行：</p>
 <pre><code class="go">result = i
-return</code></pre>
+return
+</code></pre>
 <p>而延迟函数的执行正是在return之前，即加入defer后的执行过程如下：</p>
 <pre><code class="go">result = i
 result++
-return</code></pre>
+return
+</code></pre>
 <p>所以上面函数实际返回 i++ 值。</p>
 <p>关于主函数有不同的返回方式，但返回机制就如上机介绍所说，只要把 return 语句拆开都可以很好的理解。下面还有几个例子。</p>
 <h4 id="主函数拥有匿名返回值，返回字面值"><a href="#主函数拥有匿名返回值，返回字面值" class="headerlink" title="主函数拥有匿名返回值，返回字面值"></a>主函数拥有匿名返回值，返回字面值</h4><p>一个主函数拥有一个匿名的返回值，返回时使用字面值，比如返回”1”、”2”、”Hello”这样的值，这种情况下 defer 语句是无法操作返回值的。</p>
 <p>一个返回字面值的函数，如下所示：</p>
-<pre><code class="go">func foo() int {
+<pre><code class="go">func foo() int &#123;
     var i int
 
-    defer func() {
+    defer func() &#123;
         i++
-    }()
+    &#125;()
 
     return 1
-}</code></pre>
+&#125;
+</code></pre>
 <p>上面的 return 语句，直接把 1 写入栈中作为返回值，延迟函数无法操作该返回值，所以就无法影响返回值。</p>
 <h4 id="主函数拥有匿名返回值，返回变量"><a href="#主函数拥有匿名返回值，返回变量" class="headerlink" title="主函数拥有匿名返回值，返回变量"></a>主函数拥有匿名返回值，返回变量</h4><p>一个主函数拥有一个匿名的返回值，返回使用本地或全局变量，这种情况下 defer 语句可以引用到返回值，但不会改变返回值。</p>
 <p>一个返回本地变量的函数，如下所示：</p>
-<pre><code class="go">func foo() int {
+<pre><code class="go">func foo() int &#123;
     var i int
 
-    defer func() {
+    defer func() &#123;
         i++
-    }()
+    &#125;()
 
     return i
-}</code></pre>
+&#125;
+</code></pre>
 <p>上面的函数，返回一个局部变量，同时 defer 函数也会操作这个局部变量。对于匿名返回值来说，<strong>可以假定仍然有一个变量存储返回值</strong>，假定返回值变量为 “anony”，上面的返回语句可以拆分成以下过程：</p>
 <pre><code class="go">anony = i
 i++
-return</code></pre>
+return
+</code></pre>
 <p>由于 i 是整型，会将值拷贝给 anony，所以 defer 语句中修改i值，对函数返回值不造成影响。</p>
 <h4 id="主函数拥有具名返回值"><a href="#主函数拥有具名返回值" class="headerlink" title="主函数拥有具名返回值"></a>主函数拥有具名返回值</h4><p>主函声明语句中带名字的返回值，会被初始化成一个局部变量，函数内部可以像使用局部变量一样使用该返回值。如果 defer 语句操作该返回值，可能会改变返回结果。</p>
 <p>一个影响函返回值的例子：</p>
-<pre><code class="go">func foo() (ret int) {
-    defer func() {
+<pre><code class="go">func foo() (ret int) &#123;
+    defer func() &#123;
         ret++
-    }()
+    &#125;()
     return 0
-}</code></pre>
+&#125;
+</code></pre>
 <p>上面的函数拆解出来，如下所示：</p>
 <pre><code class="go">ret = 0
 ret++
-return</code></pre>
+return
+</code></pre>
 <p>函数真正返回前，在 defer 中对返回值做了+1操作，所以函数最终返回 1。</p>
 <h2 id="defer-数据结构"><a href="#defer-数据结构" class="headerlink" title="defer 数据结构"></a>defer 数据结构</h2><p><code>defer</code> 在 Go 语言源代码中的数据结构如下：</p>
-<pre><code class="go">type _defer struct {
-    siz       int32    // 参数和结果的内存大小
-    started   bool    
-    openDefer bool    // 当前 defer 是否经过开放编码的优化
-    sp        uintptr    // 函数栈指针
+<pre><code class="go">type _defer struct &#123;
+    siz       int32	// 参数和结果的内存大小
+    started   bool	
+    openDefer bool	// 当前 defer 是否经过开放编码的优化
+    sp        uintptr	// 函数栈指针
     pc        uintptr // 调用方的程序计数器
     fn        *funcval // defer 关键字中传入的参数，也就是 defer 后面的函数地址
-    _panic    *_panic    // 触发延迟调用的结构体，可能为空
+    _panic    *_panic	// 触发延迟调用的结构体，可能为空
     link      *_defer
-}</code></pre>
+&#125;
+</code></pre>
 <p><code>_defer</code> 结构体是延迟调用链表上的一个节点，所有的结构体都会通过 <code>link</code> 字段串联成链表。</p>
 <p>下图展示了一个 goroutine 定义多个 defer 的场景：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E4%B8%80%E4%B8%AA%20goroutine%20%E5%AE%9A%E4%B9%89%E5%A4%9A%E4%B8%AA%20defer.jpg" alt="一个 goroutine 定义多个 defer"></p>
 <p>新声明的 defer 总是添加到链表头部，函数返回前执行 defer 则是从链表首部依次取出执行。一个 goroutine 可能连续调用多个函数，defer 添加过程跟上述流程一致，进入函数时添加 defer，离开函数时取出 defer，所以即便调用多个函数，也总是能保证 defer 是按 FIFO 方式执行的。</p>
 <h2 id="defer-执行机制"><a href="#defer-执行机制" class="headerlink" title="defer 执行机制"></a>defer 执行机制</h2><p><code>defer</code> 会根据条件的不同，使用三种不同的机制处理该关键字：</p>
-<pre><code class="go">func (s *state) stmt(n *Node) {
+<pre><code class="go">func (s *state) stmt(n *Node) &#123;
     ...
-    switch n.Op {
+    switch n.Op &#123;
     case ODEFER:
-        if s.hasOpenDefers {
+        if s.hasOpenDefers &#123;
             s.openDeferRecord(n.Left) // 开放编码
-        } else {
+        &#125; else &#123;
             d := callDefer // 堆分配
-            if n.Esc == EscNever {
+            if n.Esc == EscNever &#123;
                 d = callDeferStack // 栈分配
-            }
+            &#125;
             s.callResult(n.Left, d)
-        }
-    }
-}</code></pre>
+        &#125;
+    &#125;
+&#125;
+</code></pre>
 <p>堆上分配 <code>_defer</code> 结构体是默认的兜底方案，当使用这种方式时，<code>defer</code> 在编译器看来也是函数调用。</p>
 <p>当 <code>defer</code> 关键字在函数体中最多执行一次的时候，会将 <code>_defer</code> 结构体分配到栈上，以此节约内存分配带来的开销。</p>
 <p>开放编码的方式时在 1.14 引入的使用代码内联优化 <code>defer</code> 关键的额外开销。开放编码作为一种优化 <code>defer</code> 关键字的方法，它不是在所有的场景下都会开启的，开放编码只会在满足以下的条件时启用：</p>
@@ -715,7 +756,8 @@ return</code></pre>
 <p>在代码中往往都会使用如下所示的语句初始化这三类基本类型，这三个语句分别返回了不同类型的数据结构：</p>
 <pre><code class="go">slice := make([]int, 0, 100)
 hash := make(map[int]bool, 10)
-ch := make(chan int, 5)</code></pre>
+ch := make(chan int, 5)
+</code></pre>
 <ol>
 <li><code>slice</code> 是一个包含 <code>data</code>、<code>cap</code> 和 <code>len</code> 的结构体 <code>reflect.SliceHeader</code></li>
 <li><code>hash</code> 是一个指向 <code>runtime.hmap</code> 结构体的指针；</li>
@@ -725,57 +767,57 @@ ch := make(chan int, 5)</code></pre>
 <pre><code class="go">i := new(int)
 
 var v int
-i := &amp;v</code></pre>
+i := &amp;v
+</code></pre>
 <p>上述代码片段中的两种不同初始化方法是等价的，它们都会创建一个指向 <code>int</code> 零值的指针。</p>
-<h2 id="make-实现"><a href="#make-实现" class="headerlink" title="make 实现"></a>make 实现</h2><p>make 的实现在<a href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/" target="_blank" rel="noopener">go 常用基本类型源码设计分析</a>中已经分析过了，具体总结如下：在编译期间的类型检查阶段，Go 语言会将代表 <code>make</code> 关键字的 <code>OMAKE</code> 节点根据参数类型的不同转换成了 <code>OMAKESLICE</code>、<code>OMAKEMAP</code> 和 <code>OMAKECHAN</code> 三种不同类型的节点，这些节点会调用不同的运行时函数来初始化相应的数据结构。</p>
+<h2 id="make-实现"><a href="#make-实现" class="headerlink" title="make 实现"></a>make 实现</h2><p>make 的实现在<a target="_blank" rel="noopener" href="https://xiaoming.net.cn/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/">go 常用基本类型源码设计分析</a>中已经分析过了，具体总结如下：在编译期间的类型检查阶段，Go 语言会将代表 <code>make</code> 关键字的 <code>OMAKE</code> 节点根据参数类型的不同转换成了 <code>OMAKESLICE</code>、<code>OMAKEMAP</code> 和 <code>OMAKECHAN</code> 三种不同类型的节点，这些节点会调用不同的运行时函数来初始化相应的数据结构。</p>
 <h2 id="new-实现"><a href="#new-实现" class="headerlink" title="new 实现"></a>new 实现</h2><p>编译器会在中间代码生成阶段通过以下两个函数处理该关键字：</p>
 <ol>
 <li><p><code>cmd/compile/internal/gc.callnew</code> 会将关键字转换成 <code>ONEWOBJ</code> 类型的节点；</p>
 </li>
 <li><p><code>cmd/compile/internal/gc.state.expr</code> 会根据申请空间的大小分两种情况处理：</p>
 <ul>
-<li><p>如果申请的空间为 0，就会返回一个表示空指针的 <code>zerobase</code> 变量；</p>
-</li>
-<li><p>在遇到其他情况时会将关键字转换成 <code>runtime.newobject</code> 函数：</p>
-<pre><code class="go">func callnew(t *types.Type) *Node {
-  ...
-  n := nod(ONEWOBJ, typename(t), nil)
-  ...
-  return n
-}
-
-func (s *state) expr(n *Node) *ssa.Value {
-  switch n.Op {
-  case ONEWOBJ:
-      if n.Type.Elem().Size() == 0 {
-          return s.newValue1A(ssa.OpAddr, n.Type, zerobaseSym, s.sb)
-      }
-      typ := s.expr(n.Left)
-      vv := s.rtcall(newobject, true, []*types.Type{n.Type}, typ)
-      return vv[0]
-  }
-}</code></pre>
-</li>
+<li>如果申请的空间为 0，就会返回一个表示空指针的 <code>zerobase</code> 变量；</li>
+<li>在遇到其他情况时会将关键字转换成 <code>runtime.newobject</code> 函数：</li>
 </ul>
+<pre><code class="go">func callnew(t *types.Type) *Node &#123;
+    ...
+    n := nod(ONEWOBJ, typename(t), nil)
+    ...
+    return n
+&#125;
+
+func (s *state) expr(n *Node) *ssa.Value &#123;
+    switch n.Op &#123;
+    case ONEWOBJ:
+        if n.Type.Elem().Size() == 0 &#123;
+            return s.newValue1A(ssa.OpAddr, n.Type, zerobaseSym, s.sb)
+        &#125;
+        typ := s.expr(n.Left)
+        vv := s.rtcall(newobject, true, []*types.Type&#123;n.Type&#125;, typ)
+        return vv[0]
+    &#125;
+&#125;
+</code></pre>
 </li>
 </ol>
 <p>需要注意的是，无论是直接使用 <code>new</code>，还是使用 <code>var</code> 初始化变量，它们在编译器看来都是 <code>ONEW</code> 和 <code>ODCL</code> 节点。如果变量会逃逸到堆上，这些节点在这一阶段都会被 <code>cmd/compile/internal/gc.walkstmt</code> 转换成通过 <code>runtime.newobject</code> 函数并在堆上申请内存。不过这也不是绝对的，如果通过 <code>var</code> 或者 <code>new</code> 创建的变量不需要在当前作用域外生存，例如不用作为返回值返回给调用方，那么就不需要初始化在堆上。</p>
-<pre><code class="go">func walkstmt(n *Node) *Node {
-    switch n.Op {
+<pre><code class="go">func walkstmt(n *Node) *Node &#123;
+    switch n.Op &#123;
     case ODCL:
         v := n.Left
-        if v.Class() == PAUTOHEAP {
-            if prealloc[v] == nil {
+        if v.Class() == PAUTOHEAP &#123;
+            if prealloc[v] == nil &#123;
                 prealloc[v] = callnew(v.Type)
-            }
+            &#125;
             nn := nod(OAS, v.Name.Param.Heapaddr, prealloc[v])
             nn.SetColas(true)
             nn = typecheck(nn, ctxStmt)
             return walkstmt(nn)
-        }
+        &#125;
     case ONEW:
     // 如果没有逃逸，直接在栈上分配内存
-        if n.Esc == EscNone {
+        if n.Esc == EscNone &#123;
             r := temp(n.Type.Elem())
             r = nod(OAS, r, nil)
             r = typecheck(r, ctxStmt)
@@ -783,21 +825,23 @@ func (s *state) expr(n *Node) *ssa.Value {
             r = nod(OADDR, r.Left, nil)
             r = typecheck(r, ctxExpr)
             n = r
-        } else {
+        &#125; else &#123;
       // 逃逸了就在堆上分配内存
             n = callnew(n.Type.Elem())
-        }
-    }
-}</code></pre>
+        &#125;
+    &#125;
+&#125;
+</code></pre>
 <p><code>runtime.newobject</code> 函数会获取传入类型占用空间的大小，调用 <code>runtime.mallocgc</code> 在堆上申请一片内存空间并返回指向这片内存空间的指针：</p>
-<pre><code class="go">func newobject(typ *_type) unsafe.Pointer {
+<pre><code class="go">func newobject(typ *_type) unsafe.Pointer &#123;
     return mallocgc(typ.size, typ, true)
-}</code></pre>
+&#125;
+</code></pre>
 <p><strong>参考文章</strong></p>
 <blockquote>
-<p><a href="https://mp.weixin.qq.com/s/-kV1nvWvYonGkXhdv3iNWg" target="_blank" rel="noopener">Go 语言 for 和 range 的实现</a></p>
-<p><a href="https://my.oschina.net/renhc/blog/2870345" target="_blank" rel="noopener">Go defer实现原理剖析</a></p>
-<p><a href="https://mp.weixin.qq.com/s/txj7jQNki_8zIArb9kSHeg" target="_blank" rel="noopener">Golang之轻松化解defer的温柔陷阱</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/-kV1nvWvYonGkXhdv3iNWg">Go 语言 for 和 range 的实现</a></p>
+<p><a target="_blank" rel="noopener" href="https://my.oschina.net/renhc/blog/2870345">Go defer实现原理剖析</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/txj7jQNki_8zIArb9kSHeg">Golang之轻松化解defer的温柔陷阱</a></p>
 </blockquote>
 
     </div>
@@ -805,157 +849,87 @@ func (s *state) expr(n *Node) *ssa.Value {
     
     
     
-        <div class="reward-container">
+
+    <footer class="post-footer">
+          <div class="reward-container">
   <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
+  <button>
+    赞赏
   </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
       </div>
-      
-      <div style="display: inline-block;">
+      <div>
         <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
+        <span>支付宝</span>
       </div>
 
   </div>
 </div>
 
-
-      <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
               <a href="/tags/go/" rel="tag"># go</a>
           </div>
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" rel="prev" title="腾讯开源 go 代码规范">
-      <i class="fa fa-chevron-left"></i> 腾讯开源 go 代码规范
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/" rel="next" title="gomock 使用">
-      gomock 使用 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/06/14/%E8%85%BE%E8%AE%AF%E5%BC%80%E6%BA%90%20go%20%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" rel="prev" title="腾讯开源 go 代码规范">
+                  <i class="fa fa-chevron-left"></i> 腾讯开源 go 代码规范
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/" rel="next" title="gomock 使用">
+                  gomock 使用 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
           </div>
-          
+    </footer>
+  </article>
+</div>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
   </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#for-和-range"><span class="nav-number">1.</span> <span class="nav-text">for 和 range</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#for-经典循环"><span class="nav-number">1.1.</span> <span class="nav-text">for 经典循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#for-range-范围循环"><span class="nav-number">1.2.</span> <span class="nav-text">for-range 范围循环</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数组和切片"><span class="nav-number">1.2.1.</span> <span class="nav-text">数组和切片</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#清空数组和切片"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">清空数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-range-a-遍历数组和切片"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">for range a {} 遍历数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-i-range-a-遍历数组和切片"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">for i := range a {} 遍历数组和切片</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#for-i-elem-range-a-遍历数组和切片"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">for i, elem := range a {} 遍历数组和切片</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">1.2.2.</span> <span class="nav-text">map</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串"><span class="nav-number">1.2.3.</span> <span class="nav-text">字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通道"><span class="nav-number">1.2.4.</span> <span class="nav-text">通道</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见现象总结"><span class="nav-number">1.3.</span> <span class="nav-text">常见现象总结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#永不停止的循环"><span class="nav-number">1.3.1.</span> <span class="nav-text">永不停止的循环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#循环中的指针赋值"><span class="nav-number">1.3.2.</span> <span class="nav-text">循环中的指针赋值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清空数组"><span class="nav-number">1.3.3.</span> <span class="nav-text">清空数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#随机遍历"><span class="nav-number">1.3.4.</span> <span class="nav-text">随机遍历</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#defer"><span class="nav-number">2.</span> <span class="nav-text">defer</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-的相关使用问题"><span class="nav-number">2.1.</span> <span class="nav-text">defer 的相关使用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#示例一"><span class="nav-number">2.1.1.</span> <span class="nav-text">示例一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例二"><span class="nav-number">2.1.2.</span> <span class="nav-text">示例二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例三"><span class="nav-number">2.1.3.</span> <span class="nav-text">示例三</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例四"><span class="nav-number">2.1.4.</span> <span class="nav-text">示例四</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer使用时的注意事项"><span class="nav-number">2.2.</span> <span class="nav-text">defer使用时的注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#defer-的执行时机"><span class="nav-number">2.2.1.</span> <span class="nav-text">defer 的执行时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预计算参数：defer-语句的参数在它出现时就已经确定下来"><span class="nav-number">2.2.2.</span> <span class="nav-text">预计算参数：defer 语句的参数在它出现时就已经确定下来</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#延迟函数执行按后进先出的顺序执行"><span class="nav-number">2.2.3.</span> <span class="nav-text">延迟函数执行按后进先出的顺序执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#defer-可能操作主函数的具名返回值"><span class="nav-number">2.2.4.</span> <span class="nav-text">defer 可能操作主函数的具名返回值</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#函数的返回过程"><span class="nav-number">2.2.4.1.</span> <span class="nav-text">函数的返回过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主函数拥有匿名返回值，返回字面值"><span class="nav-number">2.2.4.2.</span> <span class="nav-text">主函数拥有匿名返回值，返回字面值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主函数拥有匿名返回值，返回变量"><span class="nav-number">2.2.4.3.</span> <span class="nav-text">主函数拥有匿名返回值，返回变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主函数拥有具名返回值"><span class="nav-number">2.2.4.4.</span> <span class="nav-text">主函数拥有具名返回值</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-数据结构"><span class="nav-number">2.3.</span> <span class="nav-text">defer 数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defer-执行机制"><span class="nav-number">2.4.</span> <span class="nav-text">defer 执行机制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#make-和-new"><span class="nav-number">3.</span> <span class="nav-text">make 和 new</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#make-实现"><span class="nav-number">3.1.</span> <span class="nav-text">make 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#new-实现"><span class="nav-number">3.2.</span> <span class="nav-text">new 实现</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">139</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">50</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
 
 <div class="copyright">
-  
   &copy; 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.3m</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:37</span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -963,8 +937,7 @@ func (s *state) expr(n *Node) *ssa.Value {
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -973,53 +946,36 @@ func (s *state) expr(n *Node) *ssa.Value {
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
+    </div>
+  </footer>
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
 
   
 
-  
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
 
 </body>
 </html>

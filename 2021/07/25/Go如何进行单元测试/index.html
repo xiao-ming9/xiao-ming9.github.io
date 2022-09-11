@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,65 +14,34 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。 单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
-<meta name="keywords" content="go">
+    <meta name="description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。 单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go 如何进行单元测试">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;07&#x2F;25&#x2F;Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95&#x2F;index.html">
+<meta property="og:url" content="http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/index.html">
 <meta property="og:site_name" content="Silverming">
 <meta property="og:description" content="之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。 单元测试的含义单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2021-08-29T08:23:35.013Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-25T12:11:50.000Z">
+<meta property="article:modified_time" content="2021-08-29T08:23:35.013Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="go">
 <meta name="twitter:card" content="summary">
+
 
 <link rel="canonical" href="http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
 
-  <title>Go 如何进行单元测试 | Silverming</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/","path":"2021/07/25/Go如何进行单元测试/","title":"Go 如何进行单元测试"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go 如何进行单元测试 | Silverming</title>
   
 
 
@@ -80,187 +50,222 @@
 
 
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
   </div>
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
+
 <nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
-
 </nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
+           type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E7%9A%84%E5%90%AB%E4%B9%89"><span class="nav-number">1.</span> <span class="nav-text">单元测试的含义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95"><span class="nav-number">2.</span> <span class="nav-text">如何进行单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#testing-%E5%8C%85"><span class="nav-number">2.1.</span> <span class="nav-text">testing 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoConvey"><span class="nav-number">2.2.</span> <span class="nav-text">GoConvey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Web-%E7%95%8C%E9%9D%A2"><span class="nav-number">2.2.1.</span> <span class="nav-text">Web 界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Skip"><span class="nav-number">2.2.2.</span> <span class="nav-text">Skip</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoStub"><span class="nav-number">2.3.</span> <span class="nav-text">GoStub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomonkey-amp-monkey"><span class="nav-number">2.4.</span> <span class="nav-text">gomonkey &amp; monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monkey"><span class="nav-number">2.4.1.</span> <span class="nav-text">Monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E5%87%BD%E6%95%B0%E7%9A%84-Mock"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">对函数的 Mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%B9%E7%BB%93%E6%9E%84%E4%BD%93%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95%E7%9A%84-Mock"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">对结构体成员方法的 Mock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gomonkey"><span class="nav-number">2.4.2.</span> <span class="nav-text">gomonkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFunc-%E5%AF%B9%E5%A4%96%E9%83%A8%E5%87%BD%E6%95%B0-mock"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">ApplyFunc 对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethod-%E5%AF%B9%E7%BB%93%E6%9E%84%E4%BD%93%E6%96%B9%E6%B3%95-mock"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">ApplyMethod 对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyGlobalVar-%E5%AF%B9%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F-mock"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">ApplyGlobalVar 对全局变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVar-%E5%AF%B9%E5%87%BD%E6%95%B0%E5%8F%98%E9%87%8F-mock"><span class="nav-number">2.4.2.4.</span> <span class="nav-text">ApplyFuncVar 对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncSeq-%E6%9E%84%E9%80%A0%E5%A4%9A%E4%B8%AA%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E5%AF%B9%E5%A4%96%E9%83%A8%E5%87%BD%E6%95%B0-mock"><span class="nav-number">2.4.2.5.</span> <span class="nav-text">ApplyFuncSeq 构造多个测试用例对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethodSeq-%E6%9E%84%E9%80%A0%E5%A4%9A%E4%B8%AA%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E5%AF%B9%E7%BB%93%E6%9E%84%E4%BD%93%E6%96%B9%E6%B3%95-mock"><span class="nav-number">2.4.2.6.</span> <span class="nav-text">ApplyMethodSeq 构造多个测试用例对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVarSeq-%E6%9E%84%E9%80%A0%E5%A4%9A%E4%B8%AA%E6%B5%8B%E8%AF%95%E7%94%A8%E4%BE%8B%E5%AF%B9%E5%87%BD%E6%95%B0%E5%8F%98%E9%87%8F-mock"><span class="nav-number">2.4.2.7.</span> <span class="nav-text">ApplyFuncVarSeq 构造多个测试用例对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NewPatches-%E7%94%A8%E4%BA%8E%E8%A1%A8%E9%A9%B1%E5%8A%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.4.2.8.</span> <span class="nav-text">NewPatches 用于表驱动场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">2.4.2.9.</span> <span class="nav-text">注意事项</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomock"><span class="nav-number">2.5.</span> <span class="nav-text">gomock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%80%BB%E7%BB%93"><span class="nav-number">2.6.</span> <span class="nav-text">使用总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%8D%95%E6%B5%8B%E8%A6%86%E7%9B%96%E7%8E%87"><span class="nav-number">2.7.</span> <span class="nav-text">查看单测覆盖率</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
 
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content">
-            
+    <div class="main-inner post posts-expand">
 
-  <div class="posts-expand">
-      
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/07/25/Go%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go 如何进行单元测试 | Silverming">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           Go 如何进行单元测试
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2021-07-25 20:11:50" itemprop="dateCreated datePublished" datetime="2021-07-25T20:11:50+08:00">2021-07-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-08-29 16:23:35" itemprop="dateModified" datetime="2021-08-29T16:23:35+08:00">2021-08-29</time>
-              </span>
+      <time title="创建时间：2021-07-25 20:11:50" itemprop="dateCreated datePublished" datetime="2021-07-25T20:11:50+08:00">2021-07-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2021-08-29 16:23:35" itemprop="dateModified" datetime="2021-08-29T16:23:35+08:00">2021-08-29</time>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>16k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>18k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>16 分钟</span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -269,14 +274,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
         <p>之前了解了 gomock 的一些基本使用技巧，但是对于单元测试这一 part 一直都是云里雾里，借着最近正好工作上要求写单测，学习一下 go 语言如何进行单元测试。</p>
 <h1 id="单元测试的含义"><a href="#单元测试的含义" class="headerlink" title="单元测试的含义"></a>单元测试的含义</h1><p>单元测试通常来讲是对代码中的某一个功能单元进行测试，这里的单元可能是一个函数，也可能对应实际业务需求的某一小块功能。通过单元测试，可以检测我们的代码在某一单元功能里存在的问题，减少 bug 的产生。</p>
-<a id="more"></a>
+<span id="more"></span>
 
 <h1 id="如何进行单元测试"><a href="#如何进行单元测试" class="headerlink" title="如何进行单元测试"></a>如何进行单元测试</h1><p>这一章节主要介绍一下常用的测试工具包。</p>
-<h2 id="testing-包"><a href="#testing-包" class="headerlink" title="testing 包"></a>testing 包</h2><p>go 自带的 testing 包可以很好的帮助我们进行单元测试，对于 testing 包的使用，参考之前记录的文章：<a href="https://xiaoming.net.cn/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/" target="_blank" rel="noopener">&lt;&lt;Go 中的单元测试和基准测试的使用&gt;&gt;</a></p>
+<h2 id="testing-包"><a href="#testing-包" class="headerlink" title="testing 包"></a>testing 包</h2><p>go 自带的 testing 包可以很好的帮助我们进行单元测试，对于 testing 包的使用，参考之前记录的文章：<a target="_blank" rel="noopener" href="https://xiaoming.net.cn/2021/03/16/Go%E4%B8%AD%E7%9A%84%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E5%92%8C%E5%9F%BA%E5%87%86%E6%B5%8B%E8%AF%95%E4%BD%BF%E7%94%A8/">&lt;&lt;Go 中的单元测试和基准测试的使用&gt;&gt;</a></p>
 <p>在使用 testing 包的时候，有一个需要注意的地方就是，如果我们的测试文件由于调用了某一个函数功能在另一个包下，而这个包中的业务代码又调用了测试文件所在的包，就可能会导致循环引用。</p>
 <p>这里的解决办法是可以对测试文件单独赋予一个 <code>xxx_test</code> 包名，将这个测试包变成外部测试包。一个测试文件的包声明后缀 <code>_test</code> 文件会被 <code>go test</code> 工具单独编译成一个包后被运行，所以带 <code>_test</code> 后缀的文件可以像一个单独的程序一样，自由导入其他的包，而不会出现循环导入。</p>
 <p>这里需要注意的一种情况是，由于外部的测试包被看成了单独程序，所以这个时候它就没办法使用待测试源文件里面的非导出函数。这种问题的解决方法可以参考 go 的 <code>fmt</code> 包中的单元测试 <code>fmt_test.go</code>，其声明的包名是 <code>package fmt_test</code>,也就是一个外部测试包，其中 TestIsSpace 便是测试 <code>fmt/scan.go</code> 中的 <code>isSpace</code> 函数，其实现的方式是通过在 <code>fmt/export_test.go</code> 中添加这个函数的声明 <code>(var IsSpace = isSpace)</code> 来导出函数来实现的，其中 <code>export_test.go</code> 的包声明为 <code>package fmt</code> 。这样就巧妙的实现了只有测试包才能访问这个非导出函数的目的。</p>
@@ -289,21 +292,23 @@
     &quot;testing&quot;
     . &quot;github.com/smartystreets/goconvey/convey&quot;
 )
-func TestXXXX(t *testing.T) {
-      Convey(&quot;this is the first convey&quot;,t func() {
+func TestXXXX(t *testing.T) &#123;
+      Convey(&quot;this is the first convey&quot;,t func() &#123;
             x:=1
-            Convey(&quot;this is the second convey&quot;,t,func(){
+            Convey(&quot;this is the second convey&quot;,t,func()&#123;
                   x++
-                  Convey(&quot;this is the last convey&quot;,t,func(){
+                  Convey(&quot;this is the last convey&quot;,t,func()&#123;
                         So(x,ShouldEqual,2)
-                  })
-            })
-      })
-}</code></pre>
+                  &#125;)
+            &#125;)
+      &#125;)
+&#125;
+</code></pre>
 <p>每一个测试用例可以使用 Convey 函数进行包裹，convey 可以无限嵌套，用以体现测试用例之间的层级关系。使用 Convey 推荐的做法是：一个测试函数最外层只有一个 Convey，里面可以嵌套多层 Convey，同级的 Convey 表示不同条件下的测试场景。Convey 函数第一个参数为用例的描述，只有最外层的Convey第二个参数是测试函数的入参 <code>*testing.T</code>，第三个参数为用例判断函数(习惯使用闭包)，最后通过 So 函数完成断言判断即可。</p>
 <p>So 函数第一个参数为输入的值，第二个参数为断言条件，第三个参数为期望值，goconvey 包定义了大部分的基础断言条件，如果有需要，也可以自己定义。注意：<strong>层级相同的子 Convey 的执行策略是并行的，但是一个 Convey 下的子 So 执行是串行的</strong>。</p>
 <h3 id="Web-界面"><a href="#Web-界面" class="headerlink" title="Web 界面"></a>Web 界面</h3><p>GoConvey 不仅支持在命令行进行自动化编译测试，而且还支持在 Web 界面进行自动化编译测试。想要使用 GoConvey 的 Web 界面特性，需要在测试文件所在目录下执行 goconvey：</p>
-<pre><code class="shell">goconvey</code></pre>
+<pre><code class="shell">goconvey
+</code></pre>
 <p>在 Web 界面中可以使用以下功能：</p>
 <ol>
 <li>可以设置界面主题</li>
@@ -325,16 +330,17 @@ func TestXXXX(t *testing.T) {
 <ul>
 <li>当测试代码中存在 <code>SkipConvey</code> 时，相应闭包函数中不管是否为 SkipSo，都将被忽略，测试日志中对应的符号仅为一个”⚠”</li>
 <li>当测试代码 Convey 语句中存在 <code>SkipSo</code> 时，测试日志中每个 So 对应一个”✔”或”✘”，每个 <code>SkipSo</code> 对应一个”⚠”，按实际顺序排列</li>
-<li>不管存在<code>SkipConvey</code> 还是 <code>SkipSo</code> 时，测试日志中都有字符串 <code>&quot;{n} total assertions (one or more sections skipped)&quot;</code>，其中 <code>{n}</code> 表示测试中实际已运行的断言语句数。</li>
+<li>不管存在<code> SkipConvey</code> 还是 <code>SkipSo</code> 时，测试日志中都有字符串 <code>&quot;&#123;n&#125; total assertions (one or more sections skipped)&quot;</code>，其中 <code>&#123;n&#125;</code> 表示测试中实际已运行的断言语句数。</li>
 </ul>
-<p>对于原生的 testing 包生成的测试用例，使用的都是静态数据组成的数组，而实际的业务场景中，测试的函数往往还会调用其他的函数/结构体方法/接口等等，还有可能会使用到全局变量，这时候就需要对这些函数/结构体方法/接口/全局变量等进行 mock，也就是打桩。</p>
+<p>对于原生的 testing 包生成的测试用例，使用的都是静态数据组成的数组，而实际的业务场景中，测试的函数往往还会调用其他的函数&#x2F;结构体方法&#x2F;接口等等，还有可能会使用到全局变量，这时候就需要对这些函数&#x2F;结构体方法&#x2F;接口&#x2F;全局变量等进行 mock，也就是打桩。</p>
 <h2 id="GoStub"><a href="#GoStub" class="headerlink" title="GoStub"></a>GoStub</h2><p>GoStub 主要用来对全局变量、函数进行打桩。在日常使用中，<strong>主要用来对全局变量打桩</strong>。</p>
 <p>对全局变量打桩示例如下：</p>
 <pre><code class="go">stubs := gostub.Stub(&amp;num, 150)
-defer stubs.Reset()</code></pre>
+defer stubs.Reset()
+</code></pre>
 <p>stubs 是 GoStub 框架的函数接口 Stub 返回的对象，该对象有 Reset 操作，即将全局变量的值恢复为原值。</p>
-<h2 id="gomonkey-amp-monkey"><a href="#gomonkey-amp-monkey" class="headerlink" title="gomonkey &amp; monkey"></a>gomonkey &amp; monkey</h2><p>对于函数以及结构体成员方法，我们一般会使用 gomonkey/monkey 来进行 mock。</p>
-<h3 id="Monkey"><a href="#Monkey" class="headerlink" title="Monkey"></a>Monkey</h3><p>Monkey是Golang的一个猴子补丁（monkeypatching）框架，其通过运行时用汇编语句修改跳转的函数地址，来实现对一个函数/结构体成员方法的 mock。</p>
+<h2 id="gomonkey-amp-monkey"><a href="#gomonkey-amp-monkey" class="headerlink" title="gomonkey &amp; monkey"></a>gomonkey &amp; monkey</h2><p>对于函数以及结构体成员方法，我们一般会使用 gomonkey&#x2F;monkey 来进行 mock。</p>
+<h3 id="Monkey"><a href="#Monkey" class="headerlink" title="Monkey"></a>Monkey</h3><p>Monkey是Golang的一个猴子补丁（monkeypatching）框架，其通过运行时用汇编语句修改跳转的函数地址，来实现对一个函数&#x2F;结构体成员方法的 mock。</p>
 <h4 id="对函数的-Mock"><a href="#对函数的-Mock" class="headerlink" title="对函数的 Mock"></a>对函数的 Mock</h4><p>因为这个工具包简单易用，这里直接贴 demo 代码：</p>
 <pre><code class="go">import (
     &quot;testing&quot;
@@ -345,26 +351,28 @@ defer stubs.Reset()</code></pre>
 
 const any = &quot;any&quot;
 
-func TestExec(t *testing.T) {
-    Convey(&quot;test has digit&quot;, t, func() {
-        Convey(&quot;for succ&quot;, func() {
+func TestExec(t *testing.T) &#123;
+    Convey(&quot;test has digit&quot;, t, func() &#123;
+        Convey(&quot;for succ&quot;, func() &#123;
             outputExpect := &quot;xxx-vethName100-yyy&quot;
-            guard := Patch(osencap.Exec, func(_ string, _ ...string) (string, error) {
+            guard := Patch(osencap.Exec, func(_ string, _ ...string) (string, error) &#123;
                 return outputExpect, nil
-            })
+            &#125;)
             defer guard.Unpatch()
             output, err := osencap.Exec(any, any)
             So(output, ShouldEqual, outputExpect)
             So(err, ShouldBeNil)
-        })
-    })
-}</code></pre>
-<p><code>monkey.Patch(&lt;target function&gt;, &lt;replacement function&gt;)</code>函数可以实现对目的函数的替换，使用<code>monkey.Unpatch(&lt;target function&gt;)</code> 来恢复目的函数。</p>
+        &#125;)
+    &#125;)
+&#125;
+</code></pre>
+<p><code>monkey.Patch(&lt;target function&gt;, &lt;replacement function&gt;) </code>函数可以实现对目的函数的替换，使用<code>monkey.Unpatch(&lt;target function&gt;)</code> 来恢复目的函数。</p>
 <h4 id="对结构体成员方法的-Mock"><a href="#对结构体成员方法的-Mock" class="headerlink" title="对结构体成员方法的 Mock"></a>对结构体成员方法的 Mock</h4><pre><code class="go">var e *Etcd
-guard := PatchInstanceMethod(reflect.TypeOf(e), &quot;Get&quot;, func(_ *Etcd, _ string) []string {
-    return []string{&quot;task1&quot;, &quot;task5&quot;, &quot;task8&quot;}
-})
-defer guard.Unpatch()</code></pre>
+guard := PatchInstanceMethod(reflect.TypeOf(e), &quot;Get&quot;, func(_ *Etcd, _ string) []string &#123;
+    return []string&#123;&quot;task1&quot;, &quot;task5&quot;, &quot;task8&quot;&#125;
+&#125;)
+defer guard.Unpatch()
+</code></pre>
 <p>调用 <code>monkey.PatchInstanceMethod(&lt;type&gt;, &lt;name&gt;, &lt;replacement&gt;)</code> 函数可以实现对结构体成员方法的替换：</p>
 <ul>
 <li>第一个参数是 <code>reflect.TypeOf(实例)</code></li>
@@ -399,130 +407,131 @@ var (
     outputExpect = &quot;xxx-vethName100-yyy&quot;
 )
 
-func TestApplyFunc(t *testing.T) {
-    Convey(&quot;TestApplyFunc&quot;, t, func() {
+func TestApplyFunc(t *testing.T) &#123;
+    Convey(&quot;TestApplyFunc&quot;, t, func() &#123;
 
-        Convey(&quot;one func for succ&quot;, func() {
-            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+        Convey(&quot;one func for succ&quot;, func() &#123;
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) &#123;
                 return outputExpect, nil
-            })
+            &#125;)
             defer patches.Reset()
             output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, outputExpect)
-        })
+        &#125;)
 
-        Convey(&quot;one func for fail&quot;, func() {
-            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+        Convey(&quot;one func for fail&quot;, func() &#123;
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) &#123;
                 return &quot;&quot;, fake.ErrActual
-            })
+            &#125;)
             defer patches.Reset()
             output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
             So(err, ShouldEqual, fake.ErrActual)
             So(output, ShouldEqual, &quot;&quot;)
-        })
+        &#125;)
 
-        Convey(&quot;two funcs&quot;, func() {
-            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+        Convey(&quot;two funcs&quot;, func() &#123;
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) &#123;
                 return outputExpect, nil
-            })
+            &#125;)
             defer patches.Reset()
-            patches.ApplyFunc(fake.Belong, func(_ string, _ []string) bool {
+            patches.ApplyFunc(fake.Belong, func(_ string, _ []string) bool &#123;
                 return true
-            })
+            &#125;)
             output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, outputExpect)
             flag := fake.Belong(&quot;&quot;, nil)
             So(flag, ShouldBeTrue)
-        })
+        &#125;)
 
-        Convey(&quot;input and output param&quot;, func() {
-            patches := ApplyFunc(json.Unmarshal, func(data []byte, v interface{}) error {
-                if data == nil {
+        Convey(&quot;input and output param&quot;, func() &#123;
+            patches := ApplyFunc(json.Unmarshal, func(data []byte, v interface&#123;&#125;) error &#123;
+                if data == nil &#123;
                     panic(&quot;input param is nil!&quot;)
-                }
+                &#125;
                 p := v.(*map[int]int)
                 *p = make(map[int]int)
                 (*p)[1] = 2
                 (*p)[2] = 4
                 return nil
-            })
+            &#125;)
             defer patches.Reset()
             var m map[int]int
             err := json.Unmarshal([]byte(&quot;123&quot;), &amp;m)
             So(err, ShouldEqual, nil)
             So(m[1], ShouldEqual, 2)
             So(m[2], ShouldEqual, 4)
-        })
-    })
-}</code></pre>
+        &#125;)
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyMethod-对结构体方法-mock"><a href="#ApplyMethod-对结构体方法-mock" class="headerlink" title="ApplyMethod 对结构体方法 mock"></a>ApplyMethod 对结构体方法 mock</h4><p>ApplyMethod 第一个参数是目标类的指针变量的反射类型，第二个参数是字符串形式的方法名，第三个参数是桩函数。</p>
 <p>测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p><strong>使用 ApplyMethod 可以对非私有方法进行 mock</strong>，如果是私有的方法，gomonkey 通过反射是找不到的。</p>
-<pre><code class="go">func TestApplyMethod(t *testing.T) {
+<pre><code class="go">func TestApplyMethod(t *testing.T) &#123;
     slice := fake.NewSlice()
     var s *fake.Slice
-    Convey(&quot;TestApplyMethod&quot;, t, func() {
+    Convey(&quot;TestApplyMethod&quot;, t, func() &#123;
 
-        Convey(&quot;for succ&quot;, func() {
+        Convey(&quot;for succ&quot;, func() &#123;
             err := slice.Add(1)
             So(err, ShouldEqual, nil)
-            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error &#123;
                 return nil
-            })
+            &#125;)
             defer patches.Reset()
             err = slice.Add(1)
             So(err, ShouldEqual, nil)
             err = slice.Remove(1)
             So(err, ShouldEqual, nil)
             So(len(slice), ShouldEqual, 0)
-        })
+        &#125;)
 
-        Convey(&quot;for already exist&quot;, func() {
+        Convey(&quot;for already exist&quot;, func() &#123;
             err := slice.Add(2)
             So(err, ShouldEqual, nil)
-            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error &#123;
                 return fake.ErrElemExsit
-            })
+            &#125;)
             defer patches.Reset()
             err = slice.Add(1)
             So(err, ShouldEqual, fake.ErrElemExsit)
             err = slice.Remove(2)
             So(err, ShouldEqual, nil)
             So(len(slice), ShouldEqual, 0)
-        })
+        &#125;)
 
-        Convey(&quot;two methods&quot;, func() {
+        Convey(&quot;two methods&quot;, func() &#123;
             err := slice.Add(3)
             So(err, ShouldEqual, nil)
             defer slice.Remove(3)
-            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error {
+            patches := ApplyMethod(reflect.TypeOf(s), &quot;Add&quot;, func(_ *fake.Slice, _ int) error &#123;
                 return fake.ErrElemExsit
-            })
+            &#125;)
             defer patches.Reset()
-            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error {
+            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error &#123;
                 return fake.ErrElemNotExsit
-            })
+            &#125;)
             err = slice.Add(2)
             So(err, ShouldEqual, fake.ErrElemExsit)
             err = slice.Remove(1)
             So(err, ShouldEqual, fake.ErrElemNotExsit)
             So(len(slice), ShouldEqual, 1)
             So(slice[0], ShouldEqual, 3)
-        })
+        &#125;)
 
-        Convey(&quot;one func and one method&quot;, func() {
+        Convey(&quot;one func and one method&quot;, func() &#123;
             err := slice.Add(4)
             So(err, ShouldEqual, nil)
             defer slice.Remove(4)
-            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) {
+            patches := ApplyFunc(fake.Exec, func(_ string, _ ...string) (string, error) &#123;
                 return outputExpect, nil
-            })
+            &#125;)
             defer patches.Reset()
-            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error {
+            patches.ApplyMethod(reflect.TypeOf(s), &quot;Remove&quot;, func(_ *fake.Slice, _ int) error &#123;
                 return fake.ErrElemNotExsit
-            })
+            &#125;)
             output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, outputExpect)
@@ -530,74 +539,79 @@ func TestApplyFunc(t *testing.T) {
             So(err, ShouldEqual, fake.ErrElemNotExsit)
             So(len(slice), ShouldEqual, 1)
             So(slice[0], ShouldEqual, 4)
-        })
-    })
-}</code></pre>
+        &#125;)
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyGlobalVar-对全局变量-mock"><a href="#ApplyGlobalVar-对全局变量-mock" class="headerlink" title="ApplyGlobalVar 对全局变量 mock"></a>ApplyGlobalVar 对全局变量 mock</h4><p>ApplyGlobalVar 第一个参数是全局变量的地址，第二个参数是全局变量的桩。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <pre><code class="go">var num = 10
 
-func TestApplyGlobalVar(t *testing.T) {
-    Convey(&quot;TestApplyGlobalVar&quot;, t, func() {
+func TestApplyGlobalVar(t *testing.T) &#123;
+    Convey(&quot;TestApplyGlobalVar&quot;, t, func() &#123;
 
-        Convey(&quot;change&quot;, func() {
+        Convey(&quot;change&quot;, func() &#123;
             patches := ApplyGlobalVar(&amp;num, 150)
             defer patches.Reset()
             So(num, ShouldEqual, 150)
-        })
+        &#125;)
 
-        Convey(&quot;recover&quot;, func() {
+        Convey(&quot;recover&quot;, func() &#123;
             So(num, ShouldEqual, 10)
-        })
-    })
-}</code></pre>
+        &#125;)
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyFuncVar-对函数变量-mock"><a href="#ApplyFuncVar-对函数变量-mock" class="headerlink" title="ApplyFuncVar 对函数变量 mock"></a>ApplyFuncVar 对函数变量 mock</h4><p>ApplyFuncVar 第一个参数是函数变量的地址，第二个参数是桩函数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p>假设函数变量如下：</p>
-<pre><code class="go">var Marshal = func(v interface{}) ([]byte, error) {
+<pre><code class="go">var Marshal = func(v interface&#123;&#125;) ([]byte, error) &#123;
     return nil, nil
-}</code></pre>
-<pre><code class="go">func TestApplyFuncVar(t *testing.T) {
-    Convey(&quot;TestApplyFuncVar&quot;, t, func() {
+&#125;
+</code></pre>
+<pre><code class="go">func TestApplyFuncVar(t *testing.T) &#123;
+    Convey(&quot;TestApplyFuncVar&quot;, t, func() &#123;
 
-        Convey(&quot;for succ&quot;, func() {
+        Convey(&quot;for succ&quot;, func() &#123;
             str := &quot;hello&quot;
-            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface{}) ([]byte, error) {
+            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface&#123;&#125;) ([]byte, error) &#123;
                 return []byte(str), nil
-            })
+            &#125;)
             defer patches.Reset()
             bytes, err := fake.Marshal(nil)
             So(err, ShouldEqual, nil)
             So(string(bytes), ShouldEqual, str)
-        })
+        &#125;)
 
-        Convey(&quot;for fail&quot;, func() {
-            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface{}) ([]byte, error) {
+        Convey(&quot;for fail&quot;, func() &#123;
+            patches := ApplyFuncVar(&amp;fake.Marshal, func(_ interface&#123;&#125;) ([]byte, error) &#123;
                 return nil, fake.ErrActual
-            })
+            &#125;)
             defer patches.Reset()
             _, err := fake.Marshal(nil)
             So(err, ShouldEqual, fake.ErrActual)
-        })
-    })
-}</code></pre>
+        &#125;)
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyFuncSeq-构造多个测试用例对外部函数-mock"><a href="#ApplyFuncSeq-构造多个测试用例对外部函数-mock" class="headerlink" title="ApplyFuncSeq 构造多个测试用例对外部函数 mock"></a>ApplyFuncSeq 构造多个测试用例对外部函数 mock</h4><p>ApplyFuncSeq 第一个参数是函数名，第二个参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
 <p>其中，第二个参数 OutputCell 的定义为：</p>
-<pre><code class="go">type Params []interface{}
-type OutputCell struct {
+<pre><code class="go">type Params []interface&#123;&#125;
+type OutputCell struct &#123;
     Values Params
     Times  int // 生效次数
-}</code></pre>
-<pre><code class="go">func TestApplyFuncSeq(t *testing.T) {
-    Convey(&quot;TestApplyFuncSeq&quot;, t, func() {
+&#125;
+</code></pre>
+<pre><code class="go">func TestApplyFuncSeq(t *testing.T) &#123;
+    Convey(&quot;TestApplyFuncSeq&quot;, t, func() &#123;
 
-        Convey(&quot;default times is 1&quot;, func() {
+        Convey(&quot;default times is 1&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
             info2 := &quot;hello golang&quot;
             info3 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{info1, nil}},
-                {Values: Params{info2, nil}},
-                {Values: Params{info3, nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;info1, nil&#125;&#125;,
+                &#123;Values: Params&#123;info2, nil&#125;&#125;,
+                &#123;Values: Params&#123;info3, nil&#125;&#125;,
+            &#125;
             patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
             defer patches.Reset()
 
@@ -612,14 +626,14 @@ type OutputCell struct {
             output, err = fake.ReadLeaf(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, info3)
-        })
+        &#125;)
 
-        Convey(&quot;retry succ util the third times&quot;, func() {
+        Convey(&quot;retry succ util the third times&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
-            outputs := []OutputCell{
-                {Values: Params{&quot;&quot;, fake.ErrActual}, Times: 2},
-                {Values: Params{info1, nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;&quot;&quot;, fake.ErrActual&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;info1, nil&#125;&#125;,
+            &#125;
             patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
             defer patches.Reset()
             output, err := fake.ReadLeaf(&quot;&quot;)
@@ -629,14 +643,14 @@ type OutputCell struct {
             output, err = fake.ReadLeaf(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, info1)
-        })
+        &#125;)
 
-        Convey(&quot;batch operations failed on the third time&quot;, func() {
+        Convey(&quot;batch operations failed on the third time&quot;, func() &#123;
             info1 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{info1, nil}, Times: 2},
-                {Values: Params{&quot;&quot;, fake.ErrActual}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;info1, nil&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;&quot;&quot;, fake.ErrActual&#125;&#125;,
+            &#125;
             patches := ApplyFuncSeq(fake.ReadLeaf, outputs)
             defer patches.Reset()
             output, err := fake.ReadLeaf(&quot;&quot;)
@@ -647,24 +661,25 @@ type OutputCell struct {
             So(output, ShouldEqual, info1)
             output, err = fake.ReadLeaf(&quot;&quot;)
             So(err, ShouldEqual, fake.ErrActual)
-        })
+        &#125;)
 
-    })
-}</code></pre>
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyMethodSeq-构造多个测试用例对结构体方法-mock"><a href="#ApplyMethodSeq-构造多个测试用例对结构体方法-mock" class="headerlink" title="ApplyMethodSeq 构造多个测试用例对结构体方法 mock"></a>ApplyMethodSeq 构造多个测试用例对结构体方法 mock</h4><p>ApplyMethodSeq 第一个参数是目标类的指针变量的反射类型，第二个参数是字符串形式的方法名，第三参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<pre><code class="go">func TestApplyMethodSeq(t *testing.T) {
-    e := &amp;fake.Etcd{}
-    Convey(&quot;TestApplyMethodSeq&quot;, t, func() {
+<pre><code class="go">func TestApplyMethodSeq(t *testing.T) &#123;
+    e := &amp;fake.Etcd&#123;&#125;
+    Convey(&quot;TestApplyMethodSeq&quot;, t, func() &#123;
 
-        Convey(&quot;default times is 1&quot;, func() {
+        Convey(&quot;default times is 1&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
             info2 := &quot;hello golang&quot;
             info3 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{info1, nil}},
-                {Values: Params{info2, nil}},
-                {Values: Params{info3, nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;info1, nil&#125;&#125;,
+                &#123;Values: Params&#123;info2, nil&#125;&#125;,
+                &#123;Values: Params&#123;info3, nil&#125;&#125;,
+            &#125;
             patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
             defer patches.Reset()
             output, err := e.Retrieve(&quot;&quot;)
@@ -676,14 +691,14 @@ type OutputCell struct {
             output, err = e.Retrieve(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, info3)
-        })
+        &#125;)
 
-        Convey(&quot;retry succ util the third times&quot;, func() {
+        Convey(&quot;retry succ util the third times&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
-            outputs := []OutputCell{
-                {Values: Params{&quot;&quot;, fake.ErrActual}, Times: 2},
-                {Values: Params{info1, nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;&quot;&quot;, fake.ErrActual&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;info1, nil&#125;&#125;,
+            &#125;
             patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
             defer patches.Reset()
             output, err := e.Retrieve(&quot;&quot;)
@@ -693,14 +708,14 @@ type OutputCell struct {
             output, err = e.Retrieve(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(output, ShouldEqual, info1)
-        })
+        &#125;)
 
-        Convey(&quot;batch operations failed on the third time&quot;, func() {
+        Convey(&quot;batch operations failed on the third time&quot;, func() &#123;
             info1 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{info1, nil}, Times: 2},
-                {Values: Params{&quot;&quot;, fake.ErrActual}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;info1, nil&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;&quot;&quot;, fake.ErrActual&#125;&#125;,
+            &#125;
             patches := ApplyMethodSeq(reflect.TypeOf(e), &quot;Retrieve&quot;, outputs)
             defer patches.Reset()
             output, err := e.Retrieve(&quot;&quot;)
@@ -711,23 +726,24 @@ type OutputCell struct {
             So(output, ShouldEqual, info1)
             output, err = e.Retrieve(&quot;&quot;)
             So(err, ShouldEqual, fake.ErrActual)
-        })
+        &#125;)
 
-    })
-}</code></pre>
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="ApplyFuncVarSeq-构造多个测试用例对函数变量-mock"><a href="#ApplyFuncVarSeq-构造多个测试用例对函数变量-mock" class="headerlink" title="ApplyFuncVarSeq 构造多个测试用例对函数变量 mock"></a>ApplyFuncVarSeq 构造多个测试用例对函数变量 mock</h4><p>ApplyFuncVarSeq 第一个参数是函数变量地址，第二个参数是特定的桩序列参数。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<pre><code class="go">func TestApplyFuncVarSeq(t *testing.T) {
-    Convey(&quot;TestApplyFuncVarSeq&quot;, t, func() {
+<pre><code class="go">func TestApplyFuncVarSeq(t *testing.T) &#123;
+    Convey(&quot;TestApplyFuncVarSeq&quot;, t, func() &#123;
 
-        Convey(&quot;default times is 1&quot;, func() {
+        Convey(&quot;default times is 1&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
             info2 := &quot;hello golang&quot;
             info3 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{[]byte(info1), nil}},
-                {Values: Params{[]byte(info2), nil}},
-                {Values: Params{[]byte(info3), nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;[]byte(info1), nil&#125;&#125;,
+                &#123;Values: Params&#123;[]byte(info2), nil&#125;&#125;,
+                &#123;Values: Params&#123;[]byte(info3), nil&#125;&#125;,
+            &#125;
             patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
             defer patches.Reset()
             bytes, err := fake.Marshal(&quot;&quot;)
@@ -739,14 +755,14 @@ type OutputCell struct {
             bytes, err = fake.Marshal(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(string(bytes), ShouldEqual, info3)
-        })
+        &#125;)
 
-        Convey(&quot;retry succ util the third times&quot;, func() {
+        Convey(&quot;retry succ util the third times&quot;, func() &#123;
             info1 := &quot;hello cpp&quot;
-            outputs := []OutputCell{
-                {Values: Params{[]byte(&quot;&quot;), fake.ErrActual}, Times: 2},
-                {Values: Params{[]byte(info1), nil}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;[]byte(&quot;&quot;), fake.ErrActual&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;[]byte(info1), nil&#125;&#125;,
+            &#125;
             patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
             defer patches.Reset()
             bytes, err := fake.Marshal(&quot;&quot;)
@@ -756,14 +772,14 @@ type OutputCell struct {
             bytes, err = fake.Marshal(&quot;&quot;)
             So(err, ShouldEqual, nil)
             So(string(bytes), ShouldEqual, info1)
-        })
+        &#125;)
 
-        Convey(&quot;batch operations failed on the third time&quot;, func() {
+        Convey(&quot;batch operations failed on the third time&quot;, func() &#123;
             info1 := &quot;hello gomonkey&quot;
-            outputs := []OutputCell{
-                {Values: Params{[]byte(info1), nil}, Times: 2},
-                {Values: Params{[]byte(&quot;&quot;), fake.ErrActual}},
-            }
+            outputs := []OutputCell&#123;
+                &#123;Values: Params&#123;[]byte(info1), nil&#125;, Times: 2&#125;,
+                &#123;Values: Params&#123;[]byte(&quot;&quot;), fake.ErrActual&#125;&#125;,
+            &#125;
             patches := ApplyFuncVarSeq(&amp;fake.Marshal, outputs)
             defer patches.Reset()
             bytes, err := fake.Marshal(&quot;&quot;)
@@ -774,39 +790,40 @@ type OutputCell struct {
             So(string(bytes), ShouldEqual, info1)
             bytes, err = fake.Marshal(&quot;&quot;)
             So(err, ShouldEqual, fake.ErrActual)
-        })
+        &#125;)
 
-    })
-}</code></pre>
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="NewPatches-用于表驱动场景"><a href="#NewPatches-用于表驱动场景" class="headerlink" title="NewPatches 用于表驱动场景"></a>NewPatches 用于表驱动场景</h4><p>NewPatches 是 patches 对象的显式构造函数，一般用于目标和桩的表驱动场景。测试完成后，patches 对象通过 Reset 成员方法删除所有测试桩。</p>
-<pre><code class="go">func TestPatchPair(t *testing.T) {
+<pre><code class="go">func TestPatchPair(t *testing.T) &#123;
 
-    Convey(&quot;TestPatchPair&quot;, t, func() {
+    Convey(&quot;TestPatchPair&quot;, t, func() &#123;
 
-        Convey(&quot;TestPatchPair&quot;, func() {
-            patchPairs := [][2]interface{}{
-                {
+        Convey(&quot;TestPatchPair&quot;, func() &#123;
+            patchPairs := [][2]interface&#123;&#125;&#123;
+                &#123;
                     fake.Exec,
-                    func(_ string, _ ...string) (string, error) {
+                    func(_ string, _ ...string) (string, error) &#123;
                         return outputExpect, nil
-                    },
-                },
-                {
+                    &#125;,
+                &#125;,
+                &#123;
                     json.Unmarshal,
-                    func(_ []byte, v interface{}) error {
+                    func(_ []byte, v interface&#123;&#125;) error &#123;
                         p := v.(*map[int]int)
                         *p = make(map[int]int)
                         (*p)[1] = 2
                         (*p)[2] = 4
                         return nil
-                    },
-                },
-            }
+                    &#125;,
+                &#125;,
+            &#125;
             patches := NewPatches()
             defer patches.Reset()
-            for _, pair := range patchPairs {
+            for _, pair := range patchPairs &#123;
                 patches.ApplyFunc(pair[0], pair[1])
-            }
+            &#125;
 
             output, err := fake.Exec(&quot;&quot;, &quot;&quot;)
             So(err, ShouldEqual, nil)
@@ -817,13 +834,14 @@ type OutputCell struct {
             So(err, ShouldEqual, nil)
             So(m[1], ShouldEqual, 2)
             So(m[2], ShouldEqual, 4)
-        })
+        &#125;)
 
-    })
-}</code></pre>
+    &#125;)
+&#125;
+</code></pre>
 <h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><p>使用 gomonkey 时还有一个需要注意的点就是，必须找到该方法对应的真实的结构体的方法，而不能因为嵌套了内部结构体就直接只用外部结构体来进行反射，这会导致 mock 失败。</p>
 <p>另外，使用 gomonkey 同样需要通过 <code>go test -gcflags=all=-l</code> 选项关闭内联。</p>
-<h2 id="gomock"><a href="#gomock" class="headerlink" title="gomock"></a>gomock</h2><p>对于接口方法，则使用 gomock 来进行 mock，go mock 是官方自带的接口gomock包，这个包完成对桩对象生命周期的管理，GoMock 还包含一个 mockgen 命令行工具，用来自动生成 interface 对应的 Mock 类源文件，具体使用见<a href="https://xiaoming.net.cn/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/" target="_blank" rel="noopener">gomock 使用</a></p>
+<h2 id="gomock"><a href="#gomock" class="headerlink" title="gomock"></a>gomock</h2><p>对于接口方法，则使用 gomock 来进行 mock，go mock 是官方自带的接口gomock包，这个包完成对桩对象生命周期的管理，GoMock 还包含一个 mockgen 命令行工具，用来自动生成 interface 对应的 Mock 类源文件，具体使用见<a target="_blank" rel="noopener" href="https://xiaoming.net.cn/2021/06/29/gomock%20%E4%BD%BF%E7%94%A8/">gomock 使用</a></p>
 <h2 id="使用总结"><a href="#使用总结" class="headerlink" title="使用总结"></a>使用总结</h2><ol>
 <li>普通的单测使用 testing 包足矣，而当需要模拟全局变量的时候，使用 GoStub 是最方便快捷的方式。</li>
 <li>多条件测试可以使用 convey 进行层级划分，方便定位问题和提升代码阅读体验。</li>
@@ -831,14 +849,15 @@ type OutputCell struct {
 <li>对于接口的 mock 使用 gomock</li>
 </ol>
 <h2 id="查看单测覆盖率"><a href="#查看单测覆盖率" class="headerlink" title="查看单测覆盖率"></a>查看单测覆盖率</h2><p>通过以下命令可以将单测的覆盖情况：</p>
-<pre><code class="shell">go test -count=1 -v -coverprofile=c.out ./... -gcflags=all=-l &amp;&amp; go tool cover -html=c.out &amp;&amp; rm c.out</code></pre>
+<pre><code class="shell">go test -count=1 -v -coverprofile=c.out ./... -gcflags=all=-l &amp;&amp; go tool cover -html=c.out &amp;&amp; rm c.out
+</code></pre>
 <p><strong>参考文章</strong>：</p>
 <blockquote>
-<p><a href="https://www.jianshu.com/p/e3b2b1194830" target="_blank" rel="noopener">GoConvey框架使用指南</a></p>
-<p><a href="https://www.jianshu.com/p/70a93a9ed186" target="_blank" rel="noopener">GoStub框架使用指南</a></p>
-<p><a href="https://www.jianshu.com/p/2f675d5e334e" target="_blank" rel="noopener">Monkey框架使用指南</a></p>
-<p><a href="https://github.com/agiledragon/gomonkey/tree/master/test" target="_blank" rel="noopener">gomonkey-test</a></p>
-<p><a href="https://studygolang.com/articles/15034" target="_blank" rel="noopener">gomonkey 1.0 正式发布！</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e3b2b1194830">GoConvey框架使用指南</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/70a93a9ed186">GoStub框架使用指南</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/2f675d5e334e">Monkey框架使用指南</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/agiledragon/gomonkey/tree/master/test">gomonkey-test</a></p>
+<p><a target="_blank" rel="noopener" href="https://studygolang.com/articles/15034">gomonkey 1.0 正式发布！</a></p>
 </blockquote>
 
     </div>
@@ -846,157 +865,86 @@ type OutputCell struct {
     
     
     
-        <div class="reward-container">
+
+    <footer class="post-footer">
+          <div class="reward-container">
   <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
+  <button>
+    赞赏
   </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
       </div>
-      
-      <div style="display: inline-block;">
+      <div>
         <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
+        <span>支付宝</span>
       </div>
 
   </div>
 </div>
 
-
-      <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/go/" rel="tag"># go</a>
           </div>
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/" rel="prev" title="go template 库（模板）">
-      <i class="fa fa-chevron-left"></i> go template 库（模板）
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/08/29/go%20http%E5%BA%93%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="next" title="go http 库 Connection reset by peer 解决">
-      go http 库 Connection reset by peer 解决 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/07/14/go%20template%E5%BA%93%EF%BC%88%E6%A8%A1%E6%9D%BF%EF%BC%89/" rel="prev" title="go template 库（模板）">
+                  <i class="fa fa-chevron-left"></i> go template 库（模板）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/08/29/go%20http%E5%BA%93%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="next" title="go http 库 Connection reset by peer 解决">
+                  go http 库 Connection reset by peer 解决 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
           </div>
-          
+    </footer>
+  </article>
+</div>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
   </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单元测试的含义"><span class="nav-number">1.</span> <span class="nav-text">单元测试的含义</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何进行单元测试"><span class="nav-number">2.</span> <span class="nav-text">如何进行单元测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#testing-包"><span class="nav-number">2.1.</span> <span class="nav-text">testing 包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoConvey"><span class="nav-number">2.2.</span> <span class="nav-text">GoConvey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Web-界面"><span class="nav-number">2.2.1.</span> <span class="nav-text">Web 界面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Skip"><span class="nav-number">2.2.2.</span> <span class="nav-text">Skip</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GoStub"><span class="nav-number">2.3.</span> <span class="nav-text">GoStub</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomonkey-amp-monkey"><span class="nav-number">2.4.</span> <span class="nav-text">gomonkey &amp; monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monkey"><span class="nav-number">2.4.1.</span> <span class="nav-text">Monkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对函数的-Mock"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">对函数的 Mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#对结构体成员方法的-Mock"><span class="nav-number">2.4.1.2.</span> <span class="nav-text">对结构体成员方法的 Mock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gomonkey"><span class="nav-number">2.4.2.</span> <span class="nav-text">gomonkey</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFunc-对外部函数-mock"><span class="nav-number">2.4.2.1.</span> <span class="nav-text">ApplyFunc 对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethod-对结构体方法-mock"><span class="nav-number">2.4.2.2.</span> <span class="nav-text">ApplyMethod 对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyGlobalVar-对全局变量-mock"><span class="nav-number">2.4.2.3.</span> <span class="nav-text">ApplyGlobalVar 对全局变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVar-对函数变量-mock"><span class="nav-number">2.4.2.4.</span> <span class="nav-text">ApplyFuncVar 对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncSeq-构造多个测试用例对外部函数-mock"><span class="nav-number">2.4.2.5.</span> <span class="nav-text">ApplyFuncSeq 构造多个测试用例对外部函数 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyMethodSeq-构造多个测试用例对结构体方法-mock"><span class="nav-number">2.4.2.6.</span> <span class="nav-text">ApplyMethodSeq 构造多个测试用例对结构体方法 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ApplyFuncVarSeq-构造多个测试用例对函数变量-mock"><span class="nav-number">2.4.2.7.</span> <span class="nav-text">ApplyFuncVarSeq 构造多个测试用例对函数变量 mock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#NewPatches-用于表驱动场景"><span class="nav-number">2.4.2.8.</span> <span class="nav-text">NewPatches 用于表驱动场景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注意事项"><span class="nav-number">2.4.2.9.</span> <span class="nav-text">注意事项</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gomock"><span class="nav-number">2.5.</span> <span class="nav-text">gomock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用总结"><span class="nav-number">2.6.</span> <span class="nav-text">使用总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看单测覆盖率"><span class="nav-number">2.7.</span> <span class="nav-text">查看单测覆盖率</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">139</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">50</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
 
 <div class="copyright">
-  
   &copy; 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.3m</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:37</span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -1004,8 +952,7 @@ type OutputCell struct {
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -1014,53 +961,36 @@ type OutputCell struct {
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
+    </div>
+  </footer>
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
 
   
 
-  
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
 
 </body>
 </html>

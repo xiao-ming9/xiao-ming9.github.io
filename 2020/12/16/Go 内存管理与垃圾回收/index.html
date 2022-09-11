@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,112 +14,82 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="Go 语言抛弃了 C&#x2F;C++ 中的开发者管理内存的方式：主动申请与主动释放，增加了逃逸分析和 GC，这样开发者就能从内存管理中释放出来，有更多的精力去关注软件设计，而不是底层的内存问题。这是 Go 语言成为高生产力语言的原因之一。">
-<meta name="keywords" content="面试,go">
+    <meta name="description" content="Go 语言抛弃了 C&#x2F;C++ 中的开发者管理内存的方式：主动申请与主动释放，增加了逃逸分析和 GC，这样开发者就能从内存管理中释放出来，有更多的精力去关注软件设计，而不是底层的内存问题。这是 Go 语言成为高生产力语言的原因之一。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go 内存管理与垃圾回收">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;12&#x2F;16&#x2F;Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6&#x2F;index.html">
+<meta property="og:url" content="http://yoursite.com/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/index.html">
 <meta property="og:site_name" content="Silverming">
 <meta property="og:description" content="Go 语言抛弃了 C&#x2F;C++ 中的开发者管理内存的方式：主动申请与主动释放，增加了逃逸分析和 GC，这样开发者就能从内存管理中释放出来，有更多的精力去关注软件设计，而不是底层的内存问题。这是 Go 语言成为高生产力语言的原因之一。">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%98%E5%82%A8%E4%BD%93%E7%B3%BB.webp">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;3%E7%BA%A7Cache.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%88%86%E5%B1%82%E8%AE%BE%E8%AE%A1.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%A0%86%E5%92%8C%E6%A0%88.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%BA%BF%E6%80%A7%E5%88%86%E9%85%8D.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%BA%BF%E6%80%A7%E5%88%86%E9%85%8D%E7%9A%84%E7%BC%BA%E9%99%B7.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8%E5%88%86%E9%85%8D.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E5%9D%97%E5%AF%B9%E9%BD%90.webp">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E9%9A%94%E7%A6%BB%E9%80%82%E5%BA%94%E7%AD%96%E7%95%A5.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;TCMalloc%E6%A6%82%E8%A6%81%E5%9B%BE.svg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;PageHeap.svg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8E%9F%E7%90%86%E5%9B%BE.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98mheap.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F%E8%BD%AC%E6%8D%A2.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F%E6%98%A0%E5%B0%84%E5%85%B3%E7%B3%BB.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%B7%A8%E5%BA%A6%E7%B1%BB4%E6%9C%80%E5%A4%A7%E6%B5%AA%E8%B4%B9%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AD%98%E5%82%A8.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20class%E8%BD%AC%E6%8D%A2%E6%98%A0%E5%B0%84%E6%95%B0%E7%BB%84.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%BE%AE%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E5%8E%9F%E7%90%86.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8E%9F%E7%90%86%E5%9B%BE.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98Span%E5%86%85%E7%9A%84%E5%AF%B9%E8%B1%A1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98mcentral.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%E5%86%85%E5%AD%98%E6%80%BB%E7%BB%93.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%A0%87%E8%AE%B0%E9%98%B6%E6%AE%B5.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%B8%85%E9%99%A4%E9%98%B6%E6%AE%B5.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B3%95-1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-2.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-3.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-4.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E4%B8%89%E8%89%B2%E4%B8%8D%E5%8F%98%E6%80%A7.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C-2.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%88%A0%E9%99%A4%E5%86%99%E5%B1%8F%E9%9A%9C.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;stw%E6%94%B6%E9%9B%86%E5%99%A8.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%A2%9E%E9%87%8F%E6%94%B6%E9%9B%86%E5%99%A8.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%B9%B6%E5%8F%91%E6%94%B6%E9%9B%86%E5%99%A8.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E6%97%B6%E9%97%B4.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%B9%B6%E5%8F%91%E6%94%B6%E9%9B%86%E5%99%A8%E7%9A%84%E5%A0%86%E5%86%85%E5%AD%98.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%A0%88%E5%8C%BA%E8%AE%BE%E8%AE%A1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%A0%86%E5%92%8C%E6%A0%88.jpeg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E6%A0%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%A6%81%E7%B4%A0.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90%E5%92%8C%E4%B8%8D%E5%8F%98%E6%80%A7.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%88%86%E6%AE%B5%E6%A0%88%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E8%BF%9E%E7%BB%AD%E6%A0%88.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;%E5%85%A8%E5%B1%80%E7%BC%93%E5%AD%98%E6%B1%A0%E7%9A%84%E7%BB%93%E6%9E%84.png">
-<meta property="og:updated_time" content="2021-03-27T04:14:35.119Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%98%E5%82%A8%E4%BD%93%E7%B3%BB.webp">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/3%E7%BA%A7Cache.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E5%88%86%E5%B1%82%E8%AE%BE%E8%AE%A1.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%A0%86%E5%92%8C%E6%A0%88.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E7%BA%BF%E6%80%A7%E5%88%86%E9%85%8D.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E7%BA%BF%E6%80%A7%E5%88%86%E9%85%8D%E7%9A%84%E7%BC%BA%E9%99%B7.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8%E5%88%86%E9%85%8D.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E5%9D%97%E5%AF%B9%E9%BD%90.webp">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E9%9A%94%E7%A6%BB%E9%80%82%E5%BA%94%E7%AD%96%E7%95%A5.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/TCMalloc%E6%A6%82%E8%A6%81%E5%9B%BE.svg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/PageHeap.svg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8E%9F%E7%90%86%E5%9B%BE.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98mheap.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F%E8%BD%AC%E6%8D%A2.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F%E6%98%A0%E5%B0%84%E5%85%B3%E7%B3%BB.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%B7%A8%E5%BA%A6%E7%B1%BB4%E6%9C%80%E5%A4%A7%E6%B5%AA%E8%B4%B9%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AD%98%E5%82%A8.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20class%E8%BD%AC%E6%8D%A2%E6%98%A0%E5%B0%84%E6%95%B0%E7%BB%84.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E5%8E%9F%E7%90%86.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8E%9F%E7%90%86%E5%9B%BE.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98Span%E5%86%85%E7%9A%84%E5%AF%B9%E8%B1%A1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98mcentral.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%E5%86%85%E5%AD%98%E6%80%BB%E7%BB%93.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%A0%87%E8%AE%B0%E9%98%B6%E6%AE%B5.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%B8%85%E9%99%A4%E9%98%B6%E6%AE%B5.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B3%95-1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-2.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-3.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E7%AE%97%E6%B3%95-4.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%89%E8%89%B2%E4%B8%8D%E5%8F%98%E6%80%A7.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C-2.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%88%A0%E9%99%A4%E5%86%99%E5%B1%8F%E9%9A%9C.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/stw%E6%94%B6%E9%9B%86%E5%99%A8.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%A2%9E%E9%87%8F%E6%94%B6%E9%9B%86%E5%99%A8.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%B9%B6%E5%8F%91%E6%94%B6%E9%9B%86%E5%99%A8.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8-1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E6%97%B6%E9%97%B4.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%B9%B6%E5%8F%91%E6%94%B6%E9%9B%86%E5%99%A8%E7%9A%84%E5%A0%86%E5%86%85%E5%AD%98.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%A0%88%E5%8C%BA%E8%AE%BE%E8%AE%A1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%A0%86%E5%92%8C%E6%A0%88.jpeg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E6%A0%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%A6%81%E7%B4%A0.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90%E5%92%8C%E4%B8%8D%E5%8F%98%E6%80%A7.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%88%86%E6%AE%B5%E6%A0%88%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E8%BF%9E%E7%BB%AD%E6%A0%88.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%85%A8%E5%B1%80%E7%BC%93%E5%AD%98%E6%B1%A0%E7%9A%84%E7%BB%93%E6%9E%84.png">
+<meta property="article:published_time" content="2020-12-16T03:09:17.000Z">
+<meta property="article:modified_time" content="2022-09-10T15:09:39.237Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="面试">
+<meta property="article:tag" content="go">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp">
+<meta name="twitter:image" content="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp">
+
 
 <link rel="canonical" href="http://yoursite.com/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
 
-  <title>Go 内存管理与垃圾回收 | Silverming</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/","path":"2020/12/16/Go 内存管理与垃圾回收/","title":"Go 内存管理与垃圾回收"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Go 内存管理与垃圾回收 | Silverming</title>
   
 
 
@@ -127,187 +98,222 @@
 
 
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
   </div>
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
+
 <nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
-
 </nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
+           type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E7%9A%84%E5%AD%98%E5%82%A8%E4%BD%93%E7%B3%BB"><span class="nav-number">1.</span> <span class="nav-text">传统的存储体系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%98%E5%82%A8%E4%BD%93%E7%B3%BB"><span class="nav-number">1.1.</span> <span class="nav-text">计算机存储体系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AD%98%E5%82%A8%E4%BD%93%E7%B3%BB"><span class="nav-number">1.2.</span> <span class="nav-text">操作系统存储体系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">1.2.1.</span> <span class="nav-text">虚拟内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%92%8C%E6%A0%88"><span class="nav-number">1.2.2.</span> <span class="nav-text">堆和栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.3.</span> <span class="nav-text">堆内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E5%88%86%E9%85%8D"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">线性分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A9%BA%E9%97%B2%E9%93%BE%E8%A1%A8%E5%88%86%E9%85%8D"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">空闲链表分配</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">Go 堆内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCMalloc"><span class="nav-number">2.1.</span> <span class="nav-text">TCMalloc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TCMalloc-%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.1.</span> <span class="nav-text">TCMalloc 基本原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-%E5%A0%86%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.2.</span> <span class="nav-text">Go 堆内存管理的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.2.1.</span> <span class="nav-text">Go 内存管理的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Page"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">Page</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Span"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mcache"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">mcache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mcentral"><span class="nav-number">2.2.1.4.</span> <span class="nav-text">mcentral</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mheap"><span class="nav-number">2.2.1.5.</span> <span class="nav-text">mheap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#heapArena"><span class="nav-number">2.2.1.6.</span> <span class="nav-text">heapArena</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%B0%8F%E8%BD%AC%E6%8D%A2"><span class="nav-number">2.2.1.7.</span> <span class="nav-text">大小转换</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%BA%E4%BD%95%E4%B8%8D%E4%BD%BF%E7%94%A8%E5%87%BD%E6%95%B0%E8%AE%A1%E7%AE%97%E5%90%84%E7%A7%8D%E8%BD%AC%E6%8D%A2%EF%BC%8C%E8%80%8C%E6%98%AF%E5%86%99%E6%88%90%E6%95%B0%E7%BB%84%EF%BC%9F"><span class="nav-number">2.2.1.7.1.</span> <span class="nav-text">为何不使用函数计算各种转换，而是写成数组？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">2.2.2.</span> <span class="nav-text">Go 内存分配具体过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BE%AE%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%86%E9%85%8D"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">微对象的分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%8F%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%86%E9%85%8D"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">小对象的分配</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%BA%E5%AF%B9%E8%B1%A1%E5%AF%BB%E6%89%BE-span"><span class="nav-number">2.2.2.2.1.</span> <span class="nav-text">为对象寻找 span</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%8E-span-%E5%88%86%E9%85%8D%E5%AF%B9%E8%B1%A1%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.2.2.2.</span> <span class="nav-text">从 span 分配对象空间</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#span-%E6%B2%A1%E6%9C%89%E7%A9%BA%E9%97%B4%E6%80%8E%E4%B9%88%E5%88%86%E9%85%8D%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.2.2.2.3.</span> <span class="nav-text">span 没有空间怎么分配对象</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#mcentral-%E5%90%91-mcache-%E6%8F%90%E4%BE%9B-span"><span class="nav-number">2.2.2.2.3.1.</span> <span class="nav-text">mcentral 向 mcache 提供 span</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#mcentral-%E5%90%91-mheap-%E8%A6%81-span"><span class="nav-number">2.2.2.2.3.2.</span> <span class="nav-text">mcentral 向 mheap 要 span</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#mheap%E5%90%91OS%E7%94%B3%E8%AF%B7%E5%86%85%E5%AD%98"><span class="nav-number">2.2.2.2.3.3.</span> <span class="nav-text">mheap向OS申请内存</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%A7%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%88%86%E9%85%8D"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">大对象的分配</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">2.2.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E4%B8%8E%E5%86%85%E5%AD%98%E9%87%8A%E6%94%BE"><span class="nav-number">3.</span> <span class="nav-text">Go 垃圾回收与内存释放</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E6%A6%82%E5%BF%B5"><span class="nav-number">3.1.</span> <span class="nav-text">垃圾回收概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">垃圾收集算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E2%80%94%E2%80%94%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="nav-number">3.2.1.</span> <span class="nav-text">标记——清除算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%89%B2%E6%A0%87%E8%AE%B0%E6%B3%95"><span class="nav-number">3.2.2.</span> <span class="nav-text">三色标记法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%8F%E9%9A%9C%E6%8A%80%E6%9C%AF"><span class="nav-number">3.2.3.</span> <span class="nav-text">屏障技术</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">插入写屏障</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%86%99%E5%B1%8F%E9%9A%9C"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">删除写屏障</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E5%86%99%E5%B1%8F%E9%9A%9C"><span class="nav-number">3.2.3.3.</span> <span class="nav-text">混合写屏障</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">3.3.</span> <span class="nav-text">垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.3.1.</span> <span class="nav-text">垃圾收集器的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A2%9E%E9%87%8F%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">3.3.1.1.</span> <span class="nav-text">增量收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">3.3.1.2.</span> <span class="nav-text">并发收集器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go-%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="nav-number">3.3.2.</span> <span class="nav-text">go 的垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E6%94%B6%E5%A0%86%E7%9B%AE%E6%A0%87"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">回收堆目标</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E8%BF%87%E7%A8%8B"><span class="nav-number">3.3.3.</span> <span class="nav-text">垃圾收集过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E5%87%86%E5%A4%87%E9%98%B6%E6%AE%B5"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">标记准备阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E9%98%B6%E6%AE%B5"><span class="nav-number">3.3.3.2.</span> <span class="nav-text">标记阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%87%E8%AE%B0%E7%BB%88%E6%AD%A2%E9%98%B6%E6%AE%B5"><span class="nav-number">3.3.3.3.</span> <span class="nav-text">标记终止阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B8%85%E7%90%86%E9%98%B6%E6%AE%B5"><span class="nav-number">3.3.3.4.</span> <span class="nav-text">清理阶段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GOGC-%E5%AF%B9%E6%80%A7%E8%83%BD%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.3.4.</span> <span class="nav-text">GOGC 对性能的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#go-%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E7%9A%84%E6%97%B6%E6%9C%BA"><span class="nav-number">3.4.</span> <span class="nav-text">go 垃圾回收的时机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E8%A7%A6%E5%8F%91"><span class="nav-number">3.4.1.</span> <span class="nav-text">自动触发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E8%A7%A6%E5%8F%91"><span class="nav-number">3.4.2.</span> <span class="nav-text">手动触发</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E6%A0%88%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">Go 栈内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%88%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">4.1.</span> <span class="nav-text">栈内存管理的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">4.1.1.</span> <span class="nav-text">寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%A0%88"><span class="nav-number">4.1.2.</span> <span class="nav-text">线程栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%88%E4%B8%AD%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%A6%81%E7%B4%A0"><span class="nav-number">4.1.3.</span> <span class="nav-text">栈中的基本要素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-%E4%B8%AD%E7%9A%84%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90"><span class="nav-number">4.2.</span> <span class="nav-text">Go 中的逃逸分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90%E6%B5%8B%E8%AF%95"><span class="nav-number">4.2.1.</span> <span class="nav-text">逃逸分析测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A3%80%E9%AA%8C%E6%96%B9%E5%BC%8F"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">检验方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%83%E9%80%B8%E6%83%85%E5%86%B5%E5%88%86%E6%9E%90"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">逃逸情况分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%83%85%E5%86%B5%E4%B8%80"><span class="nav-number">4.2.1.2.1.</span> <span class="nav-text">情况一</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%83%85%E5%86%B5%E4%BA%8C"><span class="nav-number">4.2.1.2.2.</span> <span class="nav-text">情况二</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%83%85%E5%86%B5%E4%B8%89"><span class="nav-number">4.2.1.2.3.</span> <span class="nav-text">情况三</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%83%E9%80%B8%E5%88%86%E6%9E%90%E6%80%BB%E7%BB%93"><span class="nav-number">4.2.2.</span> <span class="nav-text">逃逸分析总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-%E6%A0%88%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86"><span class="nav-number">4.3.</span> <span class="nav-text">Go 栈内存空间管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%AE%B5%E6%A0%88"><span class="nav-number">4.3.1.</span> <span class="nav-text">分段栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9E%E7%BB%AD%E6%A0%88"><span class="nav-number">4.3.2.</span> <span class="nav-text">连续栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-%E6%A0%88%E7%9A%84%E7%AE%A1%E7%90%86%E6%93%8D%E4%BD%9C"><span class="nav-number">4.3.3.</span> <span class="nav-text">Go 栈的管理操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">4.3.3.1.</span> <span class="nav-text">栈初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E5%88%86%E9%85%8D"><span class="nav-number">4.3.3.2.</span> <span class="nav-text">栈分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E6%89%A9%E5%AE%B9"><span class="nav-number">4.3.3.3.</span> <span class="nav-text">栈扩容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E7%BC%A9%E5%AE%B9"><span class="nav-number">4.3.3.4.</span> <span class="nav-text">栈缩容</span></a></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
 
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content">
-            
+    <div class="main-inner post posts-expand">
 
-  <div class="posts-expand">
-      
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Go 内存管理与垃圾回收 | Silverming">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           Go 内存管理与垃圾回收
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-12-16 11:09:17" itemprop="dateCreated datePublished" datetime="2020-12-16T11:09:17+08:00">2020-12-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-27 12:14:35" itemprop="dateModified" datetime="2021-03-27T12:14:35+08:00">2021-03-27</time>
-              </span>
+      <time title="创建时间：2020-12-16 11:09:17" itemprop="dateCreated datePublished" datetime="2020-12-16T11:09:17+08:00">2020-12-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-09-10 23:09:39" itemprop="dateModified" datetime="2022-09-10T23:09:39+08:00">2022-09-10</time>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>34k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>31 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>35k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>32 分钟</span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -316,10 +322,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
-        <p>Go 语言抛弃了 C/C++ 中的开发者管理内存的方式：主动申请与主动释放，增加了<strong>逃逸分析</strong>和 <strong>GC</strong>，这样开发者就能从内存管理中释放出来，有更多的精力去关注软件设计，而不是底层的内存问题。这是 Go 语言成为高生产力语言的原因之一。</p>
-<a id="more"></a>
+        <p>Go 语言抛弃了 C&#x2F;C++ 中的开发者管理内存的方式：主动申请与主动释放，增加了<strong>逃逸分析</strong>和 <strong>GC</strong>，这样开发者就能从内存管理中释放出来，有更多的精力去关注软件设计，而不是底层的内存问题。这是 Go 语言成为高生产力语言的原因之一。</p>
+<span id="more"></span>
 
 <p>从非常宏观的角度讲，Go的内存管理是下图这个样子：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.webp" alt="Go内存管理"></p>
@@ -444,16 +448,17 @@
 <p>mheap 本身是一个全局变量，它其中的数据，也都是从 OS 直接申请来的内存，并不在 mheap 所管理的那部分内存内。</p>
 <h4 id="heapArena"><a href="#heapArena" class="headerlink" title="heapArena"></a>heapArena</h4><p>Go 采用了稀疏内存管理，堆区的所有内存可能为不连续的，go 将堆区内存视为一个个内存块，每一个内存块的大小为 64MB，并使用 <code>heapArena</code> 结构进行管理。也就是说，每一个 <code>heapArena</code> 会管理 64 MB 的内存空间。在 mheap 全局结构中维护 <code>heapArena</code> 的指针数组，大小为 4M，这使 go 能管理  256 TB 的内存。</p>
 <p> <code>heapArena</code> 结构中的成员变量如下：</p>
-<pre><code class="go">type heapArena struct {
+<pre><code class="go">type heapArena struct &#123;
     bitmap [heapArenaBitmapBytes]byte
     spans [pagesPerArena]*mspan
     pageInUse [pagesPerArena / 8]uint8
     pageMarks [pagesPerArena / 8]uint8
     zeroedBase uintptr
-}</code></pre>
+&#125;
+</code></pre>
 <ol>
 <li><strong>bitmap</strong> ：bitmap 区域标识 arena 区域哪些地址保存了对象，并且用 4bit 标志位表示对象是否包含指针、GC 标记信息。bitmap 中一个 byte 大小的内存对应 arena 区域中 4 个指针大小（指针大小为 8B ）的内存，也就是每 2 bit 管理一个 8Byte(x64 平台下的指针大小)的指针，<strong>低 4 位为这四个指针大小数据是否为指针，高 4 位为 gc 扫描时是否需要继续往后扫描，主要用于 GC</strong> </li>
-<li><strong>spans</strong>：mspan 数组，go 语言中会为每一页指定一个 mspan 结构用来管理（每页大小为 8KB），所以数组大小为 64MB /8KB=8192 （每一个 heapArena 管理 64 MB 内存）</li>
+<li><strong>spans</strong>：mspan 数组，go 语言中会为每一页指定一个 mspan 结构用来管理（每页大小为 8KB），所以数组大小为 64MB &#x2F;8KB&#x3D;8192 （每一个 heapArena 管理 64 MB 内存）</li>
 <li><strong>pageInUse，pageMarks</strong>：pages gc 使用的字段，<code>pageInUse</code> 表示相关的页的状态为 <code>mSpanInUse</code>(GC 负责垃圾回收，与之相对的是 goroutine 的栈内存，由栈管理)，<code>pages</code> 表示相关页是否存在有效对象(在 gc 扫描中被标记)，用来加速内存回收。</li>
 <li><strong>zeroedBase</strong>：用来加速第一次分配，一开始为0，标记该 arena 的第一页的第一个字节尚未使用过，随着内存的分配逐渐递增直到 <code>heapArenaBitmapBytes</code>，换句话说，它标记了该 arena 已经分配到了哪个位置。</li>
 </ol>
@@ -473,9 +478,9 @@
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%86%85%E5%AD%98%E5%A4%A7%E5%B0%8F%E6%98%A0%E5%B0%84%E5%85%B3%E7%B3%BB.jpg" alt="内存大小转换映射关系"></p>
 <p>在实现中，会根据前 3 列做 <code>size</code>、<code>size class</code> 和 <code>num of page</code> 之间的转换。</p>
 <p>另外，第4列 <code>num of objects</code> 代表是当前 <code>size class</code> 级别的 Span 可以保存多少对象数量，第 5 列 <code>tail waste</code> 是 <code>span%obj</code> 计算的结果，表示尾部会浪费多少字节的内存，因为 span 的大小并不一定是对象大小的整数倍。最后一列 max waste 代表最大浪费的内存百分比。</p>
-<p>以上图中的第四个跨度类为例，跨度类为 4 的 span class 中对象的大小上限为 48 字节、管理 1 个页、最多可以存储 170 个对象。因为内存需要按照页进行管理，所以在尾部会浪费 32 字节的内存，当页中存储的对象都是 33 字节时（满足存储在第 4 类的类大小的最低阈值），最多会浪费 31.52% 的资源：<br>$$<br>\frac{(48−33)∗170+32}{8192}=0.31518<br>$$<br><img src="https://qiniu.xiaoming.net.cn/%E8%B7%A8%E5%BA%A6%E7%B1%BB4%E6%9C%80%E5%A4%A7%E6%B5%AA%E8%B4%B9%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AD%98%E5%82%A8.png" alt="跨度类4最大浪费空间的存储"></p>
+<p>以上图中的第四个跨度类为例，跨度类为 4 的 span class 中对象的大小上限为 48 字节、管理 1 个页、最多可以存储 170 个对象。因为内存需要按照页进行管理，所以在尾部会浪费 32 字节的内存，当页中存储的对象都是 33 字节时（满足存储在第 4 类的类大小的最低阈值），最多会浪费 31.52% 的资源：<br>$$<br>\frac{(48−33)∗170+32}{8192}&#x3D;0.31518<br>$$<br><img src="https://qiniu.xiaoming.net.cn/%E8%B7%A8%E5%BA%A6%E7%B1%BB4%E6%9C%80%E5%A4%A7%E6%B5%AA%E8%B4%B9%E7%A9%BA%E9%97%B4%E7%9A%84%E5%AD%98%E5%82%A8.png" alt="跨度类4最大浪费空间的存储"></p>
 <p>此外，运行时中还包含 ID 为 0 的特殊跨度类，它能够管理大于 32KB 的特殊对象，用于分配大对象。</p>
-<p>在 Go 内存大小转换那幅图中已经标记各大小之间的转换，分别是数组：<code>class_to_size</code>，<code>size_to_class</code>和 <code>class_to_allocnpages</code>，这 3 个数组内容，就是跟上表的映射关系匹配的。比如 <code>class_to_size</code>，从上表看 class 1对应的保存对象大小为 8，所以 <code>class_to_size[1]=8</code>，span 大小为 8192 Byte，即 8KB，为 1 页，所以 <code>class_to_allocnpages[1]=1</code>。</p>
+<p>在 Go 内存大小转换那幅图中已经标记各大小之间的转换，分别是数组：<code>class_to_size</code>，<code>size_to_class </code>和 <code>class_to_allocnpages</code>，这 3 个数组内容，就是跟上表的映射关系匹配的。比如 <code>class_to_size</code>，从上表看 class 1对应的保存对象大小为 8，所以 <code>class_to_size[1]=8</code>，span 大小为 8192 Byte，即 8KB，为 1 页，所以 <code>class_to_allocnpages[1]=1</code>。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%20class%E8%BD%AC%E6%8D%A2%E6%98%A0%E5%B0%84%E6%95%B0%E7%BB%84.jpg" alt="转换数组"></p>
 <h5 id="为何不使用函数计算各种转换，而是写成数组？"><a href="#为何不使用函数计算各种转换，而是写成数组？" class="headerlink" title="为何不使用函数计算各种转换，而是写成数组？"></a>为何不使用函数计算各种转换，而是写成数组？</h5><p>有1个很重要的原因：<strong>空间换时间</strong>。上表中的转换，并不能通过简单的公式进行转换，比如 size 和 size class 的关系，并不是正比的。这些数据是使用较复杂的公式计算出来的，公式在 <code>makesizeclass.go</code> 中，这其中存在指数运算与 for 循环，造成每次大小转换的时间复杂度为 <code>O(N*2^N)</code>。另外，对一个程序而言，内存的申请和管理操作是很多的，如果不能快速完成，就是非常的低效。把以上大小转换写死到数组里，做到了把大小转换的时间复杂度直接降到 <code>O(1)</code>。</p>
 <h3 id="Go-内存分配具体过程"><a href="#Go-内存分配具体过程" class="headerlink" title="Go 内存分配具体过程"></a>Go 内存分配具体过程</h3><p>Go 中的内存分类并不像 TCMalloc 那样分成小、中、大对象，而是分为微对象、小对象和大对象。</p>
@@ -501,11 +506,12 @@
 </tbody></table>
 <p>整体来说，微对象和小对象是在 mcache 中分配的，而大对象是直接从 mheap 分配。</p>
 <h4 id="微对象的分配"><a href="#微对象的分配" class="headerlink" title="微对象的分配"></a>微对象的分配</h4><p>微对象是在 mcache 中的微分配器分配的。在线程缓存 mcache 中还包含几个用于分配微对象的字段，这几个字段组成了微对象分配器，专门为 16 字节以下的对象申请和管理内存：</p>
-<pre><code class="go">type mcache struct {
+<pre><code class="go">type mcache struct &#123;
     tiny             uintptr
     tinyoffset       uintptr
     local_tinyallocs uintptr
-}</code></pre>
+&#125;
+</code></pre>
 <p><strong>微分配器只会用于分配非指针类型的内存</strong>，上面三个字段中 <code>tiny</code> 会指向堆中的一片内存，<code>tinyOffset</code> 是下一个空闲内存所在的偏移量，最后的 <code>local_tinyallocs</code> 会记录内存分配器中分配的对象个数。</p>
 <p>微对象的分配会使用线程缓存上的微分配器提高微对象分配的性能，主要使用它来分配较小的字符串以及逃逸的临时变量。微分配器可以将多个较小的内存分配请求合入同一个内存块中，只有当内存块中的所有对象都需要被回收时，整片内存才可能被回收。</p>
 <p>微分配器管理的对象不可以是指针类型，管理多个对象的内存块大小可以通过变量 <code>maxTinySize</code> 调整，在默认情况下，内存块的大小为 16 字节。<code>maxTinySize</code> 的值越大，组合多个对象的可能性就越高，内存浪费也就越严重；<code>maxTinySize</code> 越小，内存浪费就会越少，不过无论如何调整，8 的倍数都是一个很好的选择。</p>
@@ -515,8 +521,9 @@
 <p>重新看一下 Go 内存管理的原理图：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Go%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8E%9F%E7%90%86%E5%9B%BE.jpeg" alt="Go内存管理原理图"></p>
 <p>每一个线程缓存都持有 67 * 2 个 <code>mspan</code>，也就是上文提到 1 个 size class 对应 2 个span class：</p>
-<pre><code class="go">numSpanClasses = _NumSizeClasses * 2</code></pre>
-<p><code>numSpanClasses</code> 为 span class 的数量，也就是 134 个，所以 span class 的下标是从 0 到 133，所以图中 mcache 标注了的 span class 是<code>span class 0</code>到 <code>span class 133</code>。每 1 个 span class 都指向 1 个 span，也就是 mcache 最多有134个span。</p>
+<pre><code class="go">numSpanClasses = _NumSizeClasses * 2
+</code></pre>
+<p><code>numSpanClasses</code> 为 span class 的数量，也就是 134 个，所以 span class 的下标是从 0 到 133，所以图中 mcache 标注了的 span class 是<code>span class 0 </code>到 <code>span class 133</code>。每 1 个 span class 都指向 1 个 span，也就是 mcache 最多有134个span。</p>
 <h5 id="为对象寻找-span"><a href="#为对象寻找-span" class="headerlink" title="为对象寻找 span"></a>为对象寻找 span</h5><p>为对象寻找 span 的流程如下：</p>
 <ol>
 <li>计算对象所需内存大小 size</li>
@@ -530,15 +537,18 @@
 //     1          8        8192     1024           0     87.50%
 //     2         16        8192      512           0     43.75%
 //     3         32        8192      256           0     46.88%
-//     4         48        8192      170          32     31.52%</code></pre>
+//     4         48        8192      170          32     31.52%
+</code></pre>
 <p>size class 3，它的对象大小范围是 <code>(16,32]Byte</code>，24 Byte 刚好在此区间，所以此对象的 size class 为 3。</p>
 <p>Size class 到 span class 的计算如下：</p>
 <pre><code class="go">1// noscan 为 true 代表对象不包含指针
-2func makeSpanClass(sizeclass uint8, noscan bool) spanClass {
+2func makeSpanClass(sizeclass uint8, noscan bool) spanClass &#123;
 3    return spanClass(sizeclass&lt;&lt;1) | spanClass(bool2int(noscan))
-4}</code></pre>
+4&#125;
+</code></pre>
 <p>所以，对应的 span class 为：</p>
-<pre><code class="go">span class = 3 &lt;&lt; 1 | 1 = 7</code></pre>
+<pre><code class="go">span class = 3 &lt;&lt; 1 | 1 = 7
+</code></pre>
 <p>所以该对象需要的是 span class 7 指向的 span。</p>
 <h5 id="从-span-分配对象空间"><a href="#从-span-分配对象空间" class="headerlink" title="从 span 分配对象空间"></a>从 span 分配对象空间</h5><p>Span 可以按对象大小切成很多份，这些都可以从映射表上计算出来，以 size class 3 对应的 span 为例，span 大小是 8KB，每个对象实际所占空间为 32Byte，这个 span 就被分成了256块，可以根据 span 的起始地址计算出每个对象块的内存地址。</p>
 <p>随着内存的分配，span中的对象内存块，有些被占用，有些未被占用，比如下图，整体代表 1 个 span，蓝色块代表已被占用内存，绿色块代表未被占用内存。</p>
@@ -621,7 +631,8 @@
 <p>Dijkstra 在 1978 年提出了插入写屏障，通过如下所示的写屏障，其思想是<strong>对于插入到黑色对象中的白色指针，无论其在未来是否会被赋值器删除，该屏障都会将其标记为可达（着色）</strong>。用户程序和垃圾收集器可以在交替工作的情况下保证程序执行的正确性，下面是插入写屏障的伪代码：</p>
 <pre><code class="pseudocode">writePointer(slot, ptr):
     shade(ptr)
-    *slot = ptr</code></pre>
+    *slot = ptr
+</code></pre>
 <p>每当执行类似 <code>*slot = ptr</code> 的表达式时，会先执行上面写屏障通过 <code>shade</code> 函数尝试改变指针的颜色，如果 <code>ptr</code> 指针是白色的，那么该函数会将该对象设置成灰色，也就是将指针指向的目的节点标记成灰色，其他情况则保持不变。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E6%8F%92%E5%85%A5%E5%86%99%E5%B1%8F%E9%9A%9C.png" alt="插入写屏障"></p>
 <p>假设在应用程序中使用 Dijkstra 提出的插入写屏障，在一个垃圾收集器和用户程序交替运行的场景中会出现如上图所示的标记过程：</p>
@@ -640,7 +651,8 @@
 <p>该算法会使用如下所示的写屏障保证增量或者并发执行垃圾收集时程序的正确性：</p>
 <pre><code class="pseudocode">writePointer(slot, ptr)
     shade(*slot)
-    *slot = ptr</code></pre>
+    *slot = ptr
+</code></pre>
 <p><code>shade(*slot)</code> 会先将 <code>*slot</code> 标记为灰色， 进而该写操作总是创造了一条灰色到灰色或者灰色到白色对象的路径，从而满足弱三色不变性。</p>
 <p>假设在应用程序中使用 Yuasa 提出的删除写屏障，还是用上面的例子：</p>
 <blockquote>
@@ -649,7 +661,7 @@
 <p>那么在一个垃圾收集器和用户程序交替运行的场景中会出现如下图所示的标记过程：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%88%A0%E9%99%A4%E5%86%99%E5%B1%8F%E9%9A%9C.png" alt="删除写屏障"></p>
 <ol>
-<li>在上面删除 <code>ref1</code> 时，通过使用删除写屏障 <code>YuasaWritePointer(C.ref1,nil)</code> ，将节点 C 标灰</li>
+<li>在上面删除 <code>ref2</code> 时，通过使用删除写屏障 <code>YuasaWritePointer(C.ref1,nil)</code> ，将节点 C 标灰</li>
 <li>然后在增加 <code>ref3</code> 时，直接指向 B 即可</li>
 <li>在整个过程中，由于 C 的颜色改变，导致 C 会被扫描两遍，第一遍是初始时标黑，第二遍是由于置灰后重新标黑，所以会有冗余的情况。</li>
 </ol>
@@ -660,7 +672,8 @@
     shade(*slot)
     if current stack is grey:
         shade(ptr)
-    *slot = ptr</code></pre>
+    *slot = ptr
+</code></pre>
 <p>为了移除栈的重扫描过程，除了引入混合写屏障之外，在垃圾收集的标记阶段，还需要<strong>将创建的所有新对象都标记成黑色</strong>，防止新分配的栈内存和堆内存中的对象被错误地回收，因为栈内存在标记阶段最终都会变为黑色，所以不再需要重新扫描栈空间。</p>
 <h2 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h2><h3 id="垃圾收集器的类型"><a href="#垃圾收集器的类型" class="headerlink" title="垃圾收集器的类型"></a>垃圾收集器的类型</h3><p>传统的垃圾收集算法会在垃圾收集的执行期间暂停应用程序，一旦触发垃圾收集，垃圾收集器就会抢占 CPU 的使用权占据大量的计算资源以完成标记和清除工作，然而很多追求实时的应用程序无法接受长时间的 STW。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/stw%E6%94%B6%E9%9B%86%E5%99%A8.png" alt="STW收集器"></p>
@@ -716,43 +729,47 @@
 <p><strong>Go 程序是怎么把内存释放给操作系统的？</strong></p>
 <p>释放内存的函数是 <code>sysUnused</code>，它会被 <code>mspan.scavenge()</code> 调用：</p>
 <pre><code class="go">// MAC下的实现
-func sysUnused(v unsafe.Pointer, n uintptr) {
+func sysUnused(v unsafe.Pointer, n uintptr) &#123;
     // MADV_FREE_REUSABLE is like MADV_FREE except it also propagates
     // accounting information about the process to task_info.
     madvise(v, n, _MADV_FREE_REUSABLE)
-}</code></pre>
+&#125;
+</code></pre>
 <p>注释说 <code>_MADV_FREE_REUSABLE</code> 与 <code>MADV_FREE</code> 的功能类似，它的功能是给内核提供一个建议：<strong>这个内存地址区间的内存已经不再使用，可以回收。但内核是否回收，以及什么时候回收，这就是内核的事情了</strong>。如果内核真把这片内存回收了，当 Go 程序再使用这个地址时，内核会重新进行虚拟地址到物理地址的映射。所以在内存充足的情况下，内核也没有必要立刻回收内存。</p>
 <p>从上面的流程可以知道，垃圾回收过程使用 <code>_GCoff</code>、<code>_GCmark</code> 和 <code>_GCmarktermination</code> 三个状态表示垃圾收集的全部阶段，一次完整的垃圾回收会分为四个阶段，分别是标记准备、标记、结束标记以及清理。在标记准备和标记结束阶段会需要 STW，标记阶段会减少程序的性能，而清理阶段是不会对程序有影响的。</p>
 <h3 id="GOGC-对性能的影响"><a href="#GOGC-对性能的影响" class="headerlink" title="GOGC 对性能的影响"></a>GOGC 对性能的影响</h3><p>前面提到了 go 只提供了 <code>GOGC</code> 这个参数进行垃圾回收调优， 默认值是 100。表示当内存的增加值小于等于上次垃圾回收 100% 时会强制进行一次垃圾回收。可以通过环境变量将这个值修改成 200，表示当内存增加 200% 时强制进行垃圾回收，或者将这个值设置<strong>为负数表示不进行垃圾回收</strong>。下面的例子演示了不同的 <code>GOGC</code> 对性能的影响：</p>
 <p>假设有如下分配内存的函数：</p>
-<pre><code class="go">func DoAllocate(nKB int, wg *sync.WaitGroup) {
+<pre><code class="go">func DoAllocate(nKB int, wg *sync.WaitGroup) &#123;
     var slice []byte
-    for i := 0; i &lt; nKB; i++ {
+    for i := 0; i &lt; nKB; i++ &#123;
         t := make([]byte, 1024) // 1KB
         slice = append(slice, t...)
-    }
+    &#125;
     wg.Done()
-}</code></pre>
+&#125;
+</code></pre>
 <p>在 <code>main</code> 函数中执行多个 groutine 进行内存分配调用，这里内存一直增长就会达到触发 GC 的阈值：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     t0 := time.Now()
     n := 10
     wg := new(sync.WaitGroup)
     wg.Add(n)
-    for i := 0; i &lt; n; i++ {
+    for i := 0; i &lt; n; i++ &#123;
         // 程序运行时最多分配 50MB-100MB 内存, 防止影响宿主机
         go DoAllocate(50*1024, wg)
-    }
+    &#125;
     wg.Wait()
     println(&quot;time used&quot;, time.Since(t0).Milliseconds(), &quot;ms&quot;)
-}</code></pre>
+&#125;
+</code></pre>
 <p>通过下面的脚本 <code>run.sh</code> 在不同的 <code>GOGC</code> 下运行：</p>
 <pre><code class="shell">data=( -1 10 50 100 200 400 800 1600 3200)
-for i in ${data[@]} ; do
+for i in $&#123;data[@]&#125; ; do
 echo &quot;==== start&quot;, GOGC=$i &quot;====&quot;
 GOGC=$i go run main.go
 echo
-done</code></pre>
+done
+</code></pre>
 <p>可以看到运行结果：</p>
 <pre><code class="shell">==== start, GOGC=-1 ====
 time used 1602 ms
@@ -779,31 +796,33 @@ time used 530 ms
 time used 619 ms
 
 ==== start, GOGC=3200 ====
-time used 547 ms</code></pre>
+time used 547 ms
+</code></pre>
 <p>可以看到最快是 470 ms，最慢是 1602 ms，最快和最慢的速度几乎相差了 4 倍，一个简单的修改就可以造成性能巨大的改变。</p>
 <h2 id="go-垃圾回收的时机"><a href="#go-垃圾回收的时机" class="headerlink" title="go 垃圾回收的时机"></a>go 垃圾回收的时机</h2><h3 id="自动触发"><a href="#自动触发" class="headerlink" title="自动触发"></a>自动触发</h3><p>运行时会在应用程序启动时在后台开启一个用于强制触发垃圾收集的 Goroutine，该 Goroutine 的职责非常简单：调用 <code>runtime.gcStart</code> 方法尝试启动新一轮的垃圾收集，其实现如下：</p>
-<pre><code class="go">func init() {
+<pre><code class="go">func init() &#123;
     go forcegchelper()
-}
+&#125;
 
-func forcegchelper() {
+func forcegchelper() &#123;
     forcegc.g = getg()
-    for {
+    for &#123;
         lock(&amp;forcegc.lock)
-        if forcegc.idle != 0 {
+        if forcegc.idle != 0 &#123;
             throw(&quot;forcegc: phase error&quot;)
-        }
+        &#125;
         atomic.Store(&amp;forcegc.idle, 1)
         // 主动陷入休眠
         goparkunlock(&amp;forcegc.lock, waitReasonForceGGIdle, traceEvGoBlock, 1)
         // this goroutine is explicitly resumed by sysmon
-        if debug.gctrace &gt; 0 {
+        if debug.gctrace &gt; 0 &#123;
             println(&quot;GC forced&quot;)
-        }
+        &#125;
         // 尝试启动新一轮的垃圾收集
-        gcStart(gcTrigger{kind: gcTriggerTime, now: nanotime()})
-    }
-}</code></pre>
+        gcStart(gcTrigger&#123;kind: gcTriggerTime, now: nanotime()&#125;)
+    &#125;
+&#125;
+</code></pre>
 <p>为了减少对计算资源的占用，该 Goroutine 会在循环中调用 <code>runtime.goparkunlock</code> 主动陷入休眠等待其他 Goroutine 的唤醒，所以 <code>runtime.forcegchelper</code> 在大多数时间都是陷入休眠的，但是它会被系统监控器 <code>runtime.sysmon</code> 在满足垃圾收集条件时唤醒。</p>
 <p>自动垃圾回收的自动触发条件有两个：</p>
 <ol>
@@ -859,10 +878,11 @@ func forcegchelper() {
 <li>需要分配到堆上的对象分配到了栈上，造成悬挂指针、影响内存安全；</li>
 </ol>
 <p>与悬挂指针相比，浪费的内存空间反而是小问题。在 C 语言中，栈上的变量被函数作为返回值返回给调用方是一个常见的错误，在如下所示的代码中，栈上的变量 <code>i</code> 被错误地返回：</p>
-<pre><code class="c">int *dangling_pointer() {
+<pre><code class="c">int *dangling_pointer() &#123;
     int i = 2;
     return &amp;i;
-}</code></pre>
+&#125;
+</code></pre>
 <p>当 <code>dangling_pointer</code> 函数返回后，它的本地变量就会被编译器直接回收，调用方获取的是危险的悬挂指针，这种情况下开发者无法确认当前指针指向的值是否合法，这种问题在大型项目中是比较难以发现和定位的。</p>
 <p>在编译器优化中，逃逸分析（Escape analysis）是用来决定指针动态作用域的方法。它同编译器优化原理的指针分析和外形分析相关联。当变量（或者对象）在方法中分配后，其指针有可能被返回或者被全局引用，这样就会被其他过程或者线程所引用，这种现象称作指针（或者引用）的逃逸(Escape)。</p>
 <p>像在 Java 中，在编译期间，如果 JIT 经过逃逸分析，发现有些对象没有逃逸出方法，那么有可能堆内存分配会被优化为栈内存分配。但这并不是绝对的。</p>
@@ -885,7 +905,8 @@ func forcegchelper() {
 <pre><code class="shell">➜ go run -gcflags &quot;-m -l&quot; internal/test1/main.go
 # command-line-arguments
 internal/test1/main.go:4:2: moved to heap: a
-internal/test1/main.go:5:11: main make([]*int, 1) does not escape</code></pre>
+internal/test1/main.go:5:11: main make([]*int, 1) does not escape
+</code></pre>
 <p>关于 <code>-gcflags &quot;-m -l&quot;</code> 的输出，有两种情况：</p>
 <ul>
 <li><code>moved to heap:xxx</code>：当 <code>xxx</code> 变量为值类型时，对其取地址操作导致的逃逸会是这种格式</li>
@@ -895,11 +916,12 @@ internal/test1/main.go:5:11: main make([]*int, 1) does not escape</code></pre>
 <blockquote>
 <p><strong>在某个函数中 new 或字面量创建出的变量，将其指针作为函数返回值，则该变量一定发生逃逸。</strong></p>
 </blockquote>
-<p>这是 golang 基础教程中经常举的，用于区别 c/c++ 例子：</p>
-<pre><code class="text">func test() *User{
-    a := User{}
+<p>这是 golang 基础教程中经常举的，用于区别 c&#x2F;c++ 例子：</p>
+<pre><code class="text">func test() *User&#123;
+    a := User&#123;&#125;
     return &amp;a
-}</code></pre>
+&#125;
+</code></pre>
 <p>这种情况较为基础。</p>
 <h5 id="情况二"><a href="#情况二" class="headerlink" title="情况二"></a>情况二</h5><p>验证当某个值取指针传给另一个函数，该值是否发生逃逸：</p>
 <p><strong>example 1</strong>：</p>
@@ -907,129 +929,138 @@ internal/test1/main.go:5:11: main make([]*int, 1) does not escape</code></pre>
 
 import &quot;fmt&quot;
 
-type User struct {
+type User struct &#123;
     Username string
     Password string
     Age      int
-}
+&#125;
 
-func main() {
+func main() &#123;
     a := &quot;aaa&quot;
-    u := &amp;User{a, &quot;123&quot;, 12}
+    u := &amp;User&#123;a, &quot;123&quot;, 12&#125;
     Call1(u)
-}
+&#125;
 
-func Call1(u *User) {
+func Call1(u *User) &#123;
     fmt.Printf(&quot;%v&quot;, u)
-}</code></pre>
+&#125;
+</code></pre>
 <p>看一下逃逸情况：</p>
 <pre><code class="shell">go run -gcflags &quot;-m -l&quot; demo/escape_analysis.go
 # command-line-arguments
 demo/escape_analysis.go:17:12: leaking param: u
 demo/escape_analysis.go:18:12: ... argument does not escape
 demo/escape_analysis.go:13:7: &amp;User literal escapes to heap
-&amp;{aaa 123 12}%                       </code></pre>
+&amp;&#123;aaa 123 12&#125;%                       
+</code></pre>
 <p>这里变量 <code>u</code> 发生了逃逸，这里将指针传给一个函数 <code>Call1</code>并打印。</p>
 <p>如果不打印，只对 <code>u</code>进行读写呢？修改一下 <code>Call1</code></p>
 <p><strong>example 2</strong>：</p>
 <pre><code class="go">package main
 
-type User struct {
+type User struct &#123;
     Username string
     Password string
     Age      int
-}
+&#125;
 
-func main() {
+func main() &#123;
     a := &quot;aaa&quot;
-    u := &amp;User{a, &quot;123&quot;, 12}
+    u := &amp;User&#123;a, &quot;123&quot;, 12&#125;
     Call1(u)
-}
+&#125;
 
-func Call1(u *User) int {
+func Call1(u *User) int &#123;
 
     u.Username = &quot;bbb&quot;
     return u.Age * 20
-}</code></pre>
+&#125;
+</code></pre>
 <p>结果：</p>
 <pre><code class="shell">go run -gcflags &quot;-m -l&quot; demo/escape_analysis.go
 # command-line-arguments
 demo/escape_analysis.go:15:12: u does not escape
-demo/escape_analysis.go:11:7: &amp;User literal does not escape</code></pre>
+demo/escape_analysis.go:11:7: &amp;User literal does not escape
+</code></pre>
 <p>这里变量 <code>u</code> 没有逃逸，变量为什么 example1 发生了逃逸呢？再将 <code>Call1</code> 多传几次，但还是只对 <code>u</code> 进行读写：</p>
 <p><strong>example 3</strong>：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     a := &quot;aaa&quot;
-    u := &amp;User{a, &quot;123&quot;, 12}
+    u := &amp;User&#123;a, &quot;123&quot;, 12&#125;
     Call1(u)
-}
+&#125;
 
-func Call1(u *User) int {
+func Call1(u *User) int &#123;
     return Call2(u)
-}
+&#125;
 
-func Call2(u *User) int {
+func Call2(u *User) int &#123;
     return Call3(u)
-}
+&#125;
 
-func Call3(u *User) int {
+func Call3(u *User) int &#123;
     u.Username = &quot;bbb&quot;
     return u.Age * 20
-}</code></pre>
+&#125;
+</code></pre>
 <p>结果：</p>
 <pre><code class="shell">go run -gcflags &quot;-m -l&quot; demo/escape_analysis.go
 # command-line-arguments
 demo/escape_analysis.go:23:12: u does not escape
 demo/escape_analysis.go:19:12: u does not escape
 demo/escape_analysis.go:15:12: u does not escape
-demo/escape_analysis.go:11:7: &amp;User literal does not escape</code></pre>
+demo/escape_analysis.go:11:7: &amp;User literal does not escape
+</code></pre>
 <p>可以看到，依然没有发生逃逸。</p>
 <p>那究竟为什么 <strong>example1</strong> 会逃逸呢？</p>
 <p>其原因在于，在 <code>fmt.Printf</code> 的源码中，会将传入的 u 被赋值给了 pp 指针的一个成员变量：</p>
 <pre><code class="go">// format 即为传入的变量 u
-func Fprintf(w io.Writer, format string, a ...interface{}) (n int, err error) {
+func Fprintf(w io.Writer, format string, a ...interface&#123;&#125;) (n int, err error) &#123;
     p := newPrinter()
     p.doPrintf(format, a)
     n, err = w.Write(p.buf)
     p.free()
     return
-}
+&#125;
 
 // 这里按照情况 1 会发生逃逸
-func newPrinter() *pp {
+func newPrinter() *pp &#123;
     p := ppFree.Get().(*pp)
     p.panicking = false
     p.erroring = false
     p.wrapErrs = false
     p.fmt.init(&amp;p.buf)
     return p
-}
+&#125;
 
-func (p *pp) doPrintf(format string, a []interface{}) {
+func (p *pp) doPrintf(format string, a []interface&#123;&#125;) &#123;
     //...
     p.printArg(a[argNum], rune(c))
     //...
-}
+&#125;
 
-func (p *pp) printArg(arg interface{}, verb rune) {
+func (p *pp) printArg(arg interface&#123;&#125;, verb rune) &#123;
     p.arg = arg
-    p.value = reflect.Value{}
+    p.value = reflect.Value&#123;&#125;
     //...
-}</code></pre>
+&#125;
+</code></pre>
 <p>而这个 pp 类型的指针 p 是由构造函数 newPrinter 返回的，根据情况1，p一定发生逃逸，而 p 引用了传入指针，由此我们可以总结：<strong>被已经逃逸的变量引用的指针，一定发生逃逸。</strong></p>
 <h5 id="情况三"><a href="#情况三" class="headerlink" title="情况三"></a>情况三</h5><p>再看下面的例子：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     a := make([]*int,1)
     b := 12
     a[0] = &amp;b
-}</code></pre>
+&#125;
+</code></pre>
 <p>结果：</p>
 <pre><code class="shell">go run -gcflags &quot;-m -l&quot; demo/escape_analysis.go
 # command-line-arguments
 demo/escape_analysis.go:5:2: moved to heap: b
-demo/escape_analysis.go:4:11: make([]*int, 1) does not escape</code></pre>
+demo/escape_analysis.go:4:11: make([]*int, 1) does not escape
+</code></pre>
 <p><code>sliace a</code> 并没有发生逃逸，但是被 <code>a</code> 引用的 <code>b</code> 依然逃逸了。类似的情况同样发生在 <code>map</code> 和 <code>chan</code> 中：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     a := make([]*int,1)
     b := 12
     a[0] = &amp;b
@@ -1041,7 +1072,8 @@ demo/escape_analysis.go:4:11: make([]*int, 1) does not escape</code></pre>
     e := make(chan *int,1)
     f := 15
     e &lt;- &amp;f
-}</code></pre>
+&#125;
+</code></pre>
 <p>结果：</p>
 <pre><code class="shell">go run -gcflags &quot;-m -l&quot; demo/escape_analysis.go
 # command-line-arguments
@@ -1080,7 +1112,7 @@ demo/escape_analysis.go:8:11: make(map[string]*int) does not escape
 </ul>
 <h3 id="分段栈"><a href="#分段栈" class="headerlink" title="分段栈"></a>分段栈</h3><p>分段栈是 Go 语言在 v1.3 版本之前的实现，所有 Goroutine 在初始化时都会分配一块固定大小的内存空间，这块内存的大小在 v1.2 版本中为 8KB。</p>
 <p>如果申请的内存大小为固定的 8KB 或者满足其他的条件，运行时会在全局的栈缓存链表中找到空闲的内存块并作为新 Goroutine 的栈空间返回；在其余情况下，栈内存空间会从堆上申请一块合适的内存。</p>
-<p>当 Goroutine 调用的函数层级或者局部变量需要的越来越多时，运行时会调用 <code>runtime.morestack</code>和 <code>runtime.newstack</code> 创建一个新的栈空间，这些栈空间虽然不连续，但是当前 Goroutine 的多个栈空间会以链表的形式串联起来，运行时会通过指针找到连续的栈片段：</p>
+<p>当 Goroutine 调用的函数层级或者局部变量需要的越来越多时，运行时会调用 <code>runtime.morestack </code>和 <code>runtime.newstack</code> 创建一个新的栈空间，这些栈空间虽然不连续，但是当前 Goroutine 的多个栈空间会以链表的形式串联起来，运行时会通过指针找到连续的栈片段：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%88%86%E6%AE%B5%E6%A0%88%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80.png" alt="分段栈的内存布局"></p>
 <p>一旦 Goroutine 申请的栈空间不在被需要，运行时会调用 <code>runtime.lessstack</code> 和 <code>runtime.oldstack</code> 释放不再使用的内存空间。</p>
 <p>分段栈机制虽然能够按需为当前 Goroutine 分配内存并且及时减少内存的占用，但是它也存在两个比较大的问题：</p>
@@ -1102,67 +1134,71 @@ demo/escape_analysis.go:8:11: make(map[string]*int) does not escape
 <p>下面的例子就验证了栈扩容后同一变量的内存地址也会发生变化，在下面的例子中，由于变量没有逃逸出去，始终分配在栈内存上，所以一直增大最终会导致栈内存的扩容：</p>
 <pre><code class="go">package main
 
-func main() {
+func main() &#123;
     var x [10]int
     println(&amp;x)
     a(x)
     println(&amp;x)
-}
+&#125;
 
-func a(x [10]int) {
+func a(x [10]int) &#123;
     println(`func a`)
     var y [100]int
     b(y)
-}
+&#125;
 
-func b(x [100]int) {
+func b(x [100]int) &#123;
     println(`func b`)
     var y [1000]int
     c(y)
-}
+&#125;
 
-func c(x [1000]int) {
+func c(x [1000]int) &#123;
     println(`func c`)
-}</code></pre>
+&#125;
+</code></pre>
 <p>程序的输出可以看到在栈扩容前后，变量 <code>x</code> 的内存地址的变化：</p>
 <pre><code class="shell">0xc00002e728
 func a
 func b
 func c
-0xc0000adf28</code></pre>
+0xc0000adf28
+</code></pre>
 <p>因为需要拷贝变量和调整指针，连续栈增加了栈扩容时的额外开销，但是通过合理<strong>栈缩容机制</strong>就能避免热分裂带来的性能问题，在 GC 期间如果 Goroutine 使用了栈内存的四分之一，那就将其内存减少一半，这样在栈内存几乎充满时也只会扩容一次，不会因为函数调用频繁扩缩容。</p>
 <h3 id="Go-栈的管理操作"><a href="#Go-栈的管理操作" class="headerlink" title="Go 栈的管理操作"></a>Go 栈的管理操作</h3><h4 id="栈初始化"><a href="#栈初始化" class="headerlink" title="栈初始化"></a>栈初始化</h4><p>栈空间在运行时中包含两个重要的全局变量，分别是 <code>runtime.stackpool</code> 和 <code>runtime.stackLarge</code>，这两个变量分别表示<strong>全局的栈缓存</strong>和<strong>大栈缓存</strong>，前者可以分配小于 32KB 的内存，后者用来分配大于 32KB 的栈空间：</p>
 <pre><code class="go">// 全局栈缓存
-var stackpool [_NumStackOrders]struct {
+var stackpool [_NumStackOrders]struct &#123;
     item stackpoolItem
-    _    [cpu.CacheLinePadSize - unsafe.Sizeof(stackpoolItem{})%cpu.CacheLinePadSize]byte
-}
+    _    [cpu.CacheLinePadSize - unsafe.Sizeof(stackpoolItem&#123;&#125;)%cpu.CacheLinePadSize]byte
+&#125;
 
 //go:notinheap
-type stackpoolItem struct {
+type stackpoolItem struct &#123;
     mu   mutex
     span mSpanList
-}
+&#125;
 
 // 大栈缓存
-var stackLarge struct {
+var stackLarge struct &#123;
     lock mutex
     free [heapAddrBits - pageShift]mSpanList // free lists by log_2(s.npages)
-}</code></pre>
+&#125;
+</code></pre>
 <p>这两个用于分配空间的全局变量都与内存管理单元 <code>runtime.mspan</code> 有关，可以认为 Go 语言的栈内存都是分配在堆上的，运行时初始化时通过调用的 <code>runtime.stackinit</code> 函数会在初始化这些全局变量：</p>
-<pre><code class="go">func stackinit() {
-    if _StackCacheSize&amp;_PageMask != 0 {
+<pre><code class="go">func stackinit() &#123;
+    if _StackCacheSize&amp;_PageMask != 0 &#123;
         throw(&quot;cache size must be a multiple of page size&quot;)
-    }
-    for i := range stackpool {
+    &#125;
+    for i := range stackpool &#123;
     // 初始化全局栈缓存中的 mSpanList
         stackpool[i].item.span.init()
-    }
-    for i := range stackLarge.free {
+    &#125;
+    for i := range stackLarge.free &#123;
     // 初始化大栈缓存中的 mSpanList
         stackLarge.free[i].init()
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>另外，从调度器和内存分配的角度来看，如果运行时只使用全局变量来分配内存的话，势必会造成线程之间的锁竞争进而影响程序的执行效率，栈内存由于与线程关系比较密切，所以在<strong>每一个线程缓存 <code>runtime.mcache</code> 中都加入了栈缓存减少锁竞争影响</strong>。</p>
 <pre><code class="go">//   linux/darwin/bsd | 2KB        | 4
 //   windows/32       | 4KB        | 3
@@ -1170,17 +1206,18 @@ var stackLarge struct {
 //   plan9            | 4KB        | 3
 _NumStackOrders = 4 - sys.PtrSize/4*sys.GoosWindows - 1*sys.GoosPlan9
 
-type mcache struct {
+type mcache struct &#123;
     stackcache [_NumStackOrders]stackfreelist
-}
+&#125;
 
-type stackfreelist struct {
+type stackfreelist struct &#123;
     list gclinkptr
     size uintptr
-}</code></pre>
+&#125;
+</code></pre>
 <p>所以全局缓存池的结构如下，一个全局缓存池下会有 <code>_NumStackOrders</code> 个栈缓存。栈内容的申请也是跟前面 go 内存管理中的一样，先去当前线程的对应尺寸的 <code>mcache</code> 里去申请，不够的时候 <code>mache</code> 会从全局的 <code>mcental</code> 里取内存。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%85%A8%E5%B1%80%E7%BC%93%E5%AD%98%E6%B1%A0%E7%9A%84%E7%BB%93%E6%9E%84.png" alt="全局缓存池的结构"></p>
-<p>综上，运行时使用全局的 <code>runtime.stackpool</code>和线程缓存中的空闲链表分配 32KB 以下的栈内存，使用全局的 <code>runtime.stackLarge</code> 和堆内存分配 32KB 以上的栈内存，提高本地分配栈内存的性能。</p>
+<p>综上，运行时使用全局的 <code>runtime.stackpool </code>和线程缓存中的空闲链表分配 32KB 以下的栈内存，使用全局的 <code>runtime.stackLarge</code> 和堆内存分配 32KB 以上的栈内存，提高本地分配栈内存的性能。</p>
 <h4 id="栈分配"><a href="#栈分配" class="headerlink" title="栈分配"></a>栈分配</h4><p>运行时会在 Goroutine 的初始化函数分配一个大小足够栈内存空间，根据线程缓存和申请栈的大小，会通过三种不同的方法分配栈空间：</p>
 <ol>
 <li>如果栈空间较小，使用全局栈缓存或者线程缓存上固定大小的空闲链表分配内存；</li>
@@ -1197,27 +1234,27 @@ type stackfreelist struct {
 </ol>
 <p>如果当前 Goroutine 不需要被抢占，也就意味着需要新的栈空间来支持函数调用和本地变量的初始化，运行时会先检查目标大小的栈是否会溢出。如果目标栈的大小没有超出程序的限制，我们会将 Goroutine 切换至 <code>_Gcopystack</code> 状态并开始栈的拷贝，在拷贝栈的内存之前，运行时会分配新的栈空间。</p>
 <p>新栈的初始化和数据的复制是一个比较简单的过程，需要注意这里还需要将指向源栈中内存指向新的栈。</p>
-<h4 id="栈缩容"><a href="#栈缩容" class="headerlink" title="栈缩容"></a>栈缩容</h4><p>如果要触发栈的缩容，新栈的大小会是原始栈的一半，不过如果新栈的大小低于程序的最低限制 2KB，那么缩容的过程就会停止。运行时只会在栈内存使用不足 1/4 时进行缩容，缩容也会调用扩容时使用的 <code>runtime.copystack</code> 函数开辟新的栈空间，将旧栈的数据拷贝到新栈以及调整原来指针的指向。</p>
+<h4 id="栈缩容"><a href="#栈缩容" class="headerlink" title="栈缩容"></a>栈缩容</h4><p>如果要触发栈的缩容，新栈的大小会是原始栈的一半，不过如果新栈的大小低于程序的最低限制 2KB，那么缩容的过程就会停止。运行时只会在栈内存使用不足 1&#x2F;4 时进行缩容，缩容也会调用扩容时使用的 <code>runtime.copystack</code> 函数开辟新的栈空间，将旧栈的数据拷贝到新栈以及调整原来指针的指向。</p>
 <p><strong>参考文档</strong></p>
 <blockquote>
-<p><a href="https://lessisbetter.site/2019/07/06/go-memory-allocation/#%E5%85%B6%E4%BB%96%E8%BD%AC%E6%8D%A2%E8%A1%A8%E5%AD%97%E6%AE%B5" target="_blank" rel="noopener">Go内存分配那些事，就这么简单！</a></p>
-<p><a href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-memory-allocator/" target="_blank" rel="noopener">Go 语言设计与实现-7.1内存分配器</a></p>
-<p><a href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-garbage-collector/" target="_blank" rel="noopener">Go 语言设计与实现-7.2  垃圾收集器</a></p>
-<p><a href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-stack-management/" target="_blank" rel="noopener">Go 语言设计与实现-7.3  栈内存管理</a></p>
-<p><a href="https://golang.design/under-the-hood/zh-cn/part2runtime/ch07alloc/basic/" target="_blank" rel="noopener">Go 语言原本-7.1 内存分配设计原则</a></p>
-<p><a href="https://golang.design/under-the-hood/zh-cn/part2runtime/ch08gc/" target="_blank" rel="noopener">Go 语言原本-8 垃圾回收</a></p>
-<p><a href="https://github.com/LeoYang90/Golang-Internal-Notes/blob/master/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md" target="_blank" rel="noopener">Go 内存管理</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/323915446" target="_blank" rel="noopener">Go runtime剖析系列（一）：内存管理</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/101132283" target="_blank" rel="noopener">Go 垃圾回收（一）——为什么要学习 GC ?</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/104623357" target="_blank" rel="noopener">Go 垃圾回收（二）——垃圾回收是什么？</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/105495961/" target="_blank" rel="noopener">Go 垃圾回收（三）——三色标记法是什么鬼？</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/105571503" target="_blank" rel="noopener">Go 垃圾回收（四）——一次完整的回收</a></p>
-<p><a href="https://juejin.cn/post/6844903917650722829?utm_campaign=studygolang.com&utm_medium=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com%3Futm_campaign%3Dstudygolang.com&utm_source=studygolang.com#heading-7" target="_blank" rel="noopener">搞懂Go垃圾回收</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/91559562" target="_blank" rel="noopener">golang 逃逸分析详解</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/225190602" target="_blank" rel="noopener">白话Go语言内存管理三部曲（一）内存分配原理</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/237870981" target="_blank" rel="noopener">白话Go语言内存管理三部曲（二）解密栈内存管理</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/264789260" target="_blank" rel="noopener">白话Go语言内存管理三部曲（三）垃圾回收原理</a></p>
-<p><a href="https://zhuanlan.zhihu.com/p/28409657" target="_blank" rel="noopener">聊一聊goroutine stack</a></p>
+<p><a target="_blank" rel="noopener" href="https://lessisbetter.site/2019/07/06/go-memory-allocation/#%E5%85%B6%E4%BB%96%E8%BD%AC%E6%8D%A2%E8%A1%A8%E5%AD%97%E6%AE%B5">Go内存分配那些事，就这么简单！</a></p>
+<p><a target="_blank" rel="noopener" href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-memory-allocator/">Go 语言设计与实现-7.1内存分配器</a></p>
+<p><a target="_blank" rel="noopener" href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-garbage-collector/">Go 语言设计与实现-7.2  垃圾收集器</a></p>
+<p><a target="_blank" rel="noopener" href="https://draveness.me/golang/docs/part3-runtime/ch07-memory/golang-stack-management/">Go 语言设计与实现-7.3  栈内存管理</a></p>
+<p><a target="_blank" rel="noopener" href="https://golang.design/under-the-hood/zh-cn/part2runtime/ch07alloc/basic/">Go 语言原本-7.1 内存分配设计原则</a></p>
+<p><a target="_blank" rel="noopener" href="https://golang.design/under-the-hood/zh-cn/part2runtime/ch08gc/">Go 语言原本-8 垃圾回收</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/LeoYang90/Golang-Internal-Notes/blob/master/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md">Go 内存管理</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/323915446">Go runtime剖析系列（一）：内存管理</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/101132283">Go 垃圾回收（一）——为什么要学习 GC ?</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/104623357">Go 垃圾回收（二）——垃圾回收是什么？</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/105495961/">Go 垃圾回收（三）——三色标记法是什么鬼？</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/105571503">Go 垃圾回收（四）——一次完整的回收</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/6844903917650722829?utm_campaign=studygolang.com&utm_medium=studygolang.com&utm_medium=studygolang.com&utm_source=studygolang.com?utm_campaign=studygolang.com&utm_source=studygolang.com#heading-7">搞懂Go垃圾回收</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/91559562">golang 逃逸分析详解</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/225190602">白话Go语言内存管理三部曲（一）内存分配原理</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/237870981">白话Go语言内存管理三部曲（二）解密栈内存管理</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/264789260">白话Go语言内存管理三部曲（三）垃圾回收原理</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/28409657">聊一聊goroutine stack</a></p>
 </blockquote>
 
     </div>
@@ -1225,28 +1262,26 @@ type stackfreelist struct {
     
     
     
-        <div class="reward-container">
+
+    <footer class="post-footer">
+          <div class="reward-container">
   <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
+  <button>
+    赞赏
   </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
       </div>
-      
-      <div style="display: inline-block;">
+      <div>
         <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
+        <span>支付宝</span>
       </div>
 
   </div>
 </div>
 
-
-      <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
               <a href="/tags/go/" rel="tag"># go</a>
@@ -1254,129 +1289,60 @@ type stackfreelist struct {
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/" rel="prev" title="goroutine 调度器原理">
-      <i class="fa fa-chevron-left"></i> goroutine 调度器原理
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/" rel="next" title="go 常用基本类型源码设计分析">
-      go 常用基本类型源码设计分析 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/" rel="prev" title="goroutine 调度器原理">
+                  <i class="fa fa-chevron-left"></i> goroutine 调度器原理
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/22/go%20%E5%B8%B8%E7%94%A8%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%BA%90%E7%A0%81%E8%AE%BE%E8%AE%A1%E5%88%86%E6%9E%90/" rel="next" title="go 常用基本类型源码设计分析">
+                  go 常用基本类型源码设计分析 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
           </div>
-          
+    </footer>
+  </article>
+</div>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
   </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#传统的存储体系"><span class="nav-number">1.</span> <span class="nav-text">传统的存储体系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#计算机存储体系"><span class="nav-number">1.1.</span> <span class="nav-text">计算机存储体系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作系统存储体系"><span class="nav-number">1.2.</span> <span class="nav-text">操作系统存储体系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#虚拟内存"><span class="nav-number">1.2.1.</span> <span class="nav-text">虚拟内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆和栈"><span class="nav-number">1.2.2.</span> <span class="nav-text">堆和栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆内存管理"><span class="nav-number">1.2.3.</span> <span class="nav-text">堆内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#线性分配"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">线性分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#空闲链表分配"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">空闲链表分配</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-堆内存管理"><span class="nav-number">2.</span> <span class="nav-text">Go 堆内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#TCMalloc"><span class="nav-number">2.1.</span> <span class="nav-text">TCMalloc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#TCMalloc-基本原理"><span class="nav-number">2.1.1.</span> <span class="nav-text">TCMalloc 基本原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-堆内存管理的实现"><span class="nav-number">2.2.</span> <span class="nav-text">Go 堆内存管理的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-内存管理的基本概念"><span class="nav-number">2.2.1.</span> <span class="nav-text">Go 内存管理的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Page"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">Page</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Span"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">Span</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mcache"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">mcache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mcentral"><span class="nav-number">2.2.1.4.</span> <span class="nav-text">mcentral</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#mheap"><span class="nav-number">2.2.1.5.</span> <span class="nav-text">mheap</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#heapArena"><span class="nav-number">2.2.1.6.</span> <span class="nav-text">heapArena</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#大小转换"><span class="nav-number">2.2.1.7.</span> <span class="nav-text">大小转换</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#为何不使用函数计算各种转换，而是写成数组？"><span class="nav-number">2.2.1.7.1.</span> <span class="nav-text">为何不使用函数计算各种转换，而是写成数组？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-内存分配具体过程"><span class="nav-number">2.2.2.</span> <span class="nav-text">Go 内存分配具体过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#微对象的分配"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">微对象的分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#小对象的分配"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">小对象的分配</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#为对象寻找-span"><span class="nav-number">2.2.2.2.1.</span> <span class="nav-text">为对象寻找 span</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#从-span-分配对象空间"><span class="nav-number">2.2.2.2.2.</span> <span class="nav-text">从 span 分配对象空间</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#span-没有空间怎么分配对象"><span class="nav-number">2.2.2.2.3.</span> <span class="nav-text">span 没有空间怎么分配对象</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#mcentral-向-mcache-提供-span"><span class="nav-number">2.2.2.2.3.1.</span> <span class="nav-text">mcentral 向 mcache 提供 span</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#mcentral-向-mheap-要-span"><span class="nav-number">2.2.2.2.3.2.</span> <span class="nav-text">mcentral 向 mheap 要 span</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#mheap向OS申请内存"><span class="nav-number">2.2.2.2.3.3.</span> <span class="nav-text">mheap向OS申请内存</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#大对象的分配"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">大对象的分配</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.2.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-垃圾回收与内存释放"><span class="nav-number">3.</span> <span class="nav-text">Go 垃圾回收与内存释放</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾回收概念"><span class="nav-number">3.1.</span> <span class="nav-text">垃圾回收概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾收集算法"><span class="nav-number">3.2.</span> <span class="nav-text">垃圾收集算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标记——清除算法"><span class="nav-number">3.2.1.</span> <span class="nav-text">标记——清除算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三色标记法"><span class="nav-number">3.2.2.</span> <span class="nav-text">三色标记法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#屏障技术"><span class="nav-number">3.2.3.</span> <span class="nav-text">屏障技术</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#插入写屏障"><span class="nav-number">3.2.3.1.</span> <span class="nav-text">插入写屏障</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#删除写屏障"><span class="nav-number">3.2.3.2.</span> <span class="nav-text">删除写屏障</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#混合写屏障"><span class="nav-number">3.2.3.3.</span> <span class="nav-text">混合写屏障</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾收集器"><span class="nav-number">3.3.</span> <span class="nav-text">垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#垃圾收集器的类型"><span class="nav-number">3.3.1.</span> <span class="nav-text">垃圾收集器的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#增量收集器"><span class="nav-number">3.3.1.1.</span> <span class="nav-text">增量收集器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#并发收集器"><span class="nav-number">3.3.1.2.</span> <span class="nav-text">并发收集器</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#go-的垃圾收集器"><span class="nav-number">3.3.2.</span> <span class="nav-text">go 的垃圾收集器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#回收堆目标"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">回收堆目标</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#垃圾收集过程"><span class="nav-number">3.3.3.</span> <span class="nav-text">垃圾收集过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#标记准备阶段"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">标记准备阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标记阶段"><span class="nav-number">3.3.3.2.</span> <span class="nav-text">标记阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#标记终止阶段"><span class="nav-number">3.3.3.3.</span> <span class="nav-text">标记终止阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#清理阶段"><span class="nav-number">3.3.3.4.</span> <span class="nav-text">清理阶段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GOGC-对性能的影响"><span class="nav-number">3.3.4.</span> <span class="nav-text">GOGC 对性能的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#go-垃圾回收的时机"><span class="nav-number">3.4.</span> <span class="nav-text">go 垃圾回收的时机</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自动触发"><span class="nav-number">3.4.1.</span> <span class="nav-text">自动触发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手动触发"><span class="nav-number">3.4.2.</span> <span class="nav-text">手动触发</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-栈内存管理"><span class="nav-number">4.</span> <span class="nav-text">Go 栈内存管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#栈内存管理的基本概念"><span class="nav-number">4.1.</span> <span class="nav-text">栈内存管理的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#寄存器"><span class="nav-number">4.1.1.</span> <span class="nav-text">寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程栈"><span class="nav-number">4.1.2.</span> <span class="nav-text">线程栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#栈中的基本要素"><span class="nav-number">4.1.3.</span> <span class="nav-text">栈中的基本要素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-中的逃逸分析"><span class="nav-number">4.2.</span> <span class="nav-text">Go 中的逃逸分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#逃逸分析测试"><span class="nav-number">4.2.1.</span> <span class="nav-text">逃逸分析测试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#检验方式"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">检验方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#逃逸情况分析"><span class="nav-number">4.2.1.2.</span> <span class="nav-text">逃逸情况分析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#情况一"><span class="nav-number">4.2.1.2.1.</span> <span class="nav-text">情况一</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#情况二"><span class="nav-number">4.2.1.2.2.</span> <span class="nav-text">情况二</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#情况三"><span class="nav-number">4.2.1.2.3.</span> <span class="nav-text">情况三</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#逃逸分析总结"><span class="nav-number">4.2.2.</span> <span class="nav-text">逃逸分析总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Go-栈内存空间管理"><span class="nav-number">4.3.</span> <span class="nav-text">Go 栈内存空间管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分段栈"><span class="nav-number">4.3.1.</span> <span class="nav-text">分段栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#连续栈"><span class="nav-number">4.3.2.</span> <span class="nav-text">连续栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Go-栈的管理操作"><span class="nav-number">4.3.3.</span> <span class="nav-text">Go 栈的管理操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#栈初始化"><span class="nav-number">4.3.3.1.</span> <span class="nav-text">栈初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#栈分配"><span class="nav-number">4.3.3.2.</span> <span class="nav-text">栈分配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#栈扩容"><span class="nav-number">4.3.3.3.</span> <span class="nav-text">栈扩容</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#栈缩容"><span class="nav-number">4.3.3.4.</span> <span class="nav-text">栈缩容</span></a></li></ol></li></ol></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">139</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">50</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
 
 <div class="copyright">
-  
   &copy; 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.3m</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:37</span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -1384,8 +1350,7 @@ type stackfreelist struct {
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -1394,101 +1359,36 @@ type stackfreelist struct {
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
+    </div>
+  </footer>
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
 
   
-      
-<script type="text/x-mathjax-config">
 
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
 
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') {
-          next = next.nextSibling;
-        }
-        if (next && next.nodeName.toLowerCase() === 'br') {
-          next.parentNode.removeChild(next);
-        }
-      }
-    });
-  });
 
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
-      if (element.nodeName.toLowerCase() == 'li') {
-        element = element.parentNode;
-      }
-      element.classList.add('has-jax');
-    }
-  });
-</script>
-<script>
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
-    MathJax.Hub.Typeset();
-  }, window.MathJax);
-</script>
-
-    
-
-  
 
 </body>
 </html>

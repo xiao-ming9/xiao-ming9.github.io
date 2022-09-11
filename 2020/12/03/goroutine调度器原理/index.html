@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.0.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
@@ -13,88 +14,58 @@
 <link rel="stylesheet" href="/css/main.css">
 
 
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha256-AbA177XfpSnFEvgpYu1jMygiLabzPCJCRIBtR5jGc0k=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script id="hexo-configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    hostname: new URL('http://yoursite.com').hostname,
-    root: '/',
-    scheme: 'Mist',
-    version: '7.5.0',
-    exturl: false,
-    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
-    copycode: {"enable":false,"show_result":false,"style":null},
-    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
-    bookmark: {"enable":false,"color":"#222","save":"auto"},
-    fancybox: false,
-    mediumzoom: false,
-    lazyload: false,
-    pangu: false,
-    algolia: {
-      appID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    },
-    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},
-    path: 'search.xml',
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    sidebarPadding: 40
-  };
-</script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="goroutine 调度器的概念说到“调度”，首先会想到操作系统对进程、线程的调度。操作系统调度器会将系统中的多个线程按照一定算法调度到物理 CPU 上去运行。传统的编程语言比如 C、C++ 等的并发实现实际上就是基于操作系统调度的，即程序负责创建线程，操作系统负责调度。 尽管线程的调度方式相对于进程来说，线程运行所需要资源比较少，在同一进程中进行线程切换效率会高很多，但实际上多线程开发设计会变得">
-<meta name="keywords" content="面试,go">
+    <meta name="description" content="goroutine 调度器的概念说到“调度”，首先会想到操作系统对进程、线程的调度。操作系统调度器会将系统中的多个线程按照一定算法调度到物理 CPU 上去运行。传统的编程语言比如 C、C++ 等的并发实现实际上就是基于操作系统调度的，即程序负责创建线程，操作系统负责调度。 尽管线程的调度方式相对于进程来说，线程运行所需要资源比较少，在同一进程中进行线程切换效率会高很多，但实际上多线程开发设计会变得">
 <meta property="og:type" content="article">
 <meta property="og:title" content="goroutine 调度器原理">
-<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2020&#x2F;12&#x2F;03&#x2F;goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86&#x2F;index.html">
+<meta property="og:url" content="http://yoursite.com/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/index.html">
 <meta property="og:site_name" content="Silverming">
 <meta property="og:description" content="goroutine 调度器的概念说到“调度”，首先会想到操作系统对进程、线程的调度。操作系统调度器会将系统中的多个线程按照一定算法调度到物理 CPU 上去运行。传统的编程语言比如 C、C++ 等的并发实现实际上就是基于操作系统调度的，即程序负责创建线程，操作系统负责调度。 尽管线程的调度方式相对于进程来说，线程运行所需要资源比较少，在同一进程中进行线程切换效率会高很多，但实际上多线程开发设计会变得">
-<meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;G-P-M%E6%A8%A1%E5%9E%8B.jpeg%21large">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20func%28%29%20%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B.jpeg%21large">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;goroutine%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png%21large">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF2.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-2.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-3.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4-2.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF5-1.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF6.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF7.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF8.png">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20%E4%BF%A1%E6%81%AF%E6%B3%A8%E8%A7%A3.png%21large">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20g%E4%BF%A1%E6%81%AF.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20m%E4%BF%A1%E6%81%AF.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-1.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-2.jpg">
-<meta property="og:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-3.jpg">
-<meta property="og:updated_time" content="2021-05-19T08:52:58.331Z">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/G-P-M%E6%A8%A1%E5%9E%8B.jpeg%21large">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20func%28%29%20%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B.jpeg%21large">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/goroutine%20%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png%21large">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF2.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-2.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF3-3.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4-2.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF5-1.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF6.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF7.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF8.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20%E4%BF%A1%E6%81%AF%E6%B3%A8%E8%A7%A3.png%21large">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20g%E4%BF%A1%E6%81%AF.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20m%E4%BF%A1%E6%81%AF.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-1.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-2.jpg">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-3.jpg">
+<meta property="article:published_time" content="2020-12-03T02:09:33.000Z">
+<meta property="article:modified_time" content="2022-09-10T15:09:39.241Z">
+<meta property="article:author" content="Silverming">
+<meta property="article:tag" content="面试">
+<meta property="article:tag" content="go">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https:&#x2F;&#x2F;qiniu.xiaoming.net.cn&#x2F;goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large">
+<meta name="twitter:image" content="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large">
+
 
 <link rel="canonical" href="http://yoursite.com/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/">
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome: false,
-    isPost: true,
-    isPage: false,
-    isArchive: false
-  };
-</script>
 
-  <title>goroutine 调度器原理 | Silverming</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/","path":"2020/12/03/goroutine调度器原理/","title":"goroutine 调度器原理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>goroutine 调度器原理 | Silverming</title>
   
 
 
@@ -103,187 +74,222 @@
 
 
   <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
-  <div class="site-meta">
-
-    <div>
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">Silverming</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
-        <p class="site-subtitle">Stay hungry,stay foolish</p>
   </div>
 
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Silverming</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
 
 
+
 <nav class="site-nav">
-  
-  <ul id="menu" class="menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
       </li>
   </ul>
-
 </nav>
-  <div class="site-search">
-    <div class="popup search-popup">
-    <div class="search-header">
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
-           type="text" id="search-input">
+           type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result"></div>
-
-</div>
-<div class="search-pop-overlay"></div>
-
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">goroutine 调度器的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="nav-number">2.</span> <span class="nav-text">goroutine 调度器的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G-M%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">G-M模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G-P-M-%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">G-P-M 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%85%B3-P-%E5%92%8C-M-%E7%9A%84%E4%B8%AA%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.1.</span> <span class="nav-text">有关 P 和 M 的个数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#P-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">P 的数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#M-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">M 的数量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.</span> <span class="nav-text">抢占式调度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%8D%8F%E4%BD%9C%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">基于协作的抢占式调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E4%BF%A1%E5%8F%B7%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">基于信号的抢占式调度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E8%B0%83%E5%BA%A6%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.2.3.</span> <span class="nav-text">抢占调度示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-func-%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">go func() 调度流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">4.</span> <span class="nav-text">Goroutine 生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">Goroutine 调度器场景分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80"><span class="nav-number">5.1.</span> <span class="nav-text">场景一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C"><span class="nav-number">5.2.</span> <span class="nav-text">场景二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%89"><span class="nav-number">5.3.</span> <span class="nav-text">场景三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%9B%9B"><span class="nav-number">5.4.</span> <span class="nav-text">场景四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%94"><span class="nav-number">5.5.</span> <span class="nav-text">场景五</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AD"><span class="nav-number">5.6.</span> <span class="nav-text">场景六</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%83"><span class="nav-number">5.7.</span> <span class="nav-text">场景七</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AB"><span class="nav-number">5.8.</span> <span class="nav-text">场景八</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B9%9D"><span class="nav-number">5.9.</span> <span class="nav-text">场景九</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E6%B1%87%E6%80%BB"><span class="nav-number">6.</span> <span class="nav-text">状态汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G%E7%8A%B6%E6%80%81"><span class="nav-number">6.1.</span> <span class="nav-text">G状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P-%E7%8A%B6%E6%80%81"><span class="nav-number">6.2.</span> <span class="nav-text">P 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#M-%E7%8A%B6%E6%80%81"><span class="nav-number">6.3.</span> <span class="nav-text">M 状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1"><span class="nav-number">7.</span> <span class="nav-text">调度器设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%A4%A7%E6%80%9D%E6%83%B3"><span class="nav-number">7.1.</span> <span class="nav-text">调度器设计的两大思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%B0%8F%E7%AD%96%E7%95%A5"><span class="nav-number">7.2.</span> <span class="nav-text">调度器设计的两小策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GPM-%E5%8F%AF%E8%A7%86%E5%8C%96%E8%B0%83%E8%AF%95"><span class="nav-number">8.</span> <span class="nav-text">GPM 可视化调试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-tool-trace"><span class="nav-number">8.1.</span> <span class="nav-text">go tool trace</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#g-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.1.</span> <span class="nav-text">g 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#m-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.2.</span> <span class="nav-text">m 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#p-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.3.</span> <span class="nav-text">p 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debug-trace"><span class="nav-number">8.2.</span> <span class="nav-text">Debug trace</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Silverming</p>
+  <div class="site-description" itemprop="description">Wechat:934933088</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
 
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content">
-            
+    <div class="main-inner post posts-expand">
 
-  <div class="posts-expand">
-      
+
+  
+
+
+<div class="post-block">
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/12/03/goroutine%E8%B0%83%E5%BA%A6%E5%99%A8%E5%8E%9F%E7%90%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
       <meta itemprop="name" content="Silverming">
-      <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Silverming">
+      <meta itemprop="description" content="Wechat:934933088">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="goroutine 调度器原理 | Silverming">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
           goroutine 调度器原理
         </h1>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2020-12-03 10:09:33" itemprop="dateCreated datePublished" datetime="2020-12-03T10:09:33+08:00">2020-12-03</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-19 16:52:58" itemprop="dateModified" datetime="2021-05-19T16:52:58+08:00">2021-05-19</time>
-              </span>
+      <time title="创建时间：2020-12-03 10:09:33" itemprop="dateCreated datePublished" datetime="2020-12-03T10:09:33+08:00">2020-12-03</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-09-10 23:09:39" itemprop="dateModified" datetime="2022-09-10T23:09:39+08:00">2022-09-10</time>
+    </span>
 
-          
-            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span id="busuanzi_value_page_pv"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-file-word-o"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>13k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-clock-o"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>12 分钟</span>
-            </span>
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>13k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>12 分钟</span>
+    </span>
+</div>
 
         </div>
       </header>
@@ -292,14 +298,12 @@
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
         <h1 id="goroutine-调度器的概念"><a href="#goroutine-调度器的概念" class="headerlink" title="goroutine 调度器的概念"></a>goroutine 调度器的概念</h1><p>说到“调度”，首先会想到操作系统对进程、线程的调度。操作系统调度器会将系统中的多个线程按照一定算法调度到物理 CPU 上去运行。传统的编程语言比如 C、C++ 等的并发实现实际上就是基于操作系统调度的，即程序负责创建线程，操作系统负责调度。</p>
 <p>尽管线程的调度方式相对于进程来说，线程运行所需要资源比较少，在同一进程中进行线程切换效率会高很多，但实际上多线程开发设计会变得更加复杂，要考虑很多同步竞争等问题，如锁、竞争冲突等。</p>
 <blockquote>
 <p>线程是操作系统调度时的最基本单元，而 Linux 在调度器并不区分进程和线程的调度，只是说线程调度因为资源少，所以切换的效率比较高。</p>
 </blockquote>
-<a id="more"></a>
+<span id="more"></span>
 
 <p>使用多线程编程会遇到以下问题：</p>
 <ul>
@@ -311,12 +315,12 @@
 <p>这便有了“协程”，线程分为内核态线程和用户态线程，用户态线程需要绑定内核态线程，CPU 并不能感知用户态线程的存在，它只知道它在运行1个线程，这个线程实际是内核态线程。</p>
 <p><strong>用户态线程实际有个名字叫协程（co-routine）</strong>，为了容易区分，使用协程指用户态线程，使用线程指内核态线程。</p>
 <p>协程跟线程是有区别的，线程由 CPU 调度是抢占式的，<strong>协程由用户态调度是协作式的</strong>，一个协程让出 CPU 后，才执行下一个协程。</p>
-<p>Go 中，协程被称为 goroutine（但其实并不完全是协程，还做了其他方面的优化），它非常轻量，一个 goroutine 只占几 KB，并且这几 KB 就足够 goroutine 运行完，这就能在有限的内存空间内支持大量 goroutine，支持了更多的并发。虽然一个 goroutine 的栈只占几 KB，但实际是可伸缩的，如果需要更多内容，<code>runtime</code>会自动为 goroutine 分配。</p>
+<p>Go 中，协程被称为 goroutine（但其实并不完全是协程，还做了其他方面的优化），它非常轻量，一个 goroutine 只占几 KB，并且这几 KB 就足够 goroutine 运行完，这就能在有限的内存空间内支持大量 goroutine，支持了更多的并发。虽然一个 goroutine 的栈只占几 KB，但实际是可伸缩的，如果需要更多内容，<code>runtime </code>会自动为 goroutine 分配。</p>
 <p>而将所有的 goroutines 按照一定算法放到 CPU 上执行的程序就称为 <strong>goroutine 调度器</strong>或 <strong>goroutine scheduler</strong>。</p>
 <p>不过，一个 Go 程序对于操作系统来说只是一个<strong>用户层程序</strong>，对于操作系统而言，它的眼中只有 thread，它并不知道有什么叫 Goroutine 的东西的存在。goroutine 的调度全要靠 Go 自己完成，所以就需要 goroutine 调度器来实现 Go 程序内 goroutine 之间的 CPU 资源调度。</p>
 <p>在操作系统层面，Thread 竞争的 CPU 资源是真实的物理 CPU，但对于 Go 程序来说，它是一个用户层程序，它本身整体是运行在一个或多个操作系统线程上的，因此 <strong>goroutine 们要竞争的所谓 “CPU” 资源就是操作系统线程</strong>。这样 Go scheduler 的要做的就是：<strong>将 goroutines 按照一定算法放到不同的操作系统线程中去执行</strong>。这种在语言层面自带调度器的，称之为原生支持并发。</p>
 <h1 id="goroutine-调度器的演进"><a href="#goroutine-调度器的演进" class="headerlink" title="goroutine 调度器的演进"></a>goroutine 调度器的演进</h1><p>调度器的任务是在用户态完成 goroutine 的调度，而调度器的实现好坏，对并发实际有很大的影响。</p>
-<h2 id="G-M模型"><a href="#G-M模型" class="headerlink" title="G-M模型"></a>G-M模型</h2><p>现在的 Go语言调度器是 2012 年重新设计的，在这之前的调度器称为老调度器，老调度器采用的是 <strong>G-M 模型</strong>，在这个调度器中，每个 goroutine 对应于 runtime 中的一个抽象结构：G，而 os thread 作为物理 CPU 的存在而被抽象为一个结构：M(machine)。M 想要执行 G、放回 G 都必须访问全局 G 队列，并且 M 有多个，即多线程访问同一资源需要加锁进行保证互斥/同步，所以全局 G 队列是有互斥锁进行保护的。</p>
+<h2 id="G-M模型"><a href="#G-M模型" class="headerlink" title="G-M模型"></a>G-M模型</h2><p>现在的 Go语言调度器是 2012 年重新设计的，在这之前的调度器称为老调度器，老调度器采用的是 <strong>G-M 模型</strong>，在这个调度器中，每个 goroutine 对应于 runtime 中的一个抽象结构：G，而 os thread 作为物理 CPU 的存在而被抽象为一个结构：M(machine)。M 想要执行 G、放回 G 都必须访问全局 G 队列，并且 M 有多个，即多线程访问同一资源需要加锁进行保证互斥&#x2F;同步，所以全局 G 队列是有互斥锁进行保护的。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large" alt="G-M模型"></p>
 <p>这个结构虽然简单，但是却存在着许多问题。它限制了 Go 并发程序的伸缩性，尤其是对那些有高吞吐或并行计算需求的服务程序。主要体现在如下几个方面：</p>
 <ul>
@@ -351,7 +355,7 @@
 </ul>
 <p>M 与 P 的数量没有绝对关系，一个 M 阻塞，P 就会去创建或者切换另一个 M，所以，即使 P 的默认数量是 1，也有可能会创建很多个 M 出来。</p>
 <h3 id="抢占式调度"><a href="#抢占式调度" class="headerlink" title="抢占式调度"></a>抢占式调度</h3><p>G-P-M 模型中还实现了抢占式调度，所谓抢占式调度指的是在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这也是 goroutine 不同于 coroutine 的一个地方。在 goroutine 中先后实现了两种抢占式调度算法，分别是基于协作的方式和基于信号的方式。</p>
-<h4 id="基于协作的抢占式调度"><a href="#基于协作的抢占式调度" class="headerlink" title="基于协作的抢占式调度"></a>基于协作的抢占式调度</h4><p>G-P-M 模型的实现是 Go scheduler 的一大进步，但此时的调度器仍然有一个问题，那就是不支持抢占式调度，导致一旦某个 G 中出现死循环或永久循环的代码逻辑，那么 G 将永久占用分配给它的 P 和 M，位于同一个 P 中的其他 G 将得不到调度，出现“<strong>饿死</strong>”的情况。当只有一个 P 时(GOMAXPROCS=1)时，整个 Go 程序中的其他 G 都会被饿死。所以后面 Go 设计团队在 Go 1.2 中实现了<strong>基于协作的抢占式调度</strong>。</p>
+<h4 id="基于协作的抢占式调度"><a href="#基于协作的抢占式调度" class="headerlink" title="基于协作的抢占式调度"></a>基于协作的抢占式调度</h4><p>G-P-M 模型的实现是 Go scheduler 的一大进步，但此时的调度器仍然有一个问题，那就是不支持抢占式调度，导致一旦某个 G 中出现死循环或永久循环的代码逻辑，那么 G 将永久占用分配给它的 P 和 M，位于同一个 P 中的其他 G 将得不到调度，出现“<strong>饿死</strong>”的情况。当只有一个 P 时(GOMAXPROCS&#x3D;1)时，整个 Go 程序中的其他 G 都会被饿死。所以后面 Go 设计团队在 Go 1.2 中实现了<strong>基于协作的抢占式调度</strong>。</p>
 <p>这种抢占式调度的原理则是在每个函数或方法的入口，加上一段额外的代码，让 runtime 有机会检查是否需要执行抢占调度。</p>
 <p>基于协作的抢占式调度的工作原理大致如下：</p>
 <ol>
@@ -408,17 +412,18 @@
 </li>
 <li><p>sysmon线程一开始每次循环后，休眠 20us，50次之后（即1ms后）每次休眠时间倍增，最终每一轮都会休眠 10ms。</p>
 <p> 以下代码来自 1.15.7 版本的 <code>runtime/proc.go</code>: </p>
-<pre><code class="go">  if idle == 0 { 
-      // start with 20us sleep...   
-      delay = 20  
-  } else if idle &gt; 50 {
-      // start doubling the sleep after 1ms...   
-      delay *= 2  
-  } 
-  if delay &gt; 10*1000 { 
-      // up to 10ms   
-      delay = 10 * 1000  
-  }</code></pre>
+<pre><code class="go"> if idle == 0 &#123; 
+     // start with 20us sleep...   
+     delay = 20  
+ &#125; else if idle &gt; 50 &#123;
+     // start doubling the sleep after 1ms...   
+     delay *= 2  
+ &#125; 
+ if delay &gt; 10*1000 &#123; 
+     // up to 10ms   
+     delay = 10 * 1000  
+ &#125;
+</code></pre>
 </li>
 </ol>
 </blockquote>
@@ -433,17 +438,18 @@
 <p>垃圾回收过程中需要暂停整个程序（Stop the world，STW），有时候可能需要几分钟的时间，这会导致整个程序无法工作。所以 STW 和栈扫描是一个可以抢占的安全点（Safe-points）， Go 语言在这里先加入抢占功能。基于信号的抢占式调度只解决了垃圾回收和栈扫描时存在的问题，它到目前为止没有解决全部问题。</p>
 <h3 id="抢占调度示例"><a href="#抢占调度示例" class="headerlink" title="抢占调度示例"></a>抢占调度示例</h3><p>假设在一个单核 CPU 的机器上开两个 Goroutine，其中一个执行死循环，运行结果会是怎么样的呢？</p>
 <p>在单核 CPU 的情况下，此时 P 只有一个，两个 Goroutine 可以理解为 Main Goroutine + 一个新的 Goroutine 死循环，类似如下：</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     // 模拟单核 CPU
     runtime.GOMAXPROCS(1)
-    go func() {
-        for  {
-        }
-    }()
+    go func() &#123;
+        for  &#123;
+        &#125;
+    &#125;()
 
     time.Sleep(time.Millisecond)
     fmt.Println(&quot;能不能运行到这里呢？&quot;)
-}</code></pre>
+&#125;
+</code></pre>
 <p>在 Go1.14 之前，不会输出任何结果；在 Go1.14 之后，由于引入了基于信号的抢占式调度，能够正常输出结果。</p>
 <p>在 1.14 前，基于协作的抢占式调度，需要发生函数调用时才能够抢占，这段程序中没有涉及主动放弃执行权的调用（runtime.Gosched），又或是其他调用（可能会导致执行权转移）的行为。因此这个 Goroutine 是没机会溜号的，只能一直打工…</p>
 <p>那为什么主协程（Main Goroutine）会无法运行呢，其实原因是会优先调用休眠，但由于单核 CPU，其只有唯一的 P。唯一的 P 又一直在打工不愿意下班（执行 for 死循环，被迫无限加班）。</p>
@@ -478,14 +484,15 @@
 import &quot;fmt&quot;
 
 // main.main
-func main() {
+func main() &#123;
     fmt.Println(&quot;Hello scheduler&quot;)
-}</code></pre>
+&#125;
+</code></pre>
 <p>其运行时所经历的过程跟上面的生命周期相对应：</p>
 <ol>
 <li>runtime 创建最初的线程 m0 和 goroutine g0，并把 2 者关联。</li>
 <li>调度器初始化：初始化 m0、栈、垃圾回收，以及创建和初始化由 GOMAXPROCS 个 P 构成的 P 列表。</li>
-<li>示例代码中的 main 函数是 <code>main.main</code>，<code>runtime</code> 中也有 1 个 main 函数——<code>runtime.main</code>，代码经过编译后，<code>runtime.main</code> 会调用  <code>main.main</code>，程序启动时会为 <code>runtime.main</code> 创建 goroutine，称它为 <code>main goroutine</code>，然后把 <code>main goroutine</code> 加入到P的本地队列。</li>
+<li>示例代码中的 main 函数是 <code>main.main</code>，<code>runtime</code> 中也有 1 个 main 函数——<code>runtime.main</code>，代码经过编译后，<code>runtime.main </code> 会调用  <code>main.main</code>，程序启动时会为 <code>runtime.main</code> 创建 goroutine，称它为 <code>main goroutine</code>，然后把 <code>main goroutine</code> 加入到P的本地队列。</li>
 <li>启动 m0，m0 已经绑定了 P，会从 P 的本地队列获取 G，获取到 <code>main goroutine</code>。</li>
 <li>G 拥有栈，M 根据 G 中的栈信息和调度信息设置运行环境</li>
 <li>M 运行 G</li>
@@ -512,7 +519,8 @@ func main() {
 <h2 id="场景四"><a href="#场景四" class="headerlink" title="场景四"></a>场景四</h2><p><strong>在创建 g 时，运行的 g 会尝试唤醒其他空闲的 p 和 m 组合去执行</strong>。假定 g2 唤醒了 m2，m2 绑定了 p2，并运行 g0，但 p2 本地队列没有 g，m2 此时为自旋线程（没有 G 但为运行状态的线程，不断寻找 g）。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4.png" alt="Goroutine 调度器场景4"></p>
 <p>m2 接下来会尝试从全局队列 (GQ) 取一批 g 放到 p2 的本地队列（函数：<code>findrunnable</code>）。m2 从全局队列取的 g 数量符合下面的公式：</p>
-<pre><code class="go">n = min(len(GQ)/GOMAXPROCS + 1, len(GQ/2))</code></pre>
+<pre><code class="go">n = min(len(GQ)/GOMAXPROCS + 1, len(GQ/2))
+</code></pre>
 <p>公式的含义是，至少从全局队列取 1 个 g，但每次不要从全局队列移动太多的 g 到 p 本地队列，给其他 p 留点。这是<strong>从全局队列到 P 本地队列的负载均衡</strong>。</p>
 <p>假定场景中一共有 4 个 P（<code>GOMAXPROCS=4</code>），所以 m2 只从能从全局队列取 1 个 g（即 g3）移动 p2 本地队列，然后完成从 g0 到 g3 的切换，运行 g3：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF4-2.png" alt="Goroutine 调度器场景4-2"></p>
@@ -522,7 +530,7 @@ func main() {
 <h2 id="场景六"><a href="#场景六" class="headerlink" title="场景六"></a>场景六</h2><p>p1 本地队列 g5、g6 已经被其他 m 偷走并运行完成，当前 m1 和 m2 分别在运行 g2 和 g8，m3 和 m4 没有goroutine 可以运行，m3 和 m4 处于<strong>自旋状态</strong>，它们不断寻找 goroutine。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF6.png" alt="Goroutine 调度器场景6"></p>
 <p>这里有一个问题，为什么要让 m3 和 m4 自旋？自旋本质是在运行，线程在运行却没有执行 g，就变成了浪费CPU，销毁线程可以节约CPU资源不是更好吗？实际上，创建和销毁CPU都是浪费时间的，我们<strong>希望当有新 goroutine 创建时，立刻能有 m 运行它</strong>，如果销毁再新建就增加了时延，降低了效率。当然也考虑了过多的自旋线程是浪费 CPU，所以系统中最多有 GOMAXPROCS 个自旋的线程，多余的没事做的线程会让他们休眠（函数：<code>notesleep()</code> 实现了这个思路）。</p>
-<h2 id="场景七"><a href="#场景七" class="headerlink" title="场景七"></a>场景七</h2><p>假定当前除了 m3 和 m4 为自旋线程，还有 m5 和 m6 为自旋线程，g8 创建了 g9，g9 会放入本地队列。加入此时g8 进行了<strong>阻塞的系统调用</strong>，m2 和 p2 立即解绑，p2 会执行以下判断：如果 p2 本地队列有 g、全局队列有 g 或有空闲的 m，p2 都会立马唤醒1个 m 和它绑定，否则 p2 则会加入到空闲 P 列表，等待 m 来获取可用的 p。本场景中，p2 本地队列有 g，可以和其他自旋线程 m5 绑定。</p>
+<h2 id="场景七"><a href="#场景七" class="headerlink" title="场景七"></a>场景七</h2><p>假定当前除了 m3 和 m4 为自旋线程，还有 m5 和 m6 为自旋线程，g8 创建了 g9，g9 会放入本地队列。假如此时g8 进行了<strong>阻塞的系统调用</strong>，m2 和 p2 立即解绑，p2 会执行以下判断：如果 p2 本地队列有 g、全局队列有 g 或有空闲的 m，p2 都会立马唤醒1个 m 和它绑定，否则 p2 则会加入到空闲 P 列表，等待 m 来获取可用的 p。本场景中，p2 本地队列有 g，可以和其他自旋线程 m5 绑定。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF7.png" alt="Goroutine 调度器场景7"></p>
 <h2 id="场景八"><a href="#场景八" class="headerlink" title="场景八"></a>场景八</h2><p>假设 g8 创建了 g9，假如 g8 进行了<strong>非阻塞系统调用</strong>（CGO会是这种方式，见<code>cgocall()</code>），m2 和 p2 会解绑，但 m2 会记住 p，然后 g8 和 m2 进入系统调用状态。当 g8 和 m2 退出系统调用时，会尝试获取 p2，如果无法获取，则获取空闲的 p，如果依然没有，g8 会被记为可运行状态，并加入到全局队列。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/Goroutine%20%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF8.png" alt="Goroutine 调度器场景8"></p>
@@ -619,31 +627,35 @@ func main() {
 <h1 id="GPM-可视化调试"><a href="#GPM-可视化调试" class="headerlink" title="GPM 可视化调试"></a>GPM 可视化调试</h1><p>有 2 种方式可以查看一个程序 GPM 的数据：</p>
 <h2 id="go-tool-trace"><a href="#go-tool-trace" class="headerlink" title="go tool trace"></a>go tool trace</h2><p>trace 记录了运行时的信息，能提供可视化的Web页面。</p>
 <p>简单测试代码：main 函数创建 trace，trace 会运行在单独的 goroutine 中，然后 main 打印 “Hello trace” 退出。</p>
-<pre><code class="go">func main() {
+<pre><code class="go">func main() &#123;
     // 创建trace文件
     f, err := os.Create(&quot;trace.out&quot;)
-    if err != nil {
+    if err != nil &#123;
         panic(err)
-    }
+    &#125;
     defer f.Close()
 
     // 启动trace goroutine
     err = trace.Start(f)
-    if err != nil {
+    if err != nil &#123;
         panic(err)
-    }
+    &#125;
     defer trace.Stop()
 
     // main
     fmt.Println(&quot;Hello trace&quot;)
-}</code></pre>
+&#125;
+</code></pre>
 <p>运行程序和运行trace：</p>
 <pre><code>$ go run trace.go 
-Hello World</code></pre><p>会得到一个 <code>trace.out</code> 文件，然后可以用一个工具打开，来分析这个文件:</p>
+Hello World
+</code></pre>
+<p>会得到一个 <code>trace.out</code> 文件，然后可以用一个工具打开，来分析这个文件:</p>
 <pre><code class="golang">$ go tool trace trace.out 
 2020/12/07 23:09:33 Parsing trace...
 2020/12/07 23:09:33 Splitting trace...
-2020/12/07 23:09:33 Opening browser. Trace viewer is listening on http://127.0.0.1:56469</code></pre>
+2020/12/07 23:09:33 Opening browser. Trace viewer is listening on http://127.0.0.1:56469
+</code></pre>
 <p>接下来通过浏览器打开 <code>http://127.0.0.1:33479</code> 网址，点击 <code>view trace</code> 能够看见可视化的调度流程：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace.jpg" alt="go tool trace"></p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20%E4%BF%A1%E6%81%AF%E6%B3%A8%E8%A7%A3.png%21large" alt="go tool trace 信息注解"></p>
@@ -663,15 +675,18 @@ Hello World</code></pre><p>会得到一个 <code>trace.out</code> 文件，然�
 <p>多了一个 M2 应该就是 P1 为了执行 G6 而动态创建的 M2。</p>
 <h2 id="Debug-trace"><a href="#Debug-trace" class="headerlink" title="Debug trace"></a>Debug trace</h2><p>示例代码：</p>
 <pre><code class="go">// main.main
-func main() {
-    for i := 0; i &lt; 5; i++ {
+func main() &#123;
+    for i := 0; i &lt; 5; i++ &#123;
         time.Sleep(time.Second)
         fmt.Println(&quot;Hello scheduler&quot;)
-    }
-}</code></pre>
+    &#125;
+&#125;
+</code></pre>
 <p>编译后通过 Debug 方式运行，运行过程会打印trace：</p>
 <pre><code>➜ go build .
-➜ GODEBUG=schedtrace=1000 ./one_routine2</code></pre><p>结果：</p>
+➜ GODEBUG=schedtrace=1000 ./one_routine2
+</code></pre>
+<p>结果：</p>
 <pre><code class="shell">SCHED 0ms: gomaxprocs=4 idleprocs=2 threads=3 spinningthreads=1 idlethreads=0 runqueue=0 [1 0 0 0]
 Hello scheduler
 SCHED 1003ms: gomaxprocs=4 idleprocs=4 threads=5 spinningthreads=0 idlethreads=3 runqueue=0 [0 0 0 0]
@@ -681,14 +696,15 @@ Hello scheduler
 SCHED 3010ms: gomaxprocs=4 idleprocs=4 threads=5 spinningthreads=0 idlethreads=3 runqueue=0 [0 0 0 0]
 Hello scheduler
 SCHED 4013ms: gomaxprocs=4 idleprocs=4 threads=5 spinningthreads=0 idlethreads=3 runqueue=0 [0 0 0 0]
-Hello scheduler</code></pre>
+Hello scheduler
+</code></pre>
 <p>各个字段的含义如下：</p>
 <ul>
 <li><code>SCHED</code>：调试信息输出标志字符串，代表本行是 goroutine 调度器的输出；</li>
 <li><code>0ms</code>：即从程序启动到输出这行日志的时间；</li>
 <li><code>gomaxprocs</code>: P的数量，本例有 4 个P；</li>
 <li><code>idleprocs</code>: 处于 idle (空闲）状态的 P 的数量；通过 <code>gomaxprocs</code> 和 <code>idleprocs</code> 的差值，就可以知道执行 go 代码的 P 的数量；</li>
-<li><code>threads</code>: os threads/M 的数量，包含 scheduler 使用的 m 数量，加上 runtime 自用的类似 sysmon 这样的 thread 的数量；</li>
+<li><code>threads</code>: os threads&#x2F;M 的数量，包含 scheduler 使用的 m 数量，加上 runtime 自用的类似 sysmon 这样的 thread 的数量；</li>
 <li><code>spinningthreads</code>: 处于自旋状态的 os thread 数量；</li>
 <li><code>idlethread</code>: 处于 idle 状态的 os thread 的数量；</li>
 <li><code>runqueue=0</code>： Scheduler 全局队列中 G 的数量；</li>
@@ -697,18 +713,20 @@ Hello scheduler</code></pre>
 <p>看第一行，含义是：刚启动时创建了 4 个P，其中 2 个空闲的 P，共创建 3 个M，其中 1 个 M 处于自旋，没有 M 处于空闲，第一个 P 的本地队列有一个 G。</p>
 <p>另外，可以加上 <code>scheddetail=1</code> 可以打印更详细的 trace 信息。</p>
 <p>命令：</p>
-<pre><code>➜ GODEBUG=schedtrace=1000,scheddetail=1 ./one_routine2</code></pre><p><strong>参考文档</strong>：</p>
+<pre><code>➜ GODEBUG=schedtrace=1000,scheddetail=1 ./one_routine2
+</code></pre>
+<p><strong>参考文档</strong>：</p>
 <blockquote>
-<p><a href="https://mp.weixin.qq.com/s/p7sqYBUZngMfU3xXf9TNWA" target="_blank" rel="noopener">Go语言高阶：调度器系列（1）起源</a></p>
-<p><a href="https://mp.weixin.qq.com/s/Qf0eq0aB4aK21Qk2vLiVhQ" target="_blank" rel="noopener">Go调度器系列（2）宏观看调度器</a></p>
-<p><a href="https://mp.weixin.qq.com/s/MMPf1Xj4944MJ3ujrHYt4A" target="_blank" rel="noopener">Go调度器系列（3）图解调度原理</a></p>
-<p><a href="https://mp.weixin.qq.com/s/epWDv9Nrmgg4ySFlk1gGKg" target="_blank" rel="noopener">Go调度器系列（4）源码阅读与探索</a></p>
-<p><a href="https://learnku.com/articles/41728" target="_blank" rel="noopener">[典藏版] Golang 调度器 GMP 原理与调度全分析</a></p>
-<p><a href="https://tonybai.com/2017/06/23/an-intro-about-goroutine-scheduler/" target="_blank" rel="noopener">也谈goroutine调度器</a></p>
-<p><a href="https://draveness.me/golang/docs/part3-runtime/ch06-concurrency/golang-goroutine/#65-%E8%B0%83%E5%BA%A6%E5%99%A8" target="_blank" rel="noopener">go的设计与实现-6.5调度器</a></p>
-<p><a href="https://tonybai.com/2020/03/21/illustrated-tales-of-go-runtime-scheduler/" target="_blank" rel="noopener">图解Go运行时调度器</a></p>
-<p><a href="https://mp.weixin.qq.com/s/YgiydPI7vJeOuUH4-CtJ2g" target="_blank" rel="noopener">Golang并发模型之GMP浅尝</a></p>
-<p><a href="https://mp.weixin.qq.com/s/h27GXmfGYVLHRG3Mu_8axw" target="_blank" rel="noopener">再见 Go 面试官：单核 CPU，开两个 Goroutine，其中一个死循环，会怎么样？</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/p7sqYBUZngMfU3xXf9TNWA">Go语言高阶：调度器系列（1）起源</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Qf0eq0aB4aK21Qk2vLiVhQ">Go调度器系列（2）宏观看调度器</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/MMPf1Xj4944MJ3ujrHYt4A">Go调度器系列（3）图解调度原理</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/epWDv9Nrmgg4ySFlk1gGKg">Go调度器系列（4）源码阅读与探索</a></p>
+<p><a target="_blank" rel="noopener" href="https://learnku.com/articles/41728">[典藏版] Golang 调度器 GMP 原理与调度全分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://tonybai.com/2017/06/23/an-intro-about-goroutine-scheduler/">也谈goroutine调度器</a></p>
+<p><a target="_blank" rel="noopener" href="https://draveness.me/golang/docs/part3-runtime/ch06-concurrency/golang-goroutine/#65-%E8%B0%83%E5%BA%A6%E5%99%A8">go的设计与实现-6.5调度器</a></p>
+<p><a target="_blank" rel="noopener" href="https://tonybai.com/2020/03/21/illustrated-tales-of-go-runtime-scheduler/">图解Go运行时调度器</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/YgiydPI7vJeOuUH4-CtJ2g">Golang并发模型之GMP浅尝</a></p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/h27GXmfGYVLHRG3Mu_8axw">再见 Go 面试官：单核 CPU，开两个 Goroutine，其中一个死循环，会怎么样？</a></p>
 </blockquote>
 
     </div>
@@ -716,28 +734,26 @@ Hello scheduler</code></pre>
     
     
     
-        <div class="reward-container">
+
+    <footer class="post-footer">
+          <div class="reward-container">
   <div>打工不易，想买杯奶茶</div>
-  <button disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
-    打赏
+  <button>
+    赞赏
   </button>
-  <div id="qr" style="display: none;">
-      
-      <div style="display: inline-block;">
-        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信支付">
-        <p>微信支付</p>
+  <div class="post-reward">
+      <div>
+        <img src="https://qiniu.xiaoming.net.cn/%E5%BE%AE%E4%BF%A1%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 微信">
+        <span>微信</span>
       </div>
-      
-      <div style="display: inline-block;">
+      <div>
         <img src="https://qiniu.xiaoming.net.cn/%E6%94%AF%E4%BB%98%E5%AE%9D%E6%94%B6%E6%AC%BE%E7%A0%81.png" alt="Silverming 支付宝">
-        <p>支付宝</p>
+        <span>支付宝</span>
       </div>
 
   </div>
 </div>
 
-
-      <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag"># 面试</a>
               <a href="/tags/go/" rel="tag"># go</a>
@@ -745,129 +761,60 @@ Hello scheduler</code></pre>
 
         
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2020/11/27/Protobuf%20%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE/" rel="prev" title="Protobuf">
-      <i class="fa fa-chevron-left"></i> Protobuf
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="next" title="Go 内存管理与垃圾回收">
-      Go 内存管理与垃圾回收 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-  </div>
-
-
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2020/11/27/Protobuf%20%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE/" rel="prev" title="Protobuf">
+                  <i class="fa fa-chevron-left"></i> Protobuf
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2020/12/16/Go%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E4%B8%8E%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/" rel="next" title="Go 内存管理与垃圾回收">
+                  Go 内存管理与垃圾回收 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
           </div>
-          
+    </footer>
+  </article>
+</div>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="beian"><a href="https://beian.miit.gov.cn/" rel="noopener" target="_blank">粤ICP备18114217号-1 </a>
   </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-调度器的概念"><span class="nav-number">1.</span> <span class="nav-text">goroutine 调度器的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-调度器的演进"><span class="nav-number">2.</span> <span class="nav-text">goroutine 调度器的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G-M模型"><span class="nav-number">2.1.</span> <span class="nav-text">G-M模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G-P-M-模型"><span class="nav-number">2.2.</span> <span class="nav-text">G-P-M 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#有关-P-和-M-的个数问题"><span class="nav-number">2.2.1.</span> <span class="nav-text">有关 P 和 M 的个数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#P-的数量"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">P 的数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#M-的数量"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">M 的数量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抢占式调度"><span class="nav-number">2.2.2.</span> <span class="nav-text">抢占式调度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基于协作的抢占式调度"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">基于协作的抢占式调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#基于信号的抢占式调度"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">基于信号的抢占式调度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抢占调度示例"><span class="nav-number">2.2.3.</span> <span class="nav-text">抢占调度示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-func-调度流程"><span class="nav-number">3.</span> <span class="nav-text">go func() 调度流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-生命周期"><span class="nav-number">4.</span> <span class="nav-text">Goroutine 生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-调度器场景分析"><span class="nav-number">5.</span> <span class="nav-text">Goroutine 调度器场景分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景一"><span class="nav-number">5.1.</span> <span class="nav-text">场景一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景二"><span class="nav-number">5.2.</span> <span class="nav-text">场景二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景三"><span class="nav-number">5.3.</span> <span class="nav-text">场景三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景四"><span class="nav-number">5.4.</span> <span class="nav-text">场景四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景五"><span class="nav-number">5.5.</span> <span class="nav-text">场景五</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景六"><span class="nav-number">5.6.</span> <span class="nav-text">场景六</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景七"><span class="nav-number">5.7.</span> <span class="nav-text">场景七</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景八"><span class="nav-number">5.8.</span> <span class="nav-text">场景八</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#场景九"><span class="nav-number">5.9.</span> <span class="nav-text">场景九</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态汇总"><span class="nav-number">6.</span> <span class="nav-text">状态汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G状态"><span class="nav-number">6.1.</span> <span class="nav-text">G状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P-状态"><span class="nav-number">6.2.</span> <span class="nav-text">P 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#M-状态"><span class="nav-number">6.3.</span> <span class="nav-text">M 状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调度器设计"><span class="nav-number">7.</span> <span class="nav-text">调度器设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#调度器设计的两大思想"><span class="nav-number">7.1.</span> <span class="nav-text">调度器设计的两大思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调度器设计的两小策略"><span class="nav-number">7.2.</span> <span class="nav-text">调度器设计的两小策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GPM-可视化调试"><span class="nav-number">8.</span> <span class="nav-text">GPM 可视化调试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-tool-trace"><span class="nav-number">8.1.</span> <span class="nav-text">go tool trace</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#g-信息"><span class="nav-number">8.1.1.</span> <span class="nav-text">g 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#m-信息"><span class="nav-number">8.1.2.</span> <span class="nav-text">m 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#p-信息"><span class="nav-number">8.1.3.</span> <span class="nav-text">p 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debug-trace"><span class="nav-number">8.2.</span> <span class="nav-text">Debug trace</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Silverming</p>
-  <div class="site-description" itemprop="description">Wechat:934933088</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">139</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">50</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
 
 <div class="copyright">
-  
   &copy; 
   <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
-    <i class="fa fa-user"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Silverming</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-area-chart"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.3m</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">2.4m</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">34:37</span>
+    <span title="站点阅读时长">36:04</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
-  </div>
-  <span class="post-meta-divider">|</span>
-  <div class="theme-info">主题 – <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.5.0
-  </div>
-  <div>
-     <a href="http://www.beianbeian.com/beianxinxi/56c155c0ed5f44020af3c1659377b89d.html" target="_blank" rel="noopener">粤ICP备18114217号</a>
-  </div>
-
-        
 <div class="busuanzi-count">
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
       <span class="post-meta-item-icon">
         <i class="fa fa-user"></i>
       </span>
@@ -875,8 +822,7 @@ Hello scheduler</code></pre>
         <span id="busuanzi_value_site_uv"></span>
       </span>
     </span>
-    <span class="post-meta-divider">|</span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
       <span class="post-meta-item-icon">
         <i class="fa fa-eye"></i>
       </span>
@@ -885,53 +831,36 @@ Hello scheduler</code></pre>
       </span>
     </span>
 </div>
-
-
-
-
-
-
-
-
-        
-      </div>
-    </footer>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
   </div>
 
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
+    </div>
+  </footer>
 
   
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
 
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
+  
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.0/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
 
 
   
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
 
   
 
-  
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"all","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js"></script>
+
+
 
 </body>
 </html>
