@@ -50,7 +50,7 @@
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-2.jpg">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%20tool%20trace%20p%E4%BF%A1%E6%81%AF-3.jpg">
 <meta property="article:published_time" content="2020-12-03T02:09:33.000Z">
-<meta property="article:modified_time" content="2022-09-10T15:09:39.241Z">
+<meta property="article:modified_time" content="2022-12-03T14:25:10.243Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="go">
@@ -169,7 +169,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">goroutine 调度器的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="nav-number">2.</span> <span class="nav-text">goroutine 调度器的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G-M%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">G-M模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G-P-M-%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.2.</span> <span class="nav-text">G-P-M 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%85%B3-P-%E5%92%8C-M-%E7%9A%84%E4%B8%AA%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.1.</span> <span class="nav-text">有关 P 和 M 的个数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#P-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">P 的数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#M-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">M 的数量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.</span> <span class="nav-text">抢占式调度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%8D%8F%E4%BD%9C%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">基于协作的抢占式调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E4%BF%A1%E5%8F%B7%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">基于信号的抢占式调度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E8%B0%83%E5%BA%A6%E7%A4%BA%E4%BE%8B"><span class="nav-number">2.2.3.</span> <span class="nav-text">抢占调度示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-func-%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">go func() 调度流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">4.</span> <span class="nav-text">Goroutine 生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">Goroutine 调度器场景分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80"><span class="nav-number">5.1.</span> <span class="nav-text">场景一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C"><span class="nav-number">5.2.</span> <span class="nav-text">场景二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%89"><span class="nav-number">5.3.</span> <span class="nav-text">场景三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%9B%9B"><span class="nav-number">5.4.</span> <span class="nav-text">场景四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%94"><span class="nav-number">5.5.</span> <span class="nav-text">场景五</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AD"><span class="nav-number">5.6.</span> <span class="nav-text">场景六</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%83"><span class="nav-number">5.7.</span> <span class="nav-text">场景七</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AB"><span class="nav-number">5.8.</span> <span class="nav-text">场景八</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B9%9D"><span class="nav-number">5.9.</span> <span class="nav-text">场景九</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E6%B1%87%E6%80%BB"><span class="nav-number">6.</span> <span class="nav-text">状态汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G%E7%8A%B6%E6%80%81"><span class="nav-number">6.1.</span> <span class="nav-text">G状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P-%E7%8A%B6%E6%80%81"><span class="nav-number">6.2.</span> <span class="nav-text">P 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#M-%E7%8A%B6%E6%80%81"><span class="nav-number">6.3.</span> <span class="nav-text">M 状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1"><span class="nav-number">7.</span> <span class="nav-text">调度器设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%A4%A7%E6%80%9D%E6%83%B3"><span class="nav-number">7.1.</span> <span class="nav-text">调度器设计的两大思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%B0%8F%E7%AD%96%E7%95%A5"><span class="nav-number">7.2.</span> <span class="nav-text">调度器设计的两小策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GPM-%E5%8F%AF%E8%A7%86%E5%8C%96%E8%B0%83%E8%AF%95"><span class="nav-number">8.</span> <span class="nav-text">GPM 可视化调试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-tool-trace"><span class="nav-number">8.1.</span> <span class="nav-text">go tool trace</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#g-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.1.</span> <span class="nav-text">g 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#m-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.2.</span> <span class="nav-text">m 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#p-%E4%BF%A1%E6%81%AF"><span class="nav-number">8.1.3.</span> <span class="nav-text">p 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debug-trace"><span class="nav-number">8.2.</span> <span class="nav-text">Debug trace</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">goroutine 调度器的概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#groutine-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.</span> <span class="nav-text">groutine 结构体</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="nav-number">3.</span> <span class="nav-text">goroutine 调度器的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G-M%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">G-M模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#G-P-M-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">G-P-M 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%85%B3-P-%E5%92%8C-M-%E7%9A%84%E4%B8%AA%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">3.2.1.</span> <span class="nav-text">有关 P 和 M 的个数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#P-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">P 的数量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#M-%E7%9A%84%E6%95%B0%E9%87%8F"><span class="nav-number">3.2.1.2.</span> <span class="nav-text">M 的数量</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6"><span class="nav-number">3.3.</span> <span class="nav-text">调度</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Sysmon-%E5%8D%8F%E7%A8%8B"><span class="nav-number">3.3.1.</span> <span class="nav-text">Sysmon 协程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">3.3.2.</span> <span class="nav-text">抢占式调度</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E5%8D%8F%E4%BD%9C%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">基于协作的抢占式调度</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E4%BF%A1%E5%8F%B7%E7%9A%84%E6%8A%A2%E5%8D%A0%E5%BC%8F%E8%B0%83%E5%BA%A6"><span class="nav-number">3.3.2.2.</span> <span class="nav-text">基于信号的抢占式调度</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A2%E5%8D%A0%E8%B0%83%E5%BA%A6%E7%A4%BA%E4%BE%8B"><span class="nav-number">3.3.3.</span> <span class="nav-text">抢占调度示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.3.4.</span> <span class="nav-text">网络同步非阻塞的实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#go-func-%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">go func() 调度流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">5.</span> <span class="nav-text">Goroutine 生命周期</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Goroutine-%E8%B0%83%E5%BA%A6%E5%99%A8%E5%9C%BA%E6%99%AF%E5%88%86%E6%9E%90"><span class="nav-number">6.</span> <span class="nav-text">Goroutine 调度器场景分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%80"><span class="nav-number">6.1.</span> <span class="nav-text">场景一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%8C"><span class="nav-number">6.2.</span> <span class="nav-text">场景二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%89"><span class="nav-number">6.3.</span> <span class="nav-text">场景三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%9B%9B"><span class="nav-number">6.4.</span> <span class="nav-text">场景四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%BA%94"><span class="nav-number">6.5.</span> <span class="nav-text">场景五</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AD"><span class="nav-number">6.6.</span> <span class="nav-text">场景六</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B8%83"><span class="nav-number">6.7.</span> <span class="nav-text">场景七</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E5%85%AB"><span class="nav-number">6.8.</span> <span class="nav-text">场景八</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF%E4%B9%9D"><span class="nav-number">6.9.</span> <span class="nav-text">场景九</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E6%B1%87%E6%80%BB"><span class="nav-number">7.</span> <span class="nav-text">状态汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#G%E7%8A%B6%E6%80%81"><span class="nav-number">7.1.</span> <span class="nav-text">G状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#P-%E7%8A%B6%E6%80%81"><span class="nav-number">7.2.</span> <span class="nav-text">P 状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#M-%E7%8A%B6%E6%80%81"><span class="nav-number">7.3.</span> <span class="nav-text">M 状态</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1"><span class="nav-number">8.</span> <span class="nav-text">调度器设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%A4%A7%E6%80%9D%E6%83%B3"><span class="nav-number">8.1.</span> <span class="nav-text">调度器设计的两大思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%A4%E5%B0%8F%E7%AD%96%E7%95%A5"><span class="nav-number">8.2.</span> <span class="nav-text">调度器设计的两小策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GPM-%E5%8F%AF%E8%A7%86%E5%8C%96%E8%B0%83%E8%AF%95"><span class="nav-number">10.</span> <span class="nav-text">GPM 可视化调试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#go-tool-trace"><span class="nav-number">10.1.</span> <span class="nav-text">go tool trace</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#g-%E4%BF%A1%E6%81%AF"><span class="nav-number">10.1.1.</span> <span class="nav-text">g 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#m-%E4%BF%A1%E6%81%AF"><span class="nav-number">10.1.2.</span> <span class="nav-text">m 信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#p-%E4%BF%A1%E6%81%AF"><span class="nav-number">10.1.3.</span> <span class="nav-text">p 信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Debug-trace"><span class="nav-number">10.2.</span> <span class="nav-text">Debug trace</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -263,7 +263,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-09-10 23:09:39" itemprop="dateModified" datetime="2022-09-10T23:09:39+08:00">2022-09-10</time>
+      <time title="修改时间：2022-12-03 22:25:10" itemprop="dateModified" datetime="2022-12-03T22:25:10+08:00">2022-12-03</time>
     </span>
 
   
@@ -280,14 +280,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>13k</span>
+      <span>16k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>12 分钟</span>
+      <span>15 分钟</span>
     </span>
 </div>
 
@@ -319,18 +319,42 @@
 <p>而将所有的 goroutines 按照一定算法放到 CPU 上执行的程序就称为 <strong>goroutine 调度器</strong>或 <strong>goroutine scheduler</strong>。</p>
 <p>不过，一个 Go 程序对于操作系统来说只是一个<strong>用户层程序</strong>，对于操作系统而言，它的眼中只有 thread，它并不知道有什么叫 Goroutine 的东西的存在。goroutine 的调度全要靠 Go 自己完成，所以就需要 goroutine 调度器来实现 Go 程序内 goroutine 之间的 CPU 资源调度。</p>
 <p>在操作系统层面，Thread 竞争的 CPU 资源是真实的物理 CPU，但对于 Go 程序来说，它是一个用户层程序，它本身整体是运行在一个或多个操作系统线程上的，因此 <strong>goroutine 们要竞争的所谓 “CPU” 资源就是操作系统线程</strong>。这样 Go scheduler 的要做的就是：<strong>将 goroutines 按照一定算法放到不同的操作系统线程中去执行</strong>。这种在语言层面自带调度器的，称之为原生支持并发。</p>
+<h1 id="groutine-结构体"><a href="#groutine-结构体" class="headerlink" title="groutine 结构体"></a>groutine 结构体</h1><p>我们在代码中 go 一个 func 时一般这样写：</p>
+<pre><code class="go">go func1(arg1 type1,arg2 type2)&#123;....&#125;(a1,a2)
+</code></pre>
+<p>一个协程代表了一个执行流，执行流有需要执行的函数(对应上面的func1)，有函数的入参(a1, a2)，有当前执行流的状态和进度(对应CPU的PC寄存器和SP寄存器)，当然也需要有保存状态的地方，用于执行流恢复。</p>
+<p>真正代表协程的是 runtime.g 结构体（仅列出部分字段）</p>
+<pre><code class="go">type g struct &#123;
+    stack     stack   // offset known to runtime/cgo
+    sched     gobuf   // 切换协程时的上下文信息
+    startfunc uintptr // 程序地址
+    goid      int64   // 协程id
+    status    uint32  // 协程状态
+&#125;
+
+type stack struct &#123;
+    lo uintptr // 该协程拥有的栈低位
+    hi uintptr // 该协程拥有的栈高位
+&#125;
+
+type gobuf struct &#123;
+    sp uintptr // 栈指针位置
+    pc uintptr // 运行到的程序位置
+&#125;
+</code></pre>
+<p>每个 go func 都会编译成 runtime.newproc 函数，最终有一个 runtime.g 对象放入调度队列。上面的 func1 函数的指针设置在 runtime.g 的 startfunc 字段，参数会在 newproc 函数里拷贝到 stack 中，sched 用于保存协程切换时的 pc 位置和栈位置。协程切换出去和恢复回来需要保存上下文，恢复上下文，这些由 gobuf 结构体来存储相关信息。以上就能实现协程这种执行流，并能进行切换和恢复。</p>
 <h1 id="goroutine-调度器的演进"><a href="#goroutine-调度器的演进" class="headerlink" title="goroutine 调度器的演进"></a>goroutine 调度器的演进</h1><p>调度器的任务是在用户态完成 goroutine 的调度，而调度器的实现好坏，对并发实际有很大的影响。</p>
 <h2 id="G-M模型"><a href="#G-M模型" class="headerlink" title="G-M模型"></a>G-M模型</h2><p>现在的 Go语言调度器是 2012 年重新设计的，在这之前的调度器称为老调度器，老调度器采用的是 <strong>G-M 模型</strong>，在这个调度器中，每个 goroutine 对应于 runtime 中的一个抽象结构：G，而 os thread 作为物理 CPU 的存在而被抽象为一个结构：M(machine)。M 想要执行 G、放回 G 都必须访问全局 G 队列，并且 M 有多个，即多线程访问同一资源需要加锁进行保证互斥&#x2F;同步，所以全局 G 队列是有互斥锁进行保护的。</p>
 <p><img src="https://qiniu.xiaoming.net.cn/goroutine%20G-M%E6%A8%A1%E5%9E%8B.png%21large" alt="G-M模型"></p>
 <p>这个结构虽然简单，但是却存在着许多问题。它限制了 Go 并发程序的伸缩性，尤其是对那些有高吞吐或并行计算需求的服务程序。主要体现在如下几个方面：</p>
 <ul>
 <li>单一全局互斥锁(Sched.Lock)和集中状态存储的存在导致所有 goroutine 相关操作，比如：创建、重新调度等都要上锁，这会造成激烈的锁竞争</li>
-<li>goroutine 传递问题：M 经常在 M 之间传递可运行的 goroutine，这导致调度延迟增大以及额外的性能损耗</li>
-<li>每个 M 做内存缓存，导致内存占用过高，数据局部性较差</li>
+<li>goroutine 传递问题：M 经常在 M 之间传递可运行的 goroutine，这导致调度延迟增大以及额外的性能损耗。新生成的协程也会放入全局的队列，大概率是被其他m(可以理解为底层线程的一个表示)运行了，<strong>内存亲和性不好</strong>。当前协程 A 新生成了协程 B，协程 A 比较大概率会结束或者阻塞，如果这时候 m 直接去执行协程B，内存的亲和性会好很多。</li>
+<li>每个 M 做内存缓存，导致内存占用过高，数据局部性较差。因为 mcache 与 m 绑定，在一些应用中(比如文件操作或其他可能会阻塞线程的系统调用比较多)，m 的个数可能会远超过活跃的 m 个数, 导致比较大的内存浪费..</li>
 <li>系统调用导致频繁的线程阻塞和取消阻塞操作增加了系统开销</li>
 </ul>
 <p>所以用了 4 年左右就被替换掉了。</p>
-<h2 id="G-P-M-模型"><a href="#G-P-M-模型" class="headerlink" title="G-P-M 模型"></a>G-P-M 模型</h2><p>面对之前调度器的问题，Go 设计了新的调度器，并在其中引入了 P（Processor），另外还引入了任务窃取调度的方式（work stealing）</p>
+<h2 id="G-P-M-模型"><a href="#G-P-M-模型" class="headerlink" title="G-P-M 模型"></a>G-P-M 模型</h2><p>面对之前调度器的问题，Go 设计了新的调度器，并在其中引入了 P（Processor），将 Memory Cache 放到了 P 中，另外还引入了任务窃取调度的方式（work stealing）</p>
 <ul>
 <li><strong>P</strong>：<strong>Processor，它包含了运行 goroutine 的资源</strong>，如果线程想运行 goroutine，必须先获取 P，P 中还包含了可运行的 G 队列。</li>
 <li>work stealing：当 M 绑定的 P 没有可运行的 G 时，它可以从其他运行的 M 那里偷取G。</li>
@@ -354,13 +378,48 @@
 <li>一个 M 阻塞了，会创建新的 M。</li>
 </ul>
 <p>M 与 P 的数量没有绝对关系，一个 M 阻塞，P 就会去创建或者切换另一个 M，所以，即使 P 的默认数量是 1，也有可能会创建很多个 M 出来。</p>
+<h2 id="调度"><a href="#调度" class="headerlink" title="调度"></a>调度</h2><p>golang 调度的职责就是为需要执行的Go代码(G)寻找执行者(M)以及执行的准许和资源(P)。并没有一个调度器的实体, 调度是需要发生调度时由 m 执行 <code>runtime.schedule</code> 方法进行的。</p>
+<p>发生调度的时机：</p>
+<ul>
+<li>lchannel，mutex 等 sync 操作发生了协程阻塞</li>
+<li>time.sleep</li>
+<li>网络操作暂时未ready</li>
+<li>gc</li>
+<li>主动yield</li>
+<li>运行过久或系统调用过久等等</li>
+</ul>
+<h3 id="Sysmon-协程"><a href="#Sysmon-协程" class="headerlink" title="Sysmon 协程"></a>Sysmon 协程</h3><p>sysmon 协程是在 go runtime 初始化之后，执行用户编写的代码之前，<strong>由 runtime 启动的不与任何 P 绑定，直接由一个 M 执行的协程</strong>。类似于linux中的执行一些系统任务的内核线程。</p>
+<p>可认为是10ms执行一次。(初始运行间隔为20us，sysmon运行 1ms 后逐渐翻倍，最终每10ms运行一次。如果有发生过抢占成功, 则又恢复成初始20us的运行间隔，如此循环)</p>
+<p>以下代码来自 1.15.7 版本的 <code>runtime/proc.go</code>: </p>
+<pre><code class="go">  if idle == 0 &#123; 
+      // start with 20us sleep...   
+      delay = 20  
+  &#125; else if idle &gt; 50 &#123;
+      // start doubling the sleep after 1ms...   
+      delay *= 2  
+  &#125; 
+  if delay &gt; 10*1000 &#123; 
+      // up to 10ms   
+      delay = 10 * 1000  
+  &#125;
+</code></pre>
+<p>P 的数量影响了同时运行 go 代码的协程数。如果 P 被占用很久，就会影响调度。</p>
+<p>sysmon 协程的一个功能就是进行抢占。</p>
+<p>sysmon 协程的功能如下：</p>
+<ul>
+<li>每 sysmon tick 进行一次 netpoll(在STW结束，和 M 执行查找可运行的 G 时也会执行 netpoll)获取 fd 事件，将与之相关的 G 放入全局 runqueue</li>
+<li>每次sysmon运行都执行一次抢占, 如果某个 P 的 G 执行超过1个 sysmon tick，则执行抢占。正在执行系统调用的话, 将 P 与 M 脱离(handoffp); 正在执行 Go 代码，则通知抢占(preemptone).</li>
+<li>每2分钟如果没有执行过GC, 则通知 gchelper 协程执行一次GC</li>
+<li>如果开启schdule trace的debug信息(例如GODEBUG&#x3D;schedtrace&#x3D;5000,scheddetail&#x3D;1)，则按照给定的间隔打印调度信息</li>
+<li>每5分钟归还 GC 后不再使用的 span 给操作系统，释放自由列表中多余的项减少内存占用(scavenge heap)</li>
+</ul>
 <h3 id="抢占式调度"><a href="#抢占式调度" class="headerlink" title="抢占式调度"></a>抢占式调度</h3><p>G-P-M 模型中还实现了抢占式调度，所谓抢占式调度指的是在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用 CPU 10ms，防止其他 goroutine 被饿死，这也是 goroutine 不同于 coroutine 的一个地方。在 goroutine 中先后实现了两种抢占式调度算法，分别是基于协作的方式和基于信号的方式。</p>
 <h4 id="基于协作的抢占式调度"><a href="#基于协作的抢占式调度" class="headerlink" title="基于协作的抢占式调度"></a>基于协作的抢占式调度</h4><p>G-P-M 模型的实现是 Go scheduler 的一大进步，但此时的调度器仍然有一个问题，那就是不支持抢占式调度，导致一旦某个 G 中出现死循环或永久循环的代码逻辑，那么 G 将永久占用分配给它的 P 和 M，位于同一个 P 中的其他 G 将得不到调度，出现“<strong>饿死</strong>”的情况。当只有一个 P 时(GOMAXPROCS&#x3D;1)时，整个 Go 程序中的其他 G 都会被饿死。所以后面 Go 设计团队在 Go 1.2 中实现了<strong>基于协作的抢占式调度</strong>。</p>
 <p>这种抢占式调度的原理则是在每个函数或方法的入口，加上一段额外的代码，让 runtime 有机会检查是否需要执行抢占调度。</p>
 <p>基于协作的抢占式调度的工作原理大致如下：</p>
 <ol>
 <li>编译器会在调用函数前插入一个 <code>runtime.morestack</code> 函数</li>
-<li>Go 语言运行时会在垃圾回收暂停程序、系统监控发现 Goroutine 运行超过 10ms 时发出抢占请求，此时会设置一个 <code>StackPreempt</code> 字段值为 <code>StackPreempt</code> ，标示当前 Goroutine 发出了抢占请求。</li>
+<li>Go 语言运行时会在垃圾回收暂停程序、系统监控发现 Goroutine 运行超过 10ms 时发出抢占请求(<strong>由 sysmon 协程触发</strong>)，此时会设置一个 <code>StackPreempt</code> 字段值为 <code>StackPreempt</code> ，标示当前 Goroutine 发出了抢占请求。</li>
 <li>当发生函数调用时，可能会执行编译器插入的 <code>runtime.morestack</code> 函数，它调用的 <code>runtime.newstack</code> 会检查 Goroutine 的 <code>stackguard0</code> 字段是否为 <code>StackPreempt</code></li>
 <li>如果 <code>stackguard0</code> 是 <code>StackPreempt</code>，就会触发抢占让出当前线程</li>
 </ol>
@@ -403,30 +462,6 @@
 <li>抢占运行时间过长的 G</li>
 </ul>
 <p>该方法会检测符合场景的 P，当满足上述两个场景之一时，就会发送信号给 M。M 收到信号后将会休眠正在阻塞的 Goroutine，调用绑定的信号方法，并进行重新调度。</p>
-<blockquote>
-<p>关于 sysmon 线程的描述：</p>
-<ol>
-<li><p>sysmon 线程是无限循环执行。</p>
-</li>
-<li><p>sysmon 线程在每个循环中，会进行 netpool（获取fd事件）、retake（抢占）、force gc（按时间强制执行gc），scavenge heap（释放自由列表中多余的项减少内存占用）等处理。</p>
-</li>
-<li><p>sysmon线程一开始每次循环后，休眠 20us，50次之后（即1ms后）每次休眠时间倍增，最终每一轮都会休眠 10ms。</p>
-<p> 以下代码来自 1.15.7 版本的 <code>runtime/proc.go</code>: </p>
-<pre><code class="go"> if idle == 0 &#123; 
-     // start with 20us sleep...   
-     delay = 20  
- &#125; else if idle &gt; 50 &#123;
-     // start doubling the sleep after 1ms...   
-     delay *= 2  
- &#125; 
- if delay &gt; 10*1000 &#123; 
-     // up to 10ms   
-     delay = 10 * 1000  
- &#125;
-</code></pre>
-</li>
-</ol>
-</blockquote>
 <p>简单来说，上述流程就是说 Goroutine 通过 <code>SIGURG</code> 信号标记自己可以被抢占，操作系统收到此信号后，会进行保存现场的处理，然后让出线程给调度器选择其他 Goroutine 执行。</p>
 <p>在上面的选择 <code>SIGURG</code> 作为触发异步抢占的信号：</p>
 <ol>
@@ -454,6 +489,23 @@
 <p>在 1.14 前，基于协作的抢占式调度，需要发生函数调用时才能够抢占，这段程序中没有涉及主动放弃执行权的调用（runtime.Gosched），又或是其他调用（可能会导致执行权转移）的行为。因此这个 Goroutine 是没机会溜号的，只能一直打工…</p>
 <p>那为什么主协程（Main Goroutine）会无法运行呢，其实原因是会优先调用休眠，但由于单核 CPU，其只有唯一的 P。唯一的 P 又一直在打工不愿意下班（执行 for 死循环，被迫无限加班）。</p>
 <p>因此主协程永远没有机会被调度，所以这个 Go 程序自然也就一直阻塞在了执行死循环的 Goroutine 中，永远无法下班（执行完毕，退出程序）。</p>
+<h3 id="网络同步非阻塞的实现"><a href="#网络同步非阻塞的实现" class="headerlink" title="网络同步非阻塞的实现"></a>网络同步非阻塞的实现</h3><p>go 写后台最舒服的就是能够以同步写代码的方式操作网络，但是网络操作不阻塞线程。这里主要是用户态的协程结合 epoll, nonblock 模式的fd操作，在网络操作未 ready 时切换协程，ready 后把相关协程添加到待运行队列。从而使网络操作达到既不阻塞线程，又是同步执行流的效果。</p>
+<p>Go 在这里实现了以下几个点：</p>
+<ol>
+<li>封装epoll, 有网络操作时会 epollcreate 一个 epfd</li>
+<li>所有网络 fd 均通过 fcntl 设置为 NONBLOCK 模式，以边缘触发模式放入 epoll 节点中</li>
+<li>对网络 fd 执行 Accept(syscall.accept4)，Read(syscall.read)，Write(syscall.write)操作时，相关操作未 ready，则系统调用会立即返回EAGAIN；使用gopark切换该协程</li>
+<li>在不同的时机, 通过 epollwait 来获取 ready 的 epollevents，通过其中 data 指针可获取对应的 g，将其置为待运行状态, 添加到 runq</li>
+</ol>
+<p>综上，通过结合非阻塞的fd，epoll，以及协程的切换和恢复，Go实现了网络的非阻塞操作。linux提供了网络 fd 的非阻塞模式，对于没有 ready 的非阻塞 fd 执行网络操作时，linux内核不阻塞线程，会直接返回EAGAIN，这个时候将协程状态设置为wait，然后 m 去调度其他协程。go 在初始化一个网络 fd 的时候，就会把这个 fd 使用 epollctl 加入到全局的 epoll 节点中，同时放入 epoll 中的还有 polldesc 的指针。</p>
+<pre><code class="go">func netpollopen(fd uintptr, pd *pollDesc) int32 &#123;
+    var ev epollevent
+    ev.events = _EPOLLIN | _EPOLLOUT | _EPOLLRDHUP | _EPOLLET
+    *(**pollDesc)(unsafe.Pointer(&amp;ev.data)) = pd
+    return -epollctl(epfd, _EPOLL_CTL_ADD, int32(fd), &amp;ev)
+&#125;
+</code></pre>
+<p>在 sysmon 协程中，schedule函数被调用，start the world 等三种情况下，会执行 netpoll 调用 epollwait 系统调用，把 ready 的网络事件从 epoll 中取出来，<strong>每个网络事件可以通过前面传入的 polldesc 获取到阻塞在该网络事件上的协程</strong>，以此恢复协程为 runnable。</p>
 <h1 id="go-func-调度流程"><a href="#go-func-调度流程" class="headerlink" title="go func() 调度流程"></a>go func() 调度流程</h1><p>基于上面的模型，当我们使用 <code>go func()</code> 创建一个新的 goroutine 的时候，其调度流程如下：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/go%20func%28%29%20%E8%B0%83%E5%BA%A6%E6%B5%81%E7%A8%8B.jpeg%21large" alt="go func() 调度流程"></p>
 <ol>
@@ -624,6 +676,16 @@ func main() &#123;
 <p><strong>利用并行</strong>：GOMAXPROCS 设置 P 的数量，当 GOMAXPROCS 大于 1 时，就最多有 GOMAXPROCS 个线程处于运行状态，这些线程可能分布在多个 CPU 核上同时运行，使得并发利用并行。另外，GOMAXPROCS 也限制了并发的程度，比如 <code>GOMAXPROCS = 核数/2</code>，则最多利用了一半的 CPU 核进行并行。</p>
 <h2 id="调度器设计的两小策略"><a href="#调度器设计的两小策略" class="headerlink" title="调度器设计的两小策略"></a>调度器设计的两小策略</h2><p><strong>抢占</strong>：在 coroutine 中要等待一个协程主动让出 CPU 才执行下一个协程，在 Go 中，一个 goroutine 最多占用CPU 10ms，防止其他 goroutine 被饿死，这就是 goroutine 不同于 coroutine 的一个地方。</p>
 <p><strong>全局G队列</strong>：在新的调度器中依然有全局 G 队列，但功能已经被弱化了，当 M 执行 work stealing 从其他 P 偷不到 G 时，它可以从全局 G 队列获取 G。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>轻量级的协程, 栈初始2KB, 调度不涉及系统调用</li>
+<li>调度在计算机中是分配工作所需资源的方法. linux的调度为CPU找到可运行的线程. 而Go的调度是为M(线程)找到P(内存, 执行票据)和可运行的G.</li>
+<li>用户函数调用前会检查栈空间是否足够, 不够的话, 会进行*2 栈扩容. 最大栈1G, 超出panic.</li>
+<li>用户代码中的协程同步造成的阻塞, 仅仅是切换(gopark)协程, 而不阻塞线程, m和p仍结合, 去寻找新的可执行的g.</li>
+<li>每个P均有local runq, 大多数时间仅与local runq无锁交互. 新生成的g, 放入到local runq中.</li>
+<li>调度时会随机从全局runq取g. 然后local runq, global runq… 均没有g的话, work stealing从其他P中取.</li>
+<li>sysmon: 对于运行过久的g设置抢占标识; 对于过久syscall的p, 进行m和p的分离. 防止p被占用过久影响调度.</li>
+<li>封装了epoll, 网络fd会设置成NonBlocking模式, 网络fd的read, write, accept操作, 会以NonBlocking模式操作, 返回EAGAIN则gopark当前协程. 在m调度, sysmon中, gc start the world等阶段均会poll出ready的协程进行运行或者添加到全局runq中</li>
+</ul>
 <h1 id="GPM-可视化调试"><a href="#GPM-可视化调试" class="headerlink" title="GPM 可视化调试"></a>GPM 可视化调试</h1><p>有 2 种方式可以查看一个程序 GPM 的数据：</p>
 <h2 id="go-tool-trace"><a href="#go-tool-trace" class="headerlink" title="go tool trace"></a>go tool trace</h2><p>trace 记录了运行时的信息，能提供可视化的Web页面。</p>
 <p>简单测试代码：main 函数创建 trace，trace 会运行在单独的 goroutine 中，然后 main 打印 “Hello trace” 退出。</p>
@@ -810,7 +872,7 @@ Hello scheduler
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">36:03</span>
+    <span title="站点阅读时长">36:50</span>
   </span>
 </div>
 <div class="busuanzi-count">
