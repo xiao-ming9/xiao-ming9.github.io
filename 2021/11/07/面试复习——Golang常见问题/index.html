@@ -28,7 +28,7 @@
 <meta property="og:description" content="Go 结构体是否可以比较，为什么？Go 的结构体是否可以比较，需要视具体情况而定，在某些情况下是可以比较的，而某些情况下比较会不符合预期，甚至直接报错。 先来看看几个例子：">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-11-07T12:55:07.000Z">
-<meta property="article:modified_time" content="2022-12-03T14:25:10.245Z">
+<meta property="article:modified_time" content="2023-08-05T07:12:24.875Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="go">
@@ -146,7 +146,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E7%BB%93%E6%9E%84%E4%BD%93%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E6%AF%94%E8%BE%83%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Go 结构体是否可以比较，为什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%B8%80"><span class="nav-number">1.1.</span> <span class="nav-text">例子一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%BA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">例子二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%B8%89"><span class="nav-number">1.3.</span> <span class="nav-text">例子三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E5%9B%9B"><span class="nav-number">1.4.</span> <span class="nav-text">例子四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">1.5.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%BA%94"><span class="nav-number">1.6.</span> <span class="nav-text">例子五</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%BB%86%E8%8A%82%EF%BC%8C%E5%B0%B1%E6%98%AF-%E2%80%9C%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%83%E9%80%B8%E5%90%8E%EF%BC%8C%E4%B8%A4%E4%B8%AA%E7%A9%BA-struct-%E4%BC%9A%E6%98%AF%E7%9B%B8%E7%AD%89%E7%9A%84%EF%BC%9F"><span class="nav-number">1.6.1.</span> <span class="nav-text">关注第一个细节，就是 “为什么逃逸后，两个空 struct 会是相等的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B2%A1%E9%80%83%E9%80%B8%E4%B8%8D%E7%9B%B8%E7%AD%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">为什么没逃逸不相等</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Golang-%E8%AF%AD%E8%A8%80%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">Golang 语言有什么优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Golang-%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">2.1.</span> <span class="nav-text">Golang 的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Golang-%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">Golang 存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.</span> <span class="nav-text">性能问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GC-%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.1.</span> <span class="nav-text">GC 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5%EF%BC%9A%E5%B0%9D%E8%AF%95%E9%99%8D%E4%BD%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%8C%E7%89%B9%E5%88%AB%E6%98%AF%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%BC%80%E9%94%80%EF%BC%8C%E8%BF%9B%E8%80%8C%E9%99%8D%E4%BD%8E-GC-%E5%BC%80%E9%94%80%E3%80%82"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">优化策略：尝试降低内存管理，特别是内存分配带来的开销，进而降低 GC 开销。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.2.</span> <span class="nav-text">生成代码问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">优化策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%A7%82%E6%B5%8B%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.3.</span> <span class="nav-text">性能观测问题</span></a></li></ol></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E7%BB%93%E6%9E%84%E4%BD%93%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E6%AF%94%E8%BE%83%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Go 结构体是否可以比较，为什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%B8%80"><span class="nav-number">1.1.</span> <span class="nav-text">例子一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%BA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">例子二</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%B8%89"><span class="nav-number">1.3.</span> <span class="nav-text">例子三</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E5%9B%9B"><span class="nav-number">1.4.</span> <span class="nav-text">例子四</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">1.5.</span> <span class="nav-text">分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E4%BA%94"><span class="nav-number">1.6.</span> <span class="nav-text">例子五</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E7%AC%AC%E4%B8%80%E4%B8%AA%E7%BB%86%E8%8A%82%EF%BC%8C%E5%B0%B1%E6%98%AF-%E2%80%9C%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%83%E9%80%B8%E5%90%8E%EF%BC%8C%E4%B8%A4%E4%B8%AA%E7%A9%BA-struct-%E4%BC%9A%E6%98%AF%E7%9B%B8%E7%AD%89%E7%9A%84%EF%BC%9F"><span class="nav-number">1.6.1.</span> <span class="nav-text">关注第一个细节，就是 “为什么逃逸后，两个空 struct 会是相等的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%B2%A1%E9%80%83%E9%80%B8%E4%B8%8D%E7%9B%B8%E7%AD%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">为什么没逃逸不相等</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Golang-%E8%AF%AD%E8%A8%80%E6%9C%89%E4%BB%80%E4%B9%88%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">Golang 语言有什么优缺点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Golang-%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">2.1.</span> <span class="nav-text">Golang 的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Golang-%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">Golang 存在的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.</span> <span class="nav-text">性能问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GC-%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.1.</span> <span class="nav-text">GC 问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5%EF%BC%9A%E5%B0%9D%E8%AF%95%E9%99%8D%E4%BD%8E%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%EF%BC%8C%E7%89%B9%E5%88%AB%E6%98%AF%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%BC%80%E9%94%80%EF%BC%8C%E8%BF%9B%E8%80%8C%E9%99%8D%E4%BD%8E-GC-%E5%BC%80%E9%94%80%E3%80%82"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">优化策略：尝试降低内存管理，特别是内存分配带来的开销，进而降低 GC 开销。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E4%BB%A3%E7%A0%81%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.2.</span> <span class="nav-text">生成代码问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">优化策略</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%A7%E8%83%BD%E8%A7%82%E6%B5%8B%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.3.</span> <span class="nav-text">性能观测问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Go-%E9%87%8C%E9%9D%A2%E4%BD%BF%E7%94%A8-Map-%E6%97%B6%E5%BA%94%E8%AF%A5%E6%B3%A8%E6%84%8F%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">Go 里面使用 Map 时应该注意什么问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map-%E7%9A%84-panic-%E8%83%BD%E8%A2%AB-recover-%E6%8E%89%E5%90%97"><span class="nav-number">4.</span> <span class="nav-text">Map 的 panic 能被 recover 掉吗</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Map-%E6%80%8E%E4%B9%88%E7%9F%A5%E9%81%93%E8%87%AA%E5%B7%B1%E5%A4%84%E4%BA%8E%E7%AB%9E%E4%BA%89%E7%8A%B6%E6%80%81%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">Map 怎么知道自己处于竞争状态？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E4%BD%BF%E7%94%A8-Map-%E6%9C%89%E5%93%AA%E4%BA%9B%E6%96%B9%E5%BC%8F"><span class="nav-number">6.</span> <span class="nav-text">并发使用 Map 有哪些方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E8%AF%BB%E5%86%99%E9%94%81"><span class="nav-number">6.1.</span> <span class="nav-text">加读写锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%89%87%E5%8A%A0%E9%94%81"><span class="nav-number">6.2.</span> <span class="nav-text">分片加锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB"><span class="nav-number">6.3.</span> <span class="nav-text">读写分离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#load-%E6%96%B9%E6%B3%95"><span class="nav-number">6.3.1.</span> <span class="nav-text">load 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#store-%E6%96%B9%E6%B3%95"><span class="nav-number">6.3.2.</span> <span class="nav-text">store 方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#delete-%E6%96%B9%E6%B3%95"><span class="nav-number">6.3.3.</span> <span class="nav-text">delete  方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.3.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bigcache-%E5%AF%B9-map-%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">7.</span> <span class="nav-text">bigcache 对 map 的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E9%AB%98%E5%B9%B6%E5%8F%91%E8%AE%BF%E9%97%AE"><span class="nav-number">7.1.</span> <span class="nav-text">处理高并发访问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#N%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">7.1.1.</span> <span class="nav-text">N的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9hash%E7%AE%97%E6%B3%95"><span class="nav-number">7.1.2.</span> <span class="nav-text">选择hash算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%BD%E7%95%A5%E5%86%85%E5%AD%98%E5%BC%80%E9%94%80"><span class="nav-number">7.2.</span> <span class="nav-text">忽略内存开销</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#panic-%E5%92%8C-recover-%E7%9A%84%E6%9C%BA%E5%88%B6"><span class="nav-number">8.</span> <span class="nav-text">panic 和 recover 的机制</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -159,13 +159,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-count">51</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -240,7 +240,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-12-03 22:25:10" itemprop="dateModified" datetime="2022-12-03T22:25:10+08:00">2022-12-03</time>
+      <time title="修改时间：2023-08-05 15:12:24" itemprop="dateModified" datetime="2023-08-05T15:12:24+08:00">2023-08-05</time>
     </span>
 
   
@@ -257,14 +257,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>9.7k</span>
+      <span>22k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>9 分钟</span>
+      <span>20 分钟</span>
     </span>
 </div>
 
@@ -531,11 +531,487 @@ Pointers to distinct zero-size variables may or may not be equal.
 <p>而 perf 呢，很遗憾，很多线上容器内部不支持 perf。出于一些安全策略的考虑，也不允许在线上安装 perf 这样的工具。</p>
 <p>Uber 在 Go 上开发了一个 pprof++ 的工具，类似于 pprof，也是调用 pprof 的一些接口，使用硬件的 PMU 来触发采样。但是 Uber 的 pprof++ 的一个问题是性能损耗非常大。经过一些验证，发现在一些小例子上，在打上 Uber 的 pprof++ 的 patch 之后，仅仅是打上这个 patch 而不是打开这个 pprof，就有大概 3% 左右的性能损耗。</p>
 <p>比较幸运的是，Go1.18 之后，它提出了 per-M 这个 pprof，对每个 M 来进行采样，结果相对比较准确。</p>
+<h1 id="Go-里面使用-Map-时应该注意什么问题"><a href="#Go-里面使用-Map-时应该注意什么问题" class="headerlink" title="Go 里面使用 Map 时应该注意什么问题"></a>Go 里面使用 Map 时应该注意什么问题</h1><ol>
+<li>Map 在读取和写入前要先注意初始化，否则会报 panic</li>
+<li>Map 并发不安全，并发写，并发读写都会出发 panic</li>
+</ol>
+<h1 id="Map-的-panic-能被-recover-掉吗"><a href="#Map-的-panic-能被-recover-掉吗" class="headerlink" title="Map 的 panic 能被 recover 掉吗"></a>Map 的 panic 能被 recover 掉吗</h1><p>不能。</p>
+<p>Go 中 Map 的 panic 是通过 <code>throw(&quot;xxx&quot;)</code> 的方式抛出的，其底层是调用 <code>runtime.fatalthrow()</code> 方法抛出异常，代码中有如下注释：</p>
+<pre><code>// fatalthrow implements an unrecoverable runtime throw. It freezes the
+// system, prints stack traces starting from its caller, and terminates the
+// process.
+</code></pre>
+<p>这说明：</p>
+<ul>
+<li><code>fatalthrow()</code>是无法被<code>recover()</code>的</li>
+<li>它会冻结系统，打印堆栈，然后结束进程</li>
+</ul>
+<p>recover 只能捕获到普通的 panic。</p>
+<h1 id="Map-怎么知道自己处于竞争状态？"><a href="#Map-怎么知道自己处于竞争状态？" class="headerlink" title="Map 怎么知道自己处于竞争状态？"></a>Map 怎么知道自己处于竞争状态？</h1><p>Map 的结构体 hmap 中有一个 flags 成员变量，其用于标识 map 自身处于哪种状态：</p>
+<pre><code class="go">// 可能有迭代器在使用 buckets
+iterator     = 1
+// 可能有迭代器在使用 oldbuckets
+oldIterator  = 2
+// 有协程正在向 map 写入 key
+hashWriting  = 4
+// 等量扩容
+sameSizeGrow = 8
+</code></pre>
+<p>在进行读写操作时，都会先对 flags 的状态进行检测。</p>
+<h1 id="并发使用-Map-有哪些方式"><a href="#并发使用-Map-有哪些方式" class="headerlink" title="并发使用 Map 有哪些方式"></a>并发使用 Map 有哪些方式</h1><h2 id="加读写锁"><a href="#加读写锁" class="headerlink" title="加读写锁"></a>加读写锁</h2><p>常见的 map 的操作有增删改查和遍历，这里面查和遍历是读操作，增删改是写操作，因此对查和遍历需要加读锁，对增删改需要加写锁。</p>
+<p>以 <code>map[int]int</code> 为例，借助 RWMutex，具体的实现方式如下:</p>
+<pre><code class="go">type RWMap struct &#123; // 一个读写锁保护的线程安全的map
+    sync.RWMutex // 读写锁保护下面的map字段
+    m map[int]int
+&#125;
+// 新建一个RWMap
+func NewRWMap(n int) *RWMap &#123;
+    return &amp;RWMap&#123;
+        m: make(map[int]int, n),
+    &#125;
+&#125;
+func (m *RWMap) Get(k int) (int, bool) &#123; //从map中读取一个值
+    m.RLock()
+    defer m.RUnlock()
+    v, existed := m.m[k] // 在锁的保护下从map中读取
+    return v, existed
+&#125;
+
+func (m *RWMap) Set(k int, v int) &#123; // 设置一个键值对
+    m.Lock()              // 锁保护
+    defer m.Unlock()
+    m.m[k] = v
+&#125;
+
+func (m *RWMap) Delete(k int) &#123; //删除一个键
+    m.Lock()                   // 锁保护
+    defer m.Unlock()
+    delete(m.m, k)
+&#125;
+
+func (m *RWMap) Len() int &#123; // map的长度
+    m.RLock()   // 锁保护
+    defer m.RUnlock()
+    return len(m.m)
+&#125;
+
+func (m *RWMap) Each(f func(k, v int) bool) &#123; // 遍历map
+    m.RLock()             //遍历期间一直持有读锁
+    defer m.RUnlock()
+
+    for k, v := range m.m &#123;
+        if !f(k, v) &#123;
+            return
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<h2 id="分片加锁"><a href="#分片加锁" class="headerlink" title="分片加锁"></a>分片加锁</h2><p>通过读写锁 RWMutex 实现的线程安全的 map，功能上已经完全满足了需要，但是面对高并发的场景，仅仅功能满足可不行，性能也得跟上。</p>
+<p><strong>锁是性能下降的万恶之源之一。</strong>所以并发编程的原则就是尽可能减少锁的使用。当锁不得不用的时候，可以减小锁的粒度和持有的时间。</p>
+<p>在第一种方法中，加锁的对象是整个 map，协程 A 对 map 中的 key 进行修改操作，会导致其它协程无法对其它 key 进行读写操作。一种解决思路是将这个 map 分成 n 块，每个块之间的读写操作都互不干扰，从而降低冲突的可能性。Go 比较知名的分片 map 的实现是 concurrent-map 和 bigcache。</p>
+<h2 id="读写分离"><a href="#读写分离" class="headerlink" title="读写分离"></a>读写分离</h2><p>分片加锁的思路是将大块的数据切分成小块的数据，从而减少冲突导致锁阻塞的可能性。如果在一些特殊的场景下，将读写数据分开，是不是能在进一步提升性能呢？</p>
+<p>在内置的 sync 包中也有一个线程安全的 map，通过将读写分离的方式实现了某些特定场景下的性能提升。</p>
+<p>其实在生产环境中，sync.map 用的很少，官方文档推荐的两种使用场景是：</p>
+<blockquote>
+<p>The Map type is optimized for two common use cases: </p>
+<p>(1) when the entry for a given key is only ever written once but read many times, as in caches that only grow, </p>
+<p>or(2) when multiple goroutines read, write, and overwrite entries for disjoint sets of keys.</p>
+<p> In these two cases, use of a Map may significantly reduce lock contention compared to a Go map paired with a separate Mutex or RWMutex.</p>
+</blockquote>
+<p>两种场景都比较苛刻，要么是一写多读，要么是各个协程操作的 key 集合没有交集（或者交集很少）。所以官方建议先对自己的场景做性能测评，如果确实能显著提高性能，再使用 sync.map。</p>
+<p>sync.map 的整体思路就是用两个数据结构（只读的 read 和可写的 dirty）尽量将读写操作分开，来减少锁对性能的影响。</p>
+<pre><code class="go">type Map struct &#123;
+    mu Mutex
+
+  // 基本上你可以把它看成一个安全的只读的map
+  // 它包含的元素可以通过原子操作更新的，但是已删除的entry就需要加锁操作了
+    read atomic.Value // readOnly
+
+  // 包含需要加锁才能访问的元素
+  // 包括所有在read字段中但未被expunged（删除）的元素以及新加的元素
+    dirty map[any]*entry
+
+  // 记录从read中读取miss的次数，一旦miss数和dirty长度一样了，就会把dirty提升为read，并把dirty置空
+    misses int
+&#125;
+
+// readOnly is an immutable struct stored atomically in the Map.read field.
+type readOnly struct &#123;
+    m       map[any]*entry
+    amended bool // 当dirty中包含read没有的数据时为true，比如新增一条数据
+&#125;
+
+// expunged是用来标识此项已经删掉的指针
+// 当map中的一个项目被删除了，只是把它的值标记为expunged，以后才有机会真正删除此项
+var expunged = unsafe.Pointer(new(any))
+
+// entry代表一个值
+type entry struct &#123;
+    p unsafe.Pointer // *interface&#123;&#125;
+&#125;
+</code></pre>
+<h3 id="load-方法"><a href="#load-方法" class="headerlink" title="load 方法"></a>load 方法</h3><pre><code class="go">func (m *Map) Load(key any) (value any, ok bool) &#123;
+    read, _ := m.read.Load().(readOnly)
+    e, ok := read.m[key]
+    if !ok &amp;&amp; read.amended &#123;
+        m.mu.Lock()
+        // 从 read 中读不到的时候，通过dirty进行读取
+    // 在此之前，为了避免阻塞在拿锁的时候，read 发生了更新，拿到锁之后再读取一次read（双重检查，真细节啊！）
+        read, _ = m.read.Load().(readOnly)
+        e, ok = read.m[key]
+        if !ok &amp;&amp; read.amended &#123;
+            e, ok = m.dirty[key]
+            // miss 计数，到达阈值直接把 dirty 升级为 read
+            m.missLocked()
+        &#125;
+        m.mu.Unlock()
+    &#125;
+    if !ok &#123;
+        return nil, false
+    &#125;
+    return e.load()
+&#125;
+
+func (e *entry) load() (value any, ok bool) &#123;
+    p := atomic.LoadPointer(&amp;e.p)
+    if p == nil || p == expunged &#123;
+        return nil, false
+    &#125;
+    return *(*any)(p), true
+&#125;
+</code></pre>
+<h3 id="store-方法"><a href="#store-方法" class="headerlink" title="store 方法"></a>store 方法</h3><pre><code class="go">func (m *Map) Store(key, value any) &#123;
+    read, _ := m.read.Load().(readOnly)
+  // 如果read字段包含这个key，说明是更新操作，直接在对 entry 进行 cas 更新。
+  // （e 是 entry 的指针，对其更新会同时更新 read 和 dirty 中的数据）
+    if e, ok := read.m[key]; ok &amp;&amp; e.tryStore(&amp;value) &#123;
+        return
+    &#125;
+
+  // read 中不存在或者 cas 更新失败，加锁访问 dirty
+    m.mu.Lock()
+    read, _ = m.read.Load().(readOnly) // 同样是双重检查
+    if e, ok := read.m[key]; ok &#123;
+        if e.unexpungeLocked() &#123;
+            // 这个 key 原来已经被删除了，需要添加到 dirty 中
+            m.dirty[key] = e
+        &#125;
+        e.storeLocked(&amp;value)// cas 更新 value
+    &#125; else if e, ok := m.dirty[key]; ok &#123;
+        e.storeLocked(&amp;value) // read 还是没有，但 dirty 有，直接更新
+    &#125; else &#123;
+    // 说明这是一个新的 key
+        if !read.amended &#123;
+            // 创建 dirty 对象，并且标记 dirty 包含了 read 没有的元素
+      // 同时对 nil 的数据标识为已删除
+            m.dirtyLocked()
+            m.read.Store(readOnly&#123;m: read.m, amended: true&#125;)
+        &#125;
+        m.dirty[key] = newEntry(value)
+    &#125;
+    m.mu.Unlock()
+&#125;
+
+func (e *entry) tryStore(i *any) bool &#123;
+    for &#123;
+        p := atomic.LoadPointer(&amp;e.p)
+        if p == expunged &#123;
+            return false
+        &#125;
+        if atomic.CompareAndSwapPointer(&amp;e.p, p, unsafe.Pointer(i)) &#123;
+            return true
+        &#125;
+    &#125;
+&#125;
+
+func (e *entry) unexpungeLocked() (wasExpunged bool) &#123;
+    return atomic.CompareAndSwapPointer(&amp;e.p, expunged, nil)
+&#125;
+
+func (e *entry) storeLocked(i *any) &#123;
+    atomic.StorePointer(&amp;e.p, unsafe.Pointer(i))
+&#125;
+
+func (m *Map) dirtyLocked() &#123;
+    if m.dirty != nil &#123;
+        return
+    &#125;
+
+    read, _ := m.read.Load().(readOnly)
+    m.dirty = make(map[any]*entry, len(read.m))
+    for k, e := range read.m &#123;
+        if !e.tryExpungeLocked() &#123;
+            m.dirty[k] = e
+        &#125;
+    &#125;
+&#125;
+
+func (e *entry) tryExpungeLocked() (isExpunged bool) &#123;
+    p := atomic.LoadPointer(&amp;e.p)
+    for p == nil &#123;
+        if atomic.CompareAndSwapPointer(&amp;e.p, nil, expunged) &#123;
+            return true
+        &#125;
+        p = atomic.LoadPointer(&amp;e.p)
+    &#125;
+    return p == expunged
+&#125;
+</code></pre>
+<h3 id="delete-方法"><a href="#delete-方法" class="headerlink" title="delete  方法"></a>delete  方法</h3><pre><code class="go">func (m *Map) Delete(key any) &#123;
+    m.LoadAndDelete(key)
+&#125;
+
+func (m *Map) LoadAndDelete(key any) (value any, loaded bool) &#123;
+    read, _ := m.read.Load().(readOnly)
+    e, ok := read.m[key]
+    if !ok &amp;&amp; read.amended &#123;
+    // 说明这个 key 在 diery 中
+        m.mu.Lock()
+        read, _ = m.read.Load().(readOnly) // 双重检查
+        e, ok = read.m[key]
+        if !ok &amp;&amp; read.amended &#123;
+            e, ok = m.dirty[key]
+            delete(m.dirty, key)
+            // 不管key是否存在，都记录一个未命中：这个键将走dirty查询，直到脏映射被提升为读映射。
+            m.missLocked()
+        &#125;
+        m.mu.Unlock()
+    &#125;
+    if ok &#123;
+        return e.delete()
+    &#125;
+    return nil, false
+&#125;
+
+func (e *entry) delete() (value any, ok bool) &#123;
+    for &#123;
+        p := atomic.LoadPointer(&amp;e.p)
+        if p == nil || p == expunged &#123;
+            return nil, false
+        &#125;
+        if atomic.CompareAndSwapPointer(&amp;e.p, p, nil) &#123;
+            return *(*any)(p), true
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p>补充说明一下，<code>delete()</code> 执行完之后，<code>e.p</code> 变成 nil，下次 Store 的时候，执行到 <code>dirtyLocked()</code> 这一步的时候，会被标记成 enpunged。<strong>因此在 read 中 nil 和 enpunged 都表示删除状态。</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>读写分离。读（更新）相关的操作尽量通过不加锁的 read 实现，写（新增）相关的操作通过 dirty 加锁实现。</li>
+<li>动态调整。新写入的 key 都只存在 dirty 中，如果 dirty 中的 key 被多次读取，dirty 就会上升成不需要加锁的 read。</li>
+<li>延迟删除。Delete 只是把被删除的 key 标记成 nil，新增 key-value 的时候，标记成 enpunged；<strong>dirty 上升成 read 的时候，标记删除的 key 被批量移出 map</strong>。这样的好处是 dirty 变成 read 之前，这些 key 都会命中 read，而 read 不需要加锁，无论是读还是更新，性能都很高。</li>
+</ol>
+<h1 id="bigcache-对-map-的优化"><a href="#bigcache-对-map-的优化" class="headerlink" title="bigcache 对 map 的优化"></a>bigcache 对 map 的优化</h1><h2 id="处理高并发访问"><a href="#处理高并发访问" class="headerlink" title="处理高并发访问"></a>处理高并发访问</h2><p>cache 就像一个大的 hashtable，可不可以使用一个<code>map</code> + <code>sync.RWMutex</code> 实现满足高并发的场景呢？</p>
+<p><code>sync.RWMutex</code> 虽然对读写进行了优化，但是只是处理了并发读，而写操作还是串行，一旦写的并发量大的时候，即使写不同的key，对应的goroutine也会 block住，只允许一个写执行，这是一个瓶颈，并且不可控。</p>
+<p>解决并发的问题有一个方法叫做 shard (分片)，每个分片一把锁。 很多大并发场景下为了减小并发的压力都会采用这种方法，大的场景比如数据库的分片。 Java 8 之前的ConcurrentMap就是采用分片(segment)的方式减少竞争，Go也有一个类似思想设计的map库：concurrent-map。</p>
+<p>对于每一个缓存对象，根据它的key计算它的哈希值: <code>hash(key) % N</code>，<code>N</code>是分片数量。 理想情况下N个 goroutine 每次请求正好平均落在各自的分片上，这样就不会有竞争了，即使有多个goroutine落在同一个分片上，如果hash比较平均的话，单个shard的压力也会比较小。</p>
+<p>竞争小了有什么好处？ 延迟可以大大提高，因为等待获取锁的时间变小了。</p>
+<p>当然这里有一些要考虑的地方：</p>
+<h3 id="N的选择"><a href="#N的选择" class="headerlink" title="N的选择"></a>N的选择</h3><p>既然分片可以很好的降低锁的竞争，那么N是不是越大越好呢？当然不是，如果N非常大，比如每个缓存对象一个锁，那么会带来很多额外的不必要的开销。可以选择一个不太大的值，在性能和花销上寻找一个平衡。</p>
+<p>另外, <code>N</code>是 2的幂， 比如16、32、64。这样设计的好处就是计算余数可以使用位运算快速计算。</p>
+<pre><code class="go">func (c *BigCache) getShard(hashedKey uint64) (shard *cacheShard) &#123;
+    return c.shards[hashedKey&amp;c.shardMask]
+&#125;
+</code></pre>
+<p>因为对于2的幂<code>N</code>，对于任意的<code>x</code>, 下面的公式成立:</p>
+<pre><code>x mod N = (x &amp; (N − 1))
+</code></pre>
+<p>所以只需要使用一次按位AND (<code>&amp;</code>)就可以求得它的余数。</p>
+<h3 id="选择hash算法"><a href="#选择hash算法" class="headerlink" title="选择hash算法"></a>选择hash算法</h3><p>以前已经有非常多的哈希算法，最近几年也出现了一些新的哈希算法，也被人使用Go语言来实现。</p>
+<p>很显然，一个优秀的哈希算法要保证:</p>
+<ul>
+<li>哈希值应该比较随机 (质量)</li>
+<li>哈希速度比较快 (速度)</li>
+<li>尽量不产生额外的内存分配,避免对垃圾回收产生压力 (耗费资源少)</li>
+</ul>
+<p>bigcache提供了一个默认的Hash的实现，采用fnv64a算法。这个算法的好处是采用位运算的方式在栈上进行运算，避免在堆上分配。</p>
+<pre><code>type fnv64a struct&#123;&#125;
+
+const (
+    // offset64 FNVa offset basis. See https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function#FNV-1a_hash
+    offset64 = 14695981039346656037
+    // prime64 FNVa prime value. See https://en.wikipedia.org/wiki/Fowler–Noll–Vo_hash_function#FNV-1a_hash
+    prime64 = 1099511628211
+)
+
+// Sum64 gets the string and returns its uint64 hash value.
+func (f fnv64a) Sum64(key string) uint64 &#123;
+    var hash uint64 = offset64
+    for i := 0; i &lt; len(key); i++ &#123;
+        hash ^= uint64(key[i])
+        hash *= prime64
+    &#125;
+
+    return hash
+&#125;
+</code></pre>
+<h2 id="忽略内存开销"><a href="#忽略内存开销" class="headerlink" title="忽略内存开销"></a>忽略内存开销</h2><p>对于Go语言中的map，垃圾回收器在 <code>mark</code>和<code>scan</code>阶段检查map中的每一个元素，如果缓存中包含数百万的缓存对象，垃圾回收器对这些对象的无意义的检查导致不必要的时间开销。</p>
+<p>bigcache的作者做了测试。他们测试了简单的HTTP&#x2F;JSON序列化(不会访问cache)。 在cache为空的时候1万的QPS的耗时大约10毫秒。当cache填满的时候， P99的请求都会超过1秒。监控显示堆中包含4千万的对象， GC过程中的 <code>mark</code> 和 <code>scan</code> 也需要4秒。</p>
+<p>可以很容易测试这种状况，比如下面的代码：</p>
+<pre><code class="go">package main
+
+import &quot;time&quot;
+
+type Item struct &#123;
+    A string
+    B string
+    C string
+    D string
+    E string
+    F string
+    G G
+&#125;
+
+type G struct &#123;
+    H int
+    I int
+    K int
+    L int
+    M int
+    N int
+&#125;
+
+func main() &#123;
+    m := make(map[int]*Item, 10*1024*1024)
+
+    for i := 0; i &lt; 1024*1024; i++ &#123;
+        m[i] = &amp;Item&#123;&#125;
+    &#125;
+
+    for i := 0; ; i++ &#123;
+        delete(m, i)
+        m[1024*1024+i] = &amp;Item&#123;&#125;
+        time.Sleep(10 * time.Millisecond)
+    &#125;
+&#125;
+</code></pre>
+<p>只有一个map对象，里面包含一百万的元素，每10毫秒删一个放一个。</p>
+<p>并发量相当小，并且单个的goroutine也没有竞争，但是由于元素的数量巨大，垃圾回收在<code>mark/scan</code>阶段需要花费上百毫秒进行标记和遍历。</p>
+<p>那么如何解决这个问题呢？</p>
+<p>垃圾回收器检查的是堆上的资源，如果不把对象放在堆上，不就解决这个问题了吗？开源项目offheap，它提供了定制的<code>Malloc()</code> 和 <code>Free()</code>，但是缓存需要基于这些方法定制。当然一些基于垃圾回收的编程语言为了减少垃圾回收的时间，都会提供相应的库。但是需要注意，堆外内存很容易产生内存泄漏。</p>
+<p>第二种优化方法是和Go 1.5中一个修复有关(<a target="_blank" rel="noopener" href="https://github.com/golang/go/issues/9477">#9477</a>)，这个issue还是描述了包含大量对象的map的垃圾回收时的耗时问题，Go的开发者优化了垃圾回收时对于map的处理，如果map对象中的key和value不包含指针，那么垃圾回收器就会对它们进行优化：</p>
+<blockquote>
+<p>runtime: do not scan maps when k&#x2F;v do not contain pointers</p>
+<p>Currently we scan maps even if k&#x2F;v does not contain pointers.<br>This is required because overflow buckets are hanging off the main table.<br>This change introduces a separate array that contains pointers to all<br>overflow buckets and keeps them alive. Buckets themselves are marked<br>as containing no pointers and are not scanned by GC (if k&#x2F;v does not<br>contain pointers).</p>
+<p>This brings maps in line with slices and chans – GC does not scan<br>their contents if elements do not contain pointers.</p>
+<p>Currently scanning of a map[int]int with 2e8 entries (~8GB heap)<br>takes ~8 seconds. With this change scanning takes negligible time.</p>
+<p><a target="_blank" rel="noopener" href="https://go-review.googlesource.com/c/go/+/3288">https://go-review.googlesource.com/c/go/+/3288</a></p>
+</blockquote>
+<p>所以如果我们的对象不包含指针，虽然也是分配在堆上，但是垃圾回收可以无视它们。</p>
+<p>如果把map定义成<code>map[int]int</code>，就会发现gc的耗时就会将下来了。</p>
+<p>遗憾的是，一般很难要求用户的缓存对象只能包含<code>int</code>、<code>bool</code>这样的基本数据类型。</p>
+<p>解决办法就是使用哈希值作为<code>map[int]int</code>的key， 把缓存对象序列化后放到一个预先分配的大的字节数组中，然后将它在数组中的offset作为<code>map[int]int</code>的value。</p>
+<pre><code class="go">type cacheShard struct &#123;
+    hashmap     map[uint64]uint32
+    entries     queue.BytesQueue
+    lock        sync.RWMutex
+    entryBuffer []byte
+    onRemove    onRemoveCallback
+
+    isVerbose    bool
+    statsEnabled bool
+    logger       Logger
+    clock        clock
+    lifeWindow   uint64
+
+    hashmapStats map[uint64]uint32
+    stats        Stats
+&#125;
+
+func (s *cacheShard) set(key string, hashedKey uint64, entry []byte) error &#123;
+    currentTimestamp := uint64(s.clock.epoch())
+    s.lock.Lock()
+    // 查找是否已经存在了对应的缓存对象，如果存在，将它的值置为空
+    if previousIndex := s.hashmap[hashedKey]; previousIndex != 0 &#123;
+        if previousEntry, err := s.entries.Get(int(previousIndex)); err == nil &#123;
+            resetKeyFromEntry(previousEntry)
+        &#125;
+    &#125;
+    // 触发是否要移除最老的缓存对象
+    if oldestEntry, err := s.entries.Peek(); err == nil &#123;
+        s.onEvict(oldestEntry, currentTimestamp, s.removeOldestEntry)
+    &#125;
+    // 将对象放入到一个字节数组中，如果已有的字节数组(slice)可以放得下此对象，则重用，否则新建一个字节数组
+    w := wrapEntry(currentTimestamp, hashedKey, key, entry, &amp;s.entryBuffer)
+    for &#123;
+        // 尝试放入到字节队列中，成功则加入到map中
+        if index, err := s.entries.Push(w); err == nil &#123;
+            s.hashmap[hashedKey] = uint32(index)
+            s.lock.Unlock()
+            return nil
+        &#125;
+        // 如果空间不足，移除最老的元素
+        if s.removeOldestEntry(NoSpace) != nil &#123;
+            s.lock.Unlock()
+            return fmt.Errorf(&quot;entry is bigger than max shard size&quot;)
+        &#125;
+    &#125;
+&#125;
+
+func wrapEntry(timestamp uint64, hash uint64, key string, entry []byte, buffer *[]byte) []byte &#123;
+    keyLength := len(key)
+    blobLength := len(entry) + headersSizeInBytes + keyLength
+    if blobLength &gt; len(*buffer) &#123;
+        *buffer = make([]byte, blobLength)
+    &#125;
+    blob := *buffer
+    binary.LittleEndian.PutUint64(blob, timestamp)
+    binary.LittleEndian.PutUint64(blob[timestampSizeInBytes:], hash)
+    binary.LittleEndian.PutUint16(blob[timestampSizeInBytes+hashSizeInBytes:], uint16(keyLength))
+    copy(blob[headersSizeInBytes:], key)
+    copy(blob[headersSizeInBytes+keyLength:], entry)
+    return blob[:blobLength]
+&#125;
+</code></pre>
+<p><code>queue.BytesQueue</code>是一个字节数组，可以做到按需分配。当加入一个<code>[]byte</code>时，它会把数据copy到尾部。</p>
+<p>值得注意的是删除缓存元素的时候bigcache只是把它从的索引从<code>map[uint64]uint32</code>中删除了，并把它在<code>queue.BytesQueue</code>队列中的长度置为0。那么删除操作会不会在<code>queue.BytesQueue</code>中造成很多的“虫洞”？从它的实现上来看，<strong>会</strong>，而且这些”虫洞”不会被整理，也不会被移除。因为它的底层是使用一个字节数组实现的，”虫洞”的移除是一个耗时的操作，会导致锁的持有时间过长。bigcache只能等待清理最老的元素的时候把这些”虫洞”删除掉。</p>
+<p>这种缓存，一般来说，删除元素靠的是全局过期时间（注意，是先进先出的过期，并不能为每个key单独指定不同的过期时间）或缓存总大小达到一定阈值后删除，也即把数组当队列用。所以，这种实现的前提是，缓存是自淘汰类型，而非可手动删除指定元素类型的。</p>
+<h1 id="panic-和-recover-的机制"><a href="#panic-和-recover-的机制" class="headerlink" title="panic 和 recover 的机制"></a>panic 和 recover 的机制</h1><p>Go 的 panic 结构如下：</p>
+<pre><code class="go">type _panic struct &#123;
+    argp      unsafe.Pointer
+    arg       interface&#123;&#125;
+    link      *_panic
+    recovered bool
+    aborted   bool
+    pc        uintptr
+    sp        unsafe.Pointer
+    goexit    bool
+&#125;
+</code></pre>
+<ol>
+<li><code>argp</code> 是指向 <code>defer</code> 调用时参数的指针；</li>
+<li><code>arg</code> 是调用 <code>panic</code> 时传入的参数；</li>
+<li><code>link</code> 指向了更早调用的 <code>runtime._panic</code> 结构；</li>
+<li><code>recovered</code> 表示当前 <code>runtime._panic</code> 是否被 <code>recover</code> 恢复；</li>
+<li><code>aborted</code> 表示当前的 <code>panic</code> 是否被强行终止；</li>
+</ol>
+<p>defer 方法会将 recovered 方法设置成 true。</p>
+<p>程序崩溃和恢复的过程：</p>
+<ol>
+<li>编译器会负责做转换关键字的工作；<ul>
+<li>将 <code>panic</code> 和 <code>recover</code> 分别转换成 <code>runtime.gopanic</code>和 <code>runtime.gorecover</code></li>
+<li>将 <code>defer</code> 转换成 <code>runtime.deferproc</code> 函数；</li>
+<li>在调用 <code>defer</code> 的函数末尾调用 <code>runtime.deferreturn</code> 函数；</li>
+</ul>
+</li>
+<li>在运行过程中遇到 <code>runtime.gopanic</code> 方法时，会从 Goroutine 的链表依次取出 <code>runtime._defer</code>结构体并执行；</li>
+<li><strong>如果调用延迟执行函数时遇到了<code>runtime.gorecover</code> 就会将 <code>_panic.recovered</code>标记成 true 并返回 panic 的参数</strong>；<ul>
+<li><strong>在这次调用结束之后</strong>，<code>runtime.gopanic</code> 会从 <code>runtime._defer</code> 结构体中取出程序计数器 <code>pc</code> 和栈指针 <code>sp</code> 并调用 <code>runtime.recovery</code> <strong>函数进行恢复程序</strong>；</li>
+<li><code>runtime.recovery</code> 会根据传入的 <code>pc</code> 和 <code>sp</code> 跳转回 <code>runtime.deferproc</code>；</li>
+<li>编译器自动生成的代码会发现 <code>runtime.deferproc</code>的返回值不为 0，这时会跳回 <code>runtime.deferreturn</code> 并恢复到正常的执行流程；</li>
+</ul>
+</li>
+<li><strong>如果没有遇到 <code>runtime.gorecover</code>就会依次遍历所有的 <code>runtime._defer</code>，并在最后调用 <code>runtime.fatalpanic</code> 中止程序</strong>、打印 <code>panic</code> 的参数并返回错误码 2；</li>
+</ol>
 <p><strong>参考文档</strong>：</p>
 <blockquote>
 <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/HScH6nm3xf4POXVk774jUA">手撕 Go 面试官：Go 结构体是否可以比较，为什么？</a></p>
 <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/QnMOwYUANdydbiM8yGznHA">用 Go struct 不能犯的一个低级错误！</a></p>
 <p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Oz0Zn8Y43UfHIOPL6rZ5Ig">字节大规模微服务 Go 语言发展之路</a></p>
+<p><a target="_blank" rel="noopener" href="https://juejin.cn/post/7053109648223633438">Go 并发写map产生错误能够通过recover()恢复吗？</a></p>
+<p><a target="_blank" rel="noopener" href="https://colobu.com/2019/11/18/how-is-the-bigcache-is-fast/">妙到颠毫: bigcache优化技巧</a></p>
+<p><a target="_blank" rel="noopener" href="https://pengrl.com/p/35302/">[译] Go开源项目BigCache如何加速并发访问以及避免高额的GC开销</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/356739568">Go 并发之三种线程安全的 map</a></p>
 </blockquote>
 
     </div>
@@ -602,7 +1078,7 @@ Pointers to distinct zero-size variables may or may not be equal.
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -613,13 +1089,13 @@ Pointers to distinct zero-size variables may or may not be equal.
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.4m</span>
+    <span title="站点总字数">2.5m</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">36:50</span>
+    <span title="站点阅读时长">37:40</span>
   </span>
 </div>
 <div class="busuanzi-count">

@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="1. 为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的">
+    <meta name="description" content="为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的身份。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="权限认证">
 <meta property="og:url" content="http://yoursite.com/2019/11/25/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E6%9D%83%E9%99%90%E8%AE%A4%E8%AF%81/index.html">
 <meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="1. 为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的">
+<meta property="og:description" content="为什么使用jwt传统的用户认证流程如下：  用户向服务器发送用户名和密码 服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。 服务器向用户返回一个 session_id，写入用户的 Cookie。 用户随后的每一次请求，都会通过 Cookie，将 session_id 传回服务器。 服务器收到 session_id，找到前期保存的数据，由此得知用户的身份。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%BC%9A%E8%AF%9D%E6%9C%BA%E5%88%B6.png">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/tomcat%E5%AE%9E%E7%8E%B0%E4%BC%9A%E8%AF%9D%E6%9C%BA%E5%88%B6%E5%8E%9F%E7%90%86.png">
@@ -34,8 +34,9 @@
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B.png">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B%E8%AF%B4%E6%98%8E.png">
+<meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%80%E7%BB%B4%E7%A0%81.jpg">
 <meta property="article:published_time" content="2019-11-25T14:26:44.000Z">
-<meta property="article:modified_time" content="2021-01-11T15:26:54.712Z">
+<meta property="article:modified_time" content="2023-08-05T07:12:24.880Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="权限认证">
@@ -155,7 +156,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8jwt"><span class="nav-number">1.</span> <span class="nav-text">1. 为什么使用jwt</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-JWT%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2. JWT的基本原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Header"><span class="nav-number">2.1.</span> <span class="nav-text">Header</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Payload"><span class="nav-number">2.2.</span> <span class="nav-text">Payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Signature"><span class="nav-number">2.3.</span> <span class="nav-text">Signature</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-JWT%E6%9C%89%E5%93%AA%E4%BA%9B%E7%89%B9%E7%82%B9%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">3. JWT有哪些特点？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-JWT%E8%AE%A4%E8%AF%81%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">4.</span> <span class="nav-text">4. JWT认证的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%97%A0%E7%8A%B6%E6%80%81"><span class="nav-number">4.1.</span> <span class="nav-text">1. 无状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9C%89%E6%95%88%E9%81%BF%E5%85%8D%E4%BA%86CSRF%E6%94%BB%E5%87%BB"><span class="nav-number">4.2.</span> <span class="nav-text">2. 有效避免了CSRF攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%80%82%E5%90%88%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BA%94%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">3. 适合移动端应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E5%8F%8B%E5%A5%BD"><span class="nav-number">4.4.</span> <span class="nav-text">4. 单点登录友好</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E7%AD%89%E5%9C%BA%E6%99%AF%E4%B8%8B-token-%E8%BF%98%E6%9C%89%E6%95%88%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">5. 如何解决注销登录等场景下 token 还有效的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-token-%E7%9A%84%E7%BB%AD%E7%AD%BE%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">6. token 的续签问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%EF%BC%88%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%9A%84%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">7. 什么是单点登录（单点登录的机制）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%B3%BB%E7%BB%9F%E7%99%BB%E5%BD%95%E6%9C%BA%E5%88%B6"><span class="nav-number">7.1.</span> <span class="nav-text">单系统登录机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http%E6%97%A0%E7%8A%B6%E6%80%81%E5%8D%8F%E8%AE%AE"><span class="nav-number">7.1.1.</span> <span class="nav-text">http无状态协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9D%E6%9C%BA%E5%88%B6"><span class="nav-number">7.1.2.</span> <span class="nav-text">会话机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81"><span class="nav-number">7.1.3.</span> <span class="nav-text">登录状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%9C%BA%E5%88%B6%E5%92%8C%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">7.2.</span> <span class="nav-text">单点登录机制和实现方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Session%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">8. 如何使用Session进行身份验证？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89Cookie%E7%9A%84%E8%AF%9DSession%E8%BF%98%E8%83%BD%E7%94%A8%E5%90%97%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">9. 如果没有Cookie的话Session还能用吗？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-%E4%BB%80%E4%B9%88%E6%98%AFOAuth-2-0%EF%BC%9F"><span class="nav-number">10.</span> <span class="nav-text">10. 什么是OAuth 2.0？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%92%8C-SSO-%E5%8C%BA%E5%88%AB"><span class="nav-number">10.1.</span> <span class="nav-text">和 SSO 区别</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8jwt"><span class="nav-number">1.</span> <span class="nav-text">为什么使用jwt</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JWT%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">JWT的基本原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Header"><span class="nav-number">2.1.</span> <span class="nav-text">Header</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Payload"><span class="nav-number">2.2.</span> <span class="nav-text">Payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Signature"><span class="nav-number">2.3.</span> <span class="nav-text">Signature</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JWT%E6%9C%89%E5%93%AA%E4%BA%9B%E7%89%B9%E7%82%B9%EF%BC%9F"><span class="nav-number">3.</span> <span class="nav-text">JWT有哪些特点？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JWT%E8%AE%A4%E8%AF%81%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">4.</span> <span class="nav-text">JWT认证的优势</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%97%A0%E7%8A%B6%E6%80%81"><span class="nav-number">4.1.</span> <span class="nav-text">1. 无状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9C%89%E6%95%88%E9%81%BF%E5%85%8D%E4%BA%86CSRF%E6%94%BB%E5%87%BB"><span class="nav-number">4.2.</span> <span class="nav-text">2. 有效避免了CSRF攻击</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%80%82%E5%90%88%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BA%94%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">3. 适合移动端应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E5%8F%8B%E5%A5%BD"><span class="nav-number">4.4.</span> <span class="nav-text">4. 单点登录友好</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E7%AD%89%E5%9C%BA%E6%99%AF%E4%B8%8B-token-%E8%BF%98%E6%9C%89%E6%95%88%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">如何解决注销登录等场景下 token 还有效的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#token-%E7%9A%84%E7%BB%AD%E7%AD%BE%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">token 的续签问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%EF%BC%88%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E7%9A%84%E6%9C%BA%E5%88%B6%EF%BC%89"><span class="nav-number">7.</span> <span class="nav-text">什么是单点登录（单点登录的机制）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%B3%BB%E7%BB%9F%E7%99%BB%E5%BD%95%E6%9C%BA%E5%88%B6"><span class="nav-number">7.1.</span> <span class="nav-text">单系统登录机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http%E6%97%A0%E7%8A%B6%E6%80%81%E5%8D%8F%E8%AE%AE"><span class="nav-number">7.1.1.</span> <span class="nav-text">http无状态协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%9A%E8%AF%9D%E6%9C%BA%E5%88%B6"><span class="nav-number">7.1.2.</span> <span class="nav-text">会话机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BB%E5%BD%95%E7%8A%B6%E6%80%81"><span class="nav-number">7.1.3.</span> <span class="nav-text">登录状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%9C%BA%E5%88%B6%E5%92%8C%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="nav-number">7.2.</span> <span class="nav-text">单点登录机制和实现方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Session%E8%BF%9B%E8%A1%8C%E8%BA%AB%E4%BB%BD%E9%AA%8C%E8%AF%81%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">如何使用Session进行身份验证？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E6%9E%9C%E6%B2%A1%E6%9C%89Cookie%E7%9A%84%E8%AF%9DSession%E8%BF%98%E8%83%BD%E7%94%A8%E5%90%97%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">如果没有Cookie的话Session还能用吗？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFOAuth-2-0%EF%BC%9F"><span class="nav-number">10.</span> <span class="nav-text">什么是OAuth 2.0？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%92%8C-SSO-%E5%8C%BA%E5%88%AB"><span class="nav-number">10.1.</span> <span class="nav-text">和 SSO 区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4%E7%A0%81%E6%89%AB%E7%A0%81%E7%99%BB%E5%BD%95%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">二维码扫码登录的原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4%E7%A0%81%E7%99%BB%E5%BD%95%E7%9A%84%E6%9C%AC%E8%B4%A8"><span class="nav-number">11.1.</span> <span class="nav-text">二维码登录的本质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%8C%E7%BB%B4%E7%A0%81"><span class="nav-number">11.2.</span> <span class="nav-text">什么是二维码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E8%AE%A4%E8%AF%81%E6%9C%BA%E5%88%B6"><span class="nav-number">11.3.</span> <span class="nav-text">系统认证机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%AB%E6%8F%8F%E4%BA%8C%E7%BB%B4%E7%A0%81%E7%9A%84%E4%B8%80%E8%88%AC%E6%AD%A5%E9%AA%A4"><span class="nav-number">11.4.</span> <span class="nav-text">扫描二维码的一般步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E7%BB%B4%E7%A0%81%E5%87%86%E5%A4%87"><span class="nav-number">11.4.1.</span> <span class="nav-text">二维码准备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%AB%E6%8F%8F%E7%8A%B6%E6%80%81%E5%88%87%E6%8D%A2"><span class="nav-number">11.4.2.</span> <span class="nav-text">扫描状态切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E7%A1%AE%E8%AE%A4"><span class="nav-number">11.4.3.</span> <span class="nav-text">状态确认</span></a></li></ol></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -168,13 +169,13 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">140</span>
+          <span class="site-state-item-count">142</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">50</span>
+        <span class="site-state-item-count">51</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -249,7 +250,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2021-01-11 23:26:54" itemprop="dateModified" datetime="2021-01-11T23:26:54+08:00">2021-01-11</time>
+      <time title="修改时间：2023-08-05 15:12:24" itemprop="dateModified" datetime="2023-08-05T15:12:24+08:00">2023-08-05</time>
     </span>
 
   
@@ -266,14 +267,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>9.4k</span>
+      <span>12k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>9 分钟</span>
+      <span>11 分钟</span>
     </span>
 </div>
 
@@ -284,7 +285,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="1-为什么使用jwt"><a href="#1-为什么使用jwt" class="headerlink" title="1. 为什么使用jwt"></a>1. 为什么使用jwt</h1><p>传统的用户认证流程如下：</p>
+        <h1 id="为什么使用jwt"><a href="#为什么使用jwt" class="headerlink" title="为什么使用jwt"></a>为什么使用jwt</h1><p>传统的用户认证流程如下：</p>
 <ol>
 <li>用户向服务器发送用户名和密码</li>
 <li>服务器验证通过后，在当前对话（session）里面保存相关数据，比如用户角色、登录时间等等。</li>
@@ -302,7 +303,7 @@
 <li>用户以后每次向后端发请求都在Header中带上 JWT。</li>
 <li>服务端检查 JWT 并从中获取用户相关信息。</li>
 </ol>
-<h1 id="2-JWT的基本原理"><a href="#2-JWT的基本原理" class="headerlink" title="2. JWT的基本原理"></a>2. JWT的基本原理</h1><p>JWT 实际上是一个字符串，中间用点<code>.</code>分割成三部分，三部分分别如下：</p>
+<h1 id="JWT的基本原理"><a href="#JWT的基本原理" class="headerlink" title="JWT的基本原理"></a>JWT的基本原理</h1><p>JWT 实际上是一个字符串，中间用点<code>.</code>分割成三部分，三部分分别如下：</p>
 <ul>
 <li>Header（头部）</li>
 <li>Payload（负载）</li>
@@ -372,7 +373,7 @@ ExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ
 eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvbG9jYWxob3N0OjgwMDFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDUxODg4MTE5LCJleHAiOjE0NTQ1MTYxMTksIm5iZiI6MTQ1MTg4ODExOSwianRpIjoiMzdjMTA3ZTQ2MDlkZGJjYzljMDk2ZWE1ZWU3NmM2NjcifQ.
 wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 </code></pre>
-<h1 id="3-JWT有哪些特点？"><a href="#3-JWT有哪些特点？" class="headerlink" title="3. JWT有哪些特点？"></a>3. JWT有哪些特点？</h1><ol>
+<h1 id="JWT有哪些特点？"><a href="#JWT有哪些特点？" class="headerlink" title="JWT有哪些特点？"></a>JWT有哪些特点？</h1><ol>
 <li>JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。</li>
 <li>JWT 不加密的情况下，不能将秘密数据写入 JWT。</li>
 <li>JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。</li>
@@ -380,7 +381,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <li>JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。</li>
 <li>为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。</li>
 </ol>
-<h1 id="4-JWT认证的优势"><a href="#4-JWT认证的优势" class="headerlink" title="4. JWT认证的优势"></a>4. JWT认证的优势</h1><p>相比于Session认证方面来说，使用token进行身份认证有下面三个优势：</p>
+<h1 id="JWT认证的优势"><a href="#JWT认证的优势" class="headerlink" title="JWT认证的优势"></a>JWT认证的优势</h1><p>相比于Session认证方面来说，使用token进行身份认证有下面三个优势：</p>
 <h2 id="1-无状态"><a href="#1-无状态" class="headerlink" title="1. 无状态"></a>1. 无状态</h2><p>token 自身包含了身份验证所需要的所有信息，使得服务器不需要存储Session信息，这增加了系统的可用性和伸缩性，减轻了服务器的压力。但是，由于 token 无状态，也导致了它最大的缺点：<strong>当后端在 token 有有效期内废弃了一个 token 或者更改它的权限的话，不会立即生效，一般需要等到有效期过后才可以</strong>。另外，当用户 logout 的话，token 也仍然有效。除非在后端增加额外的逻辑处理。</p>
 <h2 id="2-有效避免了CSRF攻击"><a href="#2-有效避免了CSRF攻击" class="headerlink" title="2. 有效避免了CSRF攻击"></a>2. 有效避免了CSRF攻击</h2><p><strong>CSRF（Cross Site Request Forgery)</strong> 被称为<strong>跨站请求伪造</strong>，属于网络攻击领域范围。相比于 SQL 脚本注入、XSS 等等安全攻击方式，CSRF 知名度较低。</p>
 <p>CSRF 是攻击者通过一些技术手段欺骗用户的浏览器去访问一个自己曾经认证过的网站并运行一些操作（如发邮件，发消息，甚至财产操作如转账和购买商品）。由于浏览器曾经认证过，所以被访问的网站会认为是真正的用户操作而去运行。这利用了 web 中用户身份验证的一个漏洞：简单的身份验证只能保证请求发自某个用户的浏览器，却不能保证请求本身是用户自愿发出的。</p>
@@ -400,7 +401,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <h2 id="3-适合移动端应用"><a href="#3-适合移动端应用" class="headerlink" title="3. 适合移动端应用"></a>3. 适合移动端应用</h2><p>使用 Session 进行身份认证的话，需要保存一份信息在服务器端，而且这种方式会依赖到 Cookie（需要 Cookie 保存 SessionId），所以不适合移动端。</p>
 <p>但是，使用 token 进行身份认证就不会存在这种问题，因为只要 token 可以被客户端存储就能够使用，而且 token 还可以跨语言使用。</p>
 <h2 id="4-单点登录友好"><a href="#4-单点登录友好" class="headerlink" title="4. 单点登录友好"></a>4. 单点登录友好</h2><p>使用 Session 进行身份认证的话，实现单点登陆，需要我们把用户的 Session 信息保存在一台电脑上，并且还会遇到常见的 Cookie 跨域的问题。但是，使用 token 进行认证的话， token 被保存在客户端，不会存在这些问题。</p>
-<h1 id="5-如何解决注销登录等场景下-token-还有效的问题"><a href="#5-如何解决注销登录等场景下-token-还有效的问题" class="headerlink" title="5. 如何解决注销登录等场景下 token 还有效的问题"></a>5. 如何解决注销登录等场景下 token 还有效的问题</h1><p>类似的场景还有：</p>
+<h1 id="如何解决注销登录等场景下-token-还有效的问题"><a href="#如何解决注销登录等场景下-token-还有效的问题" class="headerlink" title="如何解决注销登录等场景下 token 还有效的问题"></a>如何解决注销登录等场景下 token 还有效的问题</h1><p>类似的场景还有：</p>
 <ul>
 <li>退出登录;</li>
 <li>修改密码;</li>
@@ -422,7 +423,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <li><strong>保持令牌的有效期限短并经常轮换</strong>：很简单的一种方式。但是，会导致用户登录状态不会被持久记录，而且需要用户经常登录。</li>
 </ul>
 <p>对于修改密码后 token 还有效问题的解决还是比较容易的，说一种比较好的方式：<strong>使用用户的密码的哈希值对 token 进行签名。因此，如果密码更改，则任何先前的令牌将自动无法验证。</strong></p>
-<h1 id="6-token-的续签问题"><a href="#6-token-的续签问题" class="headerlink" title="6. token 的续签问题"></a>6. token 的续签问题</h1><p>token 有效期一般都建议设置的不太长，那么 token 过期后如何认证，如何实现动态刷新 token，避免用户经常需要重新登录？</p>
+<h1 id="token-的续签问题"><a href="#token-的续签问题" class="headerlink" title="token 的续签问题"></a>token 的续签问题</h1><p>token 有效期一般都建议设置的不太长，那么 token 过期后如何认证，如何实现动态刷新 token，避免用户经常需要重新登录？</p>
 <p>在 Session 认证中一般的做法：假如 session 的有效期30分钟，如果 30 分钟内用户有访问，就把 session 有效期被延长30分钟。</p>
 <ol>
 <li><strong>类似于 Session 认证中的做法</strong>：这种方案满足于大部分场景。假设服务端给的 token 有效期设置为30分钟，服务端每次进行校验时，如果发现 token 的有效期马上快过期了，服务端就重新生成 token 给客户端。客户端每次请求都检查新旧token，如果不一致，则更新本地的 token。这种做法的问题是仅仅在快过期的时候请求才会更新 token ,对客户端不是很友好。</li>
@@ -435,7 +436,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <li>用户注销的时候需要同时保证两个 token 都无效；</li>
 <li>重新请求获取 token 的过程中会有短暂 token 不可用的情况（可以通过在客户端设置定时器，当 <code>accessToken</code> 快过期的时候，提前去通过 <code>refreshToken</code> 获取新的 <code>accessToken</code>）。</li>
 </ul>
-<h1 id="7-什么是单点登录（单点登录的机制）"><a href="#7-什么是单点登录（单点登录的机制）" class="headerlink" title="7. 什么是单点登录（单点登录的机制）"></a>7. 什么是单点登录（单点登录的机制）</h1><p>单点登录（SSO，Single Sign On）就是在多个系统中，用户只需一次登录，各个系统即可感知该用户已经登录。</p>
+<h1 id="什么是单点登录（单点登录的机制）"><a href="#什么是单点登录（单点登录的机制）" class="headerlink" title="什么是单点登录（单点登录的机制）"></a>什么是单点登录（单点登录的机制）</h1><p>单点登录（SSO，Single Sign On）就是在多个系统中，用户只需一次登录，各个系统即可感知该用户已经登录。</p>
 <h2 id="单系统登录机制"><a href="#单系统登录机制" class="headerlink" title="单系统登录机制"></a>单系统登录机制</h2><h3 id="http无状态协议"><a href="#http无状态协议" class="headerlink" title="http无状态协议"></a>http无状态协议</h3><p>web应用采用 browser&#x2F;server 架构，http 作为通信协议。http 是无状态协议，浏览器的每一次请求，服务器会独立处理，不与之前或之后的请求产生关联。这也同时意味着，任何用户都能通过浏览器访问服务器资源，如果想保护服务器的某些资源，必须限制浏览器请求；要限制浏览器请求，必须鉴别浏览器请求，响应合法请求，忽略非法请求；要鉴别浏览器请求，必须清楚浏览器请求状态。既然http协议无状态，那就需要服务器和浏览器共同维护一个状态，这就是会话机制。</p>
 <h3 id="会话机制"><a href="#会话机制" class="headerlink" title="会话机制"></a>会话机制</h3><p>浏览器第一次请求服务器，服务器创建一个会话，并将会话的 id 作为响应的一部分发送给浏览器，浏览器存储会话 id，并在后续第二次和第三次请求中带上会话 id，服务器取得请求中的会话 id 就知道是不是同一个用户了（登录的用户在 session 里面是可以查询到已经存储的 isLogin 属性设置为 true），这个过程用下图说明，后续请求与第一次请求产生了关联</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E4%BC%9A%E8%AF%9D%E6%9C%BA%E5%88%B6.png" alt="会话机制"></p>
@@ -463,7 +464,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <p>注销登录过程：</p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E8%BF%87%E7%A8%8B.png" alt="单点登录注销登录过程"></p>
 <p><img src="https://qiniu.xiaoming.net.cn/%E5%8D%95%E7%82%B9%E7%99%BB%E5%BD%95%E6%B3%A8%E9%94%80%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B%E8%AF%B4%E6%98%8E.png" alt="单点登录注销登录流程说明"></p>
-<h1 id="8-如何使用Session进行身份验证？"><a href="#8-如何使用Session进行身份验证？" class="headerlink" title="8. 如何使用Session进行身份验证？"></a>8. 如何使用Session进行身份验证？</h1><p>很多时候都是通过 SessionID 来实现特定的用户，SessionID 一般会选择存放在 Redis 中。举个例子：用户成功登陆系统，然后返回给客户端具有 SessionID 的 Cookie，当用户向后端发起请求的时候会把 SessionID 带上，这样后端就知道你的身份状态了。关于这种认证方式更详细的过程如下：</p>
+<h1 id="如何使用Session进行身份验证？"><a href="#如何使用Session进行身份验证？" class="headerlink" title="如何使用Session进行身份验证？"></a>如何使用Session进行身份验证？</h1><p>很多时候都是通过 SessionID 来实现特定的用户，SessionID 一般会选择存放在 Redis 中。举个例子：用户成功登陆系统，然后返回给客户端具有 SessionID 的 Cookie，当用户向后端发起请求的时候会把 SessionID 带上，这样后端就知道你的身份状态了。关于这种认证方式更详细的过程如下：</p>
 <ol>
 <li>用户向服务器发送用户名和密码用于登陆系统。</li>
 <li>服务器验证通过后，服务器为用户创建一个 Session，并将 Session信息存储 起来。</li>
@@ -476,16 +477,97 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 <li>依赖Session的关键业务一定要确保客户端开启了Cookie。</li>
 <li>注意Session的过期时间</li>
 </ul>
-<h1 id="9-如果没有Cookie的话Session还能用吗？"><a href="#9-如果没有Cookie的话Session还能用吗？" class="headerlink" title="9. 如果没有Cookie的话Session还能用吗？"></a>9. 如果没有Cookie的话Session还能用吗？</h1><p>一般是通过 Cookie 来保存 SessionID ，假如使用了 Cookie 保存 SessionID的方案的话， 如果客户端禁用了Cookie，那么Seesion就无法正常工作。</p>
+<h1 id="如果没有Cookie的话Session还能用吗？"><a href="#如果没有Cookie的话Session还能用吗？" class="headerlink" title="如果没有Cookie的话Session还能用吗？"></a>如果没有Cookie的话Session还能用吗？</h1><p>一般是通过 Cookie 来保存 SessionID ，假如使用了 Cookie 保存 SessionID的方案的话， 如果客户端禁用了Cookie，那么Seesion就无法正常工作。</p>
 <p>但是，并不是没有 Cookie 之后就不能用 Session 了，比如可以将 SessionID 放在请求的 url 里面<code>https://javaguide.cn/?session_id=xxx</code> 。这种方案的话可行，但是安全性和用户体验感降低。当然，为了安全也可以对 SessionID 进行一次加密之后再传入后端。</p>
-<h1 id="10-什么是OAuth-2-0？"><a href="#10-什么是OAuth-2-0？" class="headerlink" title="10. 什么是OAuth 2.0？"></a>10. 什么是OAuth 2.0？</h1><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，OAuth 2.0 更快，更容易实现，OAuth 1.0 已经被废弃。</p>
+<h1 id="什么是OAuth-2-0？"><a href="#什么是OAuth-2-0？" class="headerlink" title="什么是OAuth 2.0？"></a>什么是OAuth 2.0？</h1><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。而 OAuth 2.0 是对 OAuth 1.0 的完全重新设计，OAuth 2.0 更快，更容易实现，OAuth 1.0 已经被废弃。</p>
 <p>实际上它就是一种授权机制，它的最终目的是为第三方应用颁发一个有时效性的令牌 token，使得第三方应用能够通过该令牌获取相关的资源。</p>
 <p>OAuth 2.0 比较常用的场景就是第三方登录，当你的网站接入了第三方登录的时候一般就是使用的 OAuth 2.0 协议。</p>
 <p>另外，现在OAuth 2.0也常见于支付场景（微信支付、支付宝支付）和开发平台（微信开放平台、阿里开放平台等等）。</p>
 <h2 id="和-SSO-区别"><a href="#和-SSO-区别" class="headerlink" title="和 SSO 区别"></a>和 SSO 区别</h2><p>OAuth 是一个行业的标准授权协议，主要用来授权第三方应用获取有限的权限。SSO 解决的是一个公司的多个相关的自系统的之间的登陆问题比如京东旗下相关子系统京东金融、京东超市、京东家电等等。</p>
+<h1 id="二维码扫码登录的原理"><a href="#二维码扫码登录的原理" class="headerlink" title="二维码扫码登录的原理"></a>二维码扫码登录的原理</h1><h2 id="二维码登录的本质"><a href="#二维码登录的本质" class="headerlink" title="二维码登录的本质"></a>二维码登录的本质</h2><p>二维码登录本质上也是一种登录认证方式。既然是登录认证，要做的也就两件事情！</p>
+<ol>
+<li>告诉系统我是谁</li>
+<li>向系统证明我是谁</li>
+</ol>
+<p>比如账号密码登录，账号就是告诉系统我是谁， 密码就是向系统证明我是谁; 比如手机验证码登录，手机号就是告诉系统我是谁，验证码就是向系统证明我是谁;</p>
+<p>那么扫码登录是怎么做到这两件事情的呢？</p>
+<p>手机端应用扫PC端二维码，手机端确认后，账号就在PC端登录成功了！这里，PC端登录的账号肯定与手机端是同一个账号。不可能手机端登录的是账号A，而扫码登录以后，PC端登录的是账号B。</p>
+<p>所以，第一件事情，告诉系统我是谁，是比较清楚的！通过扫描二维码，把手机端的账号信息传递到PC端，至于是怎么传的，后面再说。</p>
+<p>第二件事情，向系统证明我是谁。扫码登录过程中，用户并没有去输入密码，也没有输入验证码，或者其他什么码。那是怎么证明的呢？</p>
+<p>这里可能会想，是不是扫码过程中，把密码传到了PC端呢？</p>
+<p>但这是不可能的。因为那样太不安全的，客户端也根本不会去存储密码。仔细想一下，其实手机端APP它是已经登录过的，就是说手机端是已经通过登录认证。所说只要<strong>扫码确认是这个手机且是这个账号操作的，其实就能间接证明我谁。</strong></p>
+<h2 id="什么是二维码"><a href="#什么是二维码" class="headerlink" title="什么是二维码"></a>什么是二维码</h2><p>在认识二维码之前先看一下一维码：</p>
+<p><img src="https://qiniu.xiaoming.net.cn/%E4%B8%80%E7%BB%B4%E7%A0%81.jpg" alt="一维码"></p>
+<p>所谓一维码，也就是条形码，超市里的条形码–这个相信大家都非常熟悉，条形码实际上就是一串数字，它上面存储了商品的序列号。</p>
+<p>二维码其实与条形码类似，只不过它存储的不一定是数字，还可以是任何的字符串，可以认为，它就是字符串的另外一种表现形式，</p>
+<p>在搜索引擎中搜索二维码，可以找到很多在线生成二维码的工具网站，这些网站可以提供字符串与二维码之间相互转换的功能</p>
+<h2 id="系统认证机制"><a href="#系统认证机制" class="headerlink" title="系统认证机制"></a>系统认证机制</h2><p>认识了二维码，了解一下移动互联网下的系统认证机制。</p>
+<p>前面说过，为了安全，手机端它是不会存储你的登录密码的。但是在日常使用过程中，应该会注意到，只有在应用下载下来后，第一次登录的时候，才需要进行一个账号密码的登录， 那之后即使这个应用进程被杀掉，或者手机重启，都是不需要再次输入账号密码的，它可以自动登录。</p>
+<p>其实这背后就是一套基于token的认证机制，来看一下这套机制是怎么运行的：</p>
+<ol>
+<li><p>账号密码登录时，客户端会将设备信息一起传递给服务端</p>
+</li>
+<li><p>如果账号密码校验通过，服务端会把账号与设备进行一个绑定，存在一个数据结构中，这个数据结构中包含了账号ID，设备ID，设备类型等等：</p>
+<pre><code class="go">const token = &#123;
+  acountid:&#39;账号ID&#39;,
+  deviceid:&#39;登录的设备ID&#39;,
+  deviceType:&#39;设备类型，如 iso,android,pc......&#39;,
+&#125;
+</code></pre>
+</li>
+<li><p>服务端会生成一个token，用它来映射数据结构，这个token其实就是一串有着特殊意义的字符串，它的意义就在于，通过它可以找到对应的账号与设备信息</p>
+</li>
+<li><p>客户端得到这个 token 后，需要进行一个本地保存，每次访问系统 API 都携带上 token 与设备信息</p>
+</li>
+<li><p>服务端可以通过 token 找到与它绑定的账号与设备信息，然后把绑定的设备信息与客户端每次传来的设备信息进行比较， 如果相同，那么校验通过，返回 API 接口响应数据， 如果不同，那就是校验不通过拒绝访问</p>
+</li>
+</ol>
+<p>从前面这个流程可以看到，客户端不会也没必要保存密码，相反，它是保存了token。可能有些同学会想，这个token这么重要，万一被别人知道了怎么办。实际上，知道了也没有影响， 因为设备信息是唯一的，只要你的设备信息别人不知道， 别人拿其他设备来访问，验证也是不通过的。</p>
+<p>可以说，客户端登录的目的，就是获得属于自己的token。</p>
+<p>那么在扫码登录过程中，PC端是怎么获得属于自己的token呢？不可能手机端直接把自己的token给PC端用！token只能属于某个客户端私有，其他人或者是其他客户端是用不了的。</p>
+<p>在分析这个问题之前，有必要先梳理一下，扫描二维码登录的一般步骤是什么样的。这可以帮助我们梳理清楚整个过程。</p>
+<h2 id="扫描二维码的一般步骤"><a href="#扫描二维码的一般步骤" class="headerlink" title="扫描二维码的一般步骤"></a>扫描二维码的一般步骤</h2><ol>
+<li>扫码前，手机端应用是已登录状态，PC端显示一个二维码，等待扫描</li>
+<li>手机端打开应用，扫描PC端的二维码，扫描后，会提示”已扫描，请在手机端点击确认”</li>
+<li>用户在手机端点击确认，确认后PC端登录就成功了</li>
+</ol>
+<p>可以看到，二维码在中间有三个状态， 待扫描，已扫描待确认，已确认。那么可以想象：</p>
+<ol>
+<li>二维码的背后它一定存在一个唯一性的ID，当二维码生成时，这个ID也一起生成，并且绑定了PC端的设备信息</li>
+<li>手机去扫描这个二维码</li>
+<li>二维码切换为已扫描待确认状态， 此时就会将账号信息与这个ID绑定</li>
+<li>当手机端确认登录时，它就会生成PC端用于登录的token，并返回给PC端</li>
+</ol>
+<p>好了，到这里，基本思路就已经清晰了，接下来把整个过程再具体化一下：</p>
+<h3 id="二维码准备"><a href="#二维码准备" class="headerlink" title="二维码准备"></a>二维码准备</h3><p>按二维码不同状态来看， 首先是等待扫描状态，用户打开PC端，切换到二维码登录界面时。</p>
+<ol>
+<li>PC端向服务端发起请求，告诉服务端，我要生成用户登录的二维码，并且把PC端设备信息也传递给服务端</li>
+<li>服务端收到请求后，它生成二维码ID，并将二维码ID与PC端设备信息进行绑定</li>
+<li>然后把二维码ID返回给PC端</li>
+<li>PC端收到二维码ID后，生成二维码(二维码中肯定包含了ID)</li>
+<li>为了及时知道二维码的状态，PC端在展现二维码后，不断的轮询服务端，比如每隔一秒就轮询一次，请求服务端告诉当前二维码的状态及相关信息</li>
+</ol>
+<p>二维码已经准好了，接下来就是扫描状态。</p>
+<h3 id="扫描状态切换"><a href="#扫描状态切换" class="headerlink" title="扫描状态切换"></a>扫描状态切换</h3><ol>
+<li>用户用手机去扫描PC端的二维码，通过二维码内容取到其中的二维码ID</li>
+<li>再调用服务端API将移动端的身份信息与二维码ID一起发送给服务端</li>
+<li>服务端接收到后，它可以将身份信息与二维码ID进行绑定，生成临时token。然后返回给手机端</li>
+<li>因为PC端一直在轮询二维码状态，所以这时候二维码状态发生了改变，它就可以在界面上把二维码状态更新为已扫描</li>
+</ol>
+<p>那么为什么需要返回给手机端一个临时token呢？临时token与token一样，它也是一种身份凭证，不同的地方在于它只能用一次，用过就失效。</p>
+<p>在第三步骤中返回临时token，为的就是手机端在下一步操作时，可以用它作为凭证。以此确保扫码，登录两步操作是同一部手机端发出的。</p>
+<h3 id="状态确认"><a href="#状态确认" class="headerlink" title="状态确认"></a>状态确认</h3><ol>
+<li>手机端在接收到临时 token 后会弹出确认登录界面，用户点击确认时，手机端携带临时 token 用来调用服务端的接口，告诉服务端，我已经确认</li>
+<li>服务端收到确认后，根据二维码ID绑定的设备信息与账号信息，生成用户 PC 端登录的 token</li>
+<li>这时候PC端的轮询接口，它就可以得知二维码的状态已经变成了”已确认”。并且从服务端可以获取到用户登录的 token</li>
+<li>到这里，登录就成功了，后端 PC 端就可以用token去访问服务端的资源了</li>
+</ol>
 <p><strong>参考内容</strong></p>
 <blockquote>
-<p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。<br><a target="_blank" rel="noopener" href="https://github.com/Snailclimb/JavaGuide">https://github.com/Snailclimb/JavaGuide</a><br><a target="_blank" rel="noopener" href="https://github.com/CyC2018/CS-Notes">https://github.com/CyC2018/CS-Notes</a>  </p>
+<p>主要参考以来两篇博客以及相关博客推荐，因找的博客比较多，没注意记录，最后好多忘了在哪2333，如果有侵权，请及时联系我，非常抱歉。  </p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Snailclimb/JavaGuide">https://github.com/Snailclimb/JavaGuide</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/CyC2018/CS-Notes">https://github.com/CyC2018/CS-Notes</a>  </p>
+<p><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/IXAbHKgZ0hGZTWNstLTpSQ">TikTok二面：“聊聊二维码扫码登录的原理”</a></p>
 </blockquote>
 
     </div>
@@ -553,7 +635,7 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -564,13 +646,13 @@ wyoQ95RjAyQ2FF3aj8EvCSaUmeP0KUqcCJDENNfnaT4
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">2.4m</span>
+    <span title="站点总字数">2.5m</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">36:50</span>
+    <span title="站点阅读时长">37:40</span>
   </span>
 </div>
 <div class="busuanzi-count">
