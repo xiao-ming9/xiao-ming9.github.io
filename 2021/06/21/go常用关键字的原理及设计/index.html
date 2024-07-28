@@ -24,13 +24,13 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="go 常用关键字的原理及设计">
 <meta property="og:url" content="http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/index.html">
-<meta property="og:site_name" content="Silverming">
+<meta property="og:site_name" content="Silverming的杂货笔记">
 <meta property="og:description" content="for 和 range循环是几乎所有编程语言都具有的控制结构，也是编程语言中常用的控制结构，Go 语言除了使用经典的三段式循环之外，还引入了另一个关键字 range 用于快速遍历数组、哈希表以及 Channel 等元素。 这里主要记录 Go 语言中的两种不同循环，也就是经典的 for 循环和 for…range 循环，分析这两种循环在运行时的结构以及它们的实现原理。 for 循环和 for…ran">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/go%E7%BB%8F%E5%85%B8%E5%BE%AA%E7%8E%AF.webp">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/%E4%B8%80%E4%B8%AA%20goroutine%20%E5%AE%9A%E4%B9%89%E5%A4%9A%E4%B8%AA%20defer.jpg">
 <meta property="article:published_time" content="2021-06-21T01:55:34.000Z">
-<meta property="article:modified_time" content="2023-08-05T07:12:24.874Z">
+<meta property="article:modified_time" content="2024-07-28T14:38:25.067Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="go">
@@ -45,7 +45,7 @@
 <script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2021/06/21/go%E5%B8%B8%E7%94%A8%E5%85%B3%E9%94%AE%E5%AD%97%E7%9A%84%E5%8E%9F%E7%90%86%E5%8F%8A%E8%AE%BE%E8%AE%A1/","path":"2021/06/21/go常用关键字的原理及设计/","title":"go 常用关键字的原理及设计"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>go 常用关键字的原理及设计 | Silverming</title>
+<title>go 常用关键字的原理及设计 | Silverming的杂货笔记</title>
   
 
 
@@ -76,7 +76,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">Silverming</p>
+      <p class="site-title">Silverming的杂货笔记</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
@@ -215,12 +215,12 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
+      <meta itemprop="name" content="Silverming的杂货笔记">
       <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="go 常用关键字的原理及设计 | Silverming">
+      <meta itemprop="name" content="go 常用关键字的原理及设计 | Silverming的杂货笔记">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
@@ -243,7 +243,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-08-05 15:12:24" itemprop="dateModified" datetime="2023-08-05T15:12:24+08:00">2023-08-05</time>
+      <time title="修改时间：2024-07-28 22:38:25" itemprop="dateModified" datetime="2024-07-28T22:38:25+08:00">2024-07-28</time>
     </span>
 
   
@@ -438,7 +438,7 @@ $ go run main.go
 $ go run main.go
 3 3 3
 </code></pre>
-<p>在这种场景下，**正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code>**。</p>
+<p>在这种场景下，**正确的做法应该是使用 <code>&amp;arr[i]</code> 替代 <code>&amp;v</code> **。</p>
 <p>所以如果想要访问数组中元素所在的地址，不应该直接获取 <code>range</code> 返回的 <code>v2</code> 变量的地址 <code>&amp;v2</code>，想要解决这个问题应该使用 <code>&amp;a[index]</code> 这种方式获取数组中元素对应的地址。</p>
 <pre><code class="go">func main() &#123;
     arr := []int&#123;1, 2, 3&#125;
@@ -585,7 +585,7 @@ func main() &#123;
 <p>根据上述 return 规则拆解，所以得到的结果是 1</p>
 </blockquote>
 <pre><code class="go">func f() (r int) &#123;
-      t := 5
+      t := 1
       // 1. 赋值指令
       r = t
       // 2. defer 被插入到赋值与返回之间执行，这里 r 是传值
@@ -750,7 +750,7 @@ return
 <p>当 <code>defer</code> 关键字在函数体中最多执行一次的时候，会将 <code>_defer</code> 结构体分配到栈上，以此节约内存分配带来的开销。</p>
 <p>开放编码的方式时在 1.14 引入的使用代码内联优化 <code>defer</code> 关键的额外开销。开放编码作为一种优化 <code>defer</code> 关键字的方法，它不是在所有的场景下都会开启的，开放编码只会在满足以下的条件时启用：</p>
 <ol>
-<li>函数的 <code>defer</code> 数 量少于或者等于 8 个；</li>
+<li>函数的 <code>defer</code> 数量少于或者等于 8 个；</li>
 <li>函数的 <code>defer</code> 关键字不能在循环中执行；</li>
 <li>函数的 <code>return</code> 语句与 <code>defer</code> 语句的乘积小于或者等于 15 个；</li>
 </ol>
@@ -1122,7 +1122,7 @@ func (s *state) expr(n *Node) *ssa.Value &#123;
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -1139,7 +1139,7 @@ func (s *state) expr(n *Node) *ssa.Value &#123;
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">37:40</span>
+    <span title="站点阅读时长">37:51</span>
   </span>
 </div>
 <div class="busuanzi-count">

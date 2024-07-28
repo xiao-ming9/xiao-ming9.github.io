@@ -20,17 +20,19 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"yoursite.com","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.13.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="1. 缓存的基本思想缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。 其实，在使用缓存的时候，你发现缓存的思想实际在操作系统或者其他地方都被大量用到。 比如 CPU Cache 缓存的是内存数据用于解决 CPU 处理速度和内存不匹配的问题，内存缓存的是硬盘数据用于解决硬盘访问速度过慢的问题。 再比如操作系统在页表方案基础之上引入了快表来加速虚拟地址到物">
+    <meta name="description" content="缓存的基本思想缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。 其实，在使用缓存的时候，你发现缓存的思想实际在操作系统或者其他地方都被大量用到。 比如 CPU Cache 缓存的是内存数据用于解决 CPU 处理速度和内存不匹配的问题，内存缓存的是硬盘数据用于解决硬盘访问速度过慢的问题。 再比如操作系统在页表方案基础之上引入了快表来加速虚拟地址到物理地址">
 <meta property="og:type" content="article">
 <meta property="og:title" content="缓存">
 <meta property="og:url" content="http://yoursite.com/2020/01/18/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E7%BC%93%E5%AD%98/index.html">
-<meta property="og:site_name" content="Silverming">
-<meta property="og:description" content="1. 缓存的基本思想缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。 其实，在使用缓存的时候，你发现缓存的思想实际在操作系统或者其他地方都被大量用到。 比如 CPU Cache 缓存的是内存数据用于解决 CPU 处理速度和内存不匹配的问题，内存缓存的是硬盘数据用于解决硬盘访问速度过慢的问题。 再比如操作系统在页表方案基础之上引入了快表来加速虚拟地址到物">
+<meta property="og:site_name" content="Silverming的杂货笔记">
+<meta property="og:description" content="缓存的基本思想缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。 其实，在使用缓存的时候，你发现缓存的思想实际在操作系统或者其他地方都被大量用到。 比如 CPU Cache 缓存的是内存数据用于解决 CPU 处理速度和内存不匹配的问题，内存缓存的是硬盘数据用于解决硬盘访问速度过慢的问题。 再比如操作系统在页表方案基础之上引入了快表来加速虚拟地址到物理地址">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://qiniu.xiaoming.net.cn/%E5%8A%A0%E5%85%A5%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E5%90%8E%E7%9A%84%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
+<meta property="og:image" content="http://qiniu.xiaoming.net.cn/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.jpeg">
 <meta property="og:image" content="http://qiniu.xiaoming.net.cn/%E5%8A%A0%E5%85%A5%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E5%90%8E%E7%9A%84%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
 <meta property="og:image" content="http://qiniu.xiaoming.net.cn/%E4%B8%80%E8%87%B4%E6%80%A7hash%E7%AE%97%E6%B3%95">
 <meta property="article:published_time" content="2020-01-18T01:21:57.000Z">
-<meta property="article:modified_time" content="2020-12-09T13:53:26.207Z">
+<meta property="article:modified_time" content="2024-07-28T14:38:25.082Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="面试">
 <meta property="article:tag" content="缓存">
@@ -45,7 +47,7 @@
 <script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://yoursite.com/2020/01/18/%E9%9D%A2%E8%AF%95%E5%A4%8D%E4%B9%A0%E2%80%94%E2%80%94%E7%BC%93%E5%AD%98/","path":"2020/01/18/面试复习——缓存/","title":"缓存"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>缓存 | Silverming</title>
+<title>缓存 | Silverming的杂货笔记</title>
   
 
 
@@ -76,7 +78,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <p class="site-title">Silverming</p>
+      <p class="site-title">Silverming的杂货笔记</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">Stay hungry,stay foolish</p>
@@ -149,7 +151,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-%E7%BC%93%E5%AD%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.</span> <span class="nav-text">1. 缓存的基本思想</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-%E7%BC%93%E5%AD%98%E7%89%B9%E5%BE%81"><span class="nav-number">2.</span> <span class="nav-text">2. 缓存特征</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%B8%AD%E7%8E%87"><span class="nav-number">2.1.</span> <span class="nav-text">命中率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.</span> <span class="nav-text">最大空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.</span> <span class="nav-text">淘汰策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-%E7%BC%93%E5%AD%98%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">3. 缓存的位置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="nav-number">3.1.</span> <span class="nav-text">浏览器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ISP"><span class="nav-number">3.2.</span> <span class="nav-text">ISP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"><span class="nav-number">3.4.</span> <span class="nav-text">本地缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98"><span class="nav-number">3.5.</span> <span class="nav-text">分布式缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%93%E5%AD%98"><span class="nav-number">3.6.</span> <span class="nav-text">数据库缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E5%86%85%E9%83%A8%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">3.7.</span> <span class="nav-text">Java 内部的缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98"><span class="nav-number">3.8.</span> <span class="nav-text">CPU 多级缓存</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-CDN"><span class="nav-number">4.</span> <span class="nav-text">4. CDN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">5. 缓存会出现什么问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="nav-number">5.1.</span> <span class="nav-text">缓存穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">5.1.1.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%97%A0%E6%95%88-key"><span class="nav-number">5.1.1.1.</span> <span class="nav-text">缓存无效 key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">5.1.1.2.</span> <span class="nav-text">布隆过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BA%E7%BB%93%E6%9E%9C"><span class="nav-number">5.1.1.3.</span> <span class="nav-text">缓存空结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="nav-number">5.2.</span> <span class="nav-text">缓存雪崩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">5.3.</span> <span class="nav-text">缓存一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98-%E2%80%9C%E6%97%A0%E5%BA%95%E6%B4%9E%E2%80%9D-%E7%8E%B0%E8%B1%A1"><span class="nav-number">5.4.</span> <span class="nav-text">缓存 “无底洞” 现象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-%E7%BC%93%E5%AD%98%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E5%88%86%E5%B8%83%EF%BC%9F"><span class="nav-number">6.</span> <span class="nav-text">6. 缓存数据如何分布？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%88%86%E5%B8%83"><span class="nav-number">6.1.</span> <span class="nav-text">哈希分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E5%88%86%E5%B8%83"><span class="nav-number">6.2.</span> <span class="nav-text">顺序分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C"><span class="nav-number">6.3.</span> <span class="nav-text">一致性哈希</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F-x2F-%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="nav-number">7.</span> <span class="nav-text">7. 缓存读写模式&#x2F;更新策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache-Aside-Pattern%EF%BC%88%E6%97%81%E8%B7%AF%E7%BC%93%E5%AD%98%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">7.1.</span> <span class="nav-text">Cache Aside Pattern（旁路缓存模式）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%86%99%E6%95%B0%E6%8D%AE%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%85%88%E5%88%A0%E9%99%A4-cache-%EF%BC%8C%E5%90%8E%E6%9B%B4%E6%96%B0-DB-%E4%B9%88%EF%BC%9F"><span class="nav-number">7.1.1.</span> <span class="nav-text">在写数据的过程中，可以先删除 cache ，后更新 DB 么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%86%99%E6%95%B0%E6%8D%AE%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%85%88%E6%9B%B4%E6%96%B0-DB%EF%BC%8C%E5%90%8E%E5%88%A0%E9%99%A4-cache-%E5%B0%B1%E6%B2%A1%E6%9C%89%E9%97%AE%E9%A2%98%E4%BA%86%E4%B9%88%EF%BC%9F"><span class="nav-number">7.1.2.</span> <span class="nav-text">在写数据的过程中，先更新 DB，后删除 cache 就没有问题了么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-Aside-Pattern-%E7%9A%84%E7%BC%BA%E9%99%B7"><span class="nav-number">7.1.3.</span> <span class="nav-text">Cache Aside Pattern 的缺陷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-x2F-Write-Through-Pattern%EF%BC%88%E8%AF%BB%E5%86%99%E7%A9%BF%E9%80%8F%EF%BC%89"><span class="nav-number">7.2.</span> <span class="nav-text">Read&#x2F;Write Through Pattern（读写穿透）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Write-Behind-Pattern%EF%BC%88%E5%BC%82%E6%AD%A5%E7%BC%93%E5%AD%98%E5%86%99%E5%85%A5%EF%BC%89"><span class="nav-number">7.3.</span> <span class="nav-text">Write Behind Pattern（异步缓存写入）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E5%B8%A6%E6%9C%89%E8%B6%85%E6%97%B6%E6%97%B6%E9%97%B4%E5%92%8C%E5%AE%B9%E9%87%8F%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">8.</span> <span class="nav-text">8. 设计一个带有超时时间和容量的缓存</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.</span> <span class="nav-text">缓存的基本思想</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%89%B9%E5%BE%81"><span class="nav-number">2.</span> <span class="nav-text">缓存特征</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%B8%AD%E7%8E%87"><span class="nav-number">2.1.</span> <span class="nav-text">命中率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.</span> <span class="nav-text">最大空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5"><span class="nav-number">2.3.</span> <span class="nav-text">淘汰策略</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">缓存的位置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="nav-number">3.1.</span> <span class="nav-text">浏览器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ISP"><span class="nav-number">3.2.</span> <span class="nav-text">ISP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98"><span class="nav-number">3.4.</span> <span class="nav-text">本地缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E7%BC%93%E5%AD%98"><span class="nav-number">3.5.</span> <span class="nav-text">分布式缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BC%93%E5%AD%98"><span class="nav-number">3.6.</span> <span class="nav-text">数据库缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E5%86%85%E9%83%A8%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">3.7.</span> <span class="nav-text">Java 内部的缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CPU-%E5%A4%9A%E7%BA%A7%E7%BC%93%E5%AD%98"><span class="nav-number">3.8.</span> <span class="nav-text">CPU 多级缓存</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CDN"><span class="nav-number">4.</span> <span class="nav-text">CDN</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%BC%9A%E5%87%BA%E7%8E%B0%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98%EF%BC%9F"><span class="nav-number">5.</span> <span class="nav-text">缓存会出现什么问题？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="nav-number">5.1.</span> <span class="nav-text">缓存穿透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"><span class="nav-number">5.1.1.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%97%A0%E6%95%88-key"><span class="nav-number">5.1.1.1.</span> <span class="nav-text">缓存无效 key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">5.1.1.2.</span> <span class="nav-text">布隆过滤器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BA%E7%BB%93%E6%9E%9C"><span class="nav-number">5.1.1.3.</span> <span class="nav-text">缓存空结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="nav-number">5.2.</span> <span class="nav-text">缓存雪崩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">5.3.</span> <span class="nav-text">缓存一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%AD%98-%E2%80%9C%E6%97%A0%E5%BA%95%E6%B4%9E%E2%80%9D-%E7%8E%B0%E8%B1%A1"><span class="nav-number">5.4.</span> <span class="nav-text">缓存 “无底洞” 现象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">6.</span> <span class="nav-text">缓存雪崩问题解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">7.</span> <span class="nav-text">缓存穿透问题解决方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95-1"><span class="nav-number">7.1.</span> <span class="nav-text">解决办法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A5%E5%8F%82%E6%A0%A1%E9%AA%8C"><span class="nav-number">7.1.1.</span> <span class="nav-text">入参校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%97%A0%E6%95%88-key-1"><span class="nav-number">7.1.2.</span> <span class="nav-text">缓存无效 key</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8-1"><span class="nav-number">7.1.3.</span> <span class="nav-text">布隆过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BA%E7%BB%93%E6%9E%9C-1"><span class="nav-number">7.1.4.</span> <span class="nav-text">缓存空结果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E5%88%86%E5%B8%83%EF%BC%9F"><span class="nav-number">8.</span> <span class="nav-text">缓存数据如何分布？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E5%88%86%E5%B8%83"><span class="nav-number">8.1.</span> <span class="nav-text">哈希分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E5%88%86%E5%B8%83"><span class="nav-number">8.2.</span> <span class="nav-text">顺序分布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C"><span class="nav-number">8.3.</span> <span class="nav-text">一致性哈希</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E7%BC%93%E5%AD%98%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E5%8F%8C%E5%86%99%E6%97%B6%E7%9A%84%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7%EF%BC%9F"><span class="nav-number">9.</span> <span class="nav-text">如何保证缓存与数据库双写时的数据一致性？</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%A0%E9%99%A4%E7%BC%93%E5%AD%98%E8%80%8C%E4%B8%8D%E6%98%AF%E6%9B%B4%E6%96%B0%E7%BC%93%E5%AD%98%EF%BC%9F"><span class="nav-number">9.1.</span> <span class="nav-text">为什么是删除缓存而不是更新缓存？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache-Aside-Pattern%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">9.2.</span> <span class="nav-text">Cache Aside Pattern存在的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%93%E5%AD%98%E8%AF%BB%E5%86%99%E6%A8%A1%E5%BC%8F-x2F-%E6%9B%B4%E6%96%B0%E7%AD%96%E7%95%A5"><span class="nav-number">10.</span> <span class="nav-text">缓存读写模式&#x2F;更新策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Cache-Aside-Pattern%EF%BC%88%E6%97%81%E8%B7%AF%E7%BC%93%E5%AD%98%E6%A8%A1%E5%BC%8F%EF%BC%89"><span class="nav-number">10.1.</span> <span class="nav-text">Cache Aside Pattern（旁路缓存模式）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%86%99%E6%95%B0%E6%8D%AE%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%85%88%E5%88%A0%E9%99%A4-cache-%EF%BC%8C%E5%90%8E%E6%9B%B4%E6%96%B0-DB-%E4%B9%88%EF%BC%9F"><span class="nav-number">10.1.1.</span> <span class="nav-text">在写数据的过程中，可以先删除 cache ，后更新 DB 么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8%E5%86%99%E6%95%B0%E6%8D%AE%E7%9A%84%E8%BF%87%E7%A8%8B%E4%B8%AD%EF%BC%8C%E5%85%88%E6%9B%B4%E6%96%B0-DB%EF%BC%8C%E5%90%8E%E5%88%A0%E9%99%A4-cache-%E5%B0%B1%E6%B2%A1%E6%9C%89%E9%97%AE%E9%A2%98%E4%BA%86%E4%B9%88%EF%BC%9F"><span class="nav-number">10.1.2.</span> <span class="nav-text">在写数据的过程中，先更新 DB，后删除 cache 就没有问题了么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-Aside-Pattern-%E7%9A%84%E7%BC%BA%E9%99%B7"><span class="nav-number">10.1.3.</span> <span class="nav-text">Cache Aside Pattern 的缺陷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Read-x2F-Write-Through-Pattern%EF%BC%88%E8%AF%BB%E5%86%99%E7%A9%BF%E9%80%8F%EF%BC%89"><span class="nav-number">10.2.</span> <span class="nav-text">Read&#x2F;Write Through Pattern（读写穿透）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Write-Behind-Pattern%EF%BC%88%E5%BC%82%E6%AD%A5%E7%BC%93%E5%AD%98%E5%86%99%E5%85%A5%EF%BC%89"><span class="nav-number">10.3.</span> <span class="nav-text">Write Behind Pattern（异步缓存写入）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E5%B8%A6%E6%9C%89%E8%B6%85%E6%97%B6%E6%97%B6%E9%97%B4%E5%92%8C%E5%AE%B9%E9%87%8F%E7%9A%84%E7%BC%93%E5%AD%98"><span class="nav-number">11.</span> <span class="nav-text">设计一个带有超时时间和容量的缓存</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -215,12 +217,12 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Silverming">
+      <meta itemprop="name" content="Silverming的杂货笔记">
       <meta itemprop="description" content="Wechat:934933088">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="缓存 | Silverming">
+      <meta itemprop="name" content="缓存 | Silverming的杂货笔记">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
@@ -243,7 +245,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2020-12-09 21:53:26" itemprop="dateModified" datetime="2020-12-09T21:53:26+08:00">2020-12-09</time>
+      <time title="修改时间：2024-07-28 22:38:25" itemprop="dateModified" datetime="2024-07-28T22:38:25+08:00">2024-07-28</time>
     </span>
 
   
@@ -260,14 +262,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>6.1k</span>
+      <span>8.3k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>6 分钟</span>
+      <span>8 分钟</span>
     </span>
 </div>
 
@@ -278,10 +280,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="1-缓存的基本思想"><a href="#1-缓存的基本思想" class="headerlink" title="1. 缓存的基本思想"></a>1. 缓存的基本思想</h1><p>缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。</p>
+        <h1 id="缓存的基本思想"><a href="#缓存的基本思想" class="headerlink" title="缓存的基本思想"></a>缓存的基本思想</h1><p>缓存的基本思想其实很简单，就是我们非常熟悉的空间换时间。它的确对系统的性能提升的性价比非常高。</p>
 <p>其实，在使用缓存的时候，你发现缓存的思想实际在操作系统或者其他地方都被大量用到。 比如 <strong>CPU Cache 缓存的是内存数据用于解决 CPU 处理速度和内存不匹配的问题，内存缓存的是硬盘数据用于解决硬盘访问速度过慢的问题。</strong> <strong>再比如操作系统在页表方案基础之上引入了快表来加速虚拟地址到物理地址的转换。可以把快表理解为一种特殊的高速缓冲存储器（Cache）。</strong></p>
 <p>回归到业务系统来说：<strong>为了避免用户在请求数据的时候获取速度过于缓慢，所以在数据库之上增加了缓存这一层来弥补。</strong></p>
-<h1 id="2-缓存特征"><a href="#2-缓存特征" class="headerlink" title="2. 缓存特征"></a>2. 缓存特征</h1><h2 id="命中率"><a href="#命中率" class="headerlink" title="命中率"></a>命中率</h2><p>当某个请求能够通过访问缓存而得到响应时，称为缓存命中。</p>
+<h1 id="缓存特征"><a href="#缓存特征" class="headerlink" title="缓存特征"></a>缓存特征</h1><h2 id="命中率"><a href="#命中率" class="headerlink" title="命中率"></a>命中率</h2><p>当某个请求能够通过访问缓存而得到响应时，称为缓存命中。</p>
 <p>缓存命中率越高，缓存的利用率也就越高。</p>
 <span id="more"></span>
 
@@ -292,7 +294,7 @@
 <li>LRU（Least Recently Used）：最近最久未使用策略，优先淘汰最久未使用的数据，也就是上次被访问时间距离现在最久的数据。该策略可以保证内存中的数据都是热点数据，也就是经常被访问的数据，从而保证缓存命中率。</li>
 <li>LFU（Least Frequently Used）：最不经常使用策略，优先淘汰一段时间内使用次数最少的数据。</li>
 </ul>
-<h1 id="3-缓存的位置"><a href="#3-缓存的位置" class="headerlink" title="3. 缓存的位置"></a>3. 缓存的位置</h1><h2 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h2><p>当 HTTP 响应允许进行缓存时，浏览器会将 HTML、CSS、JavaScript、图片等静态资源进行缓存。</p>
+<h1 id="缓存的位置"><a href="#缓存的位置" class="headerlink" title="缓存的位置"></a>缓存的位置</h1><h2 id="浏览器"><a href="#浏览器" class="headerlink" title="浏览器"></a>浏览器</h2><p>当 HTTP 响应允许进行缓存时，浏览器会将 HTML、CSS、JavaScript、图片等静态资源进行缓存。</p>
 <h2 id="ISP"><a href="#ISP" class="headerlink" title="ISP"></a>ISP</h2><p>网络服务提供商（ISP）是网络访问的第一跳，通过将数据缓存在 ISP 中能够大大提高用户的访问速度。</p>
 <h2 id="反向代理"><a href="#反向代理" class="headerlink" title="反向代理"></a>反向代理</h2><p>反向代理位于服务器之前，请求与响应都需要经过反向代理。通过将数据缓存在反向代理，在用户请求反向代理时就可以直接使用缓存进行响应。</p>
 <h2 id="本地缓存"><a href="#本地缓存" class="headerlink" title="本地缓存"></a>本地缓存</h2><p>使用 Guava Cache 将数据缓存在服务器本地内存中，服务器代码可以直接读取本地内存中的缓存，速度非常快。</p>
@@ -301,14 +303,14 @@
 <h2 id="数据库缓存"><a href="#数据库缓存" class="headerlink" title="数据库缓存"></a>数据库缓存</h2><p>MySQL 等数据库管理系统具有自己的查询缓存机制来提高查询效率。</p>
 <h2 id="Java-内部的缓存"><a href="#Java-内部的缓存" class="headerlink" title="Java 内部的缓存"></a>Java 内部的缓存</h2><p>Java 为了优化空间，提高字符串、基本数据类型包装类的创建效率，设计了字符串常量池及 Byte、Short、Character、Integer、Long、Boolean 这六种包装类缓冲池。</p>
 <h2 id="CPU-多级缓存"><a href="#CPU-多级缓存" class="headerlink" title="CPU 多级缓存"></a>CPU 多级缓存</h2><p>CPU 为了解决运算速度与主存 IO 速度不匹配的问题，引入了多级缓存结构，同时使用 MESI 等缓存一致性协议来解决多核 CPU 缓存数据一致性的问题。</p>
-<h1 id="4-CDN"><a href="#4-CDN" class="headerlink" title="4. CDN"></a>4. CDN</h1><p>内容分发网络（Content distribution network，CDN）是一种互连的网络系统，它利用更靠近用户的服务器从而更快更可靠地将 HTML、CSS、JavaScript、音乐、图片、视频等静态资源分发给用户。</p>
+<h1 id="CDN"><a href="#CDN" class="headerlink" title="CDN"></a>CDN</h1><p>内容分发网络（Content distribution network，CDN）是一种互连的网络系统，它利用更靠近用户的服务器从而更快更可靠地将 HTML、CSS、JavaScript、音乐、图片、视频等静态资源分发给用户。</p>
 <p>CDN 主要有以下优点：</p>
 <ul>
 <li>更快地将数据分发给用户；</li>
 <li>通过部署多台服务器，从而提高系统整体的带宽性能；</li>
 <li>多台服务器可以看成是一种冗余机制，从而具有高可用性。</li>
 </ul>
-<h1 id="5-缓存会出现什么问题？"><a href="#5-缓存会出现什么问题？" class="headerlink" title="5. 缓存会出现什么问题？"></a>5. 缓存会出现什么问题？</h1><h2 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h2><p>缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。举个例子：某个黑客故意制造我们缓存中不存在的 key 发起大量请求，导致大量请求落到数据库。</p>
+<h1 id="缓存会出现什么问题？"><a href="#缓存会出现什么问题？" class="headerlink" title="缓存会出现什么问题？"></a>缓存会出现什么问题？</h1><h2 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h2><p>缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。举个例子：某个黑客故意制造我们缓存中不存在的 key 发起大量请求，导致大量请求落到数据库。</p>
 <h3 id="解决办法"><a href="#解决办法" class="headerlink" title="解决办法"></a>解决办法</h3><p>最基本的就是首先做好参数校验，一些不合法的参数请求直接抛出异常信息返回给客户端。比如查询的数据库 id 不能小于 0、传入的邮箱格式不对的时候直接返回错误消息给客户端等等。</p>
 <h4 id="缓存无效-key"><a href="#缓存无效-key" class="headerlink" title="缓存无效 key"></a>缓存无效 key</h4><p>如果缓存和数据库都查不到某个 key 的数据就写一个到 Redis 中去并设置过期时间，具体命令如下： <code>SET key value EX 10086</code> 。这种方式可以解决请求的 key 变化不频繁的情况，如果黑客恶意攻击，每次构建不同的请求 key，会导致 Redis 中缓存大量无效的 key 。很明显，这种方案并不能从根本上解决此问题。如果非要用这种方式来解决穿透问题的话，尽量将无效的 key 的过期时间设置短一点比如 1 分钟。</p>
 <h4 id="布隆过滤器"><a href="#布隆过滤器" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h4><p>将所有可能存在的数据哈希到一个足够大的bitmap中，一个一定不存在的数据会被这个bitmap拦截掉，从而避免了对底层存储系统的查询压力。</p>
@@ -343,7 +345,34 @@
 <li>减少网络通信次数；</li>
 <li>降低接入成本，使用长连接 &#x2F; 连接池，NIO 等。</li>
 </ul>
-<h1 id="6-缓存数据如何分布？"><a href="#6-缓存数据如何分布？" class="headerlink" title="6. 缓存数据如何分布？"></a>6. 缓存数据如何分布？</h1><h2 id="哈希分布"><a href="#哈希分布" class="headerlink" title="哈希分布"></a>哈希分布</h2><p>哈希分布就是将数据计算哈希值之后，按照哈希值分配到不同的节点上。例如有 N 个节点，数据的主键为 key，则将该数据分配的节点序号为：<code>hash(key) % N</code>。</p>
+<h1 id="缓存雪崩问题解决方案"><a href="#缓存雪崩问题解决方案" class="headerlink" title="缓存雪崩问题解决方案"></a>缓存雪崩问题解决方案</h1><p>缓存雪崩指的是缓存同一时间大面积的失效，所以后面的请求都会落到数据库上，造成数据库短时间内承受大量的请求而崩掉。</p>
+<p>解决方案：</p>
+<ul>
+<li>事前：尽量保证整个Redis集群的高可用性，发现机器宕机尽快补上，选择合适的内存淘汰策略</li>
+<li>事中：<strong>本地ehcache缓存+hystrix限流&amp;降级</strong>，避免MySQL崩掉</li>
+<li>事后：利用redis持久化机制保存的数据尽快恢复缓存</li>
+</ul>
+<p><img src="http://qiniu.xiaoming.net.cn/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88.jpeg" alt="缓存雪崩解决方案"></p>
+<p><strong>针对 Redis 服务不可用的情况：</strong></p>
+<ol>
+<li>采用 Redis 集群，避免单机出现问题整个缓存服务都没办法使用。</li>
+<li>限流，避免同时处理大量的请求。</li>
+</ol>
+<p><strong>针对热点缓存失效的情况：</strong></p>
+<ol>
+<li>设置不同的失效时间比如随机设置缓存的失效时间。</li>
+<li>缓存永不失效。</li>
+</ol>
+<h1 id="缓存穿透问题解决方案"><a href="#缓存穿透问题解决方案" class="headerlink" title="缓存穿透问题解决方案"></a>缓存穿透问题解决方案</h1><p>缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。例如：某个黑客故意制造我们缓存中不存在的 key 发起大量请求，导致大量请求落到数据库。</p>
+<h2 id="解决办法-1"><a href="#解决办法-1" class="headerlink" title="解决办法"></a>解决办法</h2><h3 id="入参校验"><a href="#入参校验" class="headerlink" title="入参校验"></a>入参校验</h3><p>最基本的就是首先做好参数校验，一些不合法的参数请求直接抛出异常信息返回给客户端。比如查询的数据库 id 不能小于 0、传入的邮箱格式不对的时候直接返回错误消息给客户端等等。</p>
+<h3 id="缓存无效-key-1"><a href="#缓存无效-key-1" class="headerlink" title="缓存无效 key"></a>缓存无效 key</h3><p>如果缓存和数据库都查不到某个 key 的数据就写一个到 Redis 中去并设置过期时间，具体命令如下： <code>SET key value EX 10086</code> 。这种方式可以解决请求的 key 变化不频繁的情况，如果黑客恶意攻击，每次构建不同的请求 key，会导致 Redis 中缓存大量无效的 key 。很明显，这种方案并不能从根本上解决此问题。如果非要用这种方式来解决穿透问题的话，尽量将无效的 key 的过期时间设置短一点比如 1 分钟。</p>
+<h3 id="布隆过滤器-1"><a href="#布隆过滤器-1" class="headerlink" title="布隆过滤器"></a>布隆过滤器</h3><p>将所有可能存在的数据哈希到一个足够大的bitmap中，一个一定不存在的数据会被这个bitmap拦截掉，从而避免了对底层存储系统的查询压力。</p>
+<p>具体是这样做的：把所有可能存在的请求的值都存放在布隆过滤器中，当用户请求过来，先判断用户发来的请求的值是否存在于布隆过滤器中。不存在的话，直接返回请求参数错误信息给客户端，存在的话才会走下面的流程。</p>
+<p>流程如下：</p>
+<p><img src="http://qiniu.xiaoming.net.cn/%E5%8A%A0%E5%85%A5%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E5%90%8E%E7%9A%84%E7%BC%93%E5%AD%98%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="加入布隆过滤器后的缓存处理流程"></p>
+<p>但是，需要注意的是布隆过滤器可能会存在误判的情况。总结来说就是： <strong>布隆过滤器说某个元素存在，小概率会误判。布隆过滤器说某个元素不在，那么这个元素一定不在。</strong>(具体原因看<strong>面试复习——数据结构</strong>第13题)</p>
+<h3 id="缓存空结果-1"><a href="#缓存空结果-1" class="headerlink" title="缓存空结果"></a>缓存空结果</h3><p>另外也有一个更为简单粗暴的方法，如果一个查询返回的数据为空（不管是数据不存在，还是系统故障），仍然把这个空结果进行缓存，但它的过期时间会很短，最长不超过五分钟。</p>
+<h1 id="缓存数据如何分布？"><a href="#缓存数据如何分布？" class="headerlink" title="缓存数据如何分布？"></a>缓存数据如何分布？</h1><h2 id="哈希分布"><a href="#哈希分布" class="headerlink" title="哈希分布"></a>哈希分布</h2><p>哈希分布就是将数据计算哈希值之后，按照哈希值分配到不同的节点上。例如有 N 个节点，数据的主键为 key，则将该数据分配的节点序号为：<code>hash(key) % N</code>。</p>
 <p>传统的哈希分布算法存在一个问题：当节点数量变化时，也就是 N 值变化，那么几乎所有的数据都需要重新分布，将导致大量的数据迁移。</p>
 <h2 id="顺序分布"><a href="#顺序分布" class="headerlink" title="顺序分布"></a>顺序分布</h2><p>将数据划分为多个连续的部分，按数据的 ID 或者时间分布到不同节点上。例如 User 表的 ID 范围为 1 ~ 7000，使用顺序分布可以将其划分成多个子表，对应的主键范围为 1 ~ 1000，1001 ~ 2000，…，6001 ~ 7000。</p>
 <p>顺序分布相比于哈希分布的主要优点如下：</p>
@@ -363,7 +392,27 @@
 </ul>
 <p>上面描述的一致性哈希存在数据分布不均匀的问题，节点存储的数据量有可能会存在很大的不同。数据不均匀主要是因为节点在哈希环上分布的不均匀，这种情况在节点数量很少的情况下尤其明显。</p>
 <p>解决方式是通过增加<strong>虚拟节点</strong>，然后将虚拟节点映射到真实节点上。虚拟节点的数量比真实节点来得多，那么虚拟节点在哈希环上分布的均匀性就会比原来的真实节点好，从而使得数据分布也更加均匀。</p>
-<h1 id="7-缓存读写模式-x2F-更新策略"><a href="#7-缓存读写模式-x2F-更新策略" class="headerlink" title="7. 缓存读写模式&#x2F;更新策略"></a>7. 缓存读写模式&#x2F;更新策略</h1><h2 id="Cache-Aside-Pattern（旁路缓存模式）"><a href="#Cache-Aside-Pattern（旁路缓存模式）" class="headerlink" title="Cache Aside Pattern（旁路缓存模式）"></a>Cache Aside Pattern（旁路缓存模式）</h2><ol>
+<h1 id="如何保证缓存与数据库双写时的数据一致性？"><a href="#如何保证缓存与数据库双写时的数据一致性？" class="headerlink" title="如何保证缓存与数据库双写时的数据一致性？"></a>如何保证缓存与数据库双写时的数据一致性？</h1><p>只要用缓存，就可能会涉及到缓存与数据库双存储，双写，只要是双写，就一定会有数据一致性问题，如何解决呢？</p>
+<p>一般来说，如果系统不是严格要求缓存+数据库必须一致性的话，缓存可以稍微跟数据库偶尔有不一致的情况。</p>
+<p>另外，可以将读请求和写请求串行化，串到一个内存队列里去，这样就可以保证一定不会出现不一致的情况，但是串行化之后，就会导致系统的吞吐量大幅度降低，需要用比正常情况下多几倍的机器去支撑线上的一个请求。</p>
+<p>解决这个问题的最经典的模式，就是 Cache Aside Pattern 数据库读写模式（<strong>旁路缓存模式</strong>）。</p>
+<ol>
+<li>读的时候先读缓存，如果缓存不存在的话就读数据库，取出数据库后更新缓存；如果存在的话直接读取缓存的信息。</li>
+<li>写的时候，先更新数据库，再删除缓存。</li>
+</ol>
+<h2 id="为什么是删除缓存而不是更新缓存？"><a href="#为什么是删除缓存而不是更新缓存？" class="headerlink" title="为什么是删除缓存而不是更新缓存？"></a>为什么是删除缓存而不是更新缓存？</h2><p>很多时候复杂的缓存场景，缓存不是仅仅从数据库中取出来的值。可能是关联多张表的数据并通过计算才是缓存需要的值。并且，更新缓存的代价有时候很高。<strong>对于需要频繁写操作，而读操作很少的时候，每次进行数据库的修改，缓存也要随之更新，会造成系统吞吐的下降，但此时缓存并不会被频繁访问到，用到的缓存才去算缓存</strong>。</p>
+<p>删除缓存而不是更新缓存，是一种懒加载的思想，不是每次都重复更新缓存，只有用到的时候才去更新缓存，同时即使有大量的读请求，实际也就更新了一次，后面的请求不会重复读。</p>
+<h2 id="Cache-Aside-Pattern存在的问题"><a href="#Cache-Aside-Pattern存在的问题" class="headerlink" title="Cache Aside Pattern存在的问题"></a>Cache Aside Pattern存在的问题</h2><p>问题：先更新数据库，再删除缓存，如果删除缓存失败了，导致数据库中是新数据，缓存中是旧数据，就出现数据不一致的问题。</p>
+<p><strong>解决思路</strong>：先删除缓存，再更新数据库。</p>
+<ul>
+<li>缓存删除失败：如果缓存删除失败，那么就不会继续执行，数据库信息没有被修改，保持了数据的一致性；</li>
+<li>缓存删除成功，数据库更新失败：此时数据库里的是旧数据，缓存是空的，查询时发现缓存不存在，就查询数据库并更新缓存，数据保持一致。</li>
+</ul>
+<p>问题：上面的方案存在不足，如果删除完缓存更新数据库时，如果一个请求过来查询数据，缓存不存在，就查询数据库的旧数据，更新旧数据到缓存中。随后数据更新完成，修改了数据库的数据，此时缓存和数据库的数据就会出现不一致了。高并发下会出现这种数据库 + 缓存不一致的情况。 如果不采用给缓存设置过期时间策略，该数据永远都是脏数据。</p>
+<p><strong>解决方案</strong>：采用双删除策略。写请求先删除缓存，再去更新数据库，等待一段时间后异步删除缓存。这样可以保证在读取错误数据时能及时被修正过来。</p>
+<p>还有一种策略，就是：写请求先修改缓存为指定值，然后再去更新数据库，再更新缓存。读请求过来后，会先读缓存，判断是指定值后就进入循环读取状态，等到写请求更新缓存。如果循环超时就去数据库读取数据，更新缓存。</p>
+<p>这种方案保证了读写的一致性，但由于读请求等待写请求的完成，会降低系统的吞吐量。</p>
+<h1 id="缓存读写模式-x2F-更新策略"><a href="#缓存读写模式-x2F-更新策略" class="headerlink" title="缓存读写模式&#x2F;更新策略"></a>缓存读写模式&#x2F;更新策略</h1><h2 id="Cache-Aside-Pattern（旁路缓存模式）"><a href="#Cache-Aside-Pattern（旁路缓存模式）" class="headerlink" title="Cache Aside Pattern（旁路缓存模式）"></a>Cache Aside Pattern（旁路缓存模式）</h2><ol>
 <li>写：更新 DB，然后直接删除 cache 。</li>
 <li>读：从 cache 中读取数据，读取到就直接返回，读取不到的话，就从 DB 中取数据返回，然后再把数据放到 cache 中。</li>
 </ol>
@@ -380,7 +429,7 @@
 <p>但是这里也有可能产生数据不一致性的问题。这个过程可以简单描述为：</p>
 <ol>
 <li>请求 1 想要读取数据 A，此时缓存中还没有，先从 DB 读数据 A</li>
-<li>请求 2 写更新数据 A 到数据库并在 cache 中放入 A 数据</li>
+<li>请求 2 写更新数据 A 到数据库并在 cache 中删除 A 数据</li>
 <li>请求 1 将数据 A 写入 cache</li>
 </ol>
 <p>这样就产生了数据不一致的情况。</p>
@@ -403,7 +452,7 @@
 <p>但是，两个又有很大的不同：<strong>Read&#x2F;Write Through 是同步更新 cache 和 DB，而 Write Behind Caching 则是只更新缓存，不直接更新 DB，而是改为异步批量的方式来更新 DB。</strong></p>
 <p><strong>Write Behind Pattern 下 DB 的写性能非常高，尤其适合一些数据经常变化的业务场景比如说一篇文章的点赞数量、阅读数量。</strong> 往常一篇文章被点赞 500 次的话，需要重复修改 500 次 DB，但是在 Write Behind Pattern 下可能只需要修改一次 DB 就可以了。</p>
 <p>但是，这种模式同样也给 DB 和 Cache 一致性带来了新的考验，很多时候如果数据还没异步更新到 DB 的话，Cache 服务宕机就会导致数据丢失。</p>
-<h1 id="8-设计一个带有超时时间和容量的缓存"><a href="#8-设计一个带有超时时间和容量的缓存" class="headerlink" title="8. 设计一个带有超时时间和容量的缓存"></a>8. 设计一个带有超时时间和容量的缓存</h1><p>初始化一个队列，让过期时间最小的数据排在队列前，在清除过期数据时，只需查看缓存最近的过期数据，而不用扫描全部缓存。缓存可以存 HashMap，时间作为 key，缓存值作为 value。</p>
+<h1 id="设计一个带有超时时间和容量的缓存"><a href="#设计一个带有超时时间和容量的缓存" class="headerlink" title="设计一个带有超时时间和容量的缓存"></a>设计一个带有超时时间和容量的缓存</h1><p>初始化一个队列，让过期时间最小的数据排在队列前，在清除过期数据时，只需查看缓存最近的过期数据，而不用扫描全部缓存。缓存可以存 HashMap，时间作为 key，缓存值作为 value。</p>
 <p>然后执行定时任务，每次对队列头进行判断，如果已经过期，删除，并继续看下一个是否过期。</p>
 <p>同时还可以执行惰性删除，每次读取一个数后，先检查一下过期没有，过期就删除。</p>
 <p>当容量满了的时候，执行删除，如果数据都没过期，执行相应的淘汰策略。</p>
@@ -476,7 +525,7 @@
 
 <div class="copyright">
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -493,7 +542,7 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">37:40</span>
+    <span title="站点阅读时长">37:51</span>
   </span>
 </div>
 <div class="busuanzi-count">
