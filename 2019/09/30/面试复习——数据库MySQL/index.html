@@ -78,7 +78,7 @@
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/MEM_ROOT%E9%87%8A%E6%94%BE.awebp">
 <meta property="og:image" content="https://qiniu.xiaoming.net.cn/groud%20by%20%E8%AF%AD%E5%8F%A5%E6%89%A7%E8%A1%8C.awebp">
 <meta property="article:published_time" content="2019-09-30T12:51:46.000Z">
-<meta property="article:modified_time" content="2025-02-15T15:29:07.934Z">
+<meta property="article:modified_time" content="2025-02-17T16:39:35.819Z">
 <meta property="article:author" content="Silverming">
 <meta property="article:tag" content="mysql">
 <meta property="article:tag" content="面试">
@@ -291,7 +291,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2025-02-15 23:29:07" itemprop="dateModified" datetime="2025-02-15T23:29:07+08:00">2025-02-15</time>
+      <time title="修改时间：2025-02-18 00:39:35" itemprop="dateModified" datetime="2025-02-18T00:39:35+08:00">2025-02-18</time>
     </span>
 
   
@@ -416,7 +416,7 @@
 <li><code>UPDATE/DELETE/SELECT FOR UPDATE</code>时，<strong>除了对唯一索引的唯一搜索外都会获取gap锁，也就是说主键或唯一索引的相等条件搜索不会获取间隙锁，当然如果查询条件还包含非唯一索引，那么还是会获取间隙锁</strong></li>
 </ol>
 <ul>
-<li><code>Next-key lock</code>: <code>record+gap</code> 锁定索引项本身和索引范围，即<code>Record Lock</code>和<code>Gap Lock</code>的结合，是一个前开后闭的区间，结合<code>MVCC</code>，可<strong>解决幻读问题</strong>。例如一个索引包含以下值：10，11，13，20，那么就需要锁定以下区间：</li>
+<li><code>Next-key lock</code>: 临键锁，<code>record+gap</code> 锁定索引项本身和索引范围，即<code>Record Lock</code>和<code>Gap Lock</code>的结合，是一个前开后闭的区间，结合<code>MVCC</code>，可<strong>解决幻读问题</strong>。例如一个索引包含以下值：10，11，13，20，那么就需要锁定以下区间：</li>
 </ul>
 <pre><code class="sql">(-∞,10]
 (10,11]
@@ -1227,7 +1227,7 @@ PARTITION BY RANGE( YEAR(joined) ) (
 <p><strong>缓冲池污染</strong>：</p>
 <p>当某一个 SQL 语句，要批量扫描大量数据时，可能导致把缓冲池的所有页都替换出去，导致大量热数据被换出，MySQL 性能急剧下降，这种情况叫缓冲池污染。</p>
 <p>解决办法：加入<strong>老生代停留时间窗口策略</strong>后，短时间内被大量加载的页，并不会立刻插入新生代头部，而是优先淘汰那些，短期内仅仅访问了一次的页。</p>
-<h1 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>MVCC即多版本控制: 指的是一种提高并发的技术。最早的数据库系统，只有读读之间可以并发，读写，写读，写写都要阻塞。引入多版本之后，只有写写之间相互阻塞，其他三种操作都可以并行，这样大幅度提高了<code>InnoDB</code>的并发度。在内部实现中，与 <code>Postgres</code> 在数据行上实现多版本不同，**<code>InnoDB</code> 是在 <code>undolog</code> 中实现的，通过 <code>undolog</code> 可以找回数据的历史版本**。找回的数据历史版本可以提供给用户读(按照隔离级别的定义，有些读请求只能看到比较老的数据版本)，也可以在回滚的时候覆盖数据页上的数据。在 <code>InnoDB </code>内部中，会记录一个全局的活跃读写事务数组，其主要用来判断事务的可见性。</p>
+<h1 id="MVCC"><a href="#MVCC" class="headerlink" title="MVCC"></a>MVCC</h1><h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>MVCC即多版本控制: 指的是一种提高并发的技术。最早的数据库系统，只有读读之间可以并发，读写，写读，写写都要阻塞。引入多版本之后，只有写写之间相互阻塞，其他三种操作都可以并行，这样大幅度提高了<code>InnoDB</code>的并发度。在内部实现中，<strong>与 <code>Postgres</code> 在数据行上实现多版本不同，<code>InnoDB</code> 是在 <code>undolog</code> 中实现的，通过 <code>undolog</code> 可以找回数据的历史版本</strong>。找回的数据历史版本可以提供给用户读(按照隔离级别的定义，有些读请求只能看到比较老的数据版本)，也可以在回滚的时候覆盖数据页上的数据。在 <code>InnoDB </code>内部中，会记录一个全局的活跃读写事务数组，其主要用来判断事务的可见性。</p>
 <blockquote>
 <p>《高性能MySQL》中对MVCC的介绍：<br>MySQL 的大多数事务型存储引擎实现的其实都不是简单的行级锁。基于提升并发性能的考虑, 它们一般都同时实现了多版本并发控制(MVCC)。不仅是 MySQL,包括 Oracle,PostgreSQL 等其他数据库系统也都实现了 MVCC，但各自的实现机制不尽相同,因为 MVCC 没有一个统一的实现标准。可以认为 MVCC 是行级锁的一个变种,但是它在很多情况下避免了加锁操作, 因此开销更低。虽然实现机制有所不同,但大都实现了非阻塞的读操作，写操作也只锁定必要的行。<br>MVCC 的实现方式有多种,典型的有乐观(optimistic)并发控制和悲观(pessimistic)并发控制。<br>MVCC只在 <code>READ COMMITTED</code> 和 <code>REPEATABLE READ</code> 两个隔离级别下工作。其他两个隔离级别和 MVCC 不兼容, 因为 <code>READ UNCOMMITTED</code> 总是读取最新的数据行,而不是符合当前事务版本的数据行。而 <code>SERIALIZABLE</code> 则会对所有读取的行都加锁。</p>
 </blockquote>
@@ -1253,7 +1253,7 @@ PARTITION BY RANGE( YEAR(joined) ) (
 <ul>
 <li><strong>6字节的事务ID（<code>DB_TRX_ID</code>）</strong>：用来标识最近一次对本行记录做修改（<code>insert|update</code>）的事务的标识符，即最后一次修改（<code>insert|update</code>）本行记录的事务id。至于 <code>delete</code> 操作，在 <code>innodb</code> 看来也不过是一次 <code>update </code>操作，<strong>更新行中的一个特殊位 FLAG ，将行表示为deleted, 并非真正删除</strong>。</li>
 <li><strong>7字节的回滚指针（<code>DB_ROLL_PTR</code>）</strong>：指写入回滚段（<code>rollback segment</code>）的<code>undo log record</code>（撤销日志记录），指向这条记录的上一个版本。如果一行记录被更新，则<code>undo log record</code>包含“重建该行记录被更新之前内容”所必须的信息</li>
-<li>**6字节的<code>DB_ROW_ID</code>**：包含一个随着新行插入而单调递增的行ID，当由 <code>Innodb</code> 自动产生聚集索引时，聚集索引会包括这个行ID的值，否则这个行ID不会出现在任何索引中。</li>
+<li><strong>6字节的<code>DB_ROW_ID</code> 递增ID</strong>：包含一个随着新行插入而单调递增的行ID，当由 <code>Innodb</code> 自动产生聚集索引时，聚集索引会包括这个行ID的值，否则这个行ID不会出现在任何索引中。</li>
 <li><strong>FLAG</strong>：一个删除 flag 隐藏字段, 既记录被更新或删除并不代表真的删除，而是删除 flag 变了。</li>
 </ul>
 <blockquote>
@@ -1290,7 +1290,7 @@ PARTITION BY RANGE( YEAR(joined) ) (
 <p>下图是 MVCC 整体原理图：</p>
 <p><img src="http://qiniu.xiaoming.net.cn/MVCC%E5%8E%9F%E7%90%86.jpg" alt="MVCC 整体原理图"></p>
 <h2 id="当前读和快照读"><a href="#当前读和快照读" class="headerlink" title="当前读和快照读"></a>当前读和快照读</h2><p>通过 MVCC 机制，虽然让数据变得可重复读，但我们读到的数据可能是历史数据，不是数据库最新的数据。这种读取历史数据的方式，我们叫它<strong>快照读</strong> (snapshot read)，而读取数据库最新版本数据的方式，叫<strong>当前读</strong> (current read)。</p>
-<h3 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h3><p>像 <code>select lock in share mode</code> (共享锁)、<code>select for update</code> 、<code>update</code>、<code>insert</code>、<code>delete</code> (排他锁)这些操作都是一种 当前读，就是它读取的是记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。</p>
+<h3 id="当前读"><a href="#当前读" class="headerlink" title="当前读"></a>当前读</h3><p>像 <code>select lock in share mode</code> (共享锁)、<code>select for update</code> 、<code>update</code>、<code>insert</code>、<code>delete</code> (排他锁)这些操作都是一种当前读，就是它读取的是记录的最新版本，读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。</p>
 <p>当前读可以认为是悲观锁的具体功能实现</p>
 <h3 id="快照读"><a href="#快照读" class="headerlink" title="快照读"></a>快照读</h3><p>不加锁的 select 就是快照读，即不加锁的非阻塞读，也就是简单的 select 操作,不包括 <code>select .. lock in share mode</code>,<code>select ... for update</code></p>
 <p>快照读的前提是隔离级别不是串行级别，串行级别下的快照读会退化成当前读，之所以出现快照读的情况，是基于提高并发性能的考虑，快照读的实现是基于多版本并发控制，即MVCC，可以认为 MVCC 是行锁的一个变种，但它在很多情况下，避免了加锁操作，降低了开销。</p>
@@ -3314,7 +3314,7 @@ used = 0
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">37:51</span>
+    <span title="站点阅读时长">37:55</span>
   </span>
 </div>
 <div class="busuanzi-count">
